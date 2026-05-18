@@ -3,76 +3,76 @@
  * @description 版本历史系统类型定义
  */
 
-import type { JSONContent } from '@tiptap/core'
+import type { JSONContent } from "@tiptap/core";
 
 /** 版本记录 */
 export interface Version {
   /** 版本 ID */
-  id: string
+  id: string;
   /** 版本名称（可选，用户可手动命名） */
-  name?: string
+  name?: string;
   /** 文档内容（JSON 格式） */
-  content: JSONContent
+  content: JSONContent;
   /** 创建时间戳 */
-  createdAt: number
+  createdAt: number;
   /** 是否为自动保存 */
-  isAutoSave: boolean
+  isAutoSave: boolean;
   /** 字数统计 */
-  wordCount?: number
+  wordCount?: number;
 }
 
 /** 版本差异 */
 export interface VersionDiff {
   /** 旧版本 ID */
-  oldVersionId: string
+  oldVersionId: string;
   /** 新版本 ID */
-  newVersionId: string
+  newVersionId: string;
   /** 差异内容（行级） */
-  changes: DiffChange[]
+  changes: DiffChange[];
 }
 
 /** 差异变更项 */
 export interface DiffChange {
   /** 变更类型 */
-  type: 'add' | 'remove' | 'unchanged'
+  type: "add" | "remove" | "unchanged";
   /** 文本内容 */
-  text: string
+  text: string;
   /** 行号 */
-  lineNumber?: number
+  lineNumber?: number;
 }
 
 /** 版本历史配置 */
 export interface VersionHistoryConfig {
   /** 文档 ID（用于存储隔离） */
-  documentId: string
+  documentId: string;
   /** 最大保存版本数 */
-  maxVersions?: number
+  maxVersions?: number;
   /** 自动保存间隔（毫秒），0 表示禁用 */
-  autoSaveInterval?: number
+  autoSaveInterval?: number;
   /** 是否启用 */
-  enabled?: boolean
+  enabled?: boolean;
 }
 
 /** 版本历史状态 */
 export interface VersionHistoryState {
   /** 所有版本 */
-  versions: Version[]
+  versions: Version[];
   /** 当前选中的版本 ID（用于预览） */
-  selectedVersionId: string | null
+  selectedVersionId: string | null;
   /** 对比的版本 ID（用于对比视图） */
-  compareVersionId: string | null
+  compareVersionId: string | null;
   /** 是否正在加载 */
-  loading: boolean
+  loading: boolean;
   /** 面板是否打开 */
-  panelOpen: boolean
+  panelOpen: boolean;
 }
 
 /** 默认配置 */
-export const DEFAULT_VERSION_HISTORY_CONFIG: Required<Omit<VersionHistoryConfig, 'documentId'>> = {
+export const DEFAULT_VERSION_HISTORY_CONFIG: Required<Omit<VersionHistoryConfig, "documentId">> = {
   maxVersions: 50,
   autoSaveInterval: 60000, // 1 分钟
   enabled: true,
-}
+};
 
 /** 存储键前缀 */
-export const STORAGE_KEY_PREFIX = 'tiptap-version-history'
+export const STORAGE_KEY_PREFIX = "tiptap-version-history";

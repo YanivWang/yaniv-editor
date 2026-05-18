@@ -4,5 +4,4 @@
  */
 
 // 组件导出
-export { default as SubscriptSuperscriptButton } from './SubscriptSuperscriptButton.vue'
-
+export { default as SubscriptSuperscriptButton } from "./SubscriptSuperscriptButton.vue";

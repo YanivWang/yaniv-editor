@@ -2,453 +2,475 @@
  * Tiptap 编辑器多语言类型定义
  */
 
-export type LocaleCode = 'zh-CN' | 'zh-TW' | 'en-US'
+export type LocaleCode = "zh-CN" | "zh-TW" | "en-US";
 
 export interface TiptapLocale {
   // 工具栏
   toolbar: {
     // 文本格式
-    bold: string
-    italic: string
-    underline: string
-    strikethrough: string
-    code: string
-    subscript: string
-    superscript: string
+    bold: string;
+    italic: string;
+    underline: string;
+    strikethrough: string;
+    code: string;
+    subscript: string;
+    superscript: string;
 
     // 清除格式
-    clear: string
-    clearFormat: string
-    formatPainter: string
+    clear: string;
+    clearFormat: string;
+    formatPainter: string;
 
     // 标题
-    heading: string
-    heading1: string
-    heading2: string
-    heading3: string
-    heading4: string
-    heading5: string
-    heading6: string
-    paragraph: string
+    heading: string;
+    heading1: string;
+    heading2: string;
+    heading3: string;
+    heading4: string;
+    heading5: string;
+    heading6: string;
+    paragraph: string;
 
     // 字体
-    fontFamily: string
-    fontSize: string
-    lineHeight: string
+    fontFamily: string;
+    fontSize: string;
+    lineHeight: string;
 
     // 颜色
-    textColor: string
-    backgroundColor: string
-    highlightColor: string
+    textColor: string;
+    backgroundColor: string;
+    highlightColor: string;
 
     // 列表
-    bulletList: string
-    orderedList: string
-    taskList: string
-    indent: string
-    outdent: string
+    bulletList: string;
+    orderedList: string;
+    taskList: string;
+    indent: string;
+    outdent: string;
 
     // 对齐
-    alignLeft: string
-    alignCenter: string
-    alignRight: string
-    alignJustify: string
+    alignLeft: string;
+    alignCenter: string;
+    alignRight: string;
+    alignJustify: string;
 
     // 插入
-    insertLink: string
-    insertImage: string
-    insertTable: string
-    insertCodeBlock: string
-    insertHorizontalRule: string
+    insertLink: string;
+    insertImage: string;
+    insertTable: string;
+    insertCodeBlock: string;
+    insertHorizontalRule: string;
 
     // 链接
-    link: string
-    linkUrl: string
-    linkText: string
-    openLink: string
-    editLink: string
-    removeLink: string
+    link: string;
+    linkUrl: string;
+    linkText: string;
+    openLink: string;
+    editLink: string;
+    removeLink: string;
 
     // 撤销重做
-    undo: string
-    redo: string
-    undoDisabledInCollab: string
-    redoDisabledInCollab: string
+    undo: string;
+    redo: string;
+    undoDisabledInCollab: string;
+    redoDisabledInCollab: string;
 
     // 更多
-    more: string
-  }
+    more: string;
+  };
 
   // 表格相关
   table: {
-    insertTable: string
-    deleteTable: string
-    addColumnBefore: string
-    addColumnAfter: string
-    deleteColumn: string
-    addRowBefore: string
-    addRowAfter: string
-    deleteRow: string
-    mergeCells: string
-    splitCell: string
-    toggleHeaderCell: string
-    toggleHeaderColumn: string
-    toggleHeaderRow: string
-    setCellAttribute: string
-    fixTables: string
-  }
+    insertTable: string;
+    deleteTable: string;
+    addColumnBefore: string;
+    addColumnAfter: string;
+    deleteColumn: string;
+    addRowBefore: string;
+    addRowAfter: string;
+    deleteRow: string;
+    mergeCells: string;
+    splitCell: string;
+    toggleHeaderCell: string;
+    toggleHeaderColumn: string;
+    toggleHeaderRow: string;
+    setCellAttribute: string;
+    fixTables: string;
+  };
 
   // 气泡菜单
   bubbleMenu: {
-    turnInto: string
-    textStyle: string
-    color: string
-  }
+    turnInto: string;
+    textStyle: string;
+    color: string;
+  };
 
   // 拖拽菜单
   dragMenu: {
-    delete: string
-    duplicate: string
-    copy: string
-    cut: string
-    moveUp: string
-    moveDown: string
-  }
+    delete: string;
+    duplicate: string;
+    copy: string;
+    cut: string;
+    moveUp: string;
+    moveDown: string;
+  };
 
   // 代码块
   codeBlock: {
-    language: string
-    selectLanguage: string
-  }
+    language: string;
+    selectLanguage: string;
+  };
 
   // 统计信息
   stats: {
-    characters: string
-    words: string
-    pages: string
-    zoom: string
-    reset: string
-    total: string
-  }
+    characters: string;
+    words: string;
+    pages: string;
+    zoom: string;
+    reset: string;
+    total: string;
+  };
 
   // 占位符
   placeholder: {
-    default: string
-    heading: string
-    paragraph: string
-  }
+    default: string;
+    heading: string;
+    paragraph: string;
+  };
 
   // 错误和提示
   messages: {
-    imageUploadFailed: string
-    imageUploadSuccess: string
-    invalidImageFormat: string
-    imageTooLarge: string
-    networkError: string
-    pasteCleanedUp: string
-    linkRequired: string
-    linkInvalid: string
+    imageUploadFailed: string;
+    imageUploadSuccess: string;
+    invalidImageFormat: string;
+    imageTooLarge: string;
+    networkError: string;
+    pasteCleanedUp: string;
+    linkRequired: string;
+    linkInvalid: string;
     // AI 功能错误消息
-    translationFailed: string
-    polishFailed: string
-    summarizeFailed: string
-    continueWritingFailed: string
-    customAiFailed: string
-  }
+    translationFailed: string;
+    polishFailed: string;
+    summarizeFailed: string;
+    continueWritingFailed: string;
+    customAiFailed: string;
+  };
 
   // 编辑器功能相关（用于 features 组件）
   editor: {
     // 标题快捷方式
-    h1: string
-    h2: string
-    h3: string
-    h4: string
-    h5: string
-    h6: string
-    paragraph: string
-    heading: string
-    heading1: string
-    heading2: string
-    heading3: string
-    heading4: string
-    heading5: string
-    heading6: string
+    h1: string;
+    h2: string;
+    h3: string;
+    h4: string;
+    h5: string;
+    h6: string;
+    paragraph: string;
+    heading: string;
+    heading1: string;
+    heading2: string;
+    heading3: string;
+    heading4: string;
+    heading5: string;
+    heading6: string;
 
     // 文本格式
-    bold: string
-    italic: string
-    underline: string
-    strike: string
-    inlineCode: string
-    superscript: string
-    subscript: string
+    bold: string;
+    italic: string;
+    underline: string;
+    strike: string;
+    inlineCode: string;
+    superscript: string;
+    subscript: string;
 
     // 列表
-    bulletList: string
-    orderedList: string
-    taskList: string
+    bulletList: string;
+    orderedList: string;
+    taskList: string;
 
     // 对齐
-    align: string
-    alignLeft: string
-    alignCenter: string
-    alignRight: string
-    alignJustify: string
+    align: string;
+    alignLeft: string;
+    alignCenter: string;
+    alignRight: string;
+    alignJustify: string;
 
     // 缩进
-    indent: string
-    outdent: string
-    indentAndAlign: string
+    indent: string;
+    outdent: string;
+    indentAndAlign: string;
 
     // 颜色
-    colors: string
-    text: string
-    highlight: string
-    textColor: string
-    backgroundColor: string
-    defaultColors: string
-    standardColors: string
-    showAdvanced: string
-    hideAdvanced: string
-    clearColor: string
+    colors: string;
+    text: string;
+    highlight: string;
+    textColor: string;
+    backgroundColor: string;
+    defaultColors: string;
+    standardColors: string;
+    showAdvanced: string;
+    hideAdvanced: string;
+    clearColor: string;
 
     // 操作
-    actions: string
-    cut: string
-    copy: string
-    delete: string
+    actions: string;
+    cut: string;
+    copy: string;
+    delete: string;
 
     // 基础操作
-    undo: string
-    redo: string
-    undoDisabledInCollab: string
-    redoDisabledInCollab: string
-    clearFormat: string
-    formatPainter: string
+    undo: string;
+    redo: string;
+    undoDisabledInCollab: string;
+    redoDisabledInCollab: string;
+    clearFormat: string;
+    formatPainter: string;
 
     // 字体
-    font: string
-    fontSize: string
-    lineHeight: string
+    font: string;
+    fontSize: string;
+    lineHeight: string;
 
     // 插入
-    insertLink: string
-    insertImage: string
-    insertTable: string
-    image: string
-    link: string
-    editLink: string
-    openLink: string
-    removeLink: string
-    linkPlaceholder: string
-    imagePlaceholder: string
+    insertLink: string;
+    insertImage: string;
+    insertTable: string;
+    image: string;
+    link: string;
+    editLink: string;
+    openLink: string;
+    removeLink: string;
+    linkPlaceholder: string;
+    imagePlaceholder: string;
 
     // 表格
-    deleteTable: string
-    includeHeader: string
+    deleteTable: string;
+    includeHeader: string;
 
     // 上传
-    localUpload: string
-    localUploadImage: string
-    webUpload: string
-    clickOrDragUpload: string
-    onlySupportImage: string
-    video: string
-    localUploadVideo: string
-    uploadVideo: string
-    onlySupportVideo: string
-    supportImageAndVideo: string
+    localUpload: string;
+    localUploadImage: string;
+    webUpload: string;
+    clickOrDragUpload: string;
+    onlySupportImage: string;
+    video: string;
+    localUploadVideo: string;
+    uploadVideo: string;
+    onlySupportVideo: string;
+    supportImageAndVideo: string;
 
     // Word 导入/导出
-    word: string
-    importWord: string
-    exportWord: string
-    clickOrDragUploadWord: string
-    onlySupportDocx: string
-    importing: string
-    exporting: string
-    exportFilenamePlaceholder: string
-    importSuccess: string
-    exportSuccess: string
-    importFailed: string
-    exportFailed: string
+    word: string;
+    importWord: string;
+    exportWord: string;
+    clickOrDragUploadWord: string;
+    onlySupportDocx: string;
+    importing: string;
+    exporting: string;
+    exportFilenamePlaceholder: string;
+    importSuccess: string;
+    exportSuccess: string;
+    importFailed: string;
+    exportFailed: string;
 
     // 更多
-    more: string
-    aiTool: string
-    ai: string
+    more: string;
+    aiTool: string;
+    ai: string;
 
     // 格式刷相关
-    pleaseSelectTextToSample: string
-    pleaseSelectTextToSampleShort: string
-    pleaseSelectTextToSampleDouble: string
-    sampleSuccessSingle: string
-    sampleSuccessContinuous: string
-    formatPainterExited: string
-    collaborationNoFormatPainter: string
+    pleaseSelectTextToSample: string;
+    pleaseSelectTextToSampleShort: string;
+    pleaseSelectTextToSampleDouble: string;
+    sampleSuccessSingle: string;
+    sampleSuccessContinuous: string;
+    formatPainterExited: string;
+    collaborationNoFormatPainter: string;
+
+    // 查找替换
+    findReplace: string;
+    findReplaceTitle: string;
+    findPlaceholder: string;
+    replacePlaceholder: string;
+    findNext: string;
+    findPrev: string;
+    replaceOnce: string;
+    replaceAll: string;
+    caseSensitiveShort: string;
+    // 工具栏分区（信息架构 / 可访问性）
+    toolbarSectionDocument: string;
+    toolbarSectionTypography: string;
+    toolbarSectionParagraph: string;
+    toolbarSectionInsert: string;
+    toolbarSectionAssistant: string;
+    statusBarShortcutHints: string;
+    statusBarShortcutHintsTitle: string;
+    // Office 粘贴提示
+    officePasteImageTitle: string;
+    officePasteImageBody: string;
 
     // 链接相关
-    enterValidLink: string
+    enterValidLink: string;
 
     // 数学公式
-    math: string
-    mathInline: string
-    mathBlock: string
-    mathPlaceholder: string
-    mathEmpty: string
+    math: string;
+    mathInline: string;
+    mathBlock: string;
+    mathPlaceholder: string;
+    mathEmpty: string;
 
     // 模板插入
-    insertTemplate: string
-    templateMeetingMinutes: string
-    templateMeetingMinutesDesc: string
-    templateWeeklyReport: string
-    templateWeeklyReportDesc: string
-    templateDailyReport: string
-    templateDailyReportDesc: string
-    templateProjectPlan: string
-    templateProjectPlanDesc: string
-    templateProductRequirement: string
-    templateProductRequirementDesc: string
+    insertTemplate: string;
+    templateMeetingMinutes: string;
+    templateMeetingMinutesDesc: string;
+    templateWeeklyReport: string;
+    templateWeeklyReportDesc: string;
+    templateDailyReport: string;
+    templateDailyReportDesc: string;
+    templateProjectPlan: string;
+    templateProjectPlanDesc: string;
+    templateProductRequirement: string;
+    templateProductRequirementDesc: string;
 
     // 图库
-    imageGallery: string
-    galleryEmpty: string
-    galleryEmptyHint: string
-    galleryCount: string
-    galleryInsert: string
+    imageGallery: string;
+    galleryEmpty: string;
+    galleryEmptyHint: string;
+    galleryCount: string;
+    galleryInsert: string;
 
     // AI 相关
-    continueWriting: string
-    polish: string
-    summarize: string
-    translate: string
-    translateTo: string
-    customAi: string
-    selectLanguage: string
+    continueWriting: string;
+    polish: string;
+    summarize: string;
+    translate: string;
+    translateTo: string;
+    customAi: string;
+    selectLanguage: string;
 
     // AI 建议相关
-    aiSuggestion: string
-    aiContinueWriting: string
-    originalText: string
-    suggestedText: string
-    generatedContent: string
-    generating: string
-    selectedContent: string
-    currentStatus: string
-    noTextSelected: string
+    aiSuggestion: string;
+    aiContinueWriting: string;
+    originalText: string;
+    suggestedText: string;
+    generatedContent: string;
+    generating: string;
+    selectedContent: string;
+    currentStatus: string;
+    noTextSelected: string;
     // AI 功能提示信息
-    pleaseSelectText: string
-    continueWritingRequiresSelection: string
-    polishRequiresSelection: string
-    summarizeRequiresSelection: string
-    translateRequiresSelection: string
-    customAiRequiresSelection: string
-    aiPrompt: string
-    aiPromptPlaceholder: string
-    customAiCommand: string
-    customAiPromptPlaceholder: string
-    execute: string
-    cancel: string
-    reject: string
-    accept: string
+    pleaseSelectText: string;
+    continueWritingRequiresSelection: string;
+    polishRequiresSelection: string;
+    summarizeRequiresSelection: string;
+    translateRequiresSelection: string;
+    customAiRequiresSelection: string;
+    aiPrompt: string;
+    aiPromptPlaceholder: string;
+    customAiCommand: string;
+    customAiPromptPlaceholder: string;
+    execute: string;
+    cancel: string;
+    reject: string;
+    accept: string;
 
     // 语言代码
     lang: {
-      'zh-CN': string
-      'zh-TW': string
-      zh: string
-      en: string
-      ja: string
-      th: string
-      fr: string
-      es: string
-      pt: string
-      ko: string
-      vi: string
-      ru: string
-      de: string
-      hi: string
-      id: string
-      ar: string
-    }
-  }
+      "zh-CN": string;
+      "zh-TW": string;
+      zh: string;
+      en: string;
+      ja: string;
+      th: string;
+      fr: string;
+      es: string;
+      pt: string;
+      ko: string;
+      vi: string;
+      ru: string;
+      de: string;
+      hi: string;
+      id: string;
+      ar: string;
+    };
+  };
 
   // 版本历史
   versionHistory: {
-    title: string
-    saveVersion: string
-    noVersions: string
-    autoSave: string
-    words: string
-    justNow: string
-    minutesAgo: string
-    hoursAgo: string
-    daysAgo: string
-    restore: string
-    compare: string
-    rename: string
-    delete: string
-    comparing: string
-    clearCompare: string
-    versionName: string
-    saved: string
-    restored: string
-    deleted: string
-    noDiff: string
-  }
+    title: string;
+    saveVersion: string;
+    noVersions: string;
+    autoSave: string;
+    words: string;
+    justNow: string;
+    minutesAgo: string;
+    hoursAgo: string;
+    daysAgo: string;
+    restore: string;
+    compare: string;
+    rename: string;
+    delete: string;
+    comparing: string;
+    clearCompare: string;
+    versionName: string;
+    saved: string;
+    restored: string;
+    deleted: string;
+    noDiff: string;
+  };
 
   // 斜杠命令菜单
   slashCommand: {
-    noResults: string
-    basicBlocks: string
-    lists: string
-    advanced: string
-    paragraph: string
-    paragraphDesc: string
-    heading1: string
-    heading1Desc: string
-    heading2: string
-    heading2Desc: string
-    heading3: string
-    heading3Desc: string
-    bulletList: string
-    bulletListDesc: string
-    orderedList: string
-    orderedListDesc: string
-    taskList: string
-    taskListDesc: string
-    blockquote: string
-    blockquoteDesc: string
-    codeBlock: string
-    codeBlockDesc: string
-    table: string
-    tableDesc: string
-    image: string
-    imageDesc: string
-    imageUrlPrompt: string
-    horizontalRule: string
-    horizontalRuleDesc: string
-  }
+    noResults: string;
+    basicBlocks: string;
+    lists: string;
+    advanced: string;
+    paragraph: string;
+    paragraphDesc: string;
+    heading1: string;
+    heading1Desc: string;
+    heading2: string;
+    heading2Desc: string;
+    heading3: string;
+    heading3Desc: string;
+    bulletList: string;
+    bulletListDesc: string;
+    orderedList: string;
+    orderedListDesc: string;
+    taskList: string;
+    taskListDesc: string;
+    blockquote: string;
+    blockquoteDesc: string;
+    codeBlock: string;
+    codeBlockDesc: string;
+    table: string;
+    tableDesc: string;
+    image: string;
+    imageDesc: string;
+    imageUrlPrompt: string;
+    horizontalRule: string;
+    horizontalRuleDesc: string;
+  };
 
   // AI 设置
   aiSettings: {
-    title: string
-    provider: string
-    apiKeyPlaceholder: string
-    apiKeyHint: string
-    endpoint: string
-    model: string
-    enableAi: string
-    testConnection: string
-    testing: string
-    testSuccess: string
-    testFailed: string
-    viewDocs: string
-    save: string
-    cancel: string
-    clear: string
-  }
+    title: string;
+    provider: string;
+    apiKeyPlaceholder: string;
+    apiKeyHint: string;
+    endpoint: string;
+    model: string;
+    enableAi: string;
+    testConnection: string;
+    testing: string;
+    testSuccess: string;
+    testFailed: string;
+    viewDocs: string;
+    save: string;
+    cancel: string;
+    clear: string;
+  };
 }
 
-export type TranslationKey = string
-export type TranslationFunction = (key: string, params?: Record<string, any>) => string
+export type TranslationKey = string;
+export type TranslationFunction = (key: string, params?: Record<string, any>) => string;

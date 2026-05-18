@@ -4,22 +4,22 @@
  */
 
 /* CSS Variables (Light + Dark themes) */
-@import './variables.css';
+@import "./variables.css";
 
 /* Base editor styles */
-@import './base.css';
+@import "./base.css";
 
 /* Word mode (A4 paper layout) */
-@import './word-mode.css';
+@import "./word-mode.css";
 
 /* Toolbar */
-@import './toolbar.css';
+@import "./toolbar.css";
 
 /* Menus */
-@import './bubble-menu.css';
-@import './floating-menu.css';
+@import "./bubble-menu.css";
+@import "./floating-menu.css";
 
 /* Features */
-@import './table.css';
-@import './drag-handle.css';
-@import './image-toolbar.css';
+@import "./table.css";
+@import "./drag-handle.css";
+@import "./image-toolbar.css";

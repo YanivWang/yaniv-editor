@@ -3,5 +3,4 @@
  * @description 提供表格操作工具栏
  */
 
-export { default as TableToolbar } from './TableToolbar.vue'
-
+export { default as TableToolbar } from "./TableToolbar.vue";

@@ -1,10 +1,10 @@
 <template>
   <Popover
     :open="visible"
-    :getPopupContainer="getPopupContainer"
+    :get-popup-container="getPopupContainer"
     placement="bottomLeft"
     :trigger="[]"
-    overlayClassName="custom-ai-popover"
+    overlay-class-name="custom-ai-popover"
     @update:open="handleVisibleChange"
   >
     <template #content>
@@ -12,11 +12,11 @@
         <!-- 输入阶段 -->
         <div v-if="!isExecuting && !isStreaming" class="custom-ai-input-stage">
           <div class="custom-ai-header">
-            <span class="custom-ai-title">{{ t('editor.customAiCommand') }}</span>
+            <span class="custom-ai-title">{{ t("editor.customAiCommand") }}</span>
           </div>
 
           <div v-if="originalText" class="custom-ai-selected-text">
-            <div class="text-label">{{ t('editor.selectedContent') }}</div>
+            <div class="text-label">{{ t("editor.selectedContent") }}</div>
             <div class="text-content">{{ originalText }}</div>
           </div>
 
@@ -31,14 +31,14 @@
           </div>
 
           <div class="custom-ai-footer">
-            <a-button size="small" @click="handleCancel">{{ t('editor.cancel') }}</a-button>
+            <a-button size="small" @click="handleCancel">{{ t("editor.cancel") }}</a-button>
             <a-button
               type="primary"
               size="small"
-              @click="handleExecute"
               :disabled="!promptInput.trim()"
+              @click="handleExecute"
             >
-              {{ t('editor.execute') }}
+              {{ t("editor.execute") }}
             </a-button>
           </div>
         </div>
@@ -46,12 +46,12 @@
         <!-- 生成阶段 -->
         <div v-else class="custom-ai-result-stage">
           <div class="custom-ai-header">
-            <span class="custom-ai-title">{{ t('editor.aiSuggestion') }}</span>
+            <span class="custom-ai-title">{{ t("editor.aiSuggestion") }}</span>
             <LoadingOutlined v-if="isStreaming" class="ai-loading-icon" />
           </div>
 
           <div v-if="originalText" class="original-text">
-            <div class="text-label">{{ t('editor.originalText') }}</div>
+            <div class="text-label">{{ t("editor.originalText") }}</div>
             <div class="text-content">{{ originalText }}</div>
           </div>
 
@@ -59,34 +59,21 @@
 
           <div class="suggested-text">
             <div class="text-label">
-              {{ originalText ? t('editor.suggestedText') : t('editor.generatedContent') }}
+              {{ originalText ? t("editor.suggestedText") : t("editor.generatedContent") }}
             </div>
-            <div class="text-content">{{ suggestedText || t('editor.generating') }}</div>
+            <div class="text-content">{{ suggestedText || t("editor.generating") }}</div>
           </div>
 
           <div class="custom-ai-footer">
-            <a-button
-              size="small"
-              @click="handleCancelGeneration"
-              :disabled="isStreaming"
-            >
-              {{ t('editor.cancel') }}
+            <a-button size="small" :disabled="isStreaming" @click="handleCancelGeneration">
+              {{ t("editor.cancel") }}
             </a-button>
             <div class="footer-right">
-              <a-button
-                size="small"
-                @click="handleReject"
-                :disabled="isStreaming"
-              >
-                {{ t('editor.reject') }}
+              <a-button size="small" :disabled="isStreaming" @click="handleReject">
+                {{ t("editor.reject") }}
               </a-button>
-              <a-button
-                type="primary"
-                size="small"
-                @click="handleAccept"
-                :disabled="isStreaming"
-              >
-                {{ t('editor.accept') }}
+              <a-button type="primary" size="small" :disabled="isStreaming" @click="handleAccept">
+                {{ t("editor.accept") }}
               </a-button>
             </div>
           </div>
@@ -100,10 +87,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue';
-import { Popover, Button as AButton, Input as ATextarea } from 'ant-design-vue';
-import { LoadingOutlined, ArrowDownOutlined } from '@ant-design/icons-vue';
-import { t } from '@/locales';
+import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
+import { Popover, Button as AButton, Input as ATextarea } from "ant-design-vue";
+import { ref, computed, nextTick, watch } from "vue";
+
+import { t } from "@/locales";
 
 export interface CustomAiPopoverProps {
   visible: boolean;
@@ -117,14 +105,14 @@ export interface CustomAiPopoverProps {
 
 const props = withDefaults(defineProps<CustomAiPopoverProps>(), {
   visible: false,
-  originalText: '',
-  suggestedText: '',
+  originalText: "",
+  suggestedText: "",
   isStreaming: false,
   isExecuting: false,
 });
 
 const emit = defineEmits<{
-  'update:visible': [value: boolean];
+  "update:visible": [value: boolean];
   execute: [prompt: string];
   accept: [];
   reject: [];
@@ -133,27 +121,27 @@ const emit = defineEmits<{
 }>();
 
 const promptInputRef = ref<typeof ATextarea>();
-const promptInput = ref('');
+const promptInput = ref("");
 
 const anchorStyle = computed(() => {
   if (!props.position) {
     return {
-      position: 'absolute',
-      top: '0px',
-      left: '0px',
-      width: '0px',
-      height: '0px',
-      pointerEvents: 'none',
+      position: "absolute",
+      top: "0px",
+      left: "0px",
+      width: "0px",
+      height: "0px",
+      pointerEvents: "none",
     };
   }
 
   return {
-    position: 'absolute',
+    position: "absolute",
     top: `${props.position.top}px`,
     left: `${props.position.left}px`,
-    width: '0px',
-    height: '0px',
-    pointerEvents: 'none',
+    width: "0px",
+    height: "0px",
+    pointerEvents: "none",
   };
 });
 
@@ -163,35 +151,35 @@ const getPopupContainer = () => {
 
 const handleExecute = () => {
   if (promptInput.value.trim()) {
-    emit('execute', promptInput.value.trim());
+    emit("execute", promptInput.value.trim());
   }
 };
 
 const handleAccept = () => {
-  emit('accept');
-  promptInput.value = '';
+  emit("accept");
+  promptInput.value = "";
 };
 
 const handleReject = () => {
-  emit('reject');
-  promptInput.value = '';
+  emit("reject");
+  promptInput.value = "";
 };
 
 const handleCancel = () => {
-  emit('cancel');
-  promptInput.value = '';
+  emit("cancel");
+  promptInput.value = "";
 };
 
 const handleCancelGeneration = () => {
-  emit('cancelGeneration');
-  promptInput.value = '';
+  emit("cancelGeneration");
+  promptInput.value = "";
 };
 
 const handleVisibleChange = (val: boolean) => {
-  emit('update:visible', val);
+  emit("update:visible", val);
   if (!val) {
-    emit('cancel');
-    promptInput.value = '';
+    emit("cancel");
+    promptInput.value = "";
   }
 };
 
@@ -351,4 +339,3 @@ watch(
   border-top-color: #434343;
 }
 </style>
-

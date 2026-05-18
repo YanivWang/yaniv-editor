@@ -3,5 +3,5 @@
  * @description AI-powered text continuation based on selection
  */
 
-export { ContinueWritingExtension } from './ContinueWritingExtension';
-export type { ContinueWritingOptions } from './ContinueWritingExtension';
+export { ContinueWritingExtension } from "./ContinueWritingExtension";
+export type { ContinueWritingOptions } from "./ContinueWritingExtension";

@@ -68,14 +68,14 @@ Output the summary directly.`,
 - 处理好文化差异
 直接输出翻译结果，不要添加解释。`,
     targetLanguages: {
-      'zh-CN': '简体中文',
-      'zh-TW': '繁體中文',
-      'en': 'English',
-      'ja': '日本語',
-      'ko': '한국어',
-      'fr': 'Français',
-      'de': 'Deutsch',
-      'es': 'Español',
+      "zh-CN": "简体中文",
+      "zh-TW": "繁體中文",
+      en: "English",
+      ja: "日本語",
+      ko: "한국어",
+      fr: "Français",
+      de: "Deutsch",
+      es: "Español",
     },
   },
 
@@ -85,6 +85,6 @@ Output the summary directly.`,
     en: `You are an intelligent assistant. Process the provided text according to the user's specific instructions.
 Output the result directly without additional explanations.`,
   },
-} as const
+} as const;
 
-export type AiFeature = keyof typeof AI_PROMPTS
+export type AiFeature = keyof typeof AI_PROMPTS;

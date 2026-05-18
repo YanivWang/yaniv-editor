@@ -7,30 +7,31 @@
       :class="`diff-line--${change.type}`"
     >
       <span class="diff-line__indicator">
-        {{ change.type === 'add' ? '+' : change.type === 'remove' ? '-' : ' ' }}
+        {{ change.type === "add" ? "+" : change.type === "remove" ? "-" : " " }}
       </span>
-      <span class="diff-line__content">{{ change.text || ' ' }}</span>
+      <span class="diff-line__content">{{ change.text || " " }}</span>
     </div>
     <div v-if="changes.length === 0" class="diff-empty">
-      {{ t('versionHistory.noDiff') }}
+      {{ t("versionHistory.noDiff") }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { t } from '@/locales'
-import type { DiffChange } from './types'
+import { t } from "@/locales";
+
+import type { DiffChange } from "./types";
 
 interface Props {
-  changes: DiffChange[]
+  changes: DiffChange[];
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <style scoped>
 .version-diff-view {
-  font-family: 'Fira Code', 'Monaco', monospace;
+  font-family: "Fira Code", Monaco, monospace;
   font-size: 13px;
   line-height: 1.6;
 }
@@ -53,8 +54,8 @@ defineProps<Props>()
 }
 
 .diff-line__indicator {
-  width: 20px;
   flex-shrink: 0;
+  width: 20px;
   font-weight: bold;
 }
 
@@ -68,14 +69,14 @@ defineProps<Props>()
 
 .diff-line__content {
   flex: 1;
-  white-space: pre-wrap;
   word-break: break-all;
+  white-space: pre-wrap;
 }
 
 .diff-empty {
   padding: 20px 16px;
-  text-align: center;
   color: var(--tp-color-text-muted, #999);
+  text-align: center;
 }
 
 /* 深色模式 */

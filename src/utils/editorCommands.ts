@@ -3,18 +3,18 @@
  * @description 编辑器命令执行工具函数
  */
 
-import type { Ref } from 'vue'
-import type { Editor } from '@tiptap/core'
+import type { Editor } from "@tiptap/core";
+import type { Ref } from "vue";
 
 /**
  * 链式命令类型
  */
-export type EditorChain = ReturnType<Editor['chain']>
+export type EditorChain = ReturnType<Editor["chain"]>;
 
 /**
  * 命令构建函数类型
  */
-export type CommandBuilder = (chain: EditorChain) => EditorChain
+export type CommandBuilder = (chain: EditorChain) => EditorChain;
 
 /**
  * 创建命令执行器
@@ -31,13 +31,13 @@ export type CommandBuilder = (chain: EditorChain) => EditorChain
  */
 export function createCommandRunner(editor: Ref<Editor | null | undefined>) {
   return (fn: CommandBuilder) => () => {
-    const e = editor.value
+    const e = editor.value;
     if (!e) {
-      console.warn('[editorCommands] Editor instance is null or undefined')
-      return
+      console.warn("[editorCommands] Editor instance is null or undefined");
+      return;
     }
-    fn(e.chain().focus()).run()
-  }
+    fn(e.chain().focus()).run();
+  };
 }
 
 /**
@@ -48,13 +48,13 @@ export function createCommandRunner(editor: Ref<Editor | null | undefined>) {
  */
 export function createCommandRunnerWithoutFocus(editor: Ref<Editor | null | undefined>) {
   return (fn: CommandBuilder) => () => {
-    const e = editor.value
+    const e = editor.value;
     if (!e) {
-      console.warn('[editorCommands] Editor instance is null or undefined')
-      return
+      console.warn("[editorCommands] Editor instance is null or undefined");
+      return;
     }
-    fn(e.chain()).run()
-  }
+    fn(e.chain()).run();
+  };
 }
 
 /**
@@ -73,16 +73,16 @@ export function createCommandRunnerWithoutFocus(editor: Ref<Editor | null | unde
 export function executeCommand(
   editor: Ref<Editor | null | undefined>,
   fn: CommandBuilder,
-  withFocus = true
+  withFocus = true,
 ): boolean {
-  const e = editor.value
+  const e = editor.value;
   if (!e) {
-    console.warn('[editorCommands] Editor instance is null or undefined')
-    return false
+    console.warn("[editorCommands] Editor instance is null or undefined");
+    return false;
   }
 
-  const chain = withFocus ? e.chain().focus() : e.chain()
-  return fn(chain).run()
+  const chain = withFocus ? e.chain().focus() : e.chain();
+  return fn(chain).run();
 }
 
 /**
@@ -104,21 +104,19 @@ export function executeCommand(
 export function executeBatchCommands(
   editor: Ref<Editor | null | undefined>,
   commands: CommandBuilder[],
-  withFocus = true
+  withFocus = true,
 ): boolean {
-  const e = editor.value
+  const e = editor.value;
   if (!e) {
-    console.warn('[editorCommands] Editor instance is null or undefined')
-    return false
+    console.warn("[editorCommands] Editor instance is null or undefined");
+    return false;
   }
 
-  let chain = withFocus ? e.chain().focus() : e.chain()
+  let chain = withFocus ? e.chain().focus() : e.chain();
 
   for (const command of commands) {
-    chain = command(chain)
+    chain = command(chain);
   }
 
-  return chain.run()
+  return chain.run();
 }
-
-

@@ -4,7 +4,7 @@
       :class="[
         'tt-toolbar-button',
         `tt-toolbar-button--${size}`,
-        { 'is-active': active, 'is-danger': danger }
+        { 'is-active': active, 'is-danger': danger },
       ]"
       :disabled="disabled"
       type="button"
@@ -13,7 +13,7 @@
     >
       <span class="tt-toolbar-button__content">
         <slot name="icon">
-          <component v-if="icon" :is="icon" />
+          <component :is="icon" v-if="icon" />
         </slot>
         <slot />
       </span>
@@ -22,40 +22,41 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { Tooltip as ATooltip } from 'ant-design-vue'
+import { Tooltip as ATooltip } from "ant-design-vue";
+
+import type { Component } from "vue";
 
 interface Props {
-  icon?: Component
-  title: string
-  active?: boolean
-  disabled?: boolean
-  danger?: boolean
-  size?: 'small' | 'medium' | 'large'
+  icon?: Component;
+  title: string;
+  active?: boolean;
+  disabled?: boolean;
+  danger?: boolean;
+  size?: "small" | "medium" | "large";
 }
 
 const props = withDefaults(defineProps<Props>(), {
   active: false,
   disabled: false,
   danger: false,
-  size: 'medium'
-})
+  size: "medium",
+});
 
-const emit = defineEmits<{ (e: 'click'): void; (e: 'dblclick'): void }>()
+const emit = defineEmits<{ (e: "click"): void; (e: "dblclick"): void }>();
 
 function onClick() {
-  if (props.disabled) return
-  emit('click')
+  if (props.disabled) return;
+  emit("click");
 }
 
 function onDblClick() {
-  if (props.disabled) return
-  emit('dblclick')
+  if (props.disabled) return;
+  emit("dblclick");
 }
 </script>
 
 <style>
-/* 使用全局样式以支持深色模式（因为需要匹配父级的 data-theme 属性）*/
+/* 使用全局样式以支持深色模式（因为需要匹配父级的 data-theme 属性） */
 .tt-toolbar-button {
   display: inline-flex;
   align-items: center;

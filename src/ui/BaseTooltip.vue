@@ -8,11 +8,7 @@
   >
     <slot />
     <Transition name="tt-tooltip-fade">
-      <div
-        v-if="showTooltip && title"
-        class="tt-tooltip"
-        :class="`tt-tooltip--${placement}`"
-      >
+      <div v-if="showTooltip && title" class="tt-tooltip" :class="`tt-tooltip--${placement}`">
         {{ title }}
         <div class="tt-tooltip__arrow" />
       </div>
@@ -21,18 +17,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from "vue";
 
 interface Props {
-  title?: string
-  placement?: 'top' | 'bottom' | 'left' | 'right'
+  title?: string;
+  placement?: "top" | "bottom" | "left" | "right";
 }
 
 withDefaults(defineProps<Props>(), {
-  placement: 'top',
-})
+  placement: "top",
+});
 
-const showTooltip = ref(false)
+const showTooltip = ref(false);
 </script>
 
 <style scoped>
@@ -92,21 +88,23 @@ const showTooltip = ref(false)
 .tt-tooltip--top .tt-tooltip__arrow {
   top: 100%;
   left: 50%;
-  transform: translateX(-50%);
   border-top-color: rgba(0, 0, 0, 0.85);
+  transform: translateX(-50%);
 }
 
 .tt-tooltip--bottom .tt-tooltip__arrow {
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
   border-bottom-color: rgba(0, 0, 0, 0.85);
+  transform: translateX(-50%);
 }
 
 /* Transitions */
 .tt-tooltip-fade-enter-active,
 .tt-tooltip-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .tt-tooltip-fade-enter-from,

@@ -5,36 +5,36 @@
 
 export interface MathNodeAttrs {
   /** LaTeX 公式内容 */
-  latex: string
+  latex: string;
   /** 是否为块级公式 */
-  block: boolean
+  block: boolean;
 }
 
 export interface MathExtensionOptions {
   /** 是否启用行内公式 */
-  inline?: boolean
+  inline?: boolean;
   /** 是否启用块级公式 */
-  block?: boolean
+  block?: boolean;
   /** KaTeX 渲染选项 */
-  katexOptions?: KatexRenderOptions
+  katexOptions?: KatexRenderOptions;
 }
 
 export interface KatexRenderOptions {
   /** 是否显示错误信息 */
-  throwOnError?: boolean
+  throwOnError?: boolean;
   /** 错误颜色 */
-  errorColor?: string
+  errorColor?: string;
   /** 是否使用严格模式 */
-  strict?: boolean | string
+  strict?: boolean | string;
   /** 是否信任输入 */
-  trust?: boolean
+  trust?: boolean;
   /** 宏定义 */
-  macros?: Record<string, string>
+  macros?: Record<string, string>;
 }
 
 export const DEFAULT_KATEX_OPTIONS: KatexRenderOptions = {
   throwOnError: false,
-  errorColor: '#cc0000',
+  errorColor: "#cc0000",
   strict: false,
   trust: false,
-}
+};

@@ -19,11 +19,11 @@
       <p class="ant-upload-drag-icon">
         <InboxOutlined />
       </p>
-      <p class="ant-upload-text">{{ t('editor.clickOrDragUploadWord') }}</p>
-      <p class="ant-upload-hint">{{ t('editor.onlySupportDocx') }}</p>
+      <p class="ant-upload-text">{{ t("editor.clickOrDragUploadWord") }}</p>
+      <p class="ant-upload-hint">{{ t("editor.onlySupportDocx") }}</p>
     </a-upload-dragger>
-    <div v-if="importing" style="text-align: center; margin-top: 12px; color: #999">
-      {{ t('editor.importing') }}
+    <div v-if="importing" style="margin-top: 12px; color: #999; text-align: center">
+      {{ t("editor.importing") }}
     </div>
   </a-modal>
 
@@ -31,17 +31,17 @@
   <a-modal
     v-model:open="exportModalOpen"
     :title="t('editor.exportWord')"
-    @ok="doExport"
     :ok-button-props="{ disabled: exporting }"
+    @ok="doExport"
   >
     <a-input
       v-model:value="exportFilename"
       :placeholder="t('editor.exportFilenamePlaceholder')"
-      @keyup.enter="doExport"
       :disabled="exporting"
+      @keyup.enter="doExport"
     />
-    <div v-if="exporting" style="text-align: center; margin-top: 12px; color: #999">
-      {{ t('editor.exporting') }}
+    <div v-if="exporting" style="margin-top: 12px; color: #999; text-align: center">
+      {{ t("editor.exporting") }}
     </div>
   </a-modal>
 </template>
@@ -51,69 +51,77 @@
  * WordButton - Word 导入/导出按钮组件
  * @description 支持 .docx 文件的导入和导出
  */
-import { computed, ref } from 'vue'
-import type { Editor } from '@tiptap/vue-3'
-import { ToolbarGroup, ToolbarDropdownButton } from '@/ui'
-import { t } from '@/locales'
-import { FileWordOutlined, ImportOutlined, ExportOutlined, InboxOutlined } from '@ant-design/icons-vue'
-import { importWordFile } from './wordImport'
-import { exportToWord } from './wordExport'
-import type { MenuItemConfig } from '@/configs/toolbar'
+import {
+  FileWordOutlined,
+  ImportOutlined,
+  ExportOutlined,
+  InboxOutlined,
+} from "@ant-design/icons-vue";
+import { computed, ref } from "vue";
+
+import type { MenuItemConfig } from "@/configs/toolbar";
+import { t } from "@/locales";
+import { ToolbarGroup, ToolbarDropdownButton } from "@/ui";
+
+import { exportToWord } from "./wordExport";
+import { importWordFile } from "./wordImport";
+
+import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined
+  editor: Editor | null | undefined;
 }
 
-const props = defineProps<Props>()
-const editor = computed(() => props.editor ?? null)
+const props = defineProps<Props>();
+const editor = computed(() => props.editor ?? null);
 
 // ===== 状态 =====
-const importModalOpen = ref(false)
-const exportModalOpen = ref(false)
-const exportFilename = ref('document')
-const importing = ref(false)
-const exporting = ref(false)
+const importModalOpen = ref(false);
+const exportModalOpen = ref(false);
+const exportFilename = ref("document");
+const importing = ref(false);
+const exporting = ref(false);
 
 // ===== 菜单项 =====
 const menuItems = computed<MenuItemConfig[]>(() => [
   {
-    key: 'import-word',
-    label: t('editor.importWord'),
+    key: "import-word",
+    label: t("editor.importWord"),
     icon: ImportOutlined,
     action: () => {
-      importModalOpen.value = true
+      importModalOpen.value = true;
     },
   },
   {
-    key: 'export-word',
-    label: t('editor.exportWord'),
+    key: "export-word",
+    label: t("editor.exportWord"),
     icon: ExportOutlined,
     action: () => {
-      exportFilename.value = 'document'
-      exportModalOpen.value = true
+      exportFilename.value = "document";
+      exportModalOpen.value = true;
     },
   },
-])
+]);
 
 /**
  * 处理 Word 文件导入
  */
 async function handleImport(options: any) {
-  const { file, onSuccess, onError } = options || {}
-  const e = editor.value
-  if (!e) return
+  const { file, onSuccess, onError } = options || {};
+  const e = editor.value;
+  if (!e) return;
 
-  importing.value = true
+  importing.value = true;
   try {
-    await importWordFile(e, file as File)
-    importModalOpen.value = false
-    onSuccess && onSuccess({})
+    await importWordFile(e, file as File);
+    importModalOpen.value = false;
+    onSuccess && onSuccess({});
   } catch (err) {
-    console.error('[WordButton] Import failed:', err)
-    onError && onError(err)
+    console.error("[WordButton] Import failed:", err);
+    onError && onError(err);
   } finally {
-    importing.value = false
+    importing.value = false;
   }
 }
 
@@ -121,19 +129,19 @@ async function handleImport(options: any) {
  * 执行 Word 导出
  */
 async function doExport() {
-  const e = editor.value
-  if (!e) return
+  const e = editor.value;
+  if (!e) return;
 
-  exporting.value = true
+  exporting.value = true;
   try {
-    const html = e.getHTML()
-    const name = exportFilename.value.trim() || 'document'
-    await exportToWord(html, name)
-    exportModalOpen.value = false
+    const html = e.getHTML();
+    const name = exportFilename.value.trim() || "document";
+    await exportToWord(html, name);
+    exportModalOpen.value = false;
   } catch (err) {
-    console.error('[WordButton] Export failed:', err)
+    console.error("[WordButton] Export failed:", err);
   } finally {
-    exporting.value = false
+    exporting.value = false;
   }
 }
 </script>

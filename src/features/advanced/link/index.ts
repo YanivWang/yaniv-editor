@@ -5,5 +5,4 @@
  */
 
 // 组件导出
-export { default as LinkButton } from './LinkButton.vue'
-
+export { default as LinkButton } from "./LinkButton.vue";

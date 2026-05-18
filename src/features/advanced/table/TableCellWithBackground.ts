@@ -3,7 +3,7 @@
  * @description 基于 TableKit 的 TableCell，添加 backgroundColor 属性支持
  * 参考：https://tiptap.dev/docs/editor/extensions/table
  */
-import { TableCell } from '@tiptap/extension-table'
+import { TableCell } from "@tiptap/extension-table";
 
 /**
  * 自定义 TableCell 扩展，支持 backgroundColor 属性
@@ -17,32 +17,33 @@ export const TableCellWithBackground = TableCell.extend({
       // 添加 backgroundColor 属性
       backgroundColor: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-background-color') || element.style.backgroundColor || null,
+        parseHTML: (element) =>
+          element.getAttribute("data-background-color") || element.style.backgroundColor || null,
         renderHTML: (attributes) => {
           if (!attributes.backgroundColor) {
-            return {}
+            return {};
           }
           return {
-            'data-background-color': attributes.backgroundColor,
+            "data-background-color": attributes.backgroundColor,
             style: `background-color: ${attributes.backgroundColor}`,
-          }
+          };
         },
       },
       // 添加 textAlign 属性（如果 TableToolbar 需要）
       textAlign: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-text-align') || element.style.textAlign || null,
+        parseHTML: (element) =>
+          element.getAttribute("data-text-align") || element.style.textAlign || null,
         renderHTML: (attributes) => {
           if (!attributes.textAlign) {
-            return {}
+            return {};
           }
           return {
-            'data-text-align': attributes.textAlign,
+            "data-text-align": attributes.textAlign,
             style: `text-align: ${attributes.textAlign}`,
-          }
+          };
         },
       },
-    }
+    };
   },
-})
-
+});

@@ -3,5 +3,4 @@
  * @description 提供图片对齐、预览、删除等功能的气泡菜单工具栏
  */
 
-export { default as ImageToolbar } from './ImageToolbar.vue'
-
+export { default as ImageToolbar } from "./ImageToolbar.vue";

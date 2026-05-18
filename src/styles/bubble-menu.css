@@ -16,8 +16,8 @@
 /* 暗黑模式 - 气泡菜单 */
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .bubble-menu {
   background: #1f1f1f;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
   border: 1px solid #434343;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
 }
 
 /* 气泡菜单按钮 */
@@ -32,7 +32,7 @@
 
 /* 标题按钮 */
 .heading-btn {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   font-weight: bold;
 }
@@ -66,7 +66,7 @@
 }
 
 /* 响应式 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .bubble-menu-content {
     gap: 2px;
   }

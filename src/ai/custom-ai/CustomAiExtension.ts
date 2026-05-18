@@ -1,31 +1,25 @@
-/* eslint-disable perfectionist/sort-imports */
-import type { Editor } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
+import { notification } from "ant-design-vue";
+import { createApp, h, ref } from "vue";
 
-import type { App } from 'vue';
-
-import { createApp, h, ref } from 'vue';
-
-import { Extension } from '@tiptap/core';
-import { notification } from 'ant-design-vue';
-
-import { t } from '@/locales';
-
-import { aiApiService } from '@/api/ai';
-import { buildParagraphNodesFromText, hasNewlines, isValidSelection } from '@/utils/prosemirrorUtils';
-
-import type { AiSuggestionData } from '../shared/AiHighlightMark';
-
+import { aiApiService } from "@/api/ai";
+import { t } from "@/locales";
 import {
-  addAiHighlight,
-  removeAiHighlight,
-  updateAiHighlight,
-} from '../shared/AiHighlightMark';
-import CustomAiPopover from '../shared/CustomAiPopover.vue';
+  buildParagraphNodesFromText,
+  hasNewlines,
+  isValidSelection,
+} from "@/utils/prosemirrorUtils";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CustomAiOptions {}
+import { addAiHighlight, removeAiHighlight, updateAiHighlight } from "../shared/AiHighlightMark";
+import CustomAiPopover from "../shared/CustomAiPopover.vue";
 
-declare module '@tiptap/core' {
+import type { AiSuggestionData } from "../shared/AiHighlightMark";
+import type { Editor } from "@tiptap/core";
+import type { App } from "vue";
+
+export type CustomAiOptions = Record<string, never>;
+
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     customAi: {
       /**
@@ -41,7 +35,7 @@ declare module '@tiptap/core' {
  * @description AI-powered custom text processing with user-defined prompts
  */
 export const CustomAiExtension = Extension.create<CustomAiOptions>({
-  name: 'customAi',
+  name: "customAi",
 
   addCommands() {
     return {
@@ -52,13 +46,13 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
           const { from, to } = selection;
 
           // Get selected text (may be empty)
-          const selectedText = state.doc.textBetween(from, to, ' ');
+          const selectedText = state.doc.textBetween(from, to, " ");
 
           // 要求必须选中文字才能使用自定义AI
           if (!selectedText.trim()) {
             notification.warning({
-              message: t('editor.pleaseSelectText'),
-              description: t('editor.customAiRequiresSelection'),
+              message: t("editor.pleaseSelectText"),
+              description: t("editor.customAiRequiresSelection"),
               duration: 2,
             });
             return false;
@@ -68,12 +62,7 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
           const originalSelection = { from, to };
 
           // Show custom AI modal
-          showCustomAiModal(
-            editor,
-            selectedText,
-            originalSelection,
-            true,
-          );
+          showCustomAiModal(editor, selectedText, originalSelection, true);
 
           return true;
         },
@@ -89,8 +78,8 @@ let currentSelection: null | { from: number; to: number } = null;
 
 // Reactive refs for the popover
 const visibleRef = ref(false);
-const originalTextRef = ref('');
-const suggestedTextRef = ref('');
+const originalTextRef = ref("");
+const suggestedTextRef = ref("");
 const isStreamingRef = ref(false);
 const isExecutingRef = ref(false);
 
@@ -109,22 +98,17 @@ function showCustomAiModal(
   // Update refs
   visibleRef.value = true;
   originalTextRef.value = selectedText;
-  suggestedTextRef.value = '';
+  suggestedTextRef.value = "";
   isStreamingRef.value = false;
   isExecutingRef.value = false;
 
   // Add highlight for selected text
   const highlightData: AiSuggestionData = {
     originalText: selectedText,
-    suggestedText: '',
+    suggestedText: "",
     isStreaming: false,
   };
-  addAiHighlight(
-    editor,
-    originalSelection.from,
-    originalSelection.to,
-    highlightData,
-  );
+  addAiHighlight(editor, originalSelection.from, originalSelection.to, highlightData);
 
   // Mount popover if not already mounted
   if (!customAiPopoverApp) {
@@ -142,11 +126,11 @@ function mountCustomAiPopover(editor: Editor): void {
   }
 
   // Create container
-  customAiContainer = document.createElement('div');
-  customAiContainer.style.position = 'absolute';
-  customAiContainer.style.top = '0';
-  customAiContainer.style.left = '0';
-  customAiContainer.style.zIndex = '1000';
+  customAiContainer = document.createElement("div");
+  customAiContainer.style.position = "absolute";
+  customAiContainer.style.top = "0";
+  customAiContainer.style.left = "0";
+  customAiContainer.style.zIndex = "1000";
 
   // Get editor element
   const editorElement = editor.view.dom.parentElement;
@@ -170,7 +154,7 @@ function mountCustomAiPopover(editor: Editor): void {
         isExecuting: isExecutingRef.value,
         position,
         editorElement: editorElement || undefined,
-        'onUpdate:visible': (val: boolean) => {
+        "onUpdate:visible": (val: boolean) => {
           visibleRef.value = val;
         },
         onExecute: (prompt: string) => {
@@ -265,7 +249,7 @@ function handleAccept(): void {
   // 验证 selection 是否仍然有效
   const docSize = doc.content.size;
   if (!isValidSelection(currentSelection, docSize)) {
-    console.warn('[Custom AI] Invalid selection range, cannot accept');
+    console.warn("[Custom AI] Invalid selection range, cannot accept");
     handleCleanup();
     return;
   }
@@ -318,8 +302,8 @@ function handleCleanup(): void {
   unmountCustomAiPopover();
 
   visibleRef.value = false;
-  originalTextRef.value = '';
-  suggestedTextRef.value = '';
+  originalTextRef.value = "";
+  suggestedTextRef.value = "";
   isStreamingRef.value = false;
   isExecutingRef.value = false;
 
@@ -337,11 +321,11 @@ function performCustomAi(
   _originalSelection: { from: number; to: number },
   _hasSelectedText: boolean,
 ) {
-  let accumulatedContent = '';
+  let accumulatedContent = "";
 
   const callback = {
     onStart: () => {
-      accumulatedContent = '';
+      accumulatedContent = "";
     },
     onMessage: (message: { content: string }) => {
       if (message && message.content) {
@@ -354,7 +338,7 @@ function performCustomAi(
           const { state } = currentEditor;
           const { doc } = state;
           const docSize = doc.content.size;
-          
+
           if (
             currentSelection.from >= 0 &&
             currentSelection.to >= 0 &&
@@ -362,14 +346,9 @@ function performCustomAi(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                suggestedText: accumulatedContent,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              suggestedText: accumulatedContent,
+            });
           }
         }
       }
@@ -384,7 +363,7 @@ function performCustomAi(
           const { state } = currentEditor;
           const { doc } = state;
           const docSize = doc.content.size;
-          
+
           if (
             currentSelection.from >= 0 &&
             currentSelection.to >= 0 &&
@@ -392,26 +371,21 @@ function performCustomAi(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                isStreaming: false,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              isStreaming: false,
+            });
           }
         }
       } catch (error) {
-        console.warn('[Custom AI] Failed to finalize formatting:', error);
+        console.warn("[Custom AI] Failed to finalize formatting:", error);
       }
     },
     onError: (error: Error) => {
-      console.error('[Custom AI] Error:', error);
+      console.error("[Custom AI] Error:", error);
       handleCleanup();
       notification.error({
-        message: '自定义 AI 失败',
-        description: error.message || '请稍后重试',
+        message: "自定义 AI 失败",
+        description: error.message || "请稍后重试",
         duration: 3,
       });
     },
@@ -421,8 +395,7 @@ function performCustomAi(
   aiApiService.customCommand(
     selectedText,
     prompt,
-    '你係一個專業嘅文本處理助手。直接返回處理結果,唔好加任何解釋。',
+    "你係一個專業嘅文本處理助手。直接返回處理結果,唔好加任何解釋。",
     callback,
   );
 }
-

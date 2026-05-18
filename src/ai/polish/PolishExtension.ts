@@ -1,32 +1,30 @@
-/* eslint-disable perfectionist/sort-imports */
-import type { Editor } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
+import { notification } from "ant-design-vue";
+import { createApp, h, ref } from "vue";
 
-import type { App } from 'vue';
-
-import { createApp, h, ref } from 'vue';
-
-import { Extension } from '@tiptap/core';
-import { notification } from 'ant-design-vue';
-
-import { aiApiService } from '@/api/ai';
-import { buildParagraphNodesFromText, hasNewlines, isValidSelection } from '@/utils/prosemirrorUtils';
-
-import { t } from '@/locales';
-
-import type { AiSuggestionData } from '../shared/AiHighlightMark';
+import { aiApiService } from "@/api/ai";
+import { t } from "@/locales";
+import {
+  buildParagraphNodesFromText,
+  hasNewlines,
+  isValidSelection,
+} from "@/utils/prosemirrorUtils";
 
 import {
   addAiHighlight,
   removeAiHighlight,
   updateAiHighlight,
   getAiSuggestionData,
-} from '../shared/AiHighlightMark';
-import AiSuggestionPopover from '../shared/AiSuggestionPopover.vue';
+} from "../shared/AiHighlightMark";
+import AiSuggestionPopover from "../shared/AiSuggestionPopover.vue";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface PolishOptions {}
+import type { AiSuggestionData } from "../shared/AiHighlightMark";
+import type { Editor } from "@tiptap/core";
+import type { App } from "vue";
 
-declare module '@tiptap/core' {
+export type PolishOptions = Record<string, never>;
+
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     polish: {
       /**
@@ -42,7 +40,7 @@ declare module '@tiptap/core' {
  * @description AI-powered text polishing/refinement based on selection
  */
 export const PolishExtension = Extension.create<PolishOptions>({
-  name: 'polish',
+  name: "polish",
 
   addCommands() {
     return {
@@ -53,16 +51,16 @@ export const PolishExtension = Extension.create<PolishOptions>({
           const { from, to } = selection;
 
           // Get selected text
-          const selectedText = state.doc.textBetween(from, to, ' ');
+          const selectedText = state.doc.textBetween(from, to, " ");
 
           if (!selectedText.trim()) {
-            console.warn('[Polish] No text selected');
+            console.warn("[Polish] No text selected");
             // 显示用户友好的提示
             notification.warning({
-              message: t('editor.pleaseSelectText'),
-              description: t('editor.polishRequiresSelection'),
+              message: t("editor.pleaseSelectText"),
+              description: t("editor.polishRequiresSelection"),
               duration: 2,
-              placement: 'topRight',
+              placement: "topRight",
             });
             return false;
           }
@@ -71,20 +69,11 @@ export const PolishExtension = Extension.create<PolishOptions>({
           const originalSelection = { from, to };
 
           // Get full document context
-          const fullText = state.doc.textBetween(
-            0,
-            state.doc.content.size,
-            ' ',
-          );
+          const fullText = state.doc.textBetween(0, state.doc.content.size, " ");
           const sysPrompt = `以下係完整嘅文件內容:\n\n${fullText}`;
 
           // Perform AI polish
-          performPolish(
-            editor,
-            selectedText,
-            sysPrompt,
-            originalSelection,
-          );
+          performPolish(editor, selectedText, sysPrompt, originalSelection);
 
           return true;
         },
@@ -100,8 +89,8 @@ let currentSelection: null | { from: number; to: number } = null;
 
 // Reactive refs for the popover
 const visibleRef = ref(false);
-const originalTextRef = ref('');
-const suggestedTextRef = ref('');
+const originalTextRef = ref("");
+const suggestedTextRef = ref("");
 const isStreamingRef = ref(false);
 
 /**
@@ -122,21 +111,16 @@ function performPolish(
   // Update refs
   visibleRef.value = true;
   originalTextRef.value = selectedText;
-  suggestedTextRef.value = '';
+  suggestedTextRef.value = "";
   isStreamingRef.value = true;
 
   // Add highlight for the selected text
   const highlightData: AiSuggestionData = {
     originalText: selectedText,
-    suggestedText: '',
+    suggestedText: "",
     isStreaming: true,
   };
-  addAiHighlight(
-    editor,
-    originalSelection.from,
-    originalSelection.to,
-    highlightData,
-  );
+  addAiHighlight(editor, originalSelection.from, originalSelection.to, highlightData);
 
   // Mount popover if not already mounted
   if (!polishPopoverApp) {
@@ -146,11 +130,11 @@ function performPolish(
   // Setup click handler to restore popover when user clicks on highlighted text
   setupClickHandler();
 
-  let accumulatedContent = '';
+  let accumulatedContent = "";
 
   const callback = {
     onStart: () => {
-      accumulatedContent = '';
+      accumulatedContent = "";
     },
     onMessage: (message: { content: string }) => {
       if (message && message.content) {
@@ -171,14 +155,9 @@ function performPolish(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                suggestedText: accumulatedContent,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              suggestedText: accumulatedContent,
+            });
           }
         }
       }
@@ -201,26 +180,21 @@ function performPolish(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                isStreaming: false,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              isStreaming: false,
+            });
           }
         }
       } catch (error) {
-        console.warn('[Polish] Failed to finalize formatting:', error);
+        console.warn("[Polish] Failed to finalize formatting:", error);
       }
     },
     onError: (error: Error) => {
-      console.error('[Polish] Error:', error);
+      console.error("[Polish] Error:", error);
       handleCleanup();
       notification.error({
-        message: '润色失败',
-        description: error.message || t('messages.networkError'),
+        message: "润色失败",
+        description: error.message || t("messages.networkError"),
         duration: 3,
       });
     },
@@ -245,11 +219,11 @@ function mountPolishPopover(editor: Editor): void {
 
   // Create container if it doesn't exist or was removed
   if (!polishContainer || !polishContainer.parentNode) {
-    polishContainer = document.createElement('div');
-    polishContainer.style.position = 'absolute';
-    polishContainer.style.top = '0';
-    polishContainer.style.left = '0';
-    polishContainer.style.zIndex = '1000';
+    polishContainer = document.createElement("div");
+    polishContainer.style.position = "absolute";
+    polishContainer.style.top = "0";
+    polishContainer.style.left = "0";
+    polishContainer.style.zIndex = "1000";
 
     if (editorElement) {
       editorElement.append(polishContainer);
@@ -258,7 +232,7 @@ function mountPolishPopover(editor: Editor): void {
     }
   } else {
     // 如果容器已存在，清空其内容，避免重复显示
-    polishContainer.innerHTML = '';
+    polishContainer.innerHTML = "";
   }
 
   // Calculate position
@@ -274,7 +248,7 @@ function mountPolishPopover(editor: Editor): void {
         isStreaming: isStreamingRef.value,
         position,
         editorElement: editorElement || undefined,
-        'onUpdate:visible': (val: boolean) => {
+        "onUpdate:visible": (val: boolean) => {
           visibleRef.value = val;
         },
         onAccept: () => {
@@ -348,7 +322,7 @@ function handleAccept(): void {
   // 验证 selection 是否仍然有效
   const docSize = doc.content.size;
   if (!isValidSelection(currentSelection, docSize)) {
-    console.warn('[Polish] Invalid selection range, cannot accept');
+    console.warn("[Polish] Invalid selection range, cannot accept");
     handleCleanup();
     return;
   }
@@ -411,16 +385,16 @@ function setupClickHandler(): void {
   // Remove existing listener if any (cleanup)
   const existingHandler = (editorDom as any)._polishClickHandler;
   if (existingHandler) {
-    editorDom.removeEventListener('click', existingHandler);
+    editorDom.removeEventListener("click", existingHandler);
   }
 
   const clickHandler = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
     if (!target) return;
 
-    const highlightElement = target.classList.contains('ai-highlight')
+    const highlightElement = target.classList.contains("ai-highlight")
       ? target
-      : target.closest('.ai-highlight');
+      : target.closest(".ai-highlight");
 
     if (!highlightElement) return;
     if (!currentEditor || !currentSelection) return;
@@ -434,7 +408,7 @@ function setupClickHandler(): void {
     try {
       pos = currentEditor.view.posAtDOM(highlightElement, 0);
     } catch (error) {
-      console.warn('[Polish] Failed to get position from DOM:', error);
+      console.warn("[Polish] Failed to get position from DOM:", error);
       // Fallback: use the original selection range
       pos = currentSelection.from;
     }
@@ -474,7 +448,7 @@ function setupClickHandler(): void {
   (editorDom as any)._polishClickHandler = clickHandler;
 
   // Add click listener
-  editorDom.addEventListener('click', clickHandler);
+  editorDom.addEventListener("click", clickHandler);
 }
 
 /**
@@ -486,7 +460,7 @@ function handleCleanup(): void {
     const editorDom = currentEditor.view.dom;
     const existingHandler = (editorDom as any)._polishClickHandler;
     if (existingHandler) {
-      editorDom.removeEventListener('click', existingHandler);
+      editorDom.removeEventListener("click", existingHandler);
       delete (editorDom as any)._polishClickHandler;
     }
 
@@ -502,8 +476,8 @@ function handleCleanup(): void {
   polishContainer = null;
 
   visibleRef.value = false;
-  originalTextRef.value = '';
-  suggestedTextRef.value = '';
+  originalTextRef.value = "";
+  suggestedTextRef.value = "";
   isStreamingRef.value = false;
 
   currentEditor = null;

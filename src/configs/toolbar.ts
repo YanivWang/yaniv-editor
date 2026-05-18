@@ -3,26 +3,26 @@
  * @description 工具栏相关的类型定义
  */
 
-import type { Component } from 'vue'
-import type { Editor } from '@tiptap/core'
+import type { Editor } from "@tiptap/core";
+import type { Component } from "vue";
 
 /**
  * 文本格式类型名称
  */
-export type TextFormatType = 'bold' | 'italic' | 'underline' | 'strike' | 'code'
+export type TextFormatType = "bold" | "italic" | "underline" | "strike" | "code";
 
 /**
  * 文本格式配置接口
  */
 export interface TextFormatConfig {
   /** 格式类型名称 */
-  name: TextFormatType
+  name: TextFormatType;
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 格式标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
@@ -30,37 +30,37 @@ export interface TextFormatConfig {
  */
 export interface ToolbarButtonConfig {
   /** 按钮名称/标识 */
-  name: string
+  name: string;
   /** 按钮图标组件 */
-  icon?: Component
+  icon?: Component;
   /** 按钮标题（hover 提示） */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
   /** 是否禁用 */
-  disabled?: boolean
+  disabled?: boolean;
 }
 
 /**
  * 标题级别类型
  */
-export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 /**
  * 标题值类型（包含正文）
  */
-export type HeadingValue = 'paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+export type HeadingValue = "paragraph" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 /**
  * 标题配置接口
  */
 export interface HeadingConfig {
   /** 标题级别 (1-6) */
-  level: HeadingLevel
+  level: HeadingLevel;
   /** 标题标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
@@ -68,13 +68,13 @@ export interface HeadingConfig {
  */
 export interface ColorToolConfig {
   /** 颜色类型（文本或背景） */
-  type: 'text' | 'bg' | 'highlight'
+  type: "text" | "bg" | "highlight";
   /** 工具标题 */
-  title: string
+  title: string;
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 选择颜色时执行的操作 */
-  action: (color: string) => void
+  action: (color: string) => void;
 }
 
 /**
@@ -82,53 +82,53 @@ export interface ColorToolConfig {
  */
 export interface TableOperationConfig {
   /** 操作名称 */
-  name: string
+  name: string;
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 操作标题 */
-  title: string
+  title: string;
   /** 对应的编辑器命令名称 */
-  command: string
+  command: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
  * 列表类型名称
  */
-export type ListType = 'bulletList' | 'orderedList' | 'taskList'
+export type ListType = "bulletList" | "orderedList" | "taskList";
 
 /**
  * 列表工具配置接口
  */
 export interface ListToolConfig {
   /** 列表类型名称 */
-  name: ListType
+  name: ListType;
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 工具标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
  * 对齐方式类型
  */
-export type AlignValue = 'left' | 'center' | 'right' | 'justify'
+export type AlignValue = "left" | "center" | "right" | "justify";
 
 /**
  * 对齐工具配置接口
  */
 export interface AlignToolConfig {
   /** 对齐方式 */
-  value: AlignValue
+  value: AlignValue;
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 工具标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
@@ -136,13 +136,13 @@ export interface AlignToolConfig {
  */
 export interface InsertToolConfig {
   /** 插入内容类型 */
-  name: 'link' | 'image' | 'table' | 'codeBlock'
+  name: "link" | "image" | "table" | "codeBlock";
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 工具标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
@@ -150,13 +150,13 @@ export interface InsertToolConfig {
  */
 export interface AiToolConfig {
   /** AI 功能名称 */
-  name: 'continueWriting' | 'polish' | 'summarize' | 'translate' | 'customAi'
+  name: "continueWriting" | "polish" | "summarize" | "translate" | "customAi";
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 工具标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
 }
 
 /**
@@ -164,21 +164,21 @@ export interface AiToolConfig {
  */
 export interface MenuItemConfig {
   /** 菜单项 key */
-  key: string
+  key: string;
   /** 菜单项标签 */
-  label: string
+  label: string;
   /** 图标组件（可选） */
-  icon?: Component
+  icon?: Component;
   /** 点击时执行的操作 */
-  action: () => void
+  action: () => void;
   /** 是否禁用 */
-  disabled?: boolean
+  disabled?: boolean;
   /** 是否为危险操作（红色） */
-  danger?: boolean
+  danger?: boolean;
   /** 是否激活（用于显示激活状态） */
-  active?: boolean
+  active?: boolean;
   /** 子菜单项（可选） */
-  children?: MenuItemConfig[]
+  children?: MenuItemConfig[];
 }
 
 /**
@@ -186,28 +186,28 @@ export interface MenuItemConfig {
  */
 export interface MenuGroupConfig {
   /** 分组标题 */
-  title: string
+  title: string;
   /** 分组内的菜单项 */
-  items: MenuItemConfig[]
+  items: MenuItemConfig[];
 }
 
 /**
  * 工具栏配置工厂函数类型
  */
-export type ToolbarConfigFactory<T> = (editor: Editor) => T[]
+export type ToolbarConfigFactory<T> = (editor: Editor) => T[];
 
 /**
  * 编辑操作配置接口
  */
 export interface EditActionConfig {
   /** 图标组件 */
-  icon: Component
+  icon: Component;
   /** 操作标题 */
-  title: string
+  title: string;
   /** 点击时执行的操作 */
-  action: () => void | Promise<void>
+  action: () => void | Promise<void>;
   /** 是否为危险操作 */
-  danger?: boolean
+  danger?: boolean;
 }
 
 /**
@@ -215,9 +215,9 @@ export interface EditActionConfig {
  */
 export interface SelectOption<T = string> {
   /** 显示标签 */
-  label: string
+  label: string;
   /** 选项值 */
-  value: T
+  value: T;
 }
 
 /**
@@ -225,11 +225,11 @@ export interface SelectOption<T = string> {
  */
 export interface ToolbarGroupConfig {
   /** 分组名称 */
-  name: string
+  name: string;
   /** 分组内的按钮配置 */
-  buttons: ToolbarButtonConfig[]
+  buttons: ToolbarButtonConfig[];
   /** 是否显示分隔线 */
-  showDivider?: boolean
+  showDivider?: boolean;
 }
 
 /**
@@ -237,25 +237,25 @@ export interface ToolbarGroupConfig {
  */
 export interface FullToolbarConfig {
   /** 文本格式工具 */
-  textFormats: ToolbarButtonConfig[]
+  textFormats: ToolbarButtonConfig[];
   /** 标题工具 */
-  headings: HeadingConfig[]
+  headings: HeadingConfig[];
   /** 颜色工具 */
-  colorTools: ColorToolConfig[]
+  colorTools: ColorToolConfig[];
   /** 列表工具 */
-  listTools: ListToolConfig[]
+  listTools: ListToolConfig[];
   /** 对齐工具 */
-  alignTools: AlignToolConfig[]
+  alignTools: AlignToolConfig[];
   /** 插入工具 */
-  insertTools: InsertToolConfig[]
+  insertTools: InsertToolConfig[];
   /** 表格工具 */
   tableTools?: {
-    rowTools: TableOperationConfig[]
-    colTools: TableOperationConfig[]
-    cellTools: TableOperationConfig[]
-  }
+    rowTools: TableOperationConfig[];
+    colTools: TableOperationConfig[];
+    cellTools: TableOperationConfig[];
+  };
   /** AI 工具 */
-  aiTools: AiToolConfig[]
+  aiTools: AiToolConfig[];
 }
 
 /**
@@ -263,57 +263,52 @@ export interface FullToolbarConfig {
  */
 export interface BubbleMenuConfig {
   /** 是否显示菜单 */
-  shouldShow: (props: {
-    editor: Editor
-    from: number
-    to: number
-    state: any
-  }) => boolean
+  shouldShow: (props: { editor: Editor; from: number; to: number; state: any }) => boolean;
   /** 菜单位置 */
-  placement?: 'top' | 'bottom' | 'left' | 'right'
+  placement?: "top" | "bottom" | "left" | "right";
   /** Tippy.js 配置选项 */
-  tippyOptions?: Record<string, any>
+  tippyOptions?: Record<string, any>;
 }
 
 /**
  * 命令参数类型映射
  */
 export interface CommandParams {
-  toggleBold: []
-  toggleItalic: []
-  toggleUnderline: []
-  toggleStrike: []
-  toggleSubscript: []
-  toggleSuperscript: []
-  toggleCode: []
-  setColor: [color: string]
-  setHighlight: [options: { color: string }]
-  setFontFamily: [fontFamily: string]
-  setFontSize: [fontSize: string]
-  setTextAlign: [align: AlignValue]
-  toggleHeading: [options: { level: number }]
-  setHeading: [options: { level: number }]
-  setParagraph: []
-  toggleBulletList: []
-  toggleOrderedList: []
-  toggleTaskList: []
-  insertTable: [options: { rows: number; cols: number; withHeaderRow?: boolean }]
-  addRowBefore: []
-  addRowAfter: []
-  deleteRow: []
-  addColumnBefore: []
-  addColumnAfter: []
-  deleteColumn: []
-  mergeCells: []
-  splitCell: []
-  toggleHeaderRow: []
-  toggleHeaderColumn: []
-  deleteTable: []
-  setLink: [options: { href: string }]
-  unsetLink: []
-  setCodeBlock: [options: { language: string }]
-  insertContent: [content: string | Record<string, any>]
-  setCellAttribute: [name: string, value: any]
+  toggleBold: [];
+  toggleItalic: [];
+  toggleUnderline: [];
+  toggleStrike: [];
+  toggleSubscript: [];
+  toggleSuperscript: [];
+  toggleCode: [];
+  setColor: [color: string];
+  setHighlight: [options: { color: string }];
+  setFontFamily: [fontFamily: string];
+  setFontSize: [fontSize: string];
+  setTextAlign: [align: AlignValue];
+  toggleHeading: [options: { level: number }];
+  setHeading: [options: { level: number }];
+  setParagraph: [];
+  toggleBulletList: [];
+  toggleOrderedList: [];
+  toggleTaskList: [];
+  insertTable: [options: { rows: number; cols: number; withHeaderRow?: boolean }];
+  addRowBefore: [];
+  addRowAfter: [];
+  deleteRow: [];
+  addColumnBefore: [];
+  addColumnAfter: [];
+  deleteColumn: [];
+  mergeCells: [];
+  splitCell: [];
+  toggleHeaderRow: [];
+  toggleHeaderColumn: [];
+  deleteTable: [];
+  setLink: [options: { href: string }];
+  unsetLink: [];
+  setCodeBlock: [options: { language: string }];
+  insertContent: [content: string | Record<string, any>];
+  setCellAttribute: [name: string, value: any];
 }
 
 /**
@@ -321,23 +316,23 @@ export interface CommandParams {
  */
 export interface EditorStateInfo {
   /** 是否可撤销 */
-  canUndo: boolean
+  canUndo: boolean;
   /** 是否可重做 */
-  canRedo: boolean
+  canRedo: boolean;
   /** 当前激活的标记 */
-  activeMarks: string[]
+  activeMarks: string[];
   /** 当前激活的节点 */
-  activeNodes: string[]
+  activeNodes: string[];
   /** 当前段落样式 */
-  paragraphStyle: string
+  paragraphStyle: string;
   /** 当前文本对齐方式 */
-  textAlign: string
+  textAlign: string;
   /** 是否在表格中 */
-  isInTable: boolean
+  isInTable: boolean;
   /** 是否有选区 */
-  hasSelection: boolean
+  hasSelection: boolean;
   /** 选区是否为空 */
-  isEmptySelection: boolean
+  isEmptySelection: boolean;
 }
 
 // ===== 从 editorConstants 迁移的类型定义 =====
@@ -349,41 +344,40 @@ export interface EditorStateInfo {
  * 文本颜色类型
  * @note 实际类型从 TEXT_COLORS 常量推导，见 editorConstants.ts
  */
-export type TextColor = string
+export type TextColor = string;
 
 /**
  * 背景颜色类型
  * @note 实际类型从 BACKGROUND_COLORS 常量推导，见 editorConstants.ts
  */
-export type BackgroundColor = string
+export type BackgroundColor = string;
 
 /**
  * 字体系列类型
  * @note 实际类型从 FONT_FAMILIES 常量推导，见 editorConstants.ts
  */
-export type FontFamily = string
+export type FontFamily = string;
 
 /**
  * 字号类型
  * @note 实际类型从 FONT_SIZES 常量推导，见 editorConstants.ts
  */
-export type FontSize = string
+export type FontSize = string;
 
 /**
  * 行间距类型
  * @note 实际类型从 LINE_HEIGHTS 常量推导，见 editorConstants.ts
  */
-export type LineHeight = string
+export type LineHeight = string;
 
 /**
  * 代码语言类型
  * @note 实际类型从 CODE_LANGUAGES 常量推导，见 shared/configs/editorConstants.ts
  */
-export type CodeLanguage = string
+export type CodeLanguage = string;
 
 /**
  * 表格边框样式类型
  * @note 实际类型从 TABLE_BORDER_STYLES 常量推导，见 editorConstants.ts
  */
-export type TableBorderStyle = string
-
+export type TableBorderStyle = string;

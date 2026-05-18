@@ -14,8 +14,8 @@
           :key="alignOption.value"
           class="image-menu-btn"
           :class="{ active: currentAlign === alignOption.value }"
-          @click="setAlign(alignOption.value)"
           :title="alignOption.title"
+          @click="setAlign(alignOption.value)"
         >
           <component :is="alignOption.icon" />
         </button>
@@ -23,18 +23,14 @@
 
       <!-- 预览 -->
       <div class="image-menu-group">
-        <button class="image-menu-btn" @click="previewImage" title="预览">
+        <button class="image-menu-btn" title="预览" @click="previewImage">
           <EyeOutlined />
         </button>
       </div>
 
       <!-- 删除 -->
       <div class="image-menu-group">
-        <button
-          class="image-menu-btn image-menu-btn--danger"
-          @click="deleteImage"
-          title="删除图片"
-        >
+        <button class="image-menu-btn image-menu-btn--danger" title="删除图片" @click="deleteImage">
           <DeleteOutlined />
         </button>
       </div>
@@ -52,7 +48,7 @@
         v-if="currentImageSrc"
         :src="currentImageSrc"
         alt="预览"
-        style="width: 100%; height: auto;"
+        style="width: 100%; height: auto"
       />
     </a-modal>
   </bubble-menu>
@@ -63,46 +59,48 @@
  * ImageToolbar - 图片工具栏组件
  * @description 提供图片对齐、预览、删除等功能的气泡菜单
  */
-import { computed, ref } from 'vue'
-import { BubbleMenu } from '@tiptap/vue-3/menus'
-import type { Editor } from '@tiptap/vue-3'
-import { NodeSelection } from '@tiptap/pm/state'
 import {
   AlignLeftOutlined,
   AlignCenterOutlined,
   AlignRightOutlined,
   EyeOutlined,
   DeleteOutlined,
-} from '@ant-design/icons-vue'
-import { createCommandRunner, type EditorChain } from '@/utils/editorCommands'
+} from "@ant-design/icons-vue";
+import { NodeSelection } from "@tiptap/pm/state";
+import { BubbleMenu } from "@tiptap/vue-3/menus";
+import { computed, ref } from "vue";
+
+import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
+
+import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined
-    readonly?: boolean
-    enabled?: boolean
+    editor: Editor | null | undefined;
+    readonly?: boolean;
+    enabled?: boolean;
   }>(),
   {
     readonly: false,
     enabled: true,
-  }
-)
+  },
+);
 
-const editor = computed(() => props.editor ?? null)
-const runCommand = createCommandRunner(editor)
+const editor = computed(() => props.editor ?? null);
+const runCommand = createCommandRunner(editor);
 
 // ===== 状态 =====
-const previewVisible = ref(false)
-const currentImageSrc = ref('')
-const currentAlign = ref<'left' | 'center' | 'right' | null>(null)
+const previewVisible = ref(false);
+const currentImageSrc = ref("");
+const currentAlign = ref<"left" | "center" | "right" | null>(null);
 
 // ===== 对齐选项配置 =====
 const alignOptions = [
-  { value: 'left' as const, icon: AlignLeftOutlined, title: '左对齐' },
-  { value: 'center' as const, icon: AlignCenterOutlined, title: '居中' },
-  { value: 'right' as const, icon: AlignRightOutlined, title: '右对齐' },
-]
+  { value: "left" as const, icon: AlignLeftOutlined, title: "左对齐" },
+  { value: "center" as const, icon: AlignCenterOutlined, title: "居中" },
+  { value: "right" as const, icon: AlignRightOutlined, title: "右对齐" },
+];
 
 // ===== 工具函数 =====
 
@@ -110,69 +108,73 @@ const alignOptions = [
  * 获取当前选中的图片节点和位置
  */
 function getCurrentImageInfo() {
-  const e = editor.value
-  if (!e) return { node: null, pos: null }
+  const e = editor.value;
+  if (!e) return { node: null, pos: null };
 
-  const { state } = e
-  const { selection } = state
-  let node = null
-  let pos: number | null = null
+  const { state } = e;
+  const { selection } = state;
+  let node = null;
+  let pos: number | null = null;
 
   // 检查是否是节点选择（NodeSelection）
-  if (selection instanceof NodeSelection && selection.node && selection.node.type.name === 'image') {
-    node = selection.node
-    pos = selection.from
-    return { node, pos }
+  if (
+    selection instanceof NodeSelection &&
+    selection.node &&
+    selection.node.type.name === "image"
+  ) {
+    node = selection.node;
+    pos = selection.from;
+    return { node, pos };
   }
 
   // 检查光标前后的节点
-  const $anchor = selection.$anchor
-  const nodeAfter = $anchor.nodeAfter
-  const nodeBefore = $anchor.nodeBefore
+  const $anchor = selection.$anchor;
+  const nodeAfter = $anchor.nodeAfter;
+  const nodeBefore = $anchor.nodeBefore;
 
-  if (nodeAfter?.type.name === 'image') {
-    node = nodeAfter
-  } else if (nodeBefore?.type.name === 'image') {
-    node = nodeBefore
+  if (nodeAfter?.type.name === "image") {
+    node = nodeAfter;
+  } else if (nodeBefore?.type.name === "image") {
+    node = nodeBefore;
   }
 
   // 如果找到节点但没找到位置，查找位置
   if (node && pos === null) {
     state.doc.descendants((n, p) => {
       if (n === node) {
-        pos = p
-        return false
+        pos = p;
+        return false;
       }
-    })
+    });
   }
 
-  return { node, pos }
+  return { node, pos };
 }
 
 /**
  * 获取图片的对齐方式
  */
 function getImageAlign() {
-  const { node, pos } = getCurrentImageInfo()
-  if (!node || pos === null) return null
+  const { node, pos } = getCurrentImageInfo();
+  if (!node || pos === null) return null;
 
   // 优先检查图片节点本身的对齐属性
-  const nodeAlign = node.attrs.align
-  if (nodeAlign === 'left' || nodeAlign === 'center' || nodeAlign === 'right') {
-    return nodeAlign
+  const nodeAlign = node.attrs.align;
+  if (nodeAlign === "left" || nodeAlign === "center" || nodeAlign === "right") {
+    return nodeAlign;
   }
 
   // 检查父节点的对齐方式
-  const e = editor.value
-  if (!e) return null
-  const $pos = e.state.doc.resolve(pos)
-  const parent = $pos.parent
-  const parentAlign = parent?.attrs.textAlign || parent?.attrs.align
-  if (parentAlign === 'left' || parentAlign === 'center' || parentAlign === 'right') {
-    return parentAlign
+  const e = editor.value;
+  if (!e) return null;
+  const $pos = e.state.doc.resolve(pos);
+  const parent = $pos.parent;
+  const parentAlign = parent?.attrs.textAlign || parent?.attrs.align;
+  if (parentAlign === "left" || parentAlign === "center" || parentAlign === "right") {
+    return parentAlign;
   }
 
-  return null
+  return null;
 }
 
 // ===== 事件处理 =====
@@ -183,68 +185,64 @@ function getImageAlign() {
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
   // 如果功能未启用，不显示
   if (!props.enabled) {
-    return false
+    return false;
   }
-  
+
   // 检查编辑器是否存在
   if (!bubbleProps.editor) {
-    return false
+    return false;
   }
-  
-  if (props.readonly || !bubbleProps.editor.isActive('image')) {
-    return false
+
+  if (props.readonly || !bubbleProps.editor.isActive("image")) {
+    return false;
   }
 
   // 更新当前图片信息
-  const { node } = getCurrentImageInfo()
-  if (node?.type.name === 'image') {
-    currentImageSrc.value = node.attrs.src || ''
-    currentAlign.value = getImageAlign()
+  const { node } = getCurrentImageInfo();
+  if (node?.type.name === "image") {
+    currentImageSrc.value = node.attrs.src || "";
+    currentAlign.value = getImageAlign();
   }
 
-  return true
-}
+  return true;
+};
 
 /**
  * 设置图片对齐方式
  */
-function setAlign(align: 'left' | 'center' | 'right') {
-  const e = editor.value
-  if (!e) return
+function setAlign(align: "left" | "center" | "right") {
+  const e = editor.value;
+  if (!e) return;
 
-  const { node, pos } = getCurrentImageInfo()
-  if (!node || pos === null) return
+  const { node, pos } = getCurrentImageInfo();
+  if (!node || pos === null) return;
 
-  const $pos = e.state.doc.resolve(pos)
-  const parent = $pos.parent
+  const $pos = e.state.doc.resolve(pos);
+  const parent = $pos.parent;
 
   // 优先设置父节点对齐（段落或标题）
-  if (parent && (parent.type.name === 'paragraph' || parent.type.name === 'heading')) {
-    const parentStart = $pos.start($pos.depth)
+  if (parent && (parent.type.name === "paragraph" || parent.type.name === "heading")) {
+    const parentStart = $pos.start($pos.depth);
     e.chain()
       .setTextSelection({ from: parentStart, to: parentStart + parent.nodeSize })
       .setTextAlign(align)
-      .run()
+      .run();
   }
 
   // 同时设置图片节点的对齐属性
-  e.chain()
-    .focus()
-    .setNodeSelection(pos)
-    .updateAttributes('image', { align })
-    .run()
+  e.chain().focus().setNodeSelection(pos).updateAttributes("image", { align }).run();
 
-  currentAlign.value = align
+  currentAlign.value = align;
 }
 
 /**
  * 预览图片
  */
 function previewImage() {
-  const { node } = getCurrentImageInfo()
-  if (node?.type.name === 'image') {
-    currentImageSrc.value = node.attrs.src || ''
-    previewVisible.value = true
+  const { node } = getCurrentImageInfo();
+  if (node?.type.name === "image") {
+    currentImageSrc.value = node.attrs.src || "";
+    previewVisible.value = true;
   }
 }
 
@@ -252,7 +250,7 @@ function previewImage() {
  * 删除图片
  */
 function deleteImage() {
-  runCommand((chain: EditorChain) => chain.deleteSelection())()
+  runCommand((chain: EditorChain) => chain.deleteSelection())();
 }
 </script>
 
@@ -321,8 +319,8 @@ function deleteImage() {
 }
 
 .image-menu-btn:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .image-menu-btn.active {
@@ -353,4 +351,3 @@ function deleteImage() {
   }
 }
 </style>
-

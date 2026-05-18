@@ -4,5 +4,4 @@
  */
 
 // 组件导出
-export { default as FooterNav } from './FooterNav.vue'
-
+export { default as FooterNav } from "./FooterNav.vue";

@@ -4,5 +4,4 @@
  */
 
 // 组件导出
-export { default as UndoRedoButton } from './UndoRedoButton.vue'
-
+export { default as UndoRedoButton } from "./UndoRedoButton.vue";

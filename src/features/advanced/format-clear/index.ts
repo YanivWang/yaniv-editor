@@ -4,5 +4,4 @@
  */
 
 // 组件导出
-export { default as ClearFormatButton } from './ClearFormatButton.vue'
-
+export { default as ClearFormatButton } from "./ClearFormatButton.vue";

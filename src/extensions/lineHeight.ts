@@ -3,21 +3,21 @@
  * @description 自定义行间距扩展
  */
 
-import { Extension } from '@tiptap/core'
+import { Extension } from "@tiptap/core";
 
 export interface LineHeightOptions {
-  types: string[]
-  defaultLineHeight: string
+  types: string[];
+  defaultLineHeight: string;
 }
 
 export const LineHeight = Extension.create<LineHeightOptions>({
-  name: 'lineHeight',
+  name: "lineHeight",
 
   addOptions() {
     return {
-      types: ['paragraph', 'heading'],
-      defaultLineHeight: '1.5',
-    }
+      types: ["paragraph", "heading"],
+      defaultLineHeight: "1.5",
+    };
   },
 
   addGlobalAttributes() {
@@ -30,16 +30,16 @@ export const LineHeight = Extension.create<LineHeightOptions>({
             parseHTML: (element) => element.style.lineHeight || this.options.defaultLineHeight,
             renderHTML: (attributes) => {
               if (!attributes.lineHeight) {
-                return {}
+                return {};
               }
               return {
                 style: `line-height: ${attributes.lineHeight}`,
-              }
+              };
             },
           },
         },
       },
-    ]
+    ];
   },
 
   addCommands() {
@@ -47,14 +47,17 @@ export const LineHeight = Extension.create<LineHeightOptions>({
       setLineHeight:
         (lineHeight: string) =>
         ({ commands }) => {
-          return this.options.types.every((type) => commands.updateAttributes(type, { lineHeight }))
+          return this.options.types.every((type) =>
+            commands.updateAttributes(type, { lineHeight }),
+          );
         },
       unsetLineHeight:
         () =>
         ({ commands }) => {
-          return this.options.types.every((type) => commands.updateAttributes(type, { lineHeight: null }))
+          return this.options.types.every((type) =>
+            commands.updateAttributes(type, { lineHeight: null }),
+          );
         },
-    }
+    };
   },
-})
-
+});

@@ -1,12 +1,12 @@
 <template>
-  <div class="ai-toolbar-menu" ref="containerRef">
+  <div ref="containerRef" class="ai-toolbar-menu">
     <BaseTooltip :title="isConfigured ? 'AI 助手' : t('aiSettings.title')">
       <button
         class="ai-toolbar-trigger"
         :class="{ 'is-open': isOpen, 'is-loading': isLoading, 'not-configured': !isConfigured }"
         type="button"
-        @click="toggleMenu"
         :disabled="isLoading"
+        @click="toggleMenu"
       >
         <span class="ai-icon">✨</span>
         <span class="ai-label">AI</span>
@@ -19,7 +19,7 @@
       <div v-if="isOpen" class="ai-menu-dropdown">
         <!-- Not configured hint -->
         <div v-if="!isConfigured" class="ai-menu-hint">
-          {{ t('aiSettings.apiKeyHint') }}
+          {{ t("aiSettings.apiKeyHint") }}
         </div>
 
         <button
@@ -28,8 +28,8 @@
           class="ai-menu-item"
           :class="{ 'is-disabled': !isConfigured && item.key !== 'settings' }"
           type="button"
-          @click="handleItemClick(item)"
           :disabled="!isConfigured && item.key !== 'settings'"
+          @click="handleItemClick(item)"
         >
           <span class="ai-menu-item-icon">{{ item.icon }}</span>
           <span class="ai-menu-item-label">{{ item.label }}</span>
@@ -49,8 +49,8 @@
           <button
             class="ai-menu-send"
             type="button"
-            @click="handleCustomAi"
             :disabled="!customPrompt.trim() || !isConfigured"
+            @click="handleCustomAi"
           >
             →
           </button>
@@ -59,13 +59,9 @@
         <div class="ai-menu-divider" />
 
         <!-- Settings button -->
-        <button
-          class="ai-menu-item ai-menu-item--settings"
-          type="button"
-          @click="openSettings"
-        >
+        <button class="ai-menu-item ai-menu-item--settings" type="button" @click="openSettings">
           <span class="ai-menu-item-icon">⚙️</span>
-          <span class="ai-menu-item-label">{{ t('aiSettings.title') }}</span>
+          <span class="ai-menu-item-label">{{ t("aiSettings.title") }}</span>
           <span v-if="isConfigured" class="ai-status-dot ai-status-dot--success" />
           <span v-else class="ai-status-dot ai-status-dot--warning" />
         </button>
@@ -78,151 +74,175 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import type { Editor } from '@tiptap/vue-3'
-import BaseTooltip from '@/ui/BaseTooltip.vue'
-import { t } from '@/locales'
-import { useAi } from '@/ai'
-import type { AiAdapter } from '@/ai'
-import { useAiConfig } from '@/ai/config/useAiConfig'
-import AiSettingsModal from './AiSettingsModal.vue'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+
+import { useAi } from "@/ai";
+import type { AiAdapter } from "@/ai";
+import { useAiConfig } from "@/ai/config/useAiConfig";
+import { t } from "@/locales";
+import BaseTooltip from "@/ui/BaseTooltip.vue";
+
+import AiSettingsModal from "./AiSettingsModal.vue";
+
+import type { Editor } from "@tiptap/vue-3";
 
 interface Props {
-  editor: Editor | null
-  adapter: AiAdapter
+  editor: Editor | null;
+  adapter: AiAdapter;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
-const isOpen = ref(false)
-const customPrompt = ref('')
-const containerRef = ref<HTMLElement | null>(null)
-const showSettings = ref(false)
+const isOpen = ref(false);
+const customPrompt = ref("");
+const containerRef = ref<HTMLElement | null>(null);
+const showSettings = ref(false);
 
-const { isConfigured } = useAiConfig()
+const { isConfigured } = useAiConfig();
 
-const { isLoading, continueWritingStream, polishStream, summarizeStream, translateStream, customAiStream } = useAi({
+const {
+  isLoading,
+  continueWritingStream,
+  polishStream,
+  summarizeStream,
+  translateStream,
+  customAiStream,
+} = useAi({
   adapter: props.adapter,
-})
+});
 
 const menuItems = computed(() => [
-  { key: 'continue', label: t('editor.continueWriting'), icon: '✍️', action: handleContinue },
-  { key: 'polish', label: t('editor.polish'), icon: '✨', action: handlePolish },
-  { key: 'summarize', label: t('editor.summarize'), icon: '📝', action: handleSummarize },
-  { key: 'translate-en', label: t('editor.lang.en'), icon: '🌐', action: () => handleTranslate('en') },
-  { key: 'translate-zh', label: t('editor.lang.zh-CN'), icon: '🇨🇳', action: () => handleTranslate('zh-CN') },
-])
+  { key: "continue", label: t("editor.continueWriting"), icon: "✍️", action: handleContinue },
+  { key: "polish", label: t("editor.polish"), icon: "✨", action: handlePolish },
+  { key: "summarize", label: t("editor.summarize"), icon: "📝", action: handleSummarize },
+  {
+    key: "translate-en",
+    label: t("editor.lang.en"),
+    icon: "🌐",
+    action: () => handleTranslate("en"),
+  },
+  {
+    key: "translate-zh",
+    label: t("editor.lang.zh-CN"),
+    icon: "🇨🇳",
+    action: () => handleTranslate("zh-CN"),
+  },
+]);
 
 const toggleMenu = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const getSelectedText = () => {
-  if (!props.editor) return ''
-  const { from, to } = props.editor.state.selection
-  return props.editor.state.doc.textBetween(from, to, ' ')
-}
+  if (!props.editor) return "";
+  const { from, to } = props.editor.state.selection;
+  return props.editor.state.doc.textBetween(from, to, " ");
+};
 
 const insertAtCursor = (text: string) => {
-  props.editor?.chain().focus().insertContent(text).run()
-}
+  props.editor?.chain().focus().insertContent(text).run();
+};
 
 const replaceSelection = (text: string) => {
-  props.editor?.chain().focus().deleteSelection().insertContent(text).run()
-}
+  props.editor?.chain().focus().deleteSelection().insertContent(text).run();
+};
 
 const handleContinue = async () => {
-  isOpen.value = false
-  const text = getSelectedText() || props.editor?.getText() || ''
-  if (!text.trim()) return
+  isOpen.value = false;
+  const text = getSelectedText() || props.editor?.getText() || "";
+  if (!text.trim()) return;
 
   // Move cursor to end of selection
-  props.editor?.commands.focus('end')
+  props.editor?.commands.focus("end");
 
   await continueWritingStream(text, {
     onToken: (token) => insertAtCursor(token),
-    onError: (error) => console.error('AI Error:', error),
-  })
-}
+    onError: (error) => console.error("AI Error:", error),
+  });
+};
 
 const handlePolish = async () => {
-  isOpen.value = false
-  const text = getSelectedText()
-  if (!text.trim()) return
+  isOpen.value = false;
+  const text = getSelectedText();
+  if (!text.trim()) return;
 
-  let result = ''
+  let result = "";
   await polishStream(text, {
-    onToken: (token) => { result += token },
+    onToken: (token) => {
+      result += token;
+    },
     onComplete: () => replaceSelection(result),
-    onError: (error) => console.error('AI Error:', error),
-  })
-}
+    onError: (error) => console.error("AI Error:", error),
+  });
+};
 
 const handleSummarize = async () => {
-  isOpen.value = false
-  const text = getSelectedText() || props.editor?.getText() || ''
-  if (!text.trim()) return
+  isOpen.value = false;
+  const text = getSelectedText() || props.editor?.getText() || "";
+  if (!text.trim()) return;
 
   await summarizeStream(text, {
     onToken: (token) => insertAtCursor(token),
-    onError: (error) => console.error('AI Error:', error),
-  })
-}
+    onError: (error) => console.error("AI Error:", error),
+  });
+};
 
 const handleTranslate = async (lang: string) => {
-  isOpen.value = false
-  const text = getSelectedText()
-  if (!text.trim()) return
+  isOpen.value = false;
+  const text = getSelectedText();
+  if (!text.trim()) return;
 
-  let result = ''
+  let result = "";
   await translateStream(text, lang, {
-    onToken: (token) => { result += token },
+    onToken: (token) => {
+      result += token;
+    },
     onComplete: () => replaceSelection(result),
-    onError: (error) => console.error('AI Error:', error),
-  })
-}
+    onError: (error) => console.error("AI Error:", error),
+  });
+};
 
 const handleCustomAi = async () => {
-  if (!customPrompt.value.trim()) return
-  isOpen.value = false
-  
-  const text = getSelectedText() || props.editor?.getText() || ''
-  const instruction = customPrompt.value
-  customPrompt.value = ''
+  if (!customPrompt.value.trim()) return;
+  isOpen.value = false;
+
+  const text = getSelectedText() || props.editor?.getText() || "";
+  const instruction = customPrompt.value;
+  customPrompt.value = "";
 
   await customAiStream(text, instruction, {
     onToken: (token) => insertAtCursor(token),
-    onError: (error) => console.error('AI Error:', error),
-  })
-}
+    onError: (error) => console.error("AI Error:", error),
+  });
+};
 
 const handleItemClick = (item: { action: () => void }) => {
-  item.action()
-}
+  item.action();
+};
 
 const openSettings = () => {
-  isOpen.value = false
-  showSettings.value = true
-}
+  isOpen.value = false;
+  showSettings.value = true;
+};
 
 const onSettingsSaved = () => {
   // Settings saved, menu will update via reactive isConfigured
-}
+};
 
 // Close on click outside
 const handleClickOutside = (e: MouseEvent) => {
   if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-    isOpen.value = false
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener("click", handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <style scoped>
@@ -233,8 +253,8 @@ onUnmounted(() => {
 
 .ai-toolbar-trigger {
   display: inline-flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
   height: 32px;
   padding: 0 10px;
   font-size: 13px;
@@ -244,13 +264,13 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   border-radius: 16px;
-  transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: all 0.2s ease;
 }
 
 .ai-toolbar-trigger:hover:not(:disabled) {
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
 }
 
 .ai-toolbar-trigger.is-open {
@@ -258,8 +278,8 @@ onUnmounted(() => {
 }
 
 .ai-toolbar-trigger:disabled {
-  opacity: 0.7;
   cursor: wait;
+  opacity: 0.7;
 }
 
 .ai-icon {
@@ -276,7 +296,9 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Dropdown */
@@ -286,8 +308,8 @@ onUnmounted(() => {
   left: 0;
   z-index: var(--tiptap-z-bubble, 200);
   min-width: 200px;
-  margin-top: 8px;
   padding: 8px;
+  margin-top: 8px;
   background: var(--tiptap-bg, #fff);
   border: 1px solid var(--tiptap-border, #e5e5e5);
   border-radius: 12px;
@@ -296,8 +318,8 @@ onUnmounted(() => {
 
 .ai-menu-item {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
@@ -336,10 +358,10 @@ onUnmounted(() => {
   padding: 0 12px;
   font-size: 13px;
   color: var(--tiptap-text, #1a1a1a);
+  outline: none;
   background: var(--tiptap-bg-secondary, #f5f5f5);
   border: 1px solid var(--tiptap-border, #e5e5e5);
   border-radius: 8px;
-  outline: none;
   transition: border-color 0.2s ease;
 }
 
@@ -368,8 +390,8 @@ onUnmounted(() => {
 }
 
 .ai-menu-send:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* Not configured badge */
@@ -403,8 +425,8 @@ onUnmounted(() => {
 
 /* Disabled menu items */
 .ai-menu-item.is-disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .ai-menu-item.is-disabled:hover {
@@ -435,7 +457,9 @@ onUnmounted(() => {
 /* Transition */
 .ai-menu-fade-enter-active,
 .ai-menu-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .ai-menu-fade-enter-from,

@@ -2,12 +2,13 @@
  * Word 导入工具
  * @description 使用 mammoth 将 .docx 文件转换为 HTML 并插入编辑器
  */
-import mammoth from 'mammoth'
-import type { Editor } from '@tiptap/core'
+import mammoth from "mammoth";
+
+import type { Editor } from "@tiptap/core";
 
 export interface WordImportResult {
-  html: string
-  messages: string[]
+  html: string;
+  messages: string[];
 }
 
 /**
@@ -16,7 +17,7 @@ export interface WordImportResult {
  * @returns 转换结果（HTML + 消息）
  */
 export async function convertWordToHtml(file: File): Promise<WordImportResult> {
-  const arrayBuffer = await file.arrayBuffer()
+  const arrayBuffer = await file.arrayBuffer();
   const result = await mammoth.convertToHtml(
     { arrayBuffer },
     {
@@ -29,12 +30,12 @@ export async function convertWordToHtml(file: File): Promise<WordImportResult> {
         "p[style-name='Heading 6'] => h6:fresh",
       ],
     },
-  )
+  );
 
   return {
     html: result.value,
     messages: result.messages.map((m) => m.message),
-  }
+  };
 }
 
 /**
@@ -43,11 +44,11 @@ export async function convertWordToHtml(file: File): Promise<WordImportResult> {
  * @param file - .docx 文件
  */
 export async function importWordFile(editor: Editor, file: File): Promise<WordImportResult> {
-  const result = await convertWordToHtml(file)
+  const result = await convertWordToHtml(file);
 
   if (result.html) {
-    editor.chain().focus().setContent(result.html).run()
+    editor.chain().focus().setContent(result.html).run();
   }
 
-  return result
+  return result;
 }

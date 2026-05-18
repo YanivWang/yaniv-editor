@@ -4,77 +4,77 @@
  */
 
 /** Theme mode */
-export type ThemeMode = 'light' | 'dark' | 'auto'
+export type ThemeMode = "light" | "dark" | "auto";
 
 /** Theme preset */
-export type ThemePreset = 'default' | 'notion' | 'typora' | 'word' | 'github' | 'custom'
+export type ThemePreset = "default" | "notion" | "typora" | "word" | "github" | "custom";
 
 /** Feature flags */
 export interface FeatureFlags {
   // 基础功能
-  heading?: boolean
-  textFormat?: boolean
-  list?: boolean
-  align?: boolean
-  color?: boolean
-  image?: boolean
-  
+  heading?: boolean;
+  textFormat?: boolean;
+  list?: boolean;
+  align?: boolean;
+  color?: boolean;
+  image?: boolean;
+
   // 高级功能
-  font?: boolean
-  link?: boolean
-  table?: boolean
-  codeBlock?: boolean
-  undoRedo?: boolean
-  formatPainter?: boolean
-  zoom?: boolean
-  subscriptSuperscript?: boolean
-  clearFormat?: boolean
-  
+  font?: boolean;
+  link?: boolean;
+  table?: boolean;
+  codeBlock?: boolean;
+  undoRedo?: boolean;
+  formatPainter?: boolean;
+  zoom?: boolean;
+  subscriptSuperscript?: boolean;
+  clearFormat?: boolean;
+
   // 工具
-  headerNav?: boolean
-  footerNav?: boolean
-  dragHandleMenu?: boolean
-  floatingMenu?: boolean
-  linkBubbleMenu?: boolean
-  tableToolbar?: boolean
-  imageToolbar?: boolean
-  
+  headerNav?: boolean;
+  footerNav?: boolean;
+  dragHandleMenu?: boolean;
+  floatingMenu?: boolean;
+  linkBubbleMenu?: boolean;
+  tableToolbar?: boolean;
+  imageToolbar?: boolean;
+
   // AI
-  ai?: boolean
+  ai?: boolean;
 }
 
 /** AI configuration */
 export interface AiConfig {
-  provider: 'openai' | 'aliyun' | 'ollama' | 'deepseek'
-  apiKey: string
-  model?: string
-  baseUrl?: string
+  provider: "openai" | "aliyun" | "ollama" | "deepseek";
+  apiKey: string;
+  model?: string;
+  baseUrl?: string;
 }
 
 /** Editor configuration */
 export interface EditorConfig {
   /** Theme mode (light/dark/auto) */
-  theme?: ThemeMode
+  theme?: ThemeMode;
   /** Theme preset */
-  themePreset?: ThemePreset
+  themePreset?: ThemePreset;
   /** Custom theme CSS variables */
-  customTheme?: Record<string, string>
+  customTheme?: Record<string, string>;
   /** Feature flags */
-  features?: FeatureFlags
+  features?: FeatureFlags;
   /** AI configuration */
-  aiConfig?: AiConfig
+  aiConfig?: AiConfig;
   /** Locale */
-  locale?: 'zh-CN' | 'zh-TW' | 'en-US'
+  locale?: "zh-CN" | "zh-TW" | "en-US";
   /** Readonly mode */
-  readonly?: boolean
+  readonly?: boolean;
   /** Preview mode (no toolbar) */
-  previewMode?: boolean
+  previewMode?: boolean;
   /** Initial content */
-  initialContent?: string
+  initialContent?: string;
   /** Placeholder */
-  placeholder?: string
+  placeholder?: string;
   /** License key */
-  licenseKey?: string
+  licenseKey?: string;
 }
 
 /** Preset configurations */
@@ -87,7 +87,7 @@ export const PRESET_CONFIGS = {
       undoRedo: true,
     },
   } satisfies Partial<EditorConfig>,
-  
+
   /** 基础配置 */
   basic: {
     features: {
@@ -100,7 +100,7 @@ export const PRESET_CONFIGS = {
       headerNav: true,
     },
   } satisfies Partial<EditorConfig>,
-  
+
   /** 高级配置 */
   advanced: {
     features: {
@@ -125,7 +125,7 @@ export const PRESET_CONFIGS = {
       imageToolbar: true,
     },
   } satisfies Partial<EditorConfig>,
-  
+
   /** 完整配置（含 AI） */
   full: {
     features: {
@@ -154,21 +154,21 @@ export const PRESET_CONFIGS = {
       ai: true,
     },
   } satisfies Partial<EditorConfig>,
-  
+
   /** Notion 风格配置 - 极简工具栏 + 浮动格式化 */
   notion: {
-    themePreset: 'notion' as ThemePreset,
+    themePreset: "notion" as ThemePreset,
     features: {
       // 固定工具栏只保留撤消/重做
       undoRedo: true,
-      
+
       // 浮动工具栏（选中文字时显示）
       floatingMenu: true,
       linkBubbleMenu: true,
-      
+
       // 拖拽排序（六个点菜单）
       dragHandleMenu: true,
-      
+
       // 隐藏固定工具栏中的其他按钮
       heading: false,
       textFormat: false,
@@ -186,25 +186,25 @@ export const PRESET_CONFIGS = {
       footerNav: false,
     },
   } satisfies Partial<EditorConfig>,
-} as const
+} as const;
 
-export type PresetName = keyof typeof PRESET_CONFIGS
+export type PresetName = keyof typeof PRESET_CONFIGS;
 
 /** 合并配置 */
 export function mergeConfig(
   preset: PresetName | Partial<EditorConfig>,
-  overrides?: Partial<EditorConfig>
+  overrides?: Partial<EditorConfig>,
 ): EditorConfig {
-  const base = typeof preset === 'string' ? PRESET_CONFIGS[preset] : preset
+  const base = typeof preset === "string" ? PRESET_CONFIGS[preset] : preset;
   return {
-    theme: 'light',
-    themePreset: 'default',
-    locale: 'zh-CN',
+    theme: "light",
+    themePreset: "default",
+    locale: "zh-CN",
     ...base,
     ...overrides,
     features: {
       ...base.features,
       ...overrides?.features,
     },
-  }
+  };
 }

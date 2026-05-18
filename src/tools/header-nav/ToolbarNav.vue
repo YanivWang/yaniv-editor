@@ -3,97 +3,127 @@
     <div class="editor-toolbar">
       <!-- 左侧：基础工具 -->
       <div class="toolbar-left">
-        <!-- 第一组：撤销/重做 -->
-        <div v-if="config.undoRedo" class="tool-group">
-          <UndoRedoButton :editor="editor" :disabled="config.undoRedoDisabled" />
+        <!-- 文档与编辑 -->
+        <div
+          v-if="showSection.document"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionDocument')"
+        >
+          <div v-if="config.undoRedo" class="tool-group">
+            <UndoRedoButton :editor="editor" :disabled="config.undoRedoDisabled" />
+          </div>
+
+          <div v-if="config.formatPainter" class="tool-group">
+            <FormatPainterButton :editor="editor" :disabled="config.formatPainterDisabled" />
+          </div>
+
+          <div v-if="config.findReplace" class="tool-group">
+            <FindReplaceButton :editor="editor" :hotkeys-enabled="!!config.findReplace" />
+          </div>
+
+          <div v-if="config.clearFormat" class="tool-group">
+            <ClearFormatButton :editor="editor" />
+          </div>
         </div>
 
-        <!-- 第二组：格式刷 -->
-        <div v-if="config.formatPainter" class="tool-group">
-          <FormatPainterButton :editor="editor" :disabled="config.formatPainterDisabled" />
+        <!-- 字体 -->
+        <div
+          v-if="showSection.typography"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionTypography')"
+        >
+          <div v-if="config.font" class="tool-group">
+            <FontFamilySelect :editor="editor" />
+            <FontSizeSelect :editor="editor" />
+          </div>
+
+          <div v-if="config.textFormat || config.codeBlock" class="tool-group">
+            <TextFormatButtons :editor="editor" :show-code="config.codeBlock" />
+          </div>
+
+          <div v-if="config.colorPicker" class="tool-group">
+            <ToolbarGroup>
+              <ColorPicker
+                :icon="FontColorsOutlined"
+                type="text"
+                :model-value="currentTextColor"
+                :title="t('editor.textColor')"
+                @select="setTextColor"
+              />
+              <ColorPicker
+                :icon="HighlightOutlined"
+                type="background"
+                :model-value="currentBgColor"
+                :title="t('editor.backgroundColor')"
+                @select="setHighlight"
+              />
+            </ToolbarGroup>
+          </div>
         </div>
 
-        <!-- 第三组：格式清除 -->
-        <div v-if="config.clearFormat" class="tool-group">
-          <ClearFormatButton :editor="editor" />
+        <!-- 段落 -->
+        <div
+          v-if="showSection.paragraph"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionParagraph')"
+        >
+          <div v-if="config.heading || config.list" class="tool-group">
+            <HeadingDropdown v-if="config.heading" :editor="editor" />
+            <ListTools v-if="config.list" :editor="editor" :show-task-list="true" />
+          </div>
+
+          <div v-if="config.align" class="tool-group">
+            <AlignDropdown :editor="editor" />
+          </div>
         </div>
 
-        <!-- 第四组：字体工具 -->
-        <div v-if="config.font" class="tool-group">
-          <FontFamilySelect :editor="editor" />
-          <FontSizeSelect :editor="editor" />
+        <!-- 插入 -->
+        <div
+          v-if="showSection.insert"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionInsert')"
+        >
+          <div v-if="config.link || config.table || config.image" class="tool-group">
+            <LinkButton v-if="config.link" :editor="editor" />
+            <TableButton v-if="config.table" :editor="editor" />
+            <ImageUpload v-if="config.image" :editor="editor" />
+          </div>
+
+          <div v-if="config.subscriptSuperscript" class="tool-group">
+            <SubscriptSuperscriptButton :editor="editor" />
+          </div>
+
+          <div v-if="config.word" class="tool-group">
+            <WordButton :editor="editor" />
+          </div>
+
+          <div v-if="config.template || config.gallery" class="tool-group">
+            <TemplateButton v-if="config.template" :editor="editor" />
+            <GalleryButton v-if="config.gallery" :editor="editor" />
+          </div>
         </div>
 
-        <!-- 第五组：文本格式（粗体、斜体、下划线、删除线、行内代码） -->
-        <div v-if="config.textFormat || config.codeBlock" class="tool-group">
-          <TextFormatButtons :editor="editor" :show-code="config.codeBlock" />
-        </div>
-
-        <!-- 第六组：颜色选择（文本颜色、背景颜色） -->
-        <div v-if="config.colorPicker" class="tool-group">
-          <ToolbarGroup>
-            <ColorPicker
-              :icon="FontColorsOutlined"
-              type="text"
-              :model-value="currentTextColor"
-              :title="t('editor.textColor')"
-              @select="setTextColor"
+        <!-- 智能 -->
+        <div
+          v-if="showSection.assistant"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionAssistant')"
+        >
+          <div v-if="config.ai && editor" class="tool-group">
+            <AiMenuButton
+              :editor="editor"
+              :icon="ThunderboltOutlined"
+              :label="t('editor.ai')"
+              :title="t('editor.ai')"
             />
-            <ColorPicker
-              :icon="HighlightOutlined"
-              type="background"
-              :model-value="currentBgColor"
-              :title="t('editor.backgroundColor')"
-              @select="setHighlight"
-            />
-          </ToolbarGroup>
+          </div>
         </div>
 
-        <!-- 第七组：标题和列表工具 -->
-        <div v-if="config.heading || config.list" class="tool-group">
-          <HeadingDropdown v-if="config.heading" :editor="editor" />
-          <ListTools v-if="config.list" :editor="editor" :show-task-list="true" />
-        </div>
-
-        <!-- 第八组：对齐工具 -->
-        <div v-if="config.align" class="tool-group">
-          <AlignDropdown :editor="editor" />
-        </div>
-
-        <!-- 第九组：链接、表格、图片 -->
-        <div v-if="config.link || config.table || config.image" class="tool-group">
-          <LinkButton v-if="config.link" :editor="editor" />
-          <TableButton v-if="config.table" :editor="editor" />
-          <ImageUpload v-if="config.image" :editor="editor" />
-        </div>
-
-        <!-- 第十组：上标下标工具 -->
-        <div v-if="config.subscriptSuperscript" class="tool-group">
-          <SubscriptSuperscriptButton :editor="editor" />
-        </div>
-
-        <!-- 第十一组：Word 导入/导出 -->
-        <div v-if="config.word" class="tool-group">
-          <WordButton :editor="editor" />
-        </div>
-
-        <!-- 第十二组：模板和图库 -->
-        <div v-if="config.template || config.gallery" class="tool-group">
-          <TemplateButton v-if="config.template" :editor="editor" />
-          <GalleryButton v-if="config.gallery" :editor="editor" />
-        </div>
-
-        <!-- 第十三组：AI工具 -->
-        <div v-if="config.ai && editor" class="tool-group">
-          <AiMenuButton
-            :editor="editor"
-            :icon="ThunderboltOutlined"
-            :label="t('editor.ai')"
-            :title="t('editor.ai')"
-          />
-        </div>
-
-        <!-- 更多工具可以通过插槽扩展 -->
         <slot name="extra" />
       </div>
 
@@ -115,125 +145,143 @@
  * <ToolbarNav :editor="editor" :enabled="false" /> // 关闭工具栏
  * ```
  */
-import { computed, ref, watch } from 'vue'
-import type { Editor } from '@tiptap/vue-3'
-import { ToolbarGroup } from '@/ui'
-import { ColorPicker } from '@/features/basic/color'
-import { TextFormatButtons } from '@/features/basic/text-format'
-import { ListTools } from '@/features/basic/list'
-import { HeadingDropdown } from '@/features/basic/heading'
-import { AlignDropdown } from '@/features/basic/align'
-import { ImageUpload } from '@/features/basic/image'
+import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { computed, ref, watch } from "vue";
 
-import { FontFamilySelect, FontSizeSelect } from '@/features/advanced/font'
-import { ClearFormatButton } from '@/features/advanced/format-clear'
-import { LinkButton } from '@/features/advanced/link'
-import { TableButton } from '@/features/advanced/table'
-import { SubscriptSuperscriptButton } from '@/features/advanced/subscript-superscript'
-import { UndoRedoButton } from '@/features/advanced/undo-redo'
-import { FormatPainterButton } from '@/features/advanced/format-painter'
-import { WordButton } from '@/features/advanced/word'
-import { TemplateButton } from '@/features/advanced/template'
-import { GalleryButton } from '@/features/advanced/gallery'
-import { AiMenuButton } from '@/ai'
+import { AiMenuButton } from "@/ai";
+import FindReplaceButton from "@/features/advanced/find-replace/FindReplaceButton.vue";
+import { FontFamilySelect, FontSizeSelect } from "@/features/advanced/font";
+import { ClearFormatButton } from "@/features/advanced/format-clear";
+import { GalleryButton } from "@/features/advanced/gallery";
+import { LinkButton } from "@/features/advanced/link";
+import { SubscriptSuperscriptButton } from "@/features/advanced/subscript-superscript";
+import { TableButton } from "@/features/advanced/table";
+import { TemplateButton } from "@/features/advanced/template";
+import { UndoRedoButton } from "@/features/advanced/undo-redo";
+import { WordButton } from "@/features/advanced/word";
+import { AlignDropdown } from "@/features/basic/align";
+import { ColorPicker } from "@/features/basic/color";
+import { HeadingDropdown } from "@/features/basic/heading";
+import { ImageUpload } from "@/features/basic/image";
+import { ListTools } from "@/features/basic/list";
+import { TextFormatButtons } from "@/features/basic/text-format";
+import { t } from "@/locales";
+import { ToolbarGroup } from "@/ui";
+import { createCommandRunner } from "@/utils/editorCommands";
 
-import { createCommandRunner } from '@/utils/editorCommands'
-import { t } from '@/locales'
-import type { ToolbarToolsConfig } from './toolbarConfig'
-import { DEFAULT_TOOLBAR_CONFIG } from './toolbarConfig'
-import {
-  FontColorsOutlined,
-  HighlightOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons-vue'
+import { DEFAULT_TOOLBAR_CONFIG } from "./toolbarConfig";
+
+import type { ToolbarToolsConfig } from "./toolbarConfig";
+import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
   /** 编辑器实例 */
-  editor: Editor | null | undefined
+  editor: Editor | null | undefined;
   /** 工具栏配置，控制显示哪些工具 */
-  config?: ToolbarToolsConfig
+  config?: ToolbarToolsConfig;
   /** 是否启用工具栏，默认为 true */
-  enabled?: boolean
+  enabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   config: () => DEFAULT_TOOLBAR_CONFIG,
   enabled: true,
-})
+});
 
-const editor = computed(() => props.editor ?? null)
+const editor = computed(() => props.editor ?? null);
 
 // ===== 合并配置 =====
 const config = computed(() => {
   return {
     ...DEFAULT_TOOLBAR_CONFIG,
     ...props.config,
-  }
-})
+  };
+});
+
+/** 工具栏分区显隐（信息架构：文档 / 字体 / 段落 / 插入 / 智能） */
+const showSection = computed(() => {
+  const c = config.value;
+  const ed = editor.value;
+  return {
+    document: !!(c.undoRedo || c.formatPainter || c.findReplace || c.clearFormat),
+    typography: !!(c.font || c.textFormat || c.codeBlock || c.colorPicker),
+    paragraph: !!(c.heading || c.list || c.align),
+    insert: !!(
+      c.link ||
+      c.table ||
+      c.image ||
+      c.subscriptSuperscript ||
+      c.word ||
+      c.template ||
+      c.gallery
+    ),
+    assistant: !!(c.ai && ed),
+  };
+});
 
 // ===== 响应式状态 =====
-const currentTextColor = ref<string>('#000000')
-const currentBgColor = ref<string>('#ffffff')
+const currentTextColor = ref<string>("#000000");
+const currentBgColor = ref<string>("#ffffff");
 
 // ===== 辅助函数 =====
 /**
  * 标准化颜色值（确保格式统一）
  */
 function normalizeColor(color: string | undefined): string {
-  if (!color) return '#000000'
-  const trimmed = color.trim()
-  if (trimmed.startsWith('#')) {
-    return trimmed.toLowerCase()
+  if (!color) return "#000000";
+  const trimmed = color.trim();
+  if (trimmed.startsWith("#")) {
+    return trimmed.toLowerCase();
   }
-  return trimmed.toLowerCase()
+  return trimmed.toLowerCase();
 }
 
 /**
  * 命令执行器
  */
-const runCommand = createCommandRunner(editor)
+const runCommand = createCommandRunner(editor);
 
 // ===== 颜色应用函数 =====
 const setTextColor = (color: string) => {
-  currentTextColor.value = color
-  runCommand((chain) => chain.setColor(color))()
-}
+  currentTextColor.value = color;
+  runCommand((chain) => chain.setColor(color))();
+};
 
 const setHighlight = (color: string) => {
-  currentBgColor.value = color
-  runCommand((chain) => chain.setHighlight({ color }))()
-}
+  currentBgColor.value = color;
+  runCommand((chain) => chain.setHighlight({ color }))();
+};
 
 // 监听编辑器状态，更新当前颜色
 watch(
-  () => editor.value?.getAttributes('textStyle'),
+  () => editor.value?.getAttributes("textStyle"),
   (attrs) => {
     if (attrs?.color) {
-      currentTextColor.value = normalizeColor(attrs.color)
+      currentTextColor.value = normalizeColor(attrs.color);
     } else {
-      currentTextColor.value = '#000000'
+      currentTextColor.value = "#000000";
     }
   },
-  { deep: true, immediate: true }
-)
+  { deep: true, immediate: true },
+);
 
 watch(
-  () => editor.value?.getAttributes('highlight'),
+  () => editor.value?.getAttributes("highlight"),
   (attrs) => {
     if (attrs?.color) {
-      currentBgColor.value = normalizeColor(attrs.color)
+      currentBgColor.value = normalizeColor(attrs.color);
     } else {
-      currentBgColor.value = '#ffffff'
+      currentBgColor.value = "#ffffff";
     }
   },
-  { deep: true, immediate: true }
-)
+  { deep: true, immediate: true },
+);
 </script>
 
 <style lang="scss" scoped>
 // Dark 模式选择器变量（用于统一管理暗色主题样式）
-$dark-selector: ':where(.dark, .dark *) &';
+$dark-selector: ":where(.dark, .dark *) &";
 
 /* ===== 工具栏容器 ===== */
 .editor-toolbar-container {
@@ -264,20 +312,36 @@ $dark-selector: ':where(.dark, .dark *) &';
 /* ===== 工具栏左侧区域 ===== */
 .toolbar-left {
   display: flex;
+  flex: 1;
   flex-wrap: wrap;
   gap: 2px;
   align-items: center;
   min-width: 0;
-  flex: 1;
+}
+
+.toolbar-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.toolbar-section + .toolbar-section {
+  padding-left: 8px;
+  margin-left: 4px;
+  border-left: 1px solid #e8e8e8;
+
+  #{$dark-selector} {
+    border-left-color: #434343;
+  }
 }
 
 /* ===== 工具栏右侧区域 ===== */
 .toolbar-right {
   display: flex;
-  align-items: center;
   gap: 8px;
-  margin-left: auto;
+  align-items: center;
   padding-left: 12px;
+  margin-left: auto;
 }
 
 /* ===== 工具组 ===== */
@@ -301,4 +365,3 @@ $dark-selector: ':where(.dark, .dark *) &';
   }
 }
 </style>
-

@@ -1,6 +1,6 @@
-import type { Editor } from '@tiptap/core';
+import { Mark, mergeAttributes } from "@tiptap/core";
 
-import { Mark, mergeAttributes } from '@tiptap/core';
+import type { Editor } from "@tiptap/core";
 
 export interface AiHighlightOptions {
   HTMLAttributes: Record<string, any>;
@@ -12,7 +12,7 @@ export interface AiSuggestionData {
   isStreaming: boolean;
 }
 
-declare module '@tiptap/core' {
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     aiHighlight: {
       /**
@@ -32,12 +32,12 @@ declare module '@tiptap/core' {
  * @description Highlights text that is being processed by AI
  */
 export const AiHighlightMark = Mark.create<AiHighlightOptions>({
-  name: 'aiHighlight',
+  name: "aiHighlight",
 
   addOptions() {
     return {
       HTMLAttributes: {
-        class: 'ai-highlight',
+        class: "ai-highlight",
       },
     };
   },
@@ -46,35 +46,34 @@ export const AiHighlightMark = Mark.create<AiHighlightOptions>({
     return {
       originalText: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-original-text'),
+        parseHTML: (element) => element.getAttribute("data-original-text"),
         renderHTML: (attributes) => {
           if (!attributes.originalText) {
             return {};
           }
           return {
-            'data-original-text': attributes.originalText,
+            "data-original-text": attributes.originalText,
           };
         },
       },
       suggestedText: {
         default: null,
-        parseHTML: (element) => element.getAttribute('data-suggested-text'),
+        parseHTML: (element) => element.getAttribute("data-suggested-text"),
         renderHTML: (attributes) => {
           if (!attributes.suggestedText) {
             return {};
           }
           return {
-            'data-suggested-text': attributes.suggestedText,
+            "data-suggested-text": attributes.suggestedText,
           };
         },
       },
       isStreaming: {
         default: false,
-        parseHTML: (element) =>
-          element.getAttribute('data-is-streaming') === 'true',
+        parseHTML: (element) => element.getAttribute("data-is-streaming") === "true",
         renderHTML: (attributes) => {
           return {
-            'data-is-streaming': attributes.isStreaming ? 'true' : 'false',
+            "data-is-streaming": attributes.isStreaming ? "true" : "false",
           };
         },
       },
@@ -84,13 +83,13 @@ export const AiHighlightMark = Mark.create<AiHighlightOptions>({
   parseHTML() {
     return [
       {
-        tag: 'span.ai-highlight',
+        tag: "span.ai-highlight",
         getAttrs: (element) => {
-          if (typeof element === 'string') return false;
+          if (typeof element === "string") return false;
           return {
-            originalText: element.getAttribute('data-original-text'),
-            suggestedText: element.getAttribute('data-suggested-text'),
-            isStreaming: element.getAttribute('data-is-streaming') === 'true',
+            originalText: element.getAttribute("data-original-text"),
+            suggestedText: element.getAttribute("data-suggested-text"),
+            isStreaming: element.getAttribute("data-is-streaming") === "true",
           };
         },
       },
@@ -98,11 +97,7 @@ export const AiHighlightMark = Mark.create<AiHighlightOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'span',
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
-    ];
+    return ["span", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
   },
 
   addCommands() {
@@ -135,14 +130,14 @@ export function addAiHighlight(
   const aiHighlightMark = state.schema.marks.aiHighlight;
 
   if (!aiHighlightMark) {
-    console.warn('[AI Highlight] aiHighlight mark not found in schema');
+    console.warn("[AI Highlight] aiHighlight mark not found in schema");
     return;
   }
 
   // 验证位置是否有效
   const docSize = doc.content.size;
   if (from < 0 || to < 0 || from > docSize || to > docSize || from > to) {
-    console.warn('[AI Highlight] Invalid range for add:', { from, to, docSize });
+    console.warn("[AI Highlight] Invalid range for add:", { from, to, docSize });
     return;
   }
 
@@ -164,21 +159,21 @@ export function updateAiHighlight(
   const aiHighlightMark = state.schema.marks.aiHighlight;
 
   if (!aiHighlightMark) {
-    console.warn('[AI Highlight] aiHighlight mark not found in schema');
+    console.warn("[AI Highlight] aiHighlight mark not found in schema");
     return;
   }
 
   // 验证位置是否有效
   const docSize = doc.content.size;
   if (from < 0 || to < 0 || from > docSize || to > docSize || from > to) {
-    console.warn('[AI Highlight] Invalid range for update:', { from, to, docSize });
+    console.warn("[AI Highlight] Invalid range for update:", { from, to, docSize });
     return;
   }
 
   // Find the existing mark
   let existingMark: any = null;
   doc.nodesBetween(from, to, (node) => {
-    const mark = node.marks.find((m) => m.type.name === 'aiHighlight');
+    const mark = node.marks.find((m) => m.type.name === "aiHighlight");
     if (mark) {
       existingMark = mark;
       return false;
@@ -203,7 +198,7 @@ export function removeAiHighlight(editor: Editor): void {
   const { tr, doc } = state;
 
   doc.descendants((node, pos) => {
-    if (node.marks.some((mark) => mark.type.name === 'aiHighlight')) {
+    if (node.marks.some((mark) => mark.type.name === "aiHighlight")) {
       const from = pos;
       const to = pos + node.nodeSize;
       tr.removeMark(from, to, state.schema.marks.aiHighlight);
@@ -216,23 +211,20 @@ export function removeAiHighlight(editor: Editor): void {
 /**
  * Helper function to get AI suggestion data from a mark at position
  */
-export function getAiSuggestionData(
-  editor: Editor,
-  pos: number,
-): AiSuggestionData | null {
+export function getAiSuggestionData(editor: Editor, pos: number): AiSuggestionData | null {
   const { state } = editor;
   const { doc } = state;
 
   const $pos = doc.resolve(pos);
   const marks = $pos.marks();
-  const aiMark = marks.find((mark) => mark.type.name === 'aiHighlight');
+  const aiMark = marks.find((mark) => mark.type.name === "aiHighlight");
 
   if (aiMark) {
     const attrs = aiMark.attrs as Record<string, any>;
     if (attrs) {
       return {
-        originalText: attrs.originalText || '',
-        suggestedText: attrs.suggestedText || '',
+        originalText: attrs.originalText || "",
+        suggestedText: attrs.suggestedText || "",
         isStreaming: attrs.isStreaming || false,
       };
     }
@@ -240,4 +232,3 @@ export function getAiSuggestionData(
 
   return null;
 }
-

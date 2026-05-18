@@ -4,5 +4,4 @@
  */
 
 // 组件导出
-export { default as ZoomBar } from './ZoomBar.vue'
-
+export { default as ZoomBar } from "./ZoomBar.vue";

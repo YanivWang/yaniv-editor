@@ -63,7 +63,8 @@
   transform: translateY(0);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .table-menu-btn:active:not(:disabled) {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .table-menu-btn:active:not(:disabled) {
   background: #303030;
 }
 
@@ -126,7 +127,7 @@
 }
 
 /* 响应式 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .table-bubble-menu {
     max-width: calc(100vw - 20px);
     padding: 4px;
@@ -154,7 +155,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .table-bubble-menu {
     padding: 3px;
     border-radius: 6px;

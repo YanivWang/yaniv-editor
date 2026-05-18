@@ -4,7 +4,7 @@
  */
 
 // 类型导出
-export * from './types'
+export * from "./types";
 
 // 核心功能
 export {
@@ -12,7 +12,7 @@ export {
   createCollaborationExtensions,
   normalizeContent,
   getRandomColor,
-} from './collaboration'
+} from "./collaboration";
 
 // 工具函数
 export {
@@ -23,15 +23,14 @@ export {
   getUniqueUsers,
   normalizeWebSocketUrl,
   debounce,
-} from './utils'
+} from "./utils";
 
 // Composable
-export { useCollaboration } from './useCollaboration'
-export type { UseCollaborationOptions, UseCollaborationReturn } from './useCollaboration'
+export { useCollaboration } from "./useCollaboration";
+export type { UseCollaborationOptions, UseCollaborationReturn } from "./useCollaboration";
 
 // 组件
-export { default as CollaborationToggle } from './CollaborationToggle.vue'
+export { default as CollaborationToggle } from "./CollaborationToggle.vue";
 
 // 样式文件需要在使用时单独导入
 // import './tools/collaboration/collaboration.css'
-

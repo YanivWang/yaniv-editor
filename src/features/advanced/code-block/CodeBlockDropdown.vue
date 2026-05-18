@@ -14,67 +14,68 @@
  * CodeBlockDropdown - 代码块按钮组件
  * @description 点击直接插入代码块，使用默认语言
  */
-import { computed } from 'vue'
-import type { Editor } from '@tiptap/vue-3'
-import { ToolbarGroup, ToolbarButton } from '@/ui'
-import { createCommandRunner } from '@/utils/editorCommands'
-import { createStateCheckers } from '@/utils/editorState'
-import { t } from '@/locales'
-import { CodeOutlined } from '@ant-design/icons-vue'
+import { CodeOutlined } from "@ant-design/icons-vue";
+import { computed } from "vue";
+
+import { t } from "@/locales";
+import { ToolbarGroup, ToolbarButton } from "@/ui";
+import { createCommandRunner } from "@/utils/editorCommands";
+import { createStateCheckers } from "@/utils/editorState";
+
+import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined
+  editor: Editor | null | undefined;
 }
 
-const props = defineProps<Props>()
-const editor = computed(() => props.editor ?? null)
+const props = defineProps<Props>();
+const editor = computed(() => props.editor ?? null);
 
 // ===== 工具函数 =====
-const runCommand = createCommandRunner(editor)
-const { isActive } = createStateCheckers(editor)
+const runCommand = createCommandRunner(editor);
+const { isActive } = createStateCheckers(editor);
 
 // ===== 检查是否激活代码块 =====
 const isCodeBlockActive = computed(() => {
-  return isActive('codeBlock')
-})
+  return isActive("codeBlock");
+});
 
 /**
  * 插入代码块（使用默认语言）
  * 处理多行选择：将所有选中的文本合并到一个代码块中
  */
 function insertCodeBlock() {
-  const e = editor.value
-  if (!e) return
+  const e = editor.value;
+  if (!e) return;
 
   // 如果当前已经是代码块，则退出代码块模式
   if (isCodeBlockActive.value) {
-    runCommand((chain) => chain.setParagraph())()
-    return
+    runCommand((chain) => chain.setParagraph())();
+    return;
   }
 
   // 获取选区
-  const { from, to, empty } = e.state.selection
+  const { from, to, empty } = e.state.selection;
 
   // 如果没有选中任何内容，直接插入空代码块
   if (empty) {
-    runCommand((chain) => chain.setCodeBlock({ language: 'javascript' }))()
-    return
+    runCommand((chain) => chain.setCodeBlock({ language: "javascript" }))();
+    return;
   }
 
   // 获取选中的文本内容（保留换行）
-  const selectedText = e.state.doc.textBetween(from, to, '\n')
+  const selectedText = e.state.doc.textBetween(from, to, "\n");
 
   // 删除选中内容并插入代码块
   e.chain()
     .focus()
     .deleteSelection()
     .insertContent({
-      type: 'codeBlock',
-      attrs: { language: 'javascript' },
-      content: selectedText ? [{ type: 'text', text: selectedText }] : undefined
+      type: "codeBlock",
+      attrs: { language: "javascript" },
+      content: selectedText ? [{ type: "text", text: selectedText }] : undefined,
     })
-    .run()
+    .run();
 }
 </script>
-

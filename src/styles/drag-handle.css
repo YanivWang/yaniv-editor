@@ -71,7 +71,7 @@
 }
 
 /* 列表项专用偏移 */
-.ProseMirror ul:not([data-type='taskList']) li .drag-handle {
+.ProseMirror ul:not([data-type="taskList"]) li .drag-handle {
   left: -52px;
 }
 
@@ -82,7 +82,7 @@
   right: 0;
   left: 0;
   height: 2px;
-  content: '';
+  content: "";
   background: #3b82f6;
   border-radius: 1px;
 }
@@ -105,11 +105,13 @@
   padding: 8px 0;
   overflow: hidden auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
   scrollbar-color: #bfbfbf transparent;
+  scrollbar-width: thin;
   background: var(--tp-menu-bg, #fff);
   border-radius: var(--tp-menu-radius, 8px);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 15%), 0 0 1px rgb(0 0 0 / 10%);
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 15%),
+    0 0 1px rgb(0 0 0 / 10%);
   animation: tp-fade-in 0.15s ease-out;
   -webkit-overflow-scrolling: touch;
 }
@@ -234,8 +236,14 @@
 }
 
 @keyframes slide-down {
-  from { max-height: 0; opacity: 0; }
-  to { max-height: 100px; opacity: 1; }
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 100px;
+    opacity: 1;
+  }
 }
 
 .color-picker-grid {
@@ -306,9 +314,17 @@
   font-weight: 600;
 }
 
-.heading-btn[data-level='1'] { font-size: 13px; }
-.heading-btn[data-level='2'] { font-size: 12px; }
-.heading-btn[data-level='3'] { font-size: 11px; }
+.heading-btn[data-level="1"] {
+  font-size: 13px;
+}
+
+.heading-btn[data-level="2"] {
+  font-size: 12px;
+}
+
+.heading-btn[data-level="3"] {
+  font-size: 11px;
+}
 
 /* ========== 子面板 ========== */
 .sub-panel {
@@ -335,7 +351,7 @@
 }
 
 /* ========== 响应式 ========== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .drag-handle {
     display: none;
   }
@@ -364,7 +380,9 @@
 /* ========== 深色模式 ========== */
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle-menu {
   background: var(--tp-menu-bg, #1f1f1f);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 40%), 0 0 1px rgb(255 255 255 / 10%);
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 40%),
+    0 0 1px rgb(255 255 255 / 10%);
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-section {
@@ -388,7 +406,9 @@
   color: #a8a8a8;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-item.active .menu-item-icon {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .menu-item.active
+  .menu-item-icon {
   color: var(--tp-color-primary, #4fc3f7);
 }
 
@@ -396,11 +416,13 @@
   background: #3a1a1a;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle-menu::-webkit-scrollbar-thumb {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .drag-handle-menu::-webkit-scrollbar-thumb {
   background: #434343;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle-menu::-webkit-scrollbar-thumb:hover {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .drag-handle-menu::-webkit-scrollbar-thumb:hover {
   background: #595959;
 }
 

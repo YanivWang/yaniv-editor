@@ -1,0 +1,30 @@
+{
+  "recommendations": [
+    // Vue 官方支持
+    "vue.volar",
+    // ESLint
+    "dbaeumer.vscode-eslint",
+    // Prettier
+    "esbenp.prettier-vscode",
+    // Stylelint
+    "stylelint.vscode-stylelint",
+    // 路径自动补全
+    "christian-kohler.path-intellisense",
+    // CSS 变量自动补全
+    "vunguyentuan.vscode-css-variables",
+    // i18n 辅助
+    "lokalise.i18n-ally",
+    // Git 历史
+    "eamodio.gitlens",
+    // 图标（与 VSCode icon 配合）
+    "pkief.material-icon-theme",
+    // Docker
+    "ms-azuretools.vscode-docker",
+    // DotEnv 高亮
+    "mikestead.dotenv"
+  ],
+  "unwantedRecommendations": [
+    // 与 Volar 冲突
+    "octref.vetur"
+  ]
+}

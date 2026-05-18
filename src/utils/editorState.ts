@@ -3,24 +3,24 @@
  * @description 编辑器状态检查工具函数
  */
 
-import type { Ref } from 'vue'
-import type { Editor } from '@tiptap/core'
+import type { Editor } from "@tiptap/core";
+import type { Ref } from "vue";
 
 /** Attribute value type for editor state checks */
-type AttributeValue = string | number | boolean | null | undefined
+type AttributeValue = string | number | boolean | null | undefined;
 
 /**
  * 状态检查器接口
  */
 export interface StateCheckers {
   /** 检查节点/标记是否激活 */
-  isActive: (name: string, attributes?: Record<string, AttributeValue>) => boolean
+  isActive: (name: string, attributes?: Record<string, AttributeValue>) => boolean;
   /** 检查标题级别是否激活 */
-  isHeadingActive: (level: number) => boolean
+  isHeadingActive: (level: number) => boolean;
   /** 检查对齐方式是否激活 */
-  isActiveAlign: (value: 'left' | 'center' | 'right' | 'justify') => boolean
+  isActiveAlign: (value: "left" | "center" | "right" | "justify") => boolean;
   /** 检查命令是否可执行 */
-  canExecute: (command: string) => boolean
+  canExecute: (command: string) => boolean;
 }
 
 /**
@@ -55,9 +55,9 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否激活
      */
     isActive: (name: string, attributes?: Record<string, AttributeValue>) => {
-      const e = editor.value
-      if (!e) return false
-      return attributes ? e.isActive(name, attributes) : e.isActive(name)
+      const e = editor.value;
+      if (!e) return false;
+      return attributes ? e.isActive(name, attributes) : e.isActive(name);
     },
 
     /**
@@ -66,9 +66,9 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否激活
      */
     isHeadingActive: (level: number) => {
-      const e = editor.value
-      if (!e) return false
-      return e.isActive('heading', { level })
+      const e = editor.value;
+      if (!e) return false;
+      return e.isActive("heading", { level });
     },
 
     /**
@@ -76,10 +76,10 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @param value - 对齐方式
      * @returns 是否激活
      */
-    isActiveAlign: (value: 'left' | 'center' | 'right' | 'justify') => {
-      const e = editor.value
-      if (!e) return false
-      return e.isActive({ textAlign: value })
+    isActiveAlign: (value: "left" | "center" | "right" | "justify") => {
+      const e = editor.value;
+      if (!e) return false;
+      return e.isActive({ textAlign: value });
     },
 
     /**
@@ -88,14 +88,17 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否可执行
      */
     canExecute: (command: string) => {
-      const e = editor.value
-      if (!e) return false
+      const e = editor.value;
+      if (!e) return false;
       // Tiptap commands are dynamically added, use type assertion through unknown
-      const canObj = e.can() as unknown as Record<string, ((...args: unknown[]) => boolean) | undefined>
-      const fn = canObj[command]
-      return typeof fn === 'function' ? fn() : false
+      const canObj = e.can() as unknown as Record<
+        string,
+        ((...args: unknown[]) => boolean) | undefined
+      >;
+      const fn = canObj[command];
+      return typeof fn === "function" ? fn() : false;
     },
-  }
+  };
 }
 
 /**
@@ -116,11 +119,11 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
 export function isActive(
   editor: Ref<Editor | null | undefined>,
   name: string,
-  attributes?: Record<string, AttributeValue>
+  attributes?: Record<string, AttributeValue>,
 ): boolean {
-  const e = editor.value
-  if (!e) return false
-  return attributes ? e.isActive(name, attributes) : e.isActive(name)
+  const e = editor.value;
+  if (!e) return false;
+  return attributes ? e.isActive(name, attributes) : e.isActive(name);
 }
 
 /**
@@ -129,13 +132,10 @@ export function isActive(
  * @param level - 标题级别 (1-6)
  * @returns 是否激活
  */
-export function isHeadingActive(
-  editor: Ref<Editor | null | undefined>,
-  level: number
-): boolean {
-  const e = editor.value
-  if (!e) return false
-  return e.isActive('heading', { level })
+export function isHeadingActive(editor: Ref<Editor | null | undefined>, level: number): boolean {
+  const e = editor.value;
+  if (!e) return false;
+  return e.isActive("heading", { level });
 }
 
 /**
@@ -146,11 +146,11 @@ export function isHeadingActive(
  */
 export function isActiveAlign(
   editor: Ref<Editor | null | undefined>,
-  value: 'left' | 'center' | 'right' | 'justify'
+  value: "left" | "center" | "right" | "justify",
 ): boolean {
-  const e = editor.value
-  if (!e) return false
-  return e.isActive({ textAlign: value })
+  const e = editor.value;
+  if (!e) return false;
+  return e.isActive({ textAlign: value });
 }
 
 /**
@@ -159,15 +159,15 @@ export function isActiveAlign(
  * @param command - 命令名称
  * @returns 是否可执行
  */
-export function canExecute(
-  editor: Ref<Editor | null | undefined>,
-  command: string
-): boolean {
-  const e = editor.value
-  if (!e) return false
-  const canObj = e.can() as unknown as Record<string, ((...args: unknown[]) => boolean) | undefined>
-  const fn = canObj[command]
-  return typeof fn === 'function' ? fn() : false
+export function canExecute(editor: Ref<Editor | null | undefined>, command: string): boolean {
+  const e = editor.value;
+  if (!e) return false;
+  const canObj = e.can() as unknown as Record<
+    string,
+    ((...args: unknown[]) => boolean) | undefined
+  >;
+  const fn = canObj[command];
+  return typeof fn === "function" ? fn() : false;
 }
 
 /**
@@ -176,19 +176,17 @@ export function canExecute(
  * @param editor - 编辑器实例引用
  * @returns 段落样式标识 ('paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6')
  */
-export function getCurrentParagraphStyle(
-  editor: Ref<Editor | null | undefined>
-): string {
-  const e = editor.value
-  if (!e) return 'paragraph'
+export function getCurrentParagraphStyle(editor: Ref<Editor | null | undefined>): string {
+  const e = editor.value;
+  if (!e) return "paragraph";
 
   for (let i = 1; i <= 6; i++) {
-    if (e.isActive('heading', { level: i })) {
-      return `h${i}`
+    if (e.isActive("heading", { level: i })) {
+      return `h${i}`;
     }
   }
 
-  return 'paragraph'
+  return "paragraph";
 }
 
 /**
@@ -198,25 +196,23 @@ export function getCurrentParagraphStyle(
  * @returns 对齐方式 ('left' | 'center' | 'right' | 'justify')
  */
 export function getCurrentTextAlign(
-  editor: Ref<Editor | null | undefined>
-): 'left' | 'center' | 'right' | 'justify' {
-  const e = editor.value
-  if (!e) return 'left'
+  editor: Ref<Editor | null | undefined>,
+): "left" | "center" | "right" | "justify" {
+  const e = editor.value;
+  if (!e) return "left";
 
-  const alignments: Array<'left' | 'center' | 'right' | 'justify'> = [
-    'left',
-    'center',
-    'right',
-    'justify',
-  ]
+  const alignments: Array<"left" | "center" | "right" | "justify"> = [
+    "left",
+    "center",
+    "right",
+    "justify",
+  ];
 
   for (const align of alignments) {
     if (e.isActive({ textAlign: align })) {
-      return align
+      return align;
     }
   }
 
-  return 'left'
+  return "left";
 }
-
-

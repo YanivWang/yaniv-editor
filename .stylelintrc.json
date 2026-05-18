@@ -1,0 +1,51 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-standard-scss",
+    "stylelint-config-recess-order",
+    "stylelint-config-html/vue",
+    "stylelint-prettier/recommended"
+  ],
+  "plugins": ["stylelint-scss", "stylelint-order"],
+  "rules": {
+    "no-descending-specificity": null,
+    "scss/no-global-function-names": null,
+    "import-notation": null,
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "color-function-alias-notation": null,
+    "color-hex-length": null,
+    "property-no-vendor-prefix": null,
+    "value-keyword-case": ["lower", { "camelCaseSvgKeywords": true }],
+    "scss/load-partial-extension": ["never"],
+    "rule-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested"],
+        "ignore": ["after-comment", "inside-block"]
+      }
+    ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      { "ignorePseudoClasses": ["deep", "slotted", "global"] }
+    ],
+    "selector-class-pattern": null,
+    "no-invalid-position-declaration": null,
+    "declaration-block-single-line-max-declarations": null,
+    "media-feature-range-notation": null,
+    "keyframes-name-pattern": null,
+    "declaration-property-value-keyword-no-deprecated": null
+  },
+  "ignoreFiles": [
+    "dist/**",
+    "**/dist/**",
+    "coverage/**",
+    "**/coverage/**",
+    "node_modules/**",
+    "**/node_modules/**",
+    "**/*.js",
+    "**/*.ts",
+    "**/*.mjs",
+    "**/*.cjs"
+  ]
+}

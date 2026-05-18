@@ -3,4 +3,4 @@
  * @description 浏览文档中的图片并快速插入
  */
 
-export { default as GalleryButton } from './GalleryButton.vue'
+export { default as GalleryButton } from "./GalleryButton.vue";

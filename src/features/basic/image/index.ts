@@ -4,7 +4,6 @@
  * @note ImageToolbar 已迁移至 ../tools/image-toolbar
  */
 
-export { default as ImageUpload } from './ImageUpload.vue'
-export { ResizableImage } from './ResizableImage'
-export type { ResizableImageOptions } from './ResizableImage'
-
+export { default as ImageUpload } from "./ImageUpload.vue";
+export { ResizableImage } from "./ResizableImage";
+export type { ResizableImageOptions } from "./ResizableImage";

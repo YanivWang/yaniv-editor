@@ -4,8 +4,8 @@
  */
 
 // User store adapter (replaces @vben/stores)
-export { useUserStore, setUserInfo } from './user'
-export type { UserInfo } from './user'
+export { useUserStore, setUserInfo } from "./user";
+export type { UserInfo } from "./user";
 
 // Preferences adapter (replaces @vben/preferences)
-export { usePreferences, initTheme } from './preferences'
+export { usePreferences, initTheme } from "./preferences";

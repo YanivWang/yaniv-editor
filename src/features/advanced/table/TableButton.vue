@@ -1,14 +1,14 @@
 <template>
   <ToolbarGroup>
-    <Popover trigger="click" placement="bottomLeft" v-model:open="tableDropdownOpen">
+    <Popover v-model:open="tableDropdownOpen" trigger="click" placement="bottomLeft">
       <template #content>
         <div class="table-insert-panel">
           <div class="grid" @mouseleave="resetGridHover">
-            <div v-for="r in gridRows" :key="'r-'+r" class="grid-row">
+            <div v-for="r in gridRows" :key="'r-' + r" class="grid-row">
               <div
                 v-for="c in gridCols"
-                :key="'c-'+r+'-'+c"
-                :class="['grid-cell', (r <= hoverRows && c <= hoverCols) ? 'active' : '']"
+                :key="'c-' + r + '-' + c"
+                :class="['grid-cell', r <= hoverRows && c <= hoverCols ? 'active' : '']"
                 @mouseenter="setHover(r, c)"
                 @click="applyCreateTable(r, c)"
               ></div>
@@ -16,11 +16,13 @@
           </div>
           <div class="attrs">
             <div class="attr-row">
-              <a-checkbox v-model:checked="tableWithHeader">{{ t('editor.includeHeader') }}</a-checkbox>
+              <a-checkbox v-model:checked="tableWithHeader">{{
+                t("editor.includeHeader")
+              }}</a-checkbox>
             </div>
-            
+
             <!-- 表格操作工具栏 -->
-            <div  class="table-toolbar-section">
+            <div class="table-toolbar-section">
               <!-- 第一行 -->
               <div class="table-menu-row">
                 <!-- 行操作 -->
@@ -30,8 +32,8 @@
                     :key="item.name"
                     class="table-menu-btn"
                     :disabled="!canExecute(item.command)"
-                    @click="item.action"
                     :title="item.title"
+                    @click="item.action"
                   >
                     <component :is="item.icon" />
                   </button>
@@ -44,8 +46,8 @@
                     :key="item.name"
                     class="table-menu-btn"
                     :disabled="!canExecute(item.command)"
-                    @click="item.action"
                     :title="item.title"
+                    @click="item.action"
                   >
                     <component :is="item.icon" />
                   </button>
@@ -61,26 +63,30 @@
                     :key="item.name"
                     class="table-menu-btn"
                     :disabled="!canExecute(item.command)"
-                    @click="item.action"
                     :title="item.title"
+                    @click="item.action"
                   >
                     <component :is="item.icon" />
                   </button>
                 </div>
               </div>
             </div>
-            
+
             <a-button
               type="primary"
               danger
               block
               :disabled="!editor?.isActive('table')"
-              @click="deleteTable(); tableDropdownOpen = false"
-            >{{ t('editor.deleteTable') }}</a-button>
+              @click="
+                deleteTable();
+                tableDropdownOpen = false;
+              "
+              >{{ t("editor.deleteTable") }}</a-button
+            >
           </div>
         </div>
       </template>
-      
+
       <ToolbarButton :icon="TableOutlined" :title="t('editor.insertTable')" />
     </Popover>
   </ToolbarGroup>
@@ -91,13 +97,6 @@
  * TableButton - 表格按钮组件
  * @description 提供表格插入面板，支持自定义行列与表头，以及删除表格功能
  */
-import { computed, ref } from 'vue'
-import { Popover } from 'ant-design-vue'
-import type { Editor } from '@tiptap/vue-3'
-import { ToolbarGroup, ToolbarButton } from '@/ui'
-import { createCommandRunner } from '@/utils/editorCommands'
-import { createStateCheckers } from '@/utils/editorState'
-import { t } from '@/locales'
 import {
   TableOutlined,
   InsertRowAboveOutlined,
@@ -108,123 +107,132 @@ import {
   DeleteColumnOutlined,
   MergeCellsOutlined,
   SplitCellsOutlined,
-} from '@ant-design/icons-vue'
+} from "@ant-design/icons-vue";
+import { Popover } from "ant-design-vue";
+import { computed, ref } from "vue";
+
+import { t } from "@/locales";
+import { ToolbarGroup, ToolbarButton } from "@/ui";
+import { createCommandRunner } from "@/utils/editorCommands";
+import { createStateCheckers } from "@/utils/editorState";
+
+import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined
+  editor: Editor | null | undefined;
 }
 
-const props = defineProps<Props>()
-const editor = computed(() => props.editor ?? null)
+const props = defineProps<Props>();
+const editor = computed(() => props.editor ?? null);
 
 // ===== 工具函数 =====
-const runCommand = createCommandRunner(editor)
-const { canExecute } = createStateCheckers(editor)
+const runCommand = createCommandRunner(editor);
+const { canExecute } = createStateCheckers(editor);
 
 // ===== 表格操作工具 =====
 const rowTools = [
   {
-    name: 'addRowBefore',
+    name: "addRowBefore",
     icon: InsertRowAboveOutlined,
-    title: t('table.addRowBefore'),
-    command: 'addRowBefore',
+    title: t("table.addRowBefore"),
+    command: "addRowBefore",
     action: runCommand((chain) => chain.addRowBefore()),
   },
   {
-    name: 'addRowAfter',
+    name: "addRowAfter",
     icon: InsertRowBelowOutlined,
-    title: t('table.addRowAfter'),
-    command: 'addRowAfter',
+    title: t("table.addRowAfter"),
+    command: "addRowAfter",
     action: runCommand((chain) => chain.addRowAfter()),
   },
   {
-    name: 'deleteRow',
+    name: "deleteRow",
     icon: DeleteRowOutlined,
-    title: t('table.deleteRow'),
-    command: 'deleteRow',
+    title: t("table.deleteRow"),
+    command: "deleteRow",
     action: runCommand((chain) => chain.deleteRow()),
   },
-]
+];
 
 const columnTools = [
   {
-    name: 'addColumnBefore',
+    name: "addColumnBefore",
     icon: InsertRowLeftOutlined,
-    title: t('table.addColumnBefore'),
-    command: 'addColumnBefore',
+    title: t("table.addColumnBefore"),
+    command: "addColumnBefore",
     action: runCommand((chain) => chain.addColumnBefore()),
   },
   {
-    name: 'addColumnAfter',
+    name: "addColumnAfter",
     icon: InsertRowRightOutlined,
-    title: t('table.addColumnAfter'),
-    command: 'addColumnAfter',
+    title: t("table.addColumnAfter"),
+    command: "addColumnAfter",
     action: runCommand((chain) => chain.addColumnAfter()),
   },
   {
-    name: 'deleteColumn',
+    name: "deleteColumn",
     icon: DeleteColumnOutlined,
-    title: t('table.deleteColumn'),
-    command: 'deleteColumn',
+    title: t("table.deleteColumn"),
+    command: "deleteColumn",
     action: runCommand((chain) => chain.deleteColumn()),
   },
-]
+];
 
 const cellTools = [
   {
-    name: 'mergeCells',
+    name: "mergeCells",
     icon: MergeCellsOutlined,
-    title: t('table.mergeCells'),
-    command: 'mergeCells',
+    title: t("table.mergeCells"),
+    command: "mergeCells",
     action: runCommand((chain) => chain.mergeCells()),
   },
   {
-    name: 'splitCell',
+    name: "splitCell",
     icon: SplitCellsOutlined,
-    title: t('table.splitCell'),
-    command: 'splitCell',
+    title: t("table.splitCell"),
+    command: "splitCell",
     action: runCommand((chain) => chain.splitCell()),
   },
   {
-    name: 'toggleHeaderRow',
+    name: "toggleHeaderRow",
     icon: TableOutlined,
-    title: t('table.toggleHeaderRow'),
-    command: 'toggleHeaderRow',
+    title: t("table.toggleHeaderRow"),
+    command: "toggleHeaderRow",
     action: runCommand((chain) => chain.toggleHeaderRow()),
   },
   {
-    name: 'toggleHeaderColumn',
+    name: "toggleHeaderColumn",
     icon: TableOutlined,
-    title: t('table.toggleHeaderColumn'),
-    command: 'toggleHeaderColumn',
+    title: t("table.toggleHeaderColumn"),
+    command: "toggleHeaderColumn",
     action: runCommand((chain) => chain.toggleHeaderColumn()),
   },
-]
+];
 
 // ===== 响应式状态 =====
-const tableDropdownOpen = ref(false)
-const tableWithHeader = ref(true)
-const gridRows = 10
-const gridCols = 10
-const hoverRows = ref(0)
-const hoverCols = ref(0)
+const tableDropdownOpen = ref(false);
+const tableWithHeader = ref(true);
+const gridRows = 10;
+const gridCols = 10;
+const hoverRows = ref(0);
+const hoverCols = ref(0);
 
 // ===== 表格插入：网格悬停与创建 =====
 /**
  * 设置网格悬停状态
  */
 function setHover(r: number, c: number) {
-  hoverRows.value = r
-  hoverCols.value = c
+  hoverRows.value = r;
+  hoverCols.value = c;
 }
 
 /**
  * 重置网格悬停状态
  */
 function resetGridHover() {
-  hoverRows.value = 0
-  hoverCols.value = 0
+  hoverRows.value = 0;
+  hoverCols.value = 0;
 }
 
 /**
@@ -233,17 +241,19 @@ function resetGridHover() {
  * @param cols 列数
  */
 function applyCreateTable(rows: number, cols: number) {
-  const r = Math.max(1, Number(rows))
-  const c = Math.max(1, Number(cols))
-  runCommand((chain) => chain.insertTable({ rows: r, cols: c, withHeaderRow: tableWithHeader.value }))()
-  tableDropdownOpen.value = false
+  const r = Math.max(1, Number(rows));
+  const c = Math.max(1, Number(cols));
+  runCommand((chain) =>
+    chain.insertTable({ rows: r, cols: c, withHeaderRow: tableWithHeader.value }),
+  )();
+  tableDropdownOpen.value = false;
 }
 
 /**
  * 删除表格
  */
 function deleteTable() {
-  runCommand((chain) => chain.deleteTable())()
+  runCommand((chain) => chain.deleteTable())();
 }
 </script>
 
@@ -279,16 +289,16 @@ function deleteTable() {
 .grid-cell {
   width: 18px;
   height: 18px;
+  cursor: pointer;
+  background: #fff;
   border: 1px solid #e8e8e8;
   border-radius: 2px;
-  background: #fff;
-  cursor: pointer;
   transition: all 0.15s;
 }
 
 :where(.dark, .dark *) .grid-cell {
-  border-color: #434343;
   background: #1f1f1f;
+  border-color: #434343;
 }
 
 .grid-cell:hover {
@@ -316,17 +326,17 @@ function deleteTable() {
 
 .attr-row {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
 }
 
 /* ===== 表格工具栏样式 ===== */
 .table-toolbar-section {
   padding: 8px;
+  margin-bottom: 8px;
   background: #fafafa;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
-  margin-bottom: 8px;
 
   :where(.dark, .dark *) & {
     background: #262626;
@@ -389,8 +399,7 @@ function deleteTable() {
 }
 
 .table-menu-btn:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 </style>
-

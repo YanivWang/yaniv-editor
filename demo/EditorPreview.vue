@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-preview" :data-theme="theme" ref="rootRef">
+  <div ref="rootRef" class="editor-preview" :data-theme="theme">
     <!-- Animated glow backdrop -->
     <div class="editor-preview__glow"></div>
 
@@ -12,8 +12,11 @@
           <span class="dot dot--green"></span>
         </div>
         <div class="editor-preview__filename">
-          <svg viewBox="0 0 16 16" width="12" height="12" style="opacity:0.5">
-            <path fill="currentColor" d="M1 3.5A1.5 1.5 0 012.5 2h3.879a1.5 1.5 0 011.06.44l1.122 1.12A1.5 1.5 0 009.62 4H13.5A1.5 1.5 0 0115 5.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z"/>
+          <svg viewBox="0 0 16 16" width="12" height="12" style="opacity: 0.5">
+            <path
+              fill="currentColor"
+              d="M1 3.5A1.5 1.5 0 012.5 2h3.879a1.5 1.5 0 011.06.44l1.122 1.12A1.5 1.5 0 009.62 4H13.5A1.5 1.5 0 0115 5.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z"
+            />
           </svg>
           document.docx
         </div>
@@ -23,32 +26,52 @@
       <!-- Fake Toolbar -->
       <div class="editor-preview__toolbar">
         <div class="toolbar-group">
-          <span class="toolbar-btn" :class="{ 'glow': activeFormat === 'bold' }">B</span>
-          <span class="toolbar-btn" :class="{ 'glow': activeFormat === 'italic' }">I</span>
+          <span class="toolbar-btn" :class="{ glow: activeFormat === 'bold' }">B</span>
+          <span class="toolbar-btn" :class="{ glow: activeFormat === 'italic' }">I</span>
           <span class="toolbar-btn">U</span>
           <span class="toolbar-btn">S</span>
         </div>
         <div class="toolbar-sep"></div>
         <div class="toolbar-group">
-          <span class="toolbar-btn" :class="{ 'glow': activeFormat === 'h1' }">H1</span>
-          <span class="toolbar-btn" :class="{ 'glow': activeFormat === 'h2' }">H2</span>
+          <span class="toolbar-btn" :class="{ glow: activeFormat === 'h1' }">H1</span>
+          <span class="toolbar-btn" :class="{ glow: activeFormat === 'h2' }">H2</span>
         </div>
         <div class="toolbar-sep"></div>
         <div class="toolbar-group">
-          <span class="toolbar-btn icon-btn" :class="{ 'glow': activeFormat === 'list' }">
-            <svg viewBox="0 0 16 16" width="12" height="12"><path fill="currentColor" d="M2.5 4a.5.5 0 100-1 .5.5 0 000 1zM4 3.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM4 7.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM4 11.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM2.5 8a.5.5 0 100-1 .5.5 0 000 1zM2.5 12a.5.5 0 100-1 .5.5 0 000 1z"/></svg>
+          <span class="toolbar-btn icon-btn" :class="{ glow: activeFormat === 'list' }">
+            <svg viewBox="0 0 16 16" width="12" height="12">
+              <path
+                fill="currentColor"
+                d="M2.5 4a.5.5 0 100-1 .5.5 0 000 1zM4 3.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM4 7.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM4 11.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM2.5 8a.5.5 0 100-1 .5.5 0 000 1zM2.5 12a.5.5 0 100-1 .5.5 0 000 1z"
+              />
+            </svg>
           </span>
-          <span class="toolbar-btn icon-btn" :class="{ 'glow': activeFormat === 'quote' }">
-            <svg viewBox="0 0 16 16" width="12" height="12"><path fill="currentColor" d="M2 3h12v1H2V3zm2 3h8v1H4V6zm-2 3h12v1H2V9zm2 3h8v1H4v-1z"/></svg>
+          <span class="toolbar-btn icon-btn" :class="{ glow: activeFormat === 'quote' }">
+            <svg viewBox="0 0 16 16" width="12" height="12">
+              <path
+                fill="currentColor"
+                d="M2 3h12v1H2V3zm2 3h8v1H4V6zm-2 3h12v1H2V9zm2 3h8v1H4v-1z"
+              />
+            </svg>
           </span>
-          <span class="toolbar-btn icon-btn" :class="{ 'glow': activeFormat === 'code' }">
-            <svg viewBox="0 0 16 16" width="12" height="12"><path fill="currentColor" d="M5.854 4.146a.5.5 0 010 .708L2.707 8l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm4.292 0a.5.5 0 00 0 .708L13.293 8l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0z"/></svg>
+          <span class="toolbar-btn icon-btn" :class="{ glow: activeFormat === 'code' }">
+            <svg viewBox="0 0 16 16" width="12" height="12">
+              <path
+                fill="currentColor"
+                d="M5.854 4.146a.5.5 0 010 .708L2.707 8l3.147 3.146a.5.5 0 01-.708.708l-3.5-3.5a.5.5 0 010-.708l3.5-3.5a.5.5 0 01.708 0zm4.292 0a.5.5 0 00 0 .708L13.293 8l-3.147 3.146a.5.5 0 00.708.708l3.5-3.5a.5.5 0 000-.708l-3.5-3.5a.5.5 0 00-.708 0z"
+              />
+            </svg>
           </span>
         </div>
         <div class="toolbar-sep"></div>
         <div class="toolbar-group">
           <span class="toolbar-btn ai-btn" :class="{ 'ai-pulse': activeFormat === 'ai' }">
-            <svg viewBox="0 0 16 16" width="11" height="11"><path fill="currentColor" d="M8 1l1.545 4.955L14.5 7.5l-4.955 1.545L8 14l-1.545-4.955L1.5 7.5l4.955-1.545z"/></svg>
+            <svg viewBox="0 0 16 16" width="11" height="11">
+              <path
+                fill="currentColor"
+                d="M8 1l1.545 4.955L14.5 7.5l-4.955 1.545L8 14l-1.545-4.955L1.5 7.5l4.955-1.545z"
+              />
+            </svg>
             AI
           </span>
         </div>
@@ -59,11 +82,13 @@
         <div class="content-inner">
           <TransitionGroup name="line-enter">
             <div
-              v-for="(line, index) in visibleLines"
+              v-for="line in visibleLines"
               :key="'line-' + line.id"
               class="content-line"
               :class="line.class"
             >
+              <!-- 动态 tag + HTML：仅限演示内容 -->
+              <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
               <component :is="line.tag || 'div'" v-html="line.html"></component>
             </div>
           </TransitionGroup>
@@ -76,25 +101,57 @@
     <div class="editor-preview__labels editor-preview__labels--desktop">
       <div class="floating-label label--themes" :class="{ 'pop-in': entered }">
         <span class="floating-label__icon">
-          <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm4.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM3.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm2 4.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path
+              fill="currentColor"
+              d="M8 5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm4.5 3a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM3.5 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm2 4.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm5 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
+            />
+          </svg>
         </span>
         <span class="floating-label__text">5 Themes</span>
       </div>
-      <div class="floating-label label--ai" :class="{ 'pop-in': entered }" style="animation-delay: 0.2s">
+      <div
+        class="floating-label label--ai"
+        :class="{ 'pop-in': entered }"
+        style="animation-delay: 0.2s"
+      >
         <span class="floating-label__icon">
-          <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 1l1.545 4.955L14.5 7.5l-4.955 1.545L8 14l-1.545-4.955L1.5 7.5l4.955-1.545z"/></svg>
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path
+              fill="currentColor"
+              d="M8 1l1.545 4.955L14.5 7.5l-4.955 1.545L8 14l-1.545-4.955L1.5 7.5l4.955-1.545z"
+            />
+          </svg>
         </span>
         <span class="floating-label__text">AI Powered</span>
       </div>
-      <div class="floating-label label--collab" :class="{ 'pop-in': entered }" style="animation-delay: 0.4s">
+      <div
+        class="floating-label label--collab"
+        :class="{ 'pop-in': entered }"
+        style="animation-delay: 0.4s"
+      >
         <span class="floating-label__icon">
-          <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6zM5.216 14A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"/></svg>
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path
+              fill="currentColor"
+              d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6zM5.216 14A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"
+            />
+          </svg>
         </span>
         <span class="floating-label__text">Realtime Collab</span>
       </div>
-      <div class="floating-label label--word" :class="{ 'pop-in': entered }" style="animation-delay: 0.6s">
+      <div
+        class="floating-label label--word"
+        :class="{ 'pop-in': entered }"
+        style="animation-delay: 0.6s"
+      >
         <span class="floating-label__icon">
-          <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M14 4.5V14a2 2 0 01-2 2H4a2 2 0 01-2-2V2a2 2 0 012-2h5.5L14 4.5zM9.5 3A1.5 1.5 0 008 1.5V3h1.5zm-2.394 6.966a.492.492 0 00-.062.037L5.5 13.25l-1.544-3.247a.497.497 0 00-.062-.037L3 6h1.073l.858 3.076L6.323 6h1.354l1.392 3.076L9.927 6H11l-.894 3.966a.492.492 0 00-.062.037L8.5 13.25l-1.394-3.284z"/></svg>
+          <svg viewBox="0 0 16 16" width="14" height="14">
+            <path
+              fill="currentColor"
+              d="M14 4.5V14a2 2 0 01-2 2H4a2 2 0 01-2-2V2a2 2 0 012-2h5.5L14 4.5zM9.5 3A1.5 1.5 0 008 1.5V3h1.5zm-2.394 6.966a.492.492 0 00-.062.037L5.5 13.25l-1.544-3.247a.497.497 0 00-.062-.037L3 6h1.073l.858 3.076L6.323 6h1.354l1.392 3.076L9.927 6H11l-.894 3.966a.492.492 0 00-.062.037L8.5 13.25l-1.394-3.284z"
+            />
+          </svg>
         </span>
         <span class="floating-label__text">Word Export</span>
       </div>
@@ -102,7 +159,7 @@
 
     <!-- Floating Labels - Mobile (horizontal strip below editor) -->
     <div class="editor-preview__labels editor-preview__labels--mobile">
-      <div class="mobile-label" v-for="label in mobileLabels" :key="label.text">
+      <div v-for="label in mobileLabels" :key="label.text" class="mobile-label">
         <span class="mobile-label__dot" :style="{ background: label.color }"></span>
         <span class="mobile-label__text">{{ label.text }}</span>
       </div>
@@ -111,195 +168,230 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 defineProps<{
-  theme: 'light' | 'dark'
-}>()
+  theme: "light" | "dark";
+}>();
 
 interface ContentLine {
-  id: number
-  html: string
-  class?: string
-  tag?: string
+  id: number;
+  html: string;
+  class?: string;
+  tag?: string;
 }
 
-const rootRef = ref<HTMLElement | null>(null)
-const visibleLines = ref<ContentLine[]>([])
-const isTyping = ref(false)
-const activeFormat = ref('')
-const entered = ref(false)
+const rootRef = ref<HTMLElement | null>(null);
+const visibleLines = ref<ContentLine[]>([]);
+const isTyping = ref(false);
+const activeFormat = ref("");
+const entered = ref(false);
 
-let lineIdCounter = 0
-let animationTimer: ReturnType<typeof setTimeout> | null = null
-let aborted = false
+let lineIdCounter = 0;
+let animationTimer: ReturnType<typeof setTimeout> | null = null;
+let aborted = false;
 
 const mobileLabels = [
-  { text: '5 Themes', color: 'linear-gradient(135deg, #667eea, #764ba2)' },
-  { text: 'AI Powered', color: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-  { text: 'Collab', color: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
-  { text: 'Word', color: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
-]
+  { text: "5 Themes", color: "linear-gradient(135deg, #667eea, #764ba2)" },
+  { text: "AI Powered", color: "linear-gradient(135deg, #f093fb, #f5576c)" },
+  { text: "Collab", color: "linear-gradient(135deg, #43e97b, #38f9d7)" },
+  { text: "Word", color: "linear-gradient(135deg, #4facfe, #00f2fe)" },
+];
 
 interface DemoStep {
-  action: 'type' | 'addLine' | 'pause' | 'clear' | 'format'
-  line?: Omit<ContentLine, 'id'>
-  text?: string
-  lineIndex?: number
-  duration?: number
-  format?: string
+  action: "type" | "addLine" | "pause" | "clear" | "format";
+  line?: Omit<ContentLine, "id">;
+  text?: string;
+  lineIndex?: number;
+  duration?: number;
+  format?: string;
 }
 
 const demoScript: DemoStep[] = [
   // Title
-  { action: 'format', format: 'h1' },
-  { action: 'addLine', line: { html: '', class: 'line-h1', tag: 'h1' } },
-  { action: 'type', text: 'Tiptap UI Kit', lineIndex: 0, duration: 70 },
-  { action: 'pause', duration: 300 },
-  { action: 'format', format: '' },
+  { action: "format", format: "h1" },
+  { action: "addLine", line: { html: "", class: "line-h1", tag: "h1" } },
+  { action: "type", text: "Tiptap UI Kit", lineIndex: 0, duration: 70 },
+  { action: "pause", duration: 300 },
+  { action: "format", format: "" },
 
   // Subtitle
-  { action: 'addLine', line: { html: '', class: 'line-subtitle', tag: 'p' } },
-  { action: 'type', text: 'Production-ready rich text editor for Vue 3', lineIndex: 1, duration: 35 },
-  { action: 'pause', duration: 400 },
+  { action: "addLine", line: { html: "", class: "line-subtitle", tag: "p" } },
+  {
+    action: "type",
+    text: "Production-ready rich text editor for Vue 3",
+    lineIndex: 1,
+    duration: 35,
+  },
+  { action: "pause", duration: 400 },
 
   // H2
-  { action: 'format', format: 'h2' },
-  { action: 'addLine', line: { html: '', class: 'line-h2', tag: 'h2' } },
-  { action: 'type', text: 'Features', lineIndex: 2, duration: 55 },
-  { action: 'pause', duration: 200 },
-  { action: 'format', format: 'list' },
+  { action: "format", format: "h2" },
+  { action: "addLine", line: { html: "", class: "line-h2", tag: "h2" } },
+  { action: "type", text: "Features", lineIndex: 2, duration: 55 },
+  { action: "pause", duration: 200 },
+  { action: "format", format: "list" },
 
   // Bullet list items with formatting
-  { action: 'addLine', line: { html: '', class: 'line-bullet', tag: 'div' } },
-  { action: 'format', format: 'bold' },
-  { action: 'type', text: '<strong>5 beautiful themes</strong> with dark mode support', lineIndex: 3, duration: 28 },
-  { action: 'format', format: 'list' },
-  { action: 'pause', duration: 100 },
+  { action: "addLine", line: { html: "", class: "line-bullet", tag: "div" } },
+  { action: "format", format: "bold" },
+  {
+    action: "type",
+    text: "<strong>5 beautiful themes</strong> with dark mode support",
+    lineIndex: 3,
+    duration: 28,
+  },
+  { action: "format", format: "list" },
+  { action: "pause", duration: 100 },
 
-  { action: 'addLine', line: { html: '', class: 'line-bullet', tag: 'div' } },
-  { action: 'format', format: 'italic' },
-  { action: 'type', text: '<em>AI-powered</em> writing: continue, polish, translate, summarize', lineIndex: 4, duration: 25 },
-  { action: 'format', format: 'list' },
-  { action: 'pause', duration: 100 },
+  { action: "addLine", line: { html: "", class: "line-bullet", tag: "div" } },
+  { action: "format", format: "italic" },
+  {
+    action: "type",
+    text: "<em>AI-powered</em> writing: continue, polish, translate, summarize",
+    lineIndex: 4,
+    duration: 25,
+  },
+  { action: "format", format: "list" },
+  { action: "pause", duration: 100 },
 
-  { action: 'addLine', line: { html: '', class: 'line-bullet', tag: 'div' } },
-  { action: 'type', text: 'Real-time collaboration with <strong>cursor sync</strong>', lineIndex: 5, duration: 28 },
-  { action: 'format', format: '' },
-  { action: 'pause', duration: 300 },
+  { action: "addLine", line: { html: "", class: "line-bullet", tag: "div" } },
+  {
+    action: "type",
+    text: "Real-time collaboration with <strong>cursor sync</strong>",
+    lineIndex: 5,
+    duration: 28,
+  },
+  { action: "format", format: "" },
+  { action: "pause", duration: 300 },
 
   // Blockquote
-  { action: 'format', format: 'quote' },
-  { action: 'addLine', line: { html: '', class: 'line-blockquote', tag: 'blockquote' } },
-  { action: 'type', text: '"The best open-source editor UI kit for Vue 3."', lineIndex: 6, duration: 28 },
-  { action: 'format', format: '' },
-  { action: 'pause', duration: 400 },
+  { action: "format", format: "quote" },
+  { action: "addLine", line: { html: "", class: "line-blockquote", tag: "blockquote" } },
+  {
+    action: "type",
+    text: '"The best open-source editor UI kit for Vue 3."',
+    lineIndex: 6,
+    duration: 28,
+  },
+  { action: "format", format: "" },
+  { action: "pause", duration: 400 },
 
   // Code block
-  { action: 'format', format: 'code' },
-  { action: 'addLine', line: { html: '', class: 'line-code', tag: 'pre' } },
-  { action: 'type', text: '<span class="code-kw">import</span> { TiptapEditor } <span class="code-kw">from</span> <span class="code-str">\'tiptap-ui-kit\'</span>', lineIndex: 7, duration: 25 },
-  { action: 'format', format: '' },
-  { action: 'pause', duration: 300 },
+  { action: "format", format: "code" },
+  { action: "addLine", line: { html: "", class: "line-code", tag: "pre" } },
+  {
+    action: "type",
+    text: '<span class="code-kw">import</span> { TiptapEditor } <span class="code-kw">from</span> <span class="code-str">\'tiptap-ui-kit\'</span>',
+    lineIndex: 7,
+    duration: 25,
+  },
+  { action: "format", format: "" },
+  { action: "pause", duration: 300 },
 
   // AI sparkle moment
-  { action: 'format', format: 'ai' },
-  { action: 'addLine', line: { html: '', class: 'line-ai', tag: 'div' } },
-  { action: 'type', text: '<span class="ai-tag">AI</span> Generated summary: This editor kit offers enterprise-grade features...', lineIndex: 8, duration: 22 },
-  { action: 'format', format: '' },
-  { action: 'pause', duration: 2000 },
+  { action: "format", format: "ai" },
+  { action: "addLine", line: { html: "", class: "line-ai", tag: "div" } },
+  {
+    action: "type",
+    text: '<span class="ai-tag">AI</span> Generated summary: This editor kit offers enterprise-grade features...',
+    lineIndex: 8,
+    duration: 22,
+  },
+  { action: "format", format: "" },
+  { action: "pause", duration: 2000 },
 
   // Reset and loop
-  { action: 'clear' },
-  { action: 'pause', duration: 600 },
-]
+  { action: "clear" },
+  { action: "pause", duration: 600 },
+];
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
-    animationTimer = setTimeout(resolve, ms)
-  })
+    animationTimer = setTimeout(resolve, ms);
+  });
 }
 
 async function typeTextInLine(lineIndex: number, fullHtml: string, speed: number) {
-  isTyping.value = true
-  const chars = parseHtmlChars(fullHtml)
-  let current = ''
+  isTyping.value = true;
+  const chars = parseHtmlChars(fullHtml);
+  let current = "";
 
   for (let i = 0; i < chars.length; i++) {
-    if (aborted) return
-    current += chars[i]
+    if (aborted) return;
+    current += chars[i];
     if (visibleLines.value[lineIndex]) {
-      visibleLines.value[lineIndex].html = current
+      visibleLines.value[lineIndex].html = current;
     }
-    if (!chars[i].startsWith('<')) {
-      await delay(speed)
+    if (!chars[i].startsWith("<")) {
+      await delay(speed);
     }
   }
-  isTyping.value = false
+  isTyping.value = false;
 }
 
 function parseHtmlChars(html: string): string[] {
-  const chunks: string[] = []
-  let i = 0
+  const chunks: string[] = [];
+  let i = 0;
   while (i < html.length) {
-    if (html[i] === '<') {
-      const end = html.indexOf('>', i)
+    if (html[i] === "<") {
+      const end = html.indexOf(">", i);
       if (end !== -1) {
-        chunks.push(html.substring(i, end + 1))
-        i = end + 1
+        chunks.push(html.substring(i, end + 1));
+        i = end + 1;
       } else {
-        chunks.push(html[i])
-        i++
+        chunks.push(html[i]);
+        i++;
       }
-    } else if (html[i] === '&') {
-      const end = html.indexOf(';', i)
+    } else if (html[i] === "&") {
+      const end = html.indexOf(";", i);
       if (end !== -1 && end - i < 10) {
-        chunks.push(html.substring(i, end + 1))
-        i = end + 1
+        chunks.push(html.substring(i, end + 1));
+        i = end + 1;
       } else {
-        chunks.push(html[i])
-        i++
+        chunks.push(html[i]);
+        i++;
       }
     } else {
-      chunks.push(html[i])
-      i++
+      chunks.push(html[i]);
+      i++;
     }
   }
-  return chunks
+  return chunks;
 }
 
 async function runDemo() {
   while (!aborted) {
-    lineIdCounter = 0
+    lineIdCounter = 0;
     for (const step of demoScript) {
-      if (aborted) return
+      if (aborted) return;
 
       switch (step.action) {
-        case 'addLine':
+        case "addLine":
           if (step.line) {
-            visibleLines.value.push({ ...step.line, id: lineIdCounter++ })
+            visibleLines.value.push({ ...step.line, id: lineIdCounter++ });
           }
-          break
+          break;
 
-        case 'type':
+        case "type":
           if (step.text !== undefined && step.lineIndex !== undefined) {
-            await typeTextInLine(step.lineIndex, step.text, step.duration || 40)
+            await typeTextInLine(step.lineIndex, step.text, step.duration || 40);
           }
-          break
+          break;
 
-        case 'pause':
-          isTyping.value = false
-          await delay(step.duration || 300)
-          break
+        case "pause":
+          isTyping.value = false;
+          await delay(step.duration || 300);
+          break;
 
-        case 'format':
-          activeFormat.value = step.format || ''
-          break
+        case "format":
+          activeFormat.value = step.format || "";
+          break;
 
-        case 'clear':
-          visibleLines.value = []
-          activeFormat.value = ''
-          break
+        case "clear":
+          visibleLines.value = [];
+          activeFormat.value = "";
+          break;
       }
     }
   }
@@ -308,20 +400,20 @@ async function runDemo() {
 onMounted(() => {
   // Entrance animation
   requestAnimationFrame(() => {
-    entered.value = true
-  })
+    entered.value = true;
+  });
   // Start typing demo
   animationTimer = setTimeout(() => {
-    runDemo()
-  }, 800)
-})
+    runDemo();
+  }, 800);
+});
 
 onBeforeUnmount(() => {
-  aborted = true
+  aborted = true;
   if (animationTimer) {
-    clearTimeout(animationTimer)
+    clearTimeout(animationTimer);
   }
-})
+});
 </script>
 
 <style scoped>
@@ -337,16 +429,22 @@ onBeforeUnmount(() => {
 .editor-preview__glow {
   position: absolute;
   inset: -20px;
+  z-index: 0;
   background: conic-gradient(
     from 0deg,
-    #667eea33, #764ba233, #f093fb33, #f5576c33,
-    #43e97b33, #38f9d733, #4facfe33, #667eea33
+    #667eea33,
+    #764ba233,
+    #f093fb33,
+    #f5576c33,
+    #43e97b33,
+    #38f9d733,
+    #4facfe33,
+    #667eea33
   );
   border-radius: 24px;
-  filter: blur(40px);
   opacity: 0.6;
+  filter: blur(40px);
   animation: glow-rotate 8s linear infinite;
-  z-index: 0;
 }
 
 .editor-preview[data-theme="dark"] .editor-preview__glow {
@@ -355,39 +453,45 @@ onBeforeUnmount(() => {
 }
 
 @keyframes glow-rotate {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.05); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
 }
 
 /* Window */
 .editor-preview__window {
   position: relative;
   z-index: 1;
-  background: var(--ep-bg, #ffffff);
-  border-radius: 14px;
   overflow: hidden;
-  transform: translateY(30px) rotateX(4deg) scale(0.96);
-  opacity: 0;
-  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--ep-bg, #ffffff);
   border: 1px solid var(--ep-border-outer, rgba(0, 0, 0, 0.08));
+  border-radius: 14px;
   box-shadow:
     0 25px 60px -12px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(0, 0, 0, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transform: translateY(30px) rotateX(4deg) scale(0.96);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .editor-preview__window.is-entered {
-  transform: translateY(0) rotateX(0deg) scale(1);
   opacity: 1;
+  transform: translateY(0) rotateX(0deg) scale(1);
 }
 
 .editor-preview:hover .editor-preview__window.is-entered {
-  transform: translateY(-4px) scale(1.01);
   box-shadow:
     0 35px 80px -12px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(0, 0, 0, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px) scale(1.01);
 }
 
 /* Dark theme vars */
@@ -404,6 +508,7 @@ onBeforeUnmount(() => {
   --ep-quote-bg: rgba(122, 162, 247, 0.06);
   --ep-h1: #c0caf5;
   --ep-h2: #a9b1d6;
+
   box-shadow:
     0 25px 60px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.04),
@@ -446,22 +551,32 @@ onBeforeUnmount(() => {
   transition: transform 0.2s;
 }
 
-.editor-preview:hover .dot { transform: scale(1.15); }
+.editor-preview:hover .dot {
+  transform: scale(1.15);
+}
 
-.dot--red { background: #ff5f57; }
-.dot--yellow { background: #febc2e; }
-.dot--green { background: #28c840; }
+.dot--red {
+  background: #ff5f57;
+}
+
+.dot--yellow {
+  background: #febc2e;
+}
+
+.dot--green {
+  background: #28c840;
+}
 
 .editor-preview__filename {
-  flex: 1;
-  text-align: center;
-  font-size: 12px;
-  color: var(--ep-text-secondary);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
   display: flex;
+  flex: 1;
+  gap: 5px;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 12px;
+  color: var(--ep-text-secondary);
+  text-align: center;
 }
 
 .editor-preview__spacer {
@@ -471,8 +586,8 @@ onBeforeUnmount(() => {
 /* Toolbar */
 .editor-preview__toolbar {
   display: flex;
-  align-items: center;
   gap: 3px;
+  align-items: center;
   padding: 5px 12px;
   background: var(--ep-toolbar-bg);
   border-bottom: 1px solid var(--ep-border);
@@ -484,20 +599,20 @@ onBeforeUnmount(() => {
 }
 
 .toolbar-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 28px;
   height: 28px;
   padding: 0 6px;
-  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: var(--ep-text-secondary);
   cursor: default;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  border-radius: 6px;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .toolbar-btn.glow {
@@ -511,38 +626,40 @@ onBeforeUnmount(() => {
 }
 
 .toolbar-btn.ai-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-radius: 6px;
-  font-size: 10px;
-  letter-spacing: 0.5px;
   gap: 3px;
   padding: 0 8px;
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px;
   transition: all 0.3s ease;
 }
 
 .toolbar-btn.ai-btn.ai-pulse {
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.5), 0 0 40px rgba(118, 75, 162, 0.3);
+  box-shadow:
+    0 0 20px rgba(102, 126, 234, 0.5),
+    0 0 40px rgba(118, 75, 162, 0.3);
   transform: scale(1.08);
 }
 
 .toolbar-sep {
   width: 1px;
   height: 18px;
-  background: var(--ep-border);
   margin: 0 5px;
+  background: var(--ep-border);
 }
 
 /* Content Area */
 .editor-preview__content {
-  padding: 24px 32px 24px;
   min-height: 300px;
   max-height: 340px;
+  padding: 24px 32px;
   overflow: hidden;
-  color: var(--ep-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
   font-size: 14px;
   line-height: 1.7;
+  color: var(--ep-text);
 }
 
 .content-inner {
@@ -567,25 +684,25 @@ onBeforeUnmount(() => {
 
 /* Content Lines */
 .content-line {
-  margin-bottom: 3px;
   min-height: 1em;
+  margin-bottom: 3px;
 }
 
 .content-line h1 {
+  margin: 0 0 2px;
   font-size: 28px;
   font-weight: 800;
-  color: var(--ep-h1);
-  margin: 0 0 2px;
   line-height: 1.3;
+  color: var(--ep-h1);
   letter-spacing: -0.02em;
 }
 
 .content-line h2 {
+  margin: 10px 0 4px;
   font-size: 19px;
   font-weight: 700;
-  color: var(--ep-h2);
-  margin: 10px 0 4px;
   line-height: 1.3;
+  color: var(--ep-h2);
 }
 
 .content-line p {
@@ -593,46 +710,46 @@ onBeforeUnmount(() => {
 }
 
 .content-line.line-subtitle p {
-  color: var(--ep-text-secondary);
   font-size: 14px;
+  color: var(--ep-text-secondary);
 }
 
 .content-line.line-bullet :deep(div) {
-  padding-left: 22px;
   position: relative;
+  padding-left: 22px;
   margin: 3px 0;
 }
 
 .content-line.line-bullet :deep(div)::before {
-  content: '';
   position: absolute;
-  left: 6px;
   top: 9px;
+  left: 6px;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  content: "";
   background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
 }
 
 .content-line blockquote {
-  margin: 8px 0;
   padding: 10px 16px;
-  border-left: 3px solid var(--ep-quote-border);
-  color: var(--ep-text-secondary);
-  font-style: italic;
+  margin: 8px 0;
   font-size: 13.5px;
+  font-style: italic;
+  color: var(--ep-text-secondary);
   background: var(--ep-quote-bg);
+  border-left: 3px solid var(--ep-quote-border);
   border-radius: 0 8px 8px 0;
 }
 
 .content-line pre {
-  margin: 4px 0;
   padding: 14px 18px;
-  background: var(--ep-code-bg);
-  border-radius: 8px;
-  font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+  margin: 4px 0;
+  font-family: "SF Mono", "Fira Code", "JetBrains Mono", Consolas, monospace;
   font-size: 13px;
+  background: var(--ep-code-bg);
   border: 1px solid var(--ep-border);
+  border-radius: 8px;
 }
 
 .content-line :deep(.code-kw) {
@@ -644,25 +761,25 @@ onBeforeUnmount(() => {
 }
 
 .content-line.line-ai :deep(div) {
+  padding: 8px 12px;
   font-size: 13.5px;
   color: var(--ep-text-secondary);
-  padding: 8px 12px;
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.06), rgba(118, 75, 162, 0.06));
-  border-radius: 8px;
   border: 1px solid rgba(102, 126, 234, 0.12);
+  border-radius: 8px;
 }
 
 .content-line :deep(.ai-tag) {
   display: inline-block;
   padding: 1px 6px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: #fff;
-  border-radius: 4px;
+  margin-right: 6px;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-right: 6px;
   vertical-align: middle;
+  color: #fff;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
 }
 
 /* Cursor */
@@ -670,9 +787,9 @@ onBeforeUnmount(() => {
   display: inline-block;
   width: 2px;
   height: 20px;
-  background: linear-gradient(180deg, #667eea, #764ba2);
-  vertical-align: text-bottom;
   margin-left: 1px;
+  vertical-align: text-bottom;
+  background: linear-gradient(180deg, #667eea, #764ba2);
   border-radius: 1px;
   box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
 }
@@ -682,39 +799,42 @@ onBeforeUnmount(() => {
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Floating Labels - Desktop */
 .editor-preview__labels--desktop {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   pointer-events: none;
 }
 
 .floating-label {
   position: absolute;
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   padding: 8px 16px;
-  border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
   opacity: 0;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   transform: translateY(10px) scale(0.9);
   transition: none;
 }
 
 .floating-label.pop-in {
-  animation: pop-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-             float-label 5s ease-in-out 0.5s infinite;
+  animation:
+    pop-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    float-label 5s ease-in-out 0.5s infinite;
 }
 
 @keyframes pop-in {
@@ -734,22 +854,24 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 8px;
   color: #fff;
+  border-radius: 8px;
 }
 
 .floating-label__text {
   font-size: 13px;
-  white-space: nowrap;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .label--themes {
   top: 15%;
   right: -75px;
-  background: rgba(255, 255, 255, 0.85);
   color: #333;
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15), 0 0 0 1px rgba(102, 126, 234, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 20px rgba(102, 126, 234, 0.15),
+    0 0 0 1px rgba(102, 126, 234, 0.1);
 }
 
 .label--themes .floating-label__icon {
@@ -759,9 +881,11 @@ onBeforeUnmount(() => {
 .label--ai {
   bottom: 35%;
   left: -70px;
-  background: rgba(255, 255, 255, 0.85);
   color: #333;
-  box-shadow: 0 4px 20px rgba(240, 147, 251, 0.15), 0 0 0 1px rgba(240, 147, 251, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 20px rgba(240, 147, 251, 0.15),
+    0 0 0 1px rgba(240, 147, 251, 0.1);
 }
 
 .label--ai .floating-label__icon {
@@ -771,9 +895,11 @@ onBeforeUnmount(() => {
 .label--collab {
   top: 55%;
   right: -85px;
-  background: rgba(255, 255, 255, 0.85);
   color: #333;
-  box-shadow: 0 4px 20px rgba(67, 233, 123, 0.15), 0 0 0 1px rgba(67, 233, 123, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 20px rgba(67, 233, 123, 0.15),
+    0 0 0 1px rgba(67, 233, 123, 0.1);
 }
 
 .label--collab .floating-label__icon {
@@ -783,9 +909,11 @@ onBeforeUnmount(() => {
 .label--word {
   bottom: 10%;
   left: -65px;
-  background: rgba(255, 255, 255, 0.85);
   color: #333;
-  box-shadow: 0 4px 20px rgba(79, 172, 254, 0.15), 0 0 0 1px rgba(79, 172, 254, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 20px rgba(79, 172, 254, 0.15),
+    0 0 0 1px rgba(79, 172, 254, 0.1);
 }
 
 .label--word .floating-label__icon {
@@ -793,62 +921,92 @@ onBeforeUnmount(() => {
 }
 
 .editor-preview[data-theme="dark"] .floating-label {
-  background: rgba(26, 27, 38, 0.85);
   color: #c0caf5;
+  background: rgba(26, 27, 38, 0.85);
 }
 
 .editor-preview[data-theme="dark"] .label--themes {
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2), 0 0 0 1px rgba(102, 126, 234, 0.15);
+  box-shadow:
+    0 4px 20px rgba(102, 126, 234, 0.2),
+    0 0 0 1px rgba(102, 126, 234, 0.15);
 }
 
 .editor-preview[data-theme="dark"] .label--ai {
-  box-shadow: 0 4px 20px rgba(240, 147, 251, 0.2), 0 0 0 1px rgba(240, 147, 251, 0.15);
+  box-shadow:
+    0 4px 20px rgba(240, 147, 251, 0.2),
+    0 0 0 1px rgba(240, 147, 251, 0.15);
 }
 
 .editor-preview[data-theme="dark"] .label--collab {
-  box-shadow: 0 4px 20px rgba(67, 233, 123, 0.2), 0 0 0 1px rgba(67, 233, 123, 0.15);
+  box-shadow:
+    0 4px 20px rgba(67, 233, 123, 0.2),
+    0 0 0 1px rgba(67, 233, 123, 0.15);
 }
 
 .editor-preview[data-theme="dark"] .label--word {
-  box-shadow: 0 4px 20px rgba(79, 172, 254, 0.2), 0 0 0 1px rgba(79, 172, 254, 0.15);
+  box-shadow:
+    0 4px 20px rgba(79, 172, 254, 0.2),
+    0 0 0 1px rgba(79, 172, 254, 0.15);
 }
 
 @keyframes float-label {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Mobile Labels */
 .editor-preview__labels--mobile {
   display: none;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
   flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .mobile-label {
   display: flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
   padding: 6px 14px;
-  background: var(--ep-mobile-label-bg, rgba(0, 0, 0, 0.04));
-  border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   color: var(--ep-mobile-label-text, #555);
-  animation: fade-in-up 0.5s ease forwards;
+  background: var(--ep-mobile-label-bg, rgba(0, 0, 0, 0.04));
+  border-radius: 20px;
   opacity: 0;
+  animation: fade-in-up 0.5s ease forwards;
 }
 
-.mobile-label:nth-child(1) { animation-delay: 0.3s; }
-.mobile-label:nth-child(2) { animation-delay: 0.45s; }
-.mobile-label:nth-child(3) { animation-delay: 0.6s; }
-.mobile-label:nth-child(4) { animation-delay: 0.75s; }
+.mobile-label:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.mobile-label:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.mobile-label:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.mobile-label:nth-child(4) {
+  animation-delay: 0.75s;
+}
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .editor-preview[data-theme="dark"] .mobile-label {
@@ -857,27 +1015,35 @@ onBeforeUnmount(() => {
 }
 
 .mobile-label__dot {
+  flex-shrink: 0;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  flex-shrink: 0;
 }
 
 /* ===== Responsive ===== */
 
 /* Large screens - more room for labels */
-@media (min-width: 1100px) {
+@media (width >= 1100px) {
   .editor-preview {
     max-width: 820px;
   }
-  .label--themes { right: -90px; }
-  .label--collab { right: -100px; }
-  .label--ai { left: -85px; }
-  .label--word { left: -80px; }
+  .label--themes {
+    right: -90px;
+  }
+  .label--collab {
+    right: -100px;
+  }
+  .label--ai {
+    left: -85px;
+  }
+  .label--word {
+    left: -80px;
+  }
 }
 
 /* Medium - hide desktop labels, show mobile labels */
-@media (max-width: 900px) {
+@media (width <= 900px) {
   .editor-preview__labels--desktop {
     display: none;
   }
@@ -897,11 +1063,11 @@ onBeforeUnmount(() => {
 }
 
 /* Small phones */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .editor-preview__content {
-    padding: 16px 18px;
     min-height: 240px;
     max-height: 280px;
+    padding: 16px 18px;
     font-size: 13px;
   }
 
@@ -914,8 +1080,8 @@ onBeforeUnmount(() => {
   }
 
   .editor-preview__toolbar {
-    padding: 4px 8px;
     gap: 2px;
+    padding: 4px 8px;
     overflow-x: auto;
   }
 
@@ -926,8 +1092,8 @@ onBeforeUnmount(() => {
   }
 
   .toolbar-sep {
-    margin: 0 3px;
     height: 14px;
+    margin: 0 3px;
   }
 
   .editor-preview__glow {

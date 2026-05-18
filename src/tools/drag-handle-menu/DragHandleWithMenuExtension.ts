@@ -8,37 +8,44 @@
  * - 智能处理列表嵌套情况
  */
 
-import { Extension } from '@tiptap/core'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
-import { Decoration, DecorationSet } from '@tiptap/pm/view'
-import { Node as ProseMirrorNode } from '@tiptap/pm/model'
-import { h, render } from 'vue'
-import { HolderOutlined } from '@ant-design/icons-vue'
+import { HolderOutlined } from "@ant-design/icons-vue";
+import { Extension } from "@tiptap/core";
+import { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { h, render } from "vue";
 
 // ============================================================================
 // 常量
 // ============================================================================
 
-export const dragHandleWithMenuKey = new PluginKey('dragHandleWithMenu')
+export const dragHandleWithMenuKey = new PluginKey("dragHandleWithMenu");
 
 // 不显示手柄的节点类型
-const EXCLUDED_NODE_TYPES = ['doc', 'table', 'image', 'figure', 'tableCell', 'tableHeader'] as const
-const EXCLUDED_LIST_TYPES = ['taskList', 'listItem', 'taskItem'] as const
-const ALLOWED_LIST_TYPES = ['orderedList', 'bulletList'] as const
+const EXCLUDED_NODE_TYPES = [
+  "doc",
+  "table",
+  "image",
+  "figure",
+  "tableCell",
+  "tableHeader",
+] as const;
+const EXCLUDED_LIST_TYPES = ["taskList", "listItem", "taskItem"] as const;
+const ALLOWED_LIST_TYPES = ["orderedList", "bulletList"] as const;
 
 // ============================================================================
 // 类型定义
 // ============================================================================
 
 export interface DragHandleClickEvent {
-  position: { x: number; y: number }
-  nodePos: number
-  nodeTo: number
-  handleElement: HTMLElement
+  position: { x: number; y: number };
+  nodePos: number;
+  nodeTo: number;
+  handleElement: HTMLElement;
 }
 
 export interface DragHandleWithMenuOptions {
-  onHandleClick?: (event: DragHandleClickEvent) => void
+  onHandleClick?: (event: DragHandleClickEvent) => void;
 }
 
 // ============================================================================
@@ -54,46 +61,43 @@ export interface DragHandleWithMenuOptions {
  */
 function shouldShowHandle(node: ProseMirrorNode, parent: ProseMirrorNode): boolean {
   // 必须是块级元素，且不是文档根节点
-  if (!node.isBlock || node.type.name === 'doc') return false
+  if (!node.isBlock || node.type.name === "doc") return false;
 
   // 排除特定节点类型
-  if (EXCLUDED_NODE_TYPES.includes(node.type.name as any)) return false
-  if (parent.type.name === 'table') return false
+  if (EXCLUDED_NODE_TYPES.includes(node.type.name as any)) return false;
+  if (parent.type.name === "table") return false;
 
   // 列表处理逻辑
   if (ALLOWED_LIST_TYPES.includes(node.type.name as any)) {
-    return true // 有序列表和无序列表显示手柄
+    return true; // 有序列表和无序列表显示手柄
   }
 
   if (EXCLUDED_LIST_TYPES.includes(node.type.name as any)) {
-    return false // 任务列表和列表项不显示手柄
+    return false; // 任务列表和列表项不显示手柄
   }
 
   // 列表项内部的段落不显示手柄
   if (
-    (parent.type.name === 'listItem' || parent.type.name === 'taskItem') &&
-    node.type.name === 'paragraph'
+    (parent.type.name === "listItem" || parent.type.name === "taskItem") &&
+    node.type.name === "paragraph"
   ) {
-    return false
+    return false;
   }
 
   // 如果父节点是有序列表或无序列表，其内部的段落不显示手柄
-  if (
-    ALLOWED_LIST_TYPES.includes(parent.type.name as any) &&
-    node.type.name === 'paragraph'
-  ) {
-    return false
+  if (ALLOWED_LIST_TYPES.includes(parent.type.name as any) && node.type.name === "paragraph") {
+    return false;
   }
 
   // 表格单元格内不显示手柄
-  if (parent.type.name === 'tableCell' || parent.type.name === 'tableHeader') {
-    return false
+  if (parent.type.name === "tableCell" || parent.type.name === "tableHeader") {
+    return false;
   }
 
   // 空节点不显示手柄
-  if (node.content.size === 0) return false
+  if (node.content.size === 0) return false;
 
-  return true
+  return true;
 }
 
 /**
@@ -109,40 +113,40 @@ function createDragHandle(
   node: ProseMirrorNode,
   pos: number,
   view: any,
-  onHandleClick?: (event: DragHandleClickEvent) => void
+  onHandleClick?: (event: DragHandleClickEvent) => void,
 ): HTMLElement {
-  const handle = document.createElement('div')
-  handle.className = 'drag-handle'
-  handle.contentEditable = 'false'
+  const handle = document.createElement("div");
+  handle.className = "drag-handle";
+  handle.contentEditable = "false";
   // 六个点本身不包含拖拽功能，只用于显示和点击
-  handle.draggable = false
+  handle.draggable = false;
 
   // 使用 Ant Design Vue 图标：HolderOutlined
   // 直接渲染到手柄元素内，避免维护自定义 SVG
-  render(h(HolderOutlined), handle)
+  render(h(HolderOutlined), handle);
 
   // 阻止 mousedown 冒泡和默认行为，防止触发 ProseMirror 的选区更新导致组件重渲染
   // 从而解决了"需要点击两次"的问题
-  handle.addEventListener('mousedown', (e) => {
-    e.stopPropagation()
-    e.preventDefault()
-  })
+  handle.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+  });
 
   // 点击事件处理
-  handle.addEventListener('click', (e: MouseEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  handle.addEventListener("click", (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
 
-    const nodeTo = pos + node.nodeSize
-    const handleRect = handle.getBoundingClientRect()
+    const nodeTo = pos + node.nodeSize;
+    const handleRect = handle.getBoundingClientRect();
 
     // 移除其他 handle 的 active 类（确保只有一个激活）
-    view.dom.querySelectorAll('.drag-handle.active').forEach((el: Element) => {
-      el.classList.remove('active')
-    })
+    view.dom.querySelectorAll(".drag-handle.active").forEach((el: Element) => {
+      el.classList.remove("active");
+    });
 
     // 添加 active 类
-    handle.classList.add('active')
+    handle.classList.add("active");
 
     // 触发回调，传递位置和节点信息
     if (onHandleClick) {
@@ -151,11 +155,11 @@ function createDragHandle(
         nodePos: pos,
         nodeTo,
         handleElement: handle,
-      })
+      });
     }
-  })
+  });
 
-  return handle
+  return handle;
 }
 
 // ============================================================================
@@ -163,16 +167,16 @@ function createDragHandle(
 // ============================================================================
 
 export const DragHandleWithMenuExtension = Extension.create<DragHandleWithMenuOptions>({
-  name: 'dragHandleWithMenu',
+  name: "dragHandleWithMenu",
 
   addOptions() {
     return {
       onHandleClick: undefined,
-    }
+    };
   },
 
   addProseMirrorPlugins() {
-    const options = this.options
+    const options = this.options;
 
     return [
       new Plugin({
@@ -180,14 +184,14 @@ export const DragHandleWithMenuExtension = Extension.create<DragHandleWithMenuOp
 
         props: {
           decorations(state) {
-            const decorations: Decoration[] = []
+            const decorations: Decoration[] = [];
 
             state.doc.descendants((node, pos) => {
-              const $pos = state.doc.resolve(pos)
-              const parent = $pos.parent
+              const $pos = state.doc.resolve(pos);
+              const parent = $pos.parent;
 
               if (!shouldShowHandle(node, parent)) {
-                return true
+                return true;
               }
 
               // 将手柄插入到块级节点内部（pos + 1），以便 CSS 能在该块 hover 时显示
@@ -200,20 +204,19 @@ export const DragHandleWithMenuExtension = Extension.create<DragHandleWithMenuOp
                     stopEvent: (e) => {
                       // 让 ProseMirror 忽略手柄上的 mousedown 和 click 事件
                       // 确保 DOM 事件能正常被 handle 及其子元素捕获
-                      return e.type === 'mousedown' || e.type === 'click'
+                      return e.type === "mousedown" || e.type === "click";
                     },
-                  }
-                )
-              )
+                  },
+                ),
+              );
 
-              return true
-            })
+              return true;
+            });
 
-            return DecorationSet.create(state.doc, decorations)
+            return DecorationSet.create(state.doc, decorations);
           },
         },
       }),
-    ]
+    ];
   },
-})
-
+});

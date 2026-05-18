@@ -13,8 +13,8 @@
 /* Pad 视图 - 平板宽度 */
 [data-device="pad"] .tiptap-pro-editor {
   max-width: 768px;
-  margin-left: auto;
   margin-right: auto;
+  margin-left: auto;
 }
 
 [data-device="pad"] .word-document-container {
@@ -28,8 +28,8 @@
 /* Mobile 视图 - 手机宽度 */
 [data-device="mobile"] .tiptap-pro-editor {
   max-width: 375px;
-  margin-left: auto;
   margin-right: auto;
+  margin-left: auto;
 }
 
 [data-device="mobile"] .word-document-container {
@@ -50,9 +50,9 @@
 
 /* Mobile 视图 - 工具栏紧凑布局 */
 [data-device="mobile"] .word-toolbar {
-  padding: 2px 4px;
   flex-wrap: wrap;
   gap: 2px;
+  padding: 2px 4px;
 }
 
 [data-device="mobile"] .word-toolbar .ant-btn,
@@ -72,24 +72,24 @@
 
 /* Mobile 视图 - 内容区域紧凑 */
 [data-device="mobile"] .word-content-multi .ProseMirror {
+  min-height: auto;
   padding: 32px 16px;
   font-size: 14px;
-  min-height: auto;
 }
 
 [data-device="mobile"] .word-content-multi .ProseMirror h1 {
-  font-size: 22px;
   margin: 16px 0 8px;
+  font-size: 22px;
 }
 
 [data-device="mobile"] .word-content-multi .ProseMirror h2 {
-  font-size: 18px;
   margin: 14px 0 6px;
+  font-size: 18px;
 }
 
 [data-device="mobile"] .word-content-multi .ProseMirror h3 {
-  font-size: 16px;
   margin: 12px 0 6px;
+  font-size: 16px;
 }
 
 [data-device="mobile"] .word-content-multi .ProseMirror p {
@@ -104,8 +104,8 @@
 
 [data-device="mobile"] .zoom-bar {
   flex-wrap: wrap;
-  justify-content: center;
   gap: 4px;
+  justify-content: center;
 }
 
 /* ===== 过渡动画 ===== */
@@ -117,5 +117,7 @@
 .word-document-container,
 .continuous-pages,
 .word-content-multi .ProseMirror {
-  transition: padding 0.3s ease, max-width 0.3s ease;
+  transition:
+    padding 0.3s ease,
+    max-width 0.3s ease;
 }

@@ -5,22 +5,22 @@
 
 export interface TemplateItem {
   /** 模板唯一标识 */
-  key: string
+  key: string;
   /** 模板名称（翻译 key） */
-  nameKey: string
+  nameKey: string;
   /** 模板描述（翻译 key） */
-  descKey: string
+  descKey: string;
   /** 模板 HTML 内容 */
-  content: string
+  content: string;
 }
 
 /**
  * 会议纪要模板
  */
 const meetingMinutes: TemplateItem = {
-  key: 'meeting-minutes',
-  nameKey: 'editor.templateMeetingMinutes',
-  descKey: 'editor.templateMeetingMinutesDesc',
+  key: "meeting-minutes",
+  nameKey: "editor.templateMeetingMinutes",
+  descKey: "editor.templateMeetingMinutesDesc",
   content: `
 <h2>会议纪要</h2>
 <table>
@@ -45,15 +45,15 @@ const meetingMinutes: TemplateItem = {
   <tr><td></td><td></td><td></td></tr>
 </table>
 `.trim(),
-}
+};
 
 /**
  * 周报模板
  */
 const weeklyReport: TemplateItem = {
-  key: 'weekly-report',
-  nameKey: 'editor.templateWeeklyReport',
-  descKey: 'editor.templateWeeklyReportDesc',
+  key: "weekly-report",
+  nameKey: "editor.templateWeeklyReport",
+  descKey: "editor.templateWeeklyReportDesc",
   content: `
 <h2>周报</h2>
 <p><strong>姓名：</strong></p>
@@ -75,15 +75,15 @@ const weeklyReport: TemplateItem = {
   <li><p></p></li>
 </ul>
 `.trim(),
-}
+};
 
 /**
  * 项目方案模板
  */
 const projectPlan: TemplateItem = {
-  key: 'project-plan',
-  nameKey: 'editor.templateProjectPlan',
-  descKey: 'editor.templateProjectPlanDesc',
+  key: "project-plan",
+  nameKey: "editor.templateProjectPlan",
+  descKey: "editor.templateProjectPlanDesc",
   content: `
 <h2>项目方案</h2>
 <h3>1. 项目概述</h3>
@@ -109,15 +109,15 @@ const projectPlan: TemplateItem = {
   <tr><td></td><td></td><td></td></tr>
 </table>
 `.trim(),
-}
+};
 
 /**
  * 日报模板
  */
 const dailyReport: TemplateItem = {
-  key: 'daily-report',
-  nameKey: 'editor.templateDailyReport',
-  descKey: 'editor.templateDailyReportDesc',
+  key: "daily-report",
+  nameKey: "editor.templateDailyReport",
+  descKey: "editor.templateDailyReportDesc",
   content: `
 <h2>日报</h2>
 <p><strong>姓名：</strong></p>
@@ -133,15 +133,15 @@ const dailyReport: TemplateItem = {
 <h3>备注</h3>
 <p></p>
 `.trim(),
-}
+};
 
 /**
  * 产品需求文档模板
  */
 const productRequirement: TemplateItem = {
-  key: 'product-requirement',
-  nameKey: 'editor.templateProductRequirement',
-  descKey: 'editor.templateProductRequirementDesc',
+  key: "product-requirement",
+  nameKey: "editor.templateProductRequirement",
+  descKey: "editor.templateProductRequirementDesc",
   content: `
 <h2>产品需求文档 (PRD)</h2>
 <h3>1. 需求背景</h3>
@@ -168,7 +168,7 @@ const productRequirement: TemplateItem = {
 <h3>6. 上线计划</h3>
 <p></p>
 `.trim(),
-}
+};
 
 /**
  * 所有内置模板
@@ -179,4 +179,4 @@ export const builtinTemplates: TemplateItem[] = [
   dailyReport,
   projectPlan,
   productRequirement,
-]
+];

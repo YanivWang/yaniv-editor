@@ -1,17 +1,16 @@
-import type { Editor } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
+import { notification } from "ant-design-vue";
 
-import { Extension } from '@tiptap/core';
-import { notification } from 'ant-design-vue';
+import { aiApiService } from "@/api/ai";
+import { t } from "@/locales";
 
-import { t } from '@/locales';
+import { aiSuggestionManager } from "../shared/aiSuggestionManager";
 
-import { aiApiService } from '@/api/ai';
+import type { Editor } from "@tiptap/core";
 
-import { aiSuggestionManager } from '../shared/aiSuggestionManager';
+export type SummarizeOptions = Record<string, never>;
 
-export interface SummarizeOptions {}
-
-declare module '@tiptap/core' {
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     summarize: {
       summarize: () => ReturnType;
@@ -20,7 +19,7 @@ declare module '@tiptap/core' {
 }
 
 export const SummarizeExtension = Extension.create<SummarizeOptions>({
-  name: 'summarize',
+  name: "summarize",
 
   addCommands() {
     return {
@@ -29,16 +28,16 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
         ({ state, editor }) => {
           const { selection } = state;
           const { from, to } = selection;
-          const selectedText = state.doc.textBetween(from, to, ' ');
+          const selectedText = state.doc.textBetween(from, to, " ");
 
           if (!selectedText.trim()) {
-            console.warn('[Summarize] No text selected');
+            console.warn("[Summarize] No text selected");
             // 显示用户友好的提示
             notification.warning({
-              message: t('editor.pleaseSelectText'),
-              description: t('editor.summarizeRequiresSelection'),
+              message: t("editor.pleaseSelectText"),
+              description: t("editor.summarizeRequiresSelection"),
               duration: 3,
-              placement: 'topRight',
+              placement: "topRight",
             });
             return false;
           }
@@ -55,19 +54,19 @@ function performSummarize(
   selectedText: string,
   originalSelection: { from: number; to: number },
 ) {
-  let accumulatedContent = '';
+  let accumulatedContent = "";
 
   // Show AI suggestion popover with highlight
   aiSuggestionManager.show(selectedText, originalSelection, editor);
 
   // Get full document context for system prompt
   const state = editor.state;
-  const fullText = state.doc.textBetween(0, state.doc.content.size, ' ');
+  const fullText = state.doc.textBetween(0, state.doc.content.size, " ");
   const sysPrompt = `以下係完整嘅文件內容:\n\n${fullText}`;
 
   const callback = {
     onStart: () => {
-      accumulatedContent = '';
+      accumulatedContent = "";
     },
     onMessage: (message: { content: string }) => {
       if (message && message.content) {
@@ -84,15 +83,15 @@ function performSummarize(
         // Update with final content
         aiSuggestionManager.updateSuggestion(accumulatedContent);
       } catch (error) {
-        console.warn('[Summarize] Failed to finalize formatting:', error);
+        console.warn("[Summarize] Failed to finalize formatting:", error);
       }
     },
     onError: (error: Error) => {
-      console.error('[Summarize] Error:', error);
+      console.error("[Summarize] Error:", error);
       aiSuggestionManager.hide();
       notification.error({
-        message: '总结失败',
-        description: error.message || t('messages.networkError'),
+        message: "总结失败",
+        description: error.message || t("messages.networkError"),
         duration: 3,
       });
     },
@@ -100,4 +99,3 @@ function performSummarize(
 
   aiApiService.summarize(selectedText, sysPrompt, callback);
 }
-

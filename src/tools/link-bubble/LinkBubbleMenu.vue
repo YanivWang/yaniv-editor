@@ -16,13 +16,9 @@
       <div class="link-actions">
         <!-- 分隔线 -->
         <div class="link-divider"></div>
-        
+
         <!-- 编辑链接按钮 -->
-        <button
-          class="link-action-btn"
-          @click="editLink"
-          :title="t('editor.editLink')"
-        >
+        <button class="link-action-btn" :title="t('editor.editLink')" @click="editLink">
           <EditOutlined />
         </button>
 
@@ -30,11 +26,7 @@
         <div class="link-divider"></div>
 
         <!-- 打开链接按钮 -->
-        <button
-          class="link-action-btn"
-          @click="openLink"
-          :title="t('editor.openLink')"
-        >
+        <button class="link-action-btn" :title="t('editor.openLink')" @click="openLink">
           <LinkOutlined />
         </button>
 
@@ -44,8 +36,8 @@
         <!-- 删除链接按钮 -->
         <button
           class="link-action-btn link-action-btn--danger"
-          @click="removeLink"
           :title="t('editor.removeLink')"
+          @click="removeLink"
         >
           <DeleteOutlined />
         </button>
@@ -56,8 +48,8 @@
     <a-modal
       v-model:open="linkModalOpen"
       :title="t('editor.editLink')"
-      @ok="applyLink"
       width="400px"
+      @ok="applyLink"
     >
       <a-input
         v-model:value="linkUrl"
@@ -74,48 +66,50 @@
  * @description 选中链接时显示的悬浮框，提供链接编辑、打开、删除等功能
  * @description 此组件位于 tools/link-bubble 文件夹，可通过 features.linkBubbleMenu 配置是否启用
  */
-import { computed, nextTick, ref, watch } from 'vue'
-import { BubbleMenu } from '@tiptap/vue-3/menus'
-import type { Editor } from '@tiptap/vue-3'
-import { t } from '@/locales'
-import { EditOutlined, LinkOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { createCommandRunner } from '@/utils/editorCommands'
+import { EditOutlined, LinkOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import { BubbleMenu } from "@tiptap/vue-3/menus";
+import { computed, nextTick, ref, watch } from "vue";
+
+import { t } from "@/locales";
+import { createCommandRunner } from "@/utils/editorCommands";
+
+import type { Editor } from "@tiptap/vue-3";
 
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined
-    readonly?: boolean
-    enabled?: boolean
+    editor: Editor | null | undefined;
+    readonly?: boolean;
+    enabled?: boolean;
   }>(),
   {
     readonly: false,
     enabled: false, // 默认启用
-  }
-)
+  },
+);
 
-const editor = computed(() => props.editor ?? null)
-const runCommand = createCommandRunner(editor)
+const editor = computed(() => props.editor ?? null);
+const runCommand = createCommandRunner(editor);
 
 // 响应式状态
-const currentLinkUrl = ref('')
-const linkModalOpen = ref(false)
-const linkUrl = ref('')
+const currentLinkUrl = ref("");
+const linkModalOpen = ref(false);
+const linkUrl = ref("");
 
 /**
  * 更新当前链接URL
  */
 function updateCurrentLinkUrl() {
-  const e = editor.value
+  const e = editor.value;
   if (!e) {
-    currentLinkUrl.value = ''
-    return
+    currentLinkUrl.value = "";
+    return;
   }
 
-  if (e.isActive('link')) {
-    const attrs = e.getAttributes('link')
-    currentLinkUrl.value = attrs.href || ''
+  if (e.isActive("link")) {
+    const attrs = e.getAttributes("link");
+    currentLinkUrl.value = attrs.href || "";
   } else {
-    currentLinkUrl.value = ''
+    currentLinkUrl.value = "";
   }
 }
 
@@ -126,226 +120,227 @@ function updateCurrentLinkUrl() {
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
   // 如果功能未启用，不显示
   if (!props.enabled) {
-    return false
+    return false;
   }
 
   // 只读模式下不显示
   if (props.readonly) {
-    return false
+    return false;
   }
 
-  const e = bubbleProps.editor
+  const e = bubbleProps.editor;
   if (!e) {
-    return false
+    return false;
   }
 
-  const { from, to } = bubbleProps
-  const { state } = bubbleProps
+  const { from, to } = bubbleProps;
+  const { state } = bubbleProps;
 
   // 关键：只有当选择范围不为空时才显示（即必须选中文本）
   // 如果 from === to，说明只是光标位置，没有选中文本，不显示
   if (from === to) {
-    return false
+    return false;
   }
 
   // 检查选中的文本是否包含链接标记
   // 必须确保选中的文本本身是链接，而不是选择范围内有其他链接
   try {
-    const start = Math.min(from, to)
-    const end = Math.max(from, to)
-    
+    const start = Math.min(from, to);
+    const end = Math.max(from, to);
+
     // 使用 resolve 获取选择范围的标记
-    const $from = state.doc.resolve(start)
-    const $to = state.doc.resolve(end)
-    
+    const $from = state.doc.resolve(start);
+    const $to = state.doc.resolve(end);
+
     // 检查起始位置的标记（选中的文本开始位置）
-    const marksAtStart = $from.marks()
-    let linkMarkAtStart = null
+    const marksAtStart = $from.marks();
+    let linkMarkAtStart = null;
     for (const mark of marksAtStart) {
-      if (mark.type && mark.type.name === 'link' && mark.attrs?.href) {
-        linkMarkAtStart = mark
-        break
+      if (mark.type && mark.type.name === "link" && mark.attrs?.href) {
+        linkMarkAtStart = mark;
+        break;
       }
     }
-    
+
     // 检查结束位置的标记（选中的文本结束位置）
-    const marksAtEnd = $to.marks()
-    let linkMarkAtEnd = null
+    const marksAtEnd = $to.marks();
+    let linkMarkAtEnd = null;
     for (const mark of marksAtEnd) {
-      if (mark.type && mark.type.name === 'link' && mark.attrs?.href) {
-        linkMarkAtEnd = mark
-        break
+      if (mark.type && mark.type.name === "link" && mark.attrs?.href) {
+        linkMarkAtEnd = mark;
+        break;
       }
     }
-    
+
     // 只有当起始和结束位置都有链接标记，且是同一个链接时，才显示悬浮框
     // 这确保选中的文本本身是链接，而不是选择范围内有其他链接
     if (linkMarkAtStart && linkMarkAtEnd) {
       // 检查是否是同一个链接（通过比较 href）
       if (linkMarkAtStart.attrs?.href === linkMarkAtEnd.attrs?.href) {
-        currentLinkUrl.value = linkMarkAtStart.attrs.href
-        return true
+        currentLinkUrl.value = linkMarkAtStart.attrs.href;
+        return true;
       }
     }
-    
+
     // 如果起始或结束位置只有一个有链接标记，也检查选择范围内的所有文本节点
     // 确保选中的文本节点本身都包含链接标记
-    let allNodesHaveLink = false
-    let linkHref = ''
-    let hasNonLinkText = false
-    
+    let allNodesHaveLink = false;
+    let linkHref = "";
+    let hasNonLinkText = false;
+
     state.doc.nodesBetween(start, end, (node: any) => {
       // 只检查文本节点，忽略其他类型的节点
       if (node.isText) {
         if (node.marks && node.marks.length > 0) {
           const linkMark = node.marks.find(
-            (mark: any) => mark.type && mark.type.name === 'link' && mark.attrs?.href
-          )
+            (mark: any) => mark.type && mark.type.name === "link" && mark.attrs?.href,
+          );
           if (linkMark) {
             if (!linkHref) {
-              linkHref = linkMark.attrs.href
+              linkHref = linkMark.attrs.href;
             } else if (linkHref !== linkMark.attrs.href) {
               // 如果选中的文本包含不同的链接，不显示
-              hasNonLinkText = true
-              return false
+              hasNonLinkText = true;
+              return false;
             }
-            allNodesHaveLink = true
+            allNodesHaveLink = true;
           } else {
             // 如果文本节点没有链接标记，说明选中的不是链接文本
-            hasNonLinkText = true
-            return false
+            hasNonLinkText = true;
+            return false;
           }
         } else {
           // 如果文本节点没有任何标记，说明选中的不是链接文本
-          hasNonLinkText = true
-          return false
+          hasNonLinkText = true;
+          return false;
         }
       }
-    })
-    
+    });
+
     // 只有当所有选中的文本节点都包含链接标记，且没有非链接文本时，才显示
     if (allNodesHaveLink && !hasNonLinkText && linkHref) {
-      currentLinkUrl.value = linkHref
-      return true
+      currentLinkUrl.value = linkHref;
+      return true;
     }
   } catch (error) {
     // 忽略错误
   }
 
-  return false
-}
+  return false;
+};
 
 // 监听编辑器选择变化，更新链接URL
 watch(
   () => editor.value?.state.selection,
   () => {
-    if (editor.value?.isActive('link')) {
-      updateCurrentLinkUrl()
+    if (editor.value?.isActive("link")) {
+      updateCurrentLinkUrl();
     }
   },
-  { deep: true }
-)
+  { deep: true },
+);
 
 // 监听编辑器状态更新，同步链接URL
 watch(
   () => editor.value?.state,
   () => {
-    updateCurrentLinkUrl()
+    updateCurrentLinkUrl();
   },
-  { deep: true, immediate: true }
-)
+  { deep: true, immediate: true },
+);
 
 /**
  * 编辑链接
  */
 function editLink() {
-  const e = editor.value
-  if (!e) return
+  const e = editor.value;
+  if (!e) return;
 
-  if (e.isActive('link')) {
-    linkUrl.value = e.getAttributes('link').href || ''
+  if (e.isActive("link")) {
+    linkUrl.value = e.getAttributes("link").href || "";
   } else {
-    linkUrl.value = ''
+    linkUrl.value = "";
   }
 
-  linkModalOpen.value = true
+  linkModalOpen.value = true;
 }
 
 /**
  * 应用链接编辑
  */
 function applyLink() {
-  const e = editor.value
-  if (!e) return
+  const e = editor.value;
+  if (!e) return;
 
-  const finalUrl = linkUrl.value.trim()
-  
+  const finalUrl = linkUrl.value.trim();
+
   if (finalUrl) {
     // 验证URL格式
-    let urlToSet = finalUrl
+    let urlToSet = finalUrl;
     try {
-      const url = new URL(finalUrl)
-      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-        throw new Error('Invalid protocol')
+      const url = new URL(finalUrl);
+      if (url.protocol !== "http:" && url.protocol !== "https:") {
+        throw new Error("Invalid protocol");
       }
-      urlToSet = finalUrl
+      urlToSet = finalUrl;
     } catch {
       // 如果不是完整URL，尝试添加https://
-      urlToSet = finalUrl.startsWith('http')
-        ? finalUrl
-        : `https://${finalUrl}`
+      urlToSet = finalUrl.startsWith("http") ? finalUrl : `https://${finalUrl}`;
     }
-    
+
     // 更新链接 - 直接使用编辑器实例确保状态同步
     if (e) {
-      const hasSelection = !e.state.selection.empty
-      const chain = e.chain().focus()
-      
+      const hasSelection = !e.state.selection.empty;
+      const chain = e.chain().focus();
+
       if (hasSelection) {
         // 如果有选中文本，扩展标记范围并设置链接
-        const success = chain.extendMarkRange('link').setLink({ href: urlToSet, target: '_blank' }).run()
+        const success = chain
+          .extendMarkRange("link")
+          .setLink({ href: urlToSet, target: "_blank" })
+          .run();
         if (success) {
           // 立即更新显示的链接URL
-          currentLinkUrl.value = urlToSet
+          currentLinkUrl.value = urlToSet;
           // 等待状态同步后再次确认
           nextTick(() => {
-            updateCurrentLinkUrl()
-          })
+            updateCurrentLinkUrl();
+          });
         }
       } else {
         // 如果没有选中文本，在当前光标位置设置链接
-        const success = chain.setLink({ href: urlToSet, target: '_blank' }).run()
+        const success = chain.setLink({ href: urlToSet, target: "_blank" }).run();
         if (success) {
-          currentLinkUrl.value = urlToSet
+          currentLinkUrl.value = urlToSet;
           nextTick(() => {
-            updateCurrentLinkUrl()
-          })
+            updateCurrentLinkUrl();
+          });
         }
       }
     }
   } else {
     // 如果URL为空，移除链接
-    runCommand((chain: any) => chain.unsetLink())()
-    currentLinkUrl.value = ''
+    runCommand((chain: any) => chain.unsetLink())();
+    currentLinkUrl.value = "";
   }
 
   // 关闭模态框并清空输入
-  linkModalOpen.value = false
-  linkUrl.value = ''
+  linkModalOpen.value = false;
+  linkUrl.value = "";
 }
 
 /**
  * 打开链接
  */
 function openLink() {
-  const e = editor.value
-  if (!e) return
+  const e = editor.value;
+  if (!e) return;
 
-  if (e.isActive('link')) {
-    const attrs = e.getAttributes('link')
-    const href = attrs.href || ''
+  if (e.isActive("link")) {
+    const attrs = e.getAttributes("link");
+    const href = attrs.href || "";
     if (href) {
-      window.open(href, '_blank', 'noopener,noreferrer')
+      window.open(href, "_blank", "noopener,noreferrer");
     }
   }
 }
@@ -354,7 +349,7 @@ function openLink() {
  * 删除链接
  */
 function removeLink() {
-  runCommand((chain: any) => chain.unsetLink())()
+  runCommand((chain: any) => chain.unsetLink())();
 }
 </script>
 
@@ -366,8 +361,8 @@ function removeLink() {
 
 .link-bubble-menu-content {
   display: flex;
-  align-items: center;
   gap: 0;
+  align-items: center;
   padding: 8px 12px;
   background: #fff;
   border: 1px solid #d0d0d0;
@@ -392,10 +387,10 @@ function removeLink() {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 14px;
-  color: #262626;
   line-height: 1.5;
+  color: #262626;
+  white-space: nowrap;
 
   :where(.dark, .dark *) & {
     color: #f0f0f0;
@@ -405,16 +400,16 @@ function removeLink() {
 /* 操作按钮组 */
 .link-actions {
   display: flex;
-  align-items: center;
   gap: 0;
+  align-items: center;
 }
 
 /* 分隔线 */
 .link-divider {
   width: 1px;
   height: 20px;
-  background: #e8e8e8;
   margin: 0 4px;
+  background: #e8e8e8;
 
   :where(.dark, .dark *) & {
     background: #434343;
@@ -450,8 +445,8 @@ function removeLink() {
 }
 
 .link-action-btn:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* 危险按钮样式（删除） */
@@ -474,7 +469,7 @@ function removeLink() {
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .link-bubble-menu-content {
     padding: 6px 10px;
   }
@@ -490,4 +485,3 @@ function removeLink() {
   }
 }
 </style>
-

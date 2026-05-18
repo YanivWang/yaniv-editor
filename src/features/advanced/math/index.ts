@@ -1,4 +1,4 @@
 /**
  * Math Feature
  */
-export { default as MathButton } from './MathButton.vue'
+export { default as MathButton } from "./MathButton.vue";

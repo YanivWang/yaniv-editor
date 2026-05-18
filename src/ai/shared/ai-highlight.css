@@ -10,14 +10,14 @@
 }
 
 /* Hide AI highlights in readonly/preview mode */
-.ProseMirror[contenteditable='false'] .ai-highlight {
+.ProseMirror[contenteditable="false"] .ai-highlight {
   padding: 0;
   cursor: default;
   background-color: transparent;
   border-bottom: none;
 }
 
-.ProseMirror[contenteditable='false'] .ai-highlight:hover::after {
+.ProseMirror[contenteditable="false"] .ai-highlight:hover::after {
   display: none;
 }
 
@@ -72,4 +72,3 @@
 .ai-highlight {
   animation: ai-highlight-fade-in 0.3s ease;
 }
-

@@ -1,17 +1,17 @@
-import type { Editor } from '@tiptap/core';
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
-import type { App } from 'vue';
-
-import { createApp, h, ref } from 'vue';
+import { createApp, h, ref } from "vue";
 
 import {
   addAiHighlight,
   removeAiHighlight,
   updateAiHighlight,
   getAiSuggestionData,
-} from './AiHighlightMark';
-import type { AiSuggestionData } from './AiHighlightMark';
-import AiSuggestionPopover from './AiSuggestionPopover.vue';
+} from "./AiHighlightMark";
+import AiSuggestionPopover from "./AiSuggestionPopover.vue";
+
+import type { AiSuggestionData } from "./AiHighlightMark";
+import type { Editor } from "@tiptap/core";
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { App } from "vue";
 
 export interface AiSuggestionState {
   visible: boolean;
@@ -27,16 +27,16 @@ class AiSuggestionManager {
   private container: HTMLElement | null = null;
   private state: AiSuggestionState = {
     visible: false,
-    originalText: '',
-    suggestedText: '',
+    originalText: "",
+    suggestedText: "",
     isStreaming: false,
     originalSelection: { from: 0, to: 0 },
   };
 
   // Reactive refs for the popover component
   private visibleRef = ref(false);
-  private originalTextRef = ref('');
-  private suggestedTextRef = ref('');
+  private originalTextRef = ref("");
+  private suggestedTextRef = ref("");
   private isStreamingRef = ref(false);
 
   // Track if the suggestion is temporarily hidden
@@ -68,9 +68,9 @@ class AiSuggestionManager {
       const target = event.target as HTMLElement;
 
       // Check if clicked on highlighted text
-      const highlightElement = target.classList.contains('ai-highlight')
+      const highlightElement = target.classList.contains("ai-highlight")
         ? target
-        : target.closest('.ai-highlight');
+        : target.closest(".ai-highlight");
 
       if (highlightElement) {
         // Get the position of the clicked element
@@ -92,7 +92,7 @@ class AiSuggestionManager {
     };
 
     // Add click event listener to editor
-    this.editor.view.dom.addEventListener('click', this.clickHandler);
+    this.editor.view.dom.addEventListener("click", this.clickHandler);
   }
 
   /**
@@ -100,7 +100,7 @@ class AiSuggestionManager {
    */
   private removeClickHandler(): void {
     if (this.editor && this.clickHandler) {
-      this.editor.view.dom.removeEventListener('click', this.clickHandler);
+      this.editor.view.dom.removeEventListener("click", this.clickHandler);
       this.clickHandler = null;
     }
   }
@@ -119,10 +119,7 @@ class AiSuggestionManager {
   /**
    * Restore a suggestion from saved data
    */
-  private restoreSuggestion(
-    element: HTMLElement,
-    data: AiSuggestionData,
-  ): void {
+  private restoreSuggestion(element: HTMLElement, data: AiSuggestionData): void {
     if (!this.editor) return;
 
     // Get the range of the highlighted text
@@ -170,13 +167,13 @@ class AiSuggestionManager {
     if (editor && !this.editor) {
       this.init(editor);
     }
-    
+
     if (!this.editor) return;
 
     this.state = {
       visible: true,
       originalText,
-      suggestedText: '',
+      suggestedText: "",
       isStreaming: true,
       originalSelection,
     };
@@ -184,7 +181,7 @@ class AiSuggestionManager {
     // Update reactive refs
     this.visibleRef.value = true;
     this.originalTextRef.value = originalText;
-    this.suggestedTextRef.value = '';
+    this.suggestedTextRef.value = "";
     this.isStreamingRef.value = true;
 
     // Reset temporarily hidden flag
@@ -193,15 +190,10 @@ class AiSuggestionManager {
     // Add highlight to the selected text with data
     const highlightData: AiSuggestionData = {
       originalText,
-      suggestedText: '',
+      suggestedText: "",
       isStreaming: true,
     };
-    addAiHighlight(
-      this.editor,
-      originalSelection.from,
-      originalSelection.to,
-      highlightData,
-    );
+    addAiHighlight(this.editor, originalSelection.from, originalSelection.to, highlightData);
 
     // Create and mount the popover (only once)
     if (!this.popoverApp) {
@@ -278,11 +270,7 @@ class AiSuggestionManager {
       if (paragraphNodes.length > 0) {
         // Use transaction to replace selected text with paragraph nodes
         const tr = state.tr;
-        tr.replaceWith(
-          originalSelection.from,
-          originalSelection.to,
-          paragraphNodes,
-        );
+        tr.replaceWith(originalSelection.from, originalSelection.to, paragraphNodes);
         this.editor.view.dispatch(tr);
       }
     } else {
@@ -362,8 +350,8 @@ class AiSuggestionManager {
 
     this.state = {
       visible: false,
-      originalText: '',
-      suggestedText: '',
+      originalText: "",
+      suggestedText: "",
       isStreaming: false,
       originalSelection: { from: 0, to: 0 },
     };
@@ -393,11 +381,11 @@ class AiSuggestionManager {
     if (this.popoverApp && this.container) return;
 
     // Create container
-    this.container = document.createElement('div');
-    this.container.style.position = 'absolute';
-    this.container.style.top = '0';
-    this.container.style.left = '0';
-    this.container.style.zIndex = '1000';
+    this.container = document.createElement("div");
+    this.container.style.position = "absolute";
+    this.container.style.top = "0";
+    this.container.style.left = "0";
+    this.container.style.zIndex = "1000";
 
     // Get editor element
     const editorElement = this.editor.view.dom.parentElement;
@@ -420,7 +408,7 @@ class AiSuggestionManager {
           isStreaming: this.isStreamingRef.value,
           position,
           editorElement: editorElement || undefined,
-          'onUpdate:visible': (val: boolean) => {
+          "onUpdate:visible": (val: boolean) => {
             this.visibleRef.value = val;
           },
           onAccept: () => {
@@ -490,4 +478,3 @@ class AiSuggestionManager {
 
 // Export singleton instance
 export const aiSuggestionManager = new AiSuggestionManager();
-

@@ -2,4 +2,4 @@
  * Configs Entry
  */
 
-export * from './editorConstants'
+export * from "./editorConstants";

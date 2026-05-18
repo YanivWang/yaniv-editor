@@ -10,12 +10,17 @@
 
 ```vue
 <template>
-  <ToolbarNav v-if="editorInstance" :editor="editorInstance" :config="toolbarConfig" class="word-toolbar" />
+  <ToolbarNav
+    v-if="editorInstance"
+    :editor="editorInstance"
+    :config="toolbarConfig"
+    class="word-toolbar"
+  />
 </template>
 
 <script setup lang="ts">
 // 公共工具栏（已迁移）
-import { ToolbarNav, BASIC_TOOLBAR_CONFIG } from '../tools/header-nav'
+import { ToolbarNav, BASIC_TOOLBAR_CONFIG } from "../tools/header-nav";
 </script>
 ```
 
@@ -25,7 +30,7 @@ import { ToolbarNav, BASIC_TOOLBAR_CONFIG } from '../tools/header-nav'
 
 ```typescript
 // 核心编辑器
-export { default as TiptapProEditor } from './core/TiptapProEditor.vue'
+export { default as TiptapProEditor } from "./core/TiptapProEditor.vue";
 ```
 
 ### 3. 实际使用位置
@@ -34,15 +39,11 @@ export { default as TiptapProEditor } from './core/TiptapProEditor.vue'
 
 ```vue
 <template>
-  <TiptapProEditor
-    :version="'basic'"
-    :initialContent="initialContent"
-    @update="handleUpdate"
-  />
+  <TiptapProEditor :version="'basic'" :initialContent="initialContent" @update="handleUpdate" />
 </template>
 
 <script setup lang="ts">
-import { TiptapProEditor } from '#/components/tiptapPro-tenant'
+import { TiptapProEditor } from "#/components/tiptapPro-tenant";
 </script>
 ```
 
@@ -70,4 +71,3 @@ basic/color/ColorPicker.vue
 - 工具栏已迁移到 `tools/header-nav/ToolbarNav.vue`，支持可配置的工具显示
 - 用户通过使用 `TiptapProEditor` 组件来使用基础版功能
 - 可以通过 `versionConfig.features.headerNav` 配置来控制是否显示工具栏
-

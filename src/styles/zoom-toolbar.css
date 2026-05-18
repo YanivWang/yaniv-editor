@@ -54,14 +54,31 @@
   }
 }
 
-/* 变体：底部位置（固定在编辑器容器底部） */
+/* 快捷键摘要（底部状态栏） */
+.shortcut-hints {
+  max-width: min(520px, 45vw);
+  padding-left: 10px;
+  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+  border-left: 1px solid #d0d0d0;
+
+  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+    color: #b5b5b5;
+    border-left-color: #434343;
+  }
+}
+
 .zoom-controls--bottom {
+  z-index: 10;
   flex-shrink: 0;
   width: 100%;
-  z-index: 10;
+  background: #f5f5f5;
   border-top: 1px solid #d0d0d0;
   border-bottom: none;
-  background: #f5f5f5;
   box-shadow: 0 -2px 8px rgb(0 0 0 / 5%);
 
   :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {

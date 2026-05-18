@@ -1,9 +1,14 @@
 <template>
-  <a-dropdown :placement="placement" :trigger="['click']" v-model:open="dropdownOpen" @openChange="handleOpenChange">
+  <a-dropdown
+    v-model:open="dropdownOpen"
+    :placement="placement"
+    :trigger="['click']"
+    @open-change="handleOpenChange"
+  >
     <a-tooltip :title="title" placement="top" :open="dropdownOpen ? false : undefined">
       <a-button type="text" :class="['ai-menu-button', { 'is-active': active }]">
         <span class="ai-menu-button__content">
-          <component v-if="icon" :is="icon" class="ai-menu-button__icon" />
+          <component :is="icon" v-if="icon" class="ai-menu-button__icon" />
           <span v-if="label" class="ai-menu-button__label">{{ label }}</span>
           <DownOutlined class="ai-menu-button__arrow" />
         </span>
@@ -11,27 +16,38 @@
     </a-tooltip>
 
     <template #overlay>
-      <a-menu @click="onMenuClick" style="max-height: 360px; overflow-y: auto;">
+      <a-menu style="max-height: 360px; overflow-y: auto" @click="onMenuClick">
         <template v-for="item in menuItems" :key="item.key">
           <!-- 带子菜单的菜单项（如总结内容） -->
-          <a-menu-item v-if="item.children && item.children.length > 0" :key="item.key + ':with-children'">
+          <a-menu-item
+            v-if="item.children && item.children.length > 0"
+            :key="item.key + ':with-children'"
+          >
             <div class="ai-menu-translate-split" @mouseenter="onRowEnter" @mouseleave="onRowLeave">
               <span class="ai-menu-translate-split__main" @click.stop="onTranslateDefault(item)">
-                <component v-if="item.icon" :is="item.icon" class="ai-menu-item__icon" />
+                <component :is="item.icon" v-if="item.icon" class="ai-menu-item__icon" />
                 <span class="ai-menu-item__label">{{ item.label }}</span>
               </span>
               <a-dropdown
                 :trigger="hasSelectedLang ? ['hover'] : []"
                 placement="rightTop"
                 :open="overlayOpen"
-                @openChange="onDropOpenChange"
+                @open-change="onDropOpenChange"
               >
                 <span class="ai-menu-translate-split__arrow" :title="t('editor.selectLanguage')">
                   <RightOutlined />
                 </span>
                 <template #overlay>
-                  <div class="ai-menu-translate-overlay" @mouseenter="onOverlayEnter" @mouseleave="onOverlayLeave">
-                    <a-menu @click="onTranslateLangClick" class="ai-menu-dropdown-overlay" :selectedKeys="selectedLangKey ? [selectedLangKey] : []">
+                  <div
+                    class="ai-menu-translate-overlay"
+                    @mouseenter="onOverlayEnter"
+                    @mouseleave="onOverlayLeave"
+                  >
+                    <a-menu
+                      class="ai-menu-dropdown-overlay"
+                      :selected-keys="selectedLangKey ? [selectedLangKey] : []"
+                      @click="onTranslateLangClick"
+                    >
                       <a-menu-item
                         v-for="child in item.children"
                         :key="child.key"
@@ -50,9 +66,14 @@
           </a-menu-item>
 
           <!-- 普通菜单项 -->
-          <a-menu-item v-else :key="item.key" :disabled="(item as any).disabled" :danger="(item as any).danger">
+          <a-menu-item
+            v-else
+            :key="item.key"
+            :disabled="(item as any).disabled"
+            :danger="(item as any).danger"
+          >
             <span class="ai-menu-item">
-              <component v-if="item.icon" :is="item.icon" class="ai-menu-item__icon" />
+              <component :is="item.icon" v-if="item.icon" class="ai-menu-item__icon" />
               <span class="ai-menu-item__label">{{ item.label }}</span>
             </span>
           </a-menu-item>
@@ -63,13 +84,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
-import type { Component } from 'vue';
-import type { Editor } from '@tiptap/core';
-import { Tooltip as ATooltip } from 'ant-design-vue';
-import { DownOutlined, RightOutlined, ThunderboltOutlined, EditOutlined, FileTextOutlined, BulbOutlined, TranslationOutlined } from '@ant-design/icons-vue';
-import { t } from '../locales';
-import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from './translation';
+import {
+  DownOutlined,
+  RightOutlined,
+  ThunderboltOutlined,
+  EditOutlined,
+  FileTextOutlined,
+  BulbOutlined,
+  TranslationOutlined,
+} from "@ant-design/icons-vue";
+import { Tooltip as ATooltip } from "ant-design-vue";
+import { ref, computed, nextTick } from "vue";
+
+import { t } from "../locales";
+
+import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./translation";
+
+import type { Editor } from "@tiptap/core";
+import type { Component } from "vue";
 
 // 菜单项配置类型
 export interface MenuItemConfig {
@@ -91,22 +123,22 @@ interface Props {
   label?: string;
   title?: string;
   active?: boolean;
-  placement?: 'top' | 'bottom' | 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topRight';
+  placement?: "top" | "bottom" | "bottomLeft" | "bottomRight" | "topLeft" | "topRight";
 }
 
 const props = withDefaults(defineProps<Props>(), {
   active: false,
-  placement: 'bottom',
+  placement: "bottom",
 });
 
 // 子菜单状态管理（用于翻译功能的语言选择）
 const overlayOpen = ref(false);
 const hasSelectedLang = computed(() => !!currentTranslateLang.value);
 const selectedLangKey = computed(() => {
-  if (!currentTranslateLang.value) return '';
+  if (!currentTranslateLang.value) return "";
   // 根据当前语言标签找到对应的 key
   const lang = LANGUAGE_CODES.find((l) => t(`editor.lang.${l.key}`) === currentTranslateLang.value);
-  return lang ? `translate-${lang.code}` : '';
+  return lang ? `translate-${lang.code}` : "";
 });
 
 let closeTimeout: number | null = null;
@@ -168,7 +200,7 @@ function findItemByKey(items: MenuItemConfig[], key: string): MenuItemConfig | u
 function onMenuClick(info: { key: string }) {
   const item = findItemByKey(menuItems.value, info.key);
   if (!item) return;
-  
+
   // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
   // 使用 requestAnimationFrame 确保在下一个渲染周期执行，避免与菜单关闭动画冲突
   nextTick(() => {
@@ -177,7 +209,7 @@ function onMenuClick(info: { key: string }) {
         try {
           item.action?.();
         } catch (error) {
-          console.error('[AI Menu] Error executing command:', error);
+          console.error("[AI Menu] Error executing command:", error);
         }
       }, 50); // 短暂延迟，确保菜单完全关闭
     });
@@ -189,7 +221,7 @@ function onTranslateDefault(item: MenuItemConfig) {
     overlayOpen.value = true;
     return;
   }
-  
+
   // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
   nextTick(() => {
     requestAnimationFrame(() => {
@@ -197,7 +229,7 @@ function onTranslateDefault(item: MenuItemConfig) {
         try {
           item.action?.();
         } catch (error) {
-          console.error('[AI Menu] Error executing translate:', error);
+          console.error("[AI Menu] Error executing translate:", error);
         }
       }, 50);
     });
@@ -207,7 +239,7 @@ function onTranslateDefault(item: MenuItemConfig) {
 function onTranslateLangClick(info: { key: string }) {
   const child = findItemByKey(menuItems.value, info.key);
   if (!child) return;
-  
+
   // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
   nextTick(() => {
     requestAnimationFrame(() => {
@@ -215,7 +247,7 @@ function onTranslateLangClick(info: { key: string }) {
         try {
           child.action?.();
         } catch (error) {
-          console.error('[AI Menu] Error executing translate:', error);
+          console.error("[AI Menu] Error executing translate:", error);
         }
       }, 50);
     });
@@ -234,18 +266,18 @@ const menuItems = computed(() => {
 
   return [
     {
-      key: 'continueWriting',
-      label: t('editor.continueWriting'),
+      key: "continueWriting",
+      label: t("editor.continueWriting"),
       icon: ThunderboltOutlined,
       action: () => {
         if (!editor) return;
-        
+
         try {
           // 验证编辑器状态
           const { state } = editor;
           const { selection, doc } = state;
           const docSize = doc.content.size;
-          
+
           // 验证 selection 是否有效
           if (
             selection.from < 0 ||
@@ -254,40 +286,40 @@ const menuItems = computed(() => {
             selection.to > docSize ||
             selection.from > selection.to
           ) {
-            console.warn('[AI Menu] Invalid selection, cannot execute continueWriting');
+            console.warn("[AI Menu] Invalid selection, cannot execute continueWriting");
             return;
           }
-          
+
           // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).continueWriting === 'function') {
+          if (typeof (editor.commands as any).continueWriting === "function") {
             const result = editor.chain().focus().continueWriting().run();
             if (!result) {
-              console.warn('[AI Menu] continueWriting command returned false');
+              console.warn("[AI Menu] continueWriting command returned false");
             }
           } else {
-            console.warn('[AI Menu] continueWriting command not available');
+            console.warn("[AI Menu] continueWriting command not available");
             editor.commands.focus();
           }
         } catch (error) {
-          console.error('[AI Menu] Error executing continueWriting:', error);
+          console.error("[AI Menu] Error executing continueWriting:", error);
         }
       },
       disabled: false,
       danger: false,
     },
     {
-      key: 'polish',
-      label: t('editor.polish'),
+      key: "polish",
+      label: t("editor.polish"),
       icon: EditOutlined,
       action: () => {
         if (!editor) return;
-        
+
         try {
           // 验证编辑器状态
           const { state } = editor;
           const { selection, doc } = state;
           const docSize = doc.content.size;
-          
+
           // 验证 selection 是否有效
           if (
             selection.from < 0 ||
@@ -296,40 +328,40 @@ const menuItems = computed(() => {
             selection.to > docSize ||
             selection.from > selection.to
           ) {
-            console.warn('[AI Menu] Invalid selection, cannot execute polish');
+            console.warn("[AI Menu] Invalid selection, cannot execute polish");
             return;
           }
-          
+
           // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).polish === 'function') {
+          if (typeof (editor.commands as any).polish === "function") {
             const result = editor.chain().focus().polish().run();
             if (!result) {
-              console.warn('[AI Menu] polish command returned false');
+              console.warn("[AI Menu] polish command returned false");
             }
           } else {
-            console.warn('[AI Menu] polish command not available');
+            console.warn("[AI Menu] polish command not available");
             editor.commands.focus();
           }
         } catch (error) {
-          console.error('[AI Menu] Error executing polish:', error);
+          console.error("[AI Menu] Error executing polish:", error);
         }
       },
       disabled: false,
       danger: false,
     },
     {
-      key: 'summarize',
-      label: t('editor.summarize'),
+      key: "summarize",
+      label: t("editor.summarize"),
       icon: FileTextOutlined,
       action: () => {
         if (!editor) return;
-        
+
         try {
           // 验证编辑器状态
           const { state } = editor;
           const { selection, doc } = state;
           const docSize = doc.content.size;
-          
+
           // 验证 selection 是否有效
           if (
             selection.from < 0 ||
@@ -338,40 +370,40 @@ const menuItems = computed(() => {
             selection.to > docSize ||
             selection.from > selection.to
           ) {
-            console.warn('[AI Menu] Invalid selection, cannot execute summarize');
+            console.warn("[AI Menu] Invalid selection, cannot execute summarize");
             return;
           }
-          
+
           // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).summarize === 'function') {
+          if (typeof (editor.commands as any).summarize === "function") {
             const result = editor.chain().focus().summarize().run();
             if (!result) {
-              console.warn('[AI Menu] summarize command returned false');
+              console.warn("[AI Menu] summarize command returned false");
             }
           } else {
-            console.warn('[AI Menu] summarize command not available');
+            console.warn("[AI Menu] summarize command not available");
             editor.commands.focus();
           }
         } catch (error) {
-          console.error('[AI Menu] Error executing summarize:', error);
+          console.error("[AI Menu] Error executing summarize:", error);
         }
       },
       disabled: false,
       danger: false,
     },
     {
-      key: 'customAi',
-      label: t('editor.customAi'),
+      key: "customAi",
+      label: t("editor.customAi"),
       icon: BulbOutlined,
       action: () => {
         if (!editor) return;
-        
+
         try {
           // 验证编辑器状态
           const { state } = editor;
           const { selection, doc } = state;
           const docSize = doc.content.size;
-          
+
           // 验证 selection 是否有效
           if (
             selection.from < 0 ||
@@ -380,42 +412,42 @@ const menuItems = computed(() => {
             selection.to > docSize ||
             selection.from > selection.to
           ) {
-            console.warn('[AI Menu] Invalid selection, cannot execute customAi');
+            console.warn("[AI Menu] Invalid selection, cannot execute customAi");
             return;
           }
-          
+
           // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).customAi === 'function') {
+          if (typeof (editor.commands as any).customAi === "function") {
             const result = editor.chain().focus().customAi().run();
             if (!result) {
-              console.warn('[AI Menu] customAi command returned false');
+              console.warn("[AI Menu] customAi command returned false");
             }
           } else {
-            console.warn('[AI Menu] customAi command not available');
+            console.warn("[AI Menu] customAi command not available");
             editor.commands.focus();
           }
         } catch (error) {
-          console.error('[AI Menu] Error executing customAi:', error);
+          console.error("[AI Menu] Error executing customAi:", error);
         }
       },
       disabled: false,
       danger: false,
     },
     {
-      key: 'translate',
+      key: "translate",
       label: currentTranslateLang.value
-        ? t('editor.translateTo', { lang: currentTranslateLang.value })
-        : t('editor.translate'),
+        ? t("editor.translateTo", { lang: currentTranslateLang.value })
+        : t("editor.translate"),
       icon: TranslationOutlined,
       action: () => {
         if (!editor) return;
-        
+
         try {
           // 验证编辑器状态
           const { state } = editor;
           const { selection, doc } = state;
           const docSize = doc.content.size;
-          
+
           // 验证 selection 是否有效
           if (
             selection.from < 0 ||
@@ -424,25 +456,25 @@ const menuItems = computed(() => {
             selection.to > docSize ||
             selection.from > selection.to
           ) {
-            console.warn('[AI Menu] Invalid selection, cannot execute translate');
+            console.warn("[AI Menu] Invalid selection, cannot execute translate");
             return;
           }
-          
+
           // 使用保存的语言或默认语言
-          const targetLang = currentTranslateLang.value || '英文';
-          
+          const targetLang = currentTranslateLang.value || "英文";
+
           // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).translate === 'function') {
+          if (typeof (editor.commands as any).translate === "function") {
             const result = editor.chain().focus().translate(targetLang).run();
             if (!result) {
-              console.warn('[AI Menu] translate command returned false');
+              console.warn("[AI Menu] translate command returned false");
             }
           } else {
-            console.warn('[AI Menu] translate command not available');
+            console.warn("[AI Menu] translate command not available");
             editor.commands.focus();
           }
         } catch (error) {
-          console.error('[AI Menu] Error executing translate:', error);
+          console.error("[AI Menu] Error executing translate:", error);
         }
       },
       disabled: false,
@@ -454,16 +486,16 @@ const menuItems = computed(() => {
           label: langLabel,
           action: () => {
             if (!editor) return;
-            
+
             // 设置并保存语言选择
             setTranslateLang(langLabel);
-            
+
             try {
               // 验证编辑器状态
               const { state } = editor;
               const { selection, doc } = state;
               const docSize = doc.content.size;
-              
+
               // 验证 selection 是否有效
               if (
                 selection.from < 0 ||
@@ -472,22 +504,22 @@ const menuItems = computed(() => {
                 selection.to > docSize ||
                 selection.from > selection.to
               ) {
-                console.warn('[AI Menu] Invalid selection, cannot execute translate');
+                console.warn("[AI Menu] Invalid selection, cannot execute translate");
                 return;
               }
-              
+
               // 使用 chain 确保命令在同一个事务中执行
-              if (typeof (editor.commands as any).translate === 'function') {
+              if (typeof (editor.commands as any).translate === "function") {
                 const result = editor.chain().focus().translate(langLabel).run();
                 if (!result) {
-                  console.warn('[AI Menu] translate command returned false');
+                  console.warn("[AI Menu] translate command returned false");
                 }
               } else {
-                console.warn('[AI Menu] translate command not available');
+                console.warn("[AI Menu] translate command not available");
                 editor.commands.focus();
               }
             } catch (error) {
-              console.error('[AI Menu] Error executing translate:', error);
+              console.error("[AI Menu] Error executing translate:", error);
             }
           },
           disabled: false,
@@ -500,7 +532,7 @@ const menuItems = computed(() => {
 </script>
 
 <style scoped>
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ai-menu-button {
     height: 28px;
     padding: 0 6px;
@@ -587,7 +619,9 @@ const menuItems = computed(() => {
   font-size: 10px;
   line-height: 1;
   opacity: 0.65;
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 
 .ai-menu-button:hover .ai-menu-button__arrow {
@@ -599,7 +633,7 @@ const menuItems = computed(() => {
   overflow-y: auto !important;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ai-menu-dropdown-overlay {
     max-height: 150px !important;
   }
@@ -635,42 +669,42 @@ const menuItems = computed(() => {
 }
 
 .ai-menu-dropdown-overlay :deep(.ant-dropdown-menu-item-selected) {
-  background: #e6f4ff !important;
   color: #1677ff !important;
+  background: #e6f4ff !important;
 
   :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
-    background: #1a4d6e !important;
     color: #4fc3f7 !important;
+    background: #1a4d6e !important;
   }
 }
 
 .ai-menu-translate-split {
   display: flex;
+  gap: 4px;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  gap: 4px;
 }
 
 .ai-menu-translate-split__main {
   display: flex;
   flex: 1;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   min-width: 0;
   cursor: pointer;
 }
 
 .ai-menu-translate-split__arrow {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
   margin-left: 4px;
-  border-radius: 4px;
   cursor: pointer;
-  flex-shrink: 0;
+  border-radius: 4px;
   transition: background-color 0.2s;
 }
 
@@ -682,15 +716,15 @@ const menuItems = computed(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ai-menu-translate-split {
     gap: 2px;
   }
-  
+
   .ai-menu-translate-split__main {
     gap: 6px;
   }
-  
+
   .ai-menu-translate-split__arrow {
     width: 20px;
     height: 20px;
@@ -698,4 +732,3 @@ const menuItems = computed(() => {
   }
 }
 </style>
-

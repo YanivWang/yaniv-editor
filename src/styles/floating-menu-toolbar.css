@@ -34,7 +34,7 @@
 
 /* 标题按钮 */
 .floating-menu .heading-btn {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
   font-weight: bold;
 }
@@ -93,18 +93,18 @@
 }
 
 /* Tippy 样式重置 */
-.tippy-box[data-theme~='light'] {
+.tippy-box[data-theme~="light"] {
   background-color: transparent;
   border: none;
   box-shadow: none;
 }
 
-.tippy-box[data-theme~='light'] .tippy-content {
+.tippy-box[data-theme~="light"] .tippy-content {
   padding: 0;
 }
 
 /* 响应式 */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .floating-menu,
   .ProseMirror-floatingmenu {
     display: none !important;

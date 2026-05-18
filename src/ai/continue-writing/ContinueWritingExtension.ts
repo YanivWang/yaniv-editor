@@ -1,32 +1,30 @@
-/* eslint-disable perfectionist/sort-imports */
-import type { Editor } from '@tiptap/core';
+import { Extension } from "@tiptap/core";
+import { notification } from "ant-design-vue";
+import { createApp, h, ref } from "vue";
 
-import type { App } from 'vue';
-
-import { createApp, h, ref } from 'vue';
-
-import { Extension } from '@tiptap/core';
-import { notification } from 'ant-design-vue';
-
-import { aiApiService } from '@/api/ai';
-import { buildParagraphNodesFromText, hasNewlines, isValidSelection } from '@/utils/prosemirrorUtils';
-
-import { t } from '@/locales';
-
-import type { AiSuggestionData } from '../shared/AiHighlightMark';
+import { aiApiService } from "@/api/ai";
+import { t } from "@/locales";
+import {
+  buildParagraphNodesFromText,
+  hasNewlines,
+  isValidSelection,
+} from "@/utils/prosemirrorUtils";
 
 import {
   addAiHighlight,
   removeAiHighlight,
   updateAiHighlight,
   getAiSuggestionData,
-} from '../shared/AiHighlightMark';
-import AiSuggestionPopover from '../shared/AiSuggestionPopover.vue';
+} from "../shared/AiHighlightMark";
+import AiSuggestionPopover from "../shared/AiSuggestionPopover.vue";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ContinueWritingOptions {}
+import type { AiSuggestionData } from "../shared/AiHighlightMark";
+import type { Editor } from "@tiptap/core";
+import type { App } from "vue";
 
-declare module '@tiptap/core' {
+export type ContinueWritingOptions = Record<string, never>;
+
+declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     continueWriting: {
       /**
@@ -41,63 +39,58 @@ declare module '@tiptap/core' {
  * Continue Writing Extension for Tiptap v3
  * @description AI-powered text continuation based on selection
  */
-export const ContinueWritingExtension =
-  Extension.create<ContinueWritingOptions>({
-    name: 'continueWriting',
+export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>({
+  name: "continueWriting",
 
-    addCommands() {
-      return {
-        continueWriting:
-          () =>
-          ({ state, editor }) => {
-            const { selection } = state;
-            const { from, to } = selection;
+  addCommands() {
+    return {
+      continueWriting:
+        () =>
+        ({ state, editor }) => {
+          const { selection } = state;
+          const { from, to } = selection;
 
-            // Get selected text
-            const selectedText = state.doc.textBetween(from, to, ' ');
+          // Get selected text
+          const selectedText = state.doc.textBetween(from, to, " ");
 
-            if (!selectedText.trim()) {
-              console.warn('[Continue Writing] No text selected');
-              // 显示用户友好的提示
-              notification.warning({
-                message: t('editor.pleaseSelectText'),
-                description: t('editor.continueWritingRequiresSelection'),
-                duration: 2,
-                placement: 'topRight',
-              });
-              return false;
-            }
+          if (!selectedText.trim()) {
+            console.warn("[Continue Writing] No text selected");
+            // 显示用户友好的提示
+            notification.warning({
+              message: t("editor.pleaseSelectText"),
+              description: t("editor.continueWritingRequiresSelection"),
+              duration: 2,
+              placement: "topRight",
+            });
+            return false;
+          }
 
-            // Save the original selected text range for highlighting
-            const originalSelectedRange = { from, to };
+          // Save the original selected text range for highlighting
+          const originalSelectedRange = { from, to };
 
-            // For continue writing, we insert after the selection
-            // So we use the 'to' position as the start
-            const originalSelection = { from: to, to };
+          // For continue writing, we insert after the selection
+          // So we use the 'to' position as the start
+          const originalSelection = { from: to, to };
 
-            // Get full document context
-            const fullText = state.doc.textBetween(
-              0,
-              state.doc.content.size,
-              ' ',
-            );
-            const sysPrompt = `以下係完整嘅文件內容:\n\n${fullText}`;
+          // Get full document context
+          const fullText = state.doc.textBetween(0, state.doc.content.size, " ");
+          const sysPrompt = `以下係完整嘅文件內容:\n\n${fullText}`;
 
-            // Perform AI continue writing
-            performContinueWriting(
-              editor,
-              selectedText,
-              sysPrompt,
-              originalSelection,
-              to,
-              originalSelectedRange,
-            );
+          // Perform AI continue writing
+          performContinueWriting(
+            editor,
+            selectedText,
+            sysPrompt,
+            originalSelection,
+            to,
+            originalSelectedRange,
+          );
 
-            return true;
-          },
-      };
-    },
-  });
+          return true;
+        },
+    };
+  },
+});
 
 // Singleton state for continue writing popover
 let continueWritingPopoverApp: App | null = null;
@@ -108,8 +101,8 @@ let originalSelectedRange: null | { from: number; to: number } = null; // 保存
 
 // Reactive refs for the popover
 const visibleRef = ref(false);
-const originalTextRef = ref('');
-const suggestedTextRef = ref('');
+const originalTextRef = ref("");
+const suggestedTextRef = ref("");
 const isStreamingRef = ref(false);
 
 /**
@@ -133,26 +126,21 @@ function performContinueWriting(
   // Update refs - show selected text as context
   visibleRef.value = true;
   originalTextRef.value = selectedText; // Show selected text as context
-  suggestedTextRef.value = '';
+  suggestedTextRef.value = "";
   isStreamingRef.value = true;
 
   // First, add highlight for the user's selected text
   // This helps user see what text they selected
   const selectedTextHighlight: AiSuggestionData = {
     originalText: selectedText,
-    suggestedText: '',
+    suggestedText: "",
     isStreaming: false,
   };
-  addAiHighlight(
-    editor,
-    userSelectedRange.from,
-    userSelectedRange.to,
-    selectedTextHighlight,
-  );
+  addAiHighlight(editor, userSelectedRange.from, userSelectedRange.to, selectedTextHighlight);
 
   // Then, insert a placeholder space after the selection
   // This is where the new content will be inserted
-  editor.chain().focus().insertContentAt(insertPosition, ' ').run();
+  editor.chain().focus().insertContentAt(insertPosition, " ").run();
 
   // Update selection to include the space
   const suggestionSelection = {
@@ -162,30 +150,25 @@ function performContinueWriting(
 
   // Add highlight for the placeholder space where new content will be inserted
   const highlightData: AiSuggestionData = {
-    originalText: '',
-    suggestedText: '',
+    originalText: "",
+    suggestedText: "",
     isStreaming: true,
   };
-  addAiHighlight(
-    editor,
-    suggestionSelection.from,
-    suggestionSelection.to,
-    highlightData,
-  );
+  addAiHighlight(editor, suggestionSelection.from, suggestionSelection.to, highlightData);
 
   // Mount popover if not already mounted
   if (!continueWritingPopoverApp) {
     mountContinueWritingPopover(editor);
   }
-  
+
   // Setup click handler to restore popover when user clicks on highlighted text
   setupClickHandler();
 
-  let accumulatedContent = '';
+  let accumulatedContent = "";
 
   const callback = {
     onStart: () => {
-      accumulatedContent = '';
+      accumulatedContent = "";
     },
     onMessage: (message: { content: string }) => {
       if (message && message.content) {
@@ -206,14 +189,9 @@ function performContinueWriting(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                suggestedText: accumulatedContent,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              suggestedText: accumulatedContent,
+            });
           }
         }
       }
@@ -236,29 +214,21 @@ function performContinueWriting(
             currentSelection.to <= docSize &&
             currentSelection.from <= currentSelection.to
           ) {
-            updateAiHighlight(
-              editor,
-              currentSelection.from,
-              currentSelection.to,
-              {
-                isStreaming: false,
-              },
-            );
+            updateAiHighlight(editor, currentSelection.from, currentSelection.to, {
+              isStreaming: false,
+            });
           }
         }
       } catch (error) {
-        console.warn(
-          '[Continue Writing] Failed to finalize formatting:',
-          error,
-        );
+        console.warn("[Continue Writing] Failed to finalize formatting:", error);
       }
     },
     onError: (error: Error) => {
-      console.error('[Continue Writing] Error:', error);
+      console.error("[Continue Writing] Error:", error);
       handleCleanup();
       notification.error({
-        message: '续写失败',
-        description: error.message || t('messages.networkError'),
+        message: "续写失败",
+        description: error.message || t("messages.networkError"),
         duration: 3,
       });
     },
@@ -283,11 +253,11 @@ function mountContinueWritingPopover(editor: Editor): void {
 
   // Create container if it doesn't exist or was removed
   if (!continueWritingContainer || !continueWritingContainer.parentNode) {
-    continueWritingContainer = document.createElement('div');
-    continueWritingContainer.style.position = 'absolute';
-    continueWritingContainer.style.top = '0';
-    continueWritingContainer.style.left = '0';
-    continueWritingContainer.style.zIndex = '1000';
+    continueWritingContainer = document.createElement("div");
+    continueWritingContainer.style.position = "absolute";
+    continueWritingContainer.style.top = "0";
+    continueWritingContainer.style.left = "0";
+    continueWritingContainer.style.zIndex = "1000";
 
     if (editorElement) {
       editorElement.append(continueWritingContainer);
@@ -309,7 +279,7 @@ function mountContinueWritingPopover(editor: Editor): void {
         isStreaming: isStreamingRef.value,
         position,
         editorElement: editorElement || undefined,
-        'onUpdate:visible': (val: boolean) => {
+        "onUpdate:visible": (val: boolean) => {
           visibleRef.value = val;
         },
         onAccept: () => {
@@ -352,7 +322,7 @@ function calculatePopoverPosition(editor: Editor): {
   // Use originalSelectedRange (user's selected text) for positioning
   // If not available, fall back to currentSelection (insertion point)
   const rangeToUse = originalSelectedRange || currentSelection;
-  
+
   if (!rangeToUse) {
     return { left: 0, top: 0 };
   }
@@ -388,7 +358,7 @@ function handleAccept(): void {
   // 验证 selection 是否仍然有效
   const docSize = doc.content.size;
   if (!isValidSelection(currentSelection, docSize)) {
-    console.warn('[Continue Writing] Invalid selection range, cannot accept');
+    console.warn("[Continue Writing] Invalid selection range, cannot accept");
     handleCleanup();
     return;
   }
@@ -435,7 +405,7 @@ function handleCancel(): void {
   visibleRef.value = false;
   // Keep other state so highlights remain visible
   // Don't reset currentEditor, currentSelection, originalSelectedRange
-  
+
   // Setup click handler to restore popover when user clicks on highlighted text
   setupClickHandler();
 }
@@ -447,46 +417,46 @@ function setupClickHandler(): void {
   if (!currentEditor) return;
 
   const editorDom = currentEditor.view.dom;
-  
+
   // Remove existing listener if any (cleanup)
   const existingHandler = (editorDom as any)._continueWritingClickHandler;
   if (existingHandler) {
-    editorDom.removeEventListener('click', existingHandler);
+    editorDom.removeEventListener("click", existingHandler);
   }
 
   const clickHandler = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
     if (!target) return;
-    
-    const highlightElement = target.classList.contains('ai-highlight')
+
+    const highlightElement = target.classList.contains("ai-highlight")
       ? target
-      : target.closest('.ai-highlight');
+      : target.closest(".ai-highlight");
 
     if (!highlightElement) return;
     if (!currentEditor || !currentSelection) return;
     if (visibleRef.value) return; // Already visible, don't restore
-    
+
     // Prevent default to avoid editor selection changes interfering
     event.stopPropagation();
-    
+
     // Get the position of the clicked element
     let pos: number;
     try {
       pos = currentEditor.view.posAtDOM(highlightElement, 0);
     } catch (error) {
-      console.warn('[Continue Writing] Failed to get position from DOM:', error);
+      console.warn("[Continue Writing] Failed to get position from DOM:", error);
       // Fallback: use the original selection range
       pos = originalSelectedRange?.from || currentSelection.from;
     }
-    
+
     // Get the suggestion data from the mark
     let data = getAiSuggestionData(currentEditor, pos);
-    
+
     // If data not found at clicked position, try to get from original selection
     if (!data && originalSelectedRange) {
       data = getAiSuggestionData(currentEditor, originalSelectedRange.from);
     }
-    
+
     // If still no data, use saved state from refs
     if (!data) {
       data = {
@@ -495,26 +465,26 @@ function setupClickHandler(): void {
         isStreaming: isStreamingRef.value,
       };
     }
-    
+
     // Update refs with current data before mounting
     originalTextRef.value = data.originalText || originalTextRef.value;
     suggestedTextRef.value = data.suggestedText || suggestedTextRef.value;
     isStreamingRef.value = data.isStreaming || false;
-    
-      // Restore the popover
-      // Always remount to ensure fresh state and correct position
-      unmountContinueWritingPopover();
-      mountContinueWritingPopover(currentEditor);
-    
+
+    // Restore the popover
+    // Always remount to ensure fresh state and correct position
+    unmountContinueWritingPopover();
+    mountContinueWritingPopover(currentEditor);
+
     // Show the popover
     visibleRef.value = true;
   };
 
   // Store handler reference for cleanup
   (editorDom as any)._continueWritingClickHandler = clickHandler;
-  
+
   // Add click listener
-  editorDom.addEventListener('click', clickHandler);
+  editorDom.addEventListener("click", clickHandler);
 }
 
 /**
@@ -526,18 +496,18 @@ function handleCleanup(): void {
     const editorDom = currentEditor.view.dom;
     const existingHandler = (editorDom as any)._continueWritingClickHandler;
     if (existingHandler) {
-      editorDom.removeEventListener('click', existingHandler);
+      editorDom.removeEventListener("click", existingHandler);
       delete (editorDom as any)._continueWritingClickHandler;
     }
-    
+
     removeAiHighlight(currentEditor);
   }
 
   unmountContinueWritingPopover();
 
   visibleRef.value = false;
-  originalTextRef.value = '';
-  suggestedTextRef.value = '';
+  originalTextRef.value = "";
+  suggestedTextRef.value = "";
   isStreamingRef.value = false;
 
   currentEditor = null;

@@ -4,47 +4,47 @@
  */
 
 // Undo/Redo
-export { UndoRedoButton as UndoRedoGroup } from './undo-redo'
+export { UndoRedoButton as UndoRedoGroup } from "./undo-redo";
 
 // Font
-export { FontSizeSelect as FontSizeDropdown, FontFamilySelect } from './font'
-export { FontSize, LineHeight } from './font'
-export { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, DEFAULT_VALUES } from './font'
+export { FontSizeSelect as FontSizeDropdown, FontFamilySelect } from "./font";
+export { FontSize, LineHeight } from "./font";
+export { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, DEFAULT_VALUES } from "./font";
 
 // Code Block
-export { CodeBlockDropdown as CodeBlockButton } from './code-block'
+export { CodeBlockDropdown as CodeBlockButton } from "./code-block";
 
 // Link
-export { LinkButton } from './link'
+export { LinkButton } from "./link";
 
 // Format Clear
-export { ClearFormatButton as FormatClearButton } from './format-clear'
+export { ClearFormatButton as FormatClearButton } from "./format-clear";
 
 // Format Painter
-export { FormatPainterButton } from './format-painter'
-export { FormatPainter, sampleFormats } from './format-painter'
-export type { FormatPainterStorage, FormatPainterFormats } from './format-painter'
+export { FormatPainterButton } from "./format-painter";
+export { FormatPainter, sampleFormats } from "./format-painter";
+export type { FormatPainterStorage, FormatPainterFormats } from "./format-painter";
 
 // Subscript/Superscript
-export { SubscriptSuperscriptButton as SubSupGroup } from './subscript-superscript'
+export { SubscriptSuperscriptButton as SubSupGroup } from "./subscript-superscript";
 
 // Table
-export * from './table'
+export * from "./table";
 
 // Zoom
-export * from './zoom'
+export * from "./zoom";
 
 // Math
-export { MathButton } from './math'
+export { MathButton } from "./math";
 
 // Word Import/Export
-export { WordButton } from './word'
-export { importWordFile, convertWordToHtml, exportToWord } from './word'
+export { WordButton } from "./word";
+export { importWordFile, convertWordToHtml, exportToWord } from "./word";
 
 // Template
-export { TemplateButton } from './template'
-export { builtinTemplates } from './template'
-export type { TemplateItem } from './template'
+export { TemplateButton } from "./template";
+export { builtinTemplates } from "./template";
+export type { TemplateItem } from "./template";
 
 // Gallery
-export { GalleryButton } from './gallery'
+export { GalleryButton } from "./gallery";

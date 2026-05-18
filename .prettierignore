@@ -1,0 +1,15 @@
+dist
+**/dist
+coverage
+**/coverage
+node_modules
+**/node_modules
+pnpm-lock.yaml
+*.min.js
+logs
+uploads
+.pnpm-store
+**/*.vue.d.ts
+src/**/*.d.ts
+src/**/*.d.ts.map
+!src/vite-env.d.ts

@@ -8,12 +8,14 @@
           <svg viewBox="0 0 100 100" width="80" height="80">
             <defs>
               <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                <stop offset="0%" style="stop-color: #667eea; stop-opacity: 1" />
+                <stop offset="100%" style="stop-color: #764ba2; stop-opacity: 1" />
               </linearGradient>
             </defs>
-            <rect x="10" y="10" width="80" height="80" rx="15" fill="url(#gradient)"/>
-            <text x="50" y="65" text-anchor="middle" fill="white" font-size="45" font-weight="bold">T</text>
+            <rect x="10" y="10" width="80" height="80" rx="15" fill="url(#gradient)" />
+            <text x="50" y="65" text-anchor="middle" fill="white" font-size="45" font-weight="bold">
+              T
+            </text>
           </svg>
         </div>
 
@@ -23,15 +25,16 @@
         </h1>
 
         <!-- Subtitle -->
-        <p class="hero__subtitle">
-          A production-ready, AI-powered rich text editor for Vue 3
-        </p>
+        <p class="hero__subtitle">A production-ready, AI-powered rich text editor for Vue 3</p>
 
         <!-- Badges -->
         <div class="hero__badges">
           <a href="https://github.com/benngaihk/Tiptap-UI-Kit" target="_blank" class="badge">
             <svg class="badge__icon" viewBox="0 0 16 16" width="16" height="16">
-              <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              <path
+                fill="currentColor"
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
             </svg>
             <span>Star on GitHub</span>
           </a>
@@ -39,9 +42,7 @@
             <span class="badge__dot"></span>
             MIT License
           </span>
-          <span class="badge badge--static">
-            🔥 Open Source
-          </span>
+          <span class="badge badge--static"> 🔥 Open Source </span>
         </div>
 
         <!-- CTA Buttons -->
@@ -49,12 +50,22 @@
           <button class="btn btn--primary" @click="$emit('start-demo')">
             <span>Try Live Demo</span>
             <svg class="btn__icon" viewBox="0 0 20 20" width="20" height="20">
-              <path fill="currentColor" d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+              <path
+                fill="currentColor"
+                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
+              />
             </svg>
           </button>
-          <a href="https://github.com/benngaihk/Tiptap-UI-Kit" target="_blank" class="btn btn--secondary">
+          <a
+            href="https://github.com/benngaihk/Tiptap-UI-Kit"
+            target="_blank"
+            class="btn btn--secondary"
+          >
             <svg class="btn__icon" viewBox="0 0 16 16" width="20" height="20">
-              <path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              <path
+                fill="currentColor"
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
             </svg>
             <span>View on GitHub</span>
           </a>
@@ -167,12 +178,12 @@
       <p class="section-subtitle">Choose the perfect theme for your application</p>
 
       <div class="themes-grid">
-        <div class="theme-card" v-for="themeItem in themes" :key="themeItem.id">
+        <div v-for="themeItem in themes" :key="themeItem.id" class="theme-card">
           <div class="theme-card__preview" :style="{ background: themeItem.gradient }">
             <div class="theme-card__mockup">
               <div class="mockup-toolbar"></div>
               <div class="mockup-content">
-                <div class="mockup-line" v-for="i in 3" :key="i"></div>
+                <div v-for="i in 3" :key="i" class="mockup-line"></div>
               </div>
             </div>
           </div>
@@ -192,9 +203,9 @@
         <div class="tech-item">
           <div class="tech-item__icon">
             <svg viewBox="0 0 256 256" width="40" height="40">
-              <path fill="#41B883" d="M204.8,0H256L128,220.8L0,0h97.92L128,51.2L157.44,0h47.36Z"/>
-              <path fill="#41B883" d="M0,0l128,220.8L256,0h-51.2L128,132.48L50.56,0H0Z"/>
-              <path fill="#35495E" d="M50.56,0L128,133.12L204.8,0h-47.36L128,51.2L97.92,0H50.56Z"/>
+              <path fill="#41B883" d="M204.8,0H256L128,220.8L0,0h97.92L128,51.2L157.44,0h47.36Z" />
+              <path fill="#41B883" d="M0,0l128,220.8L256,0h-51.2L128,132.48L50.56,0H0Z" />
+              <path fill="#35495E" d="M50.56,0L128,133.12L204.8,0h-47.36L128,51.2L97.92,0H50.56Z" />
             </svg>
           </div>
           <div class="tech-item__name">Vue 3</div>
@@ -218,21 +229,25 @@
     <section class="cta">
       <div class="cta__content">
         <h2 class="cta__title">Ready to Start?</h2>
-        <p class="cta__subtitle">
-          Install via npm and start building amazing editors in minutes
-        </p>
+        <p class="cta__subtitle">Install via npm and start building amazing editors in minutes</p>
         <div class="cta__code">
           <code>npm install benngaihk/Tiptap-UI-Kit</code>
-          <button class="cta__copy" @click="copyInstallCommand" title="Copy to clipboard">
+          <button class="cta__copy" title="Copy to clipboard" @click="copyInstallCommand">
             <svg viewBox="0 0 24 24" width="20" height="20">
-              <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+              <path
+                fill="currentColor"
+                d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+              />
             </svg>
           </button>
         </div>
         <button class="btn btn--primary btn--large" @click="$emit('start-demo')">
           <span>Try Live Demo</span>
           <svg class="btn__icon" viewBox="0 0 20 20" width="20" height="20">
-            <path fill="currentColor" d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+            <path
+              fill="currentColor"
+              d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
+            />
           </svg>
         </button>
       </div>
@@ -240,83 +255,80 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="footer__sponsor">
-        <a href="sponsor.html" class="sponsor-btn">
-          <span class="sponsor-btn__icon">☕</span>
-          <span>请作者喝杯咖啡 | Buy Me a Coffee</span>
-        </a>
-      </div>
-      <p class="footer__text">
-        Made with ❤️ by the open source community
-      </p>
+      <p class="footer__text">Made with ❤️ by the open source community</p>
       <div class="footer__links">
         <a href="https://github.com/benngaihk/Tiptap-UI-Kit" target="_blank">GitHub</a>
         <span>·</span>
         <a href="https://github.com/benngaihk/Tiptap-UI-Kit/issues" target="_blank">Issues</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/Tiptap-UI-Kit/blob/main/LICENSE" target="_blank">MIT License</a>
+        <a href="https://github.com/benngaihk/Tiptap-UI-Kit/blob/main/LICENSE" target="_blank"
+          >MIT License</a
+        >
       </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import EditorPreview from './EditorPreview.vue'
+import { ref } from "vue";
+
+import EditorPreview from "./EditorPreview.vue";
 
 defineProps<{
-  theme: 'light' | 'dark'
-}>()
+  theme: "light" | "dark";
+}>();
 
 defineEmits<{
-  'start-demo': []
-}>()
+  "start-demo": [];
+}>();
 
 const themes = [
   {
-    id: 'word',
-    name: 'Word',
-    description: 'Professional document style with A4 layout',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    id: "word",
+    name: "Word",
+    description: "Professional document style with A4 layout",
+    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   },
   {
-    id: 'notion',
-    name: 'Notion',
-    description: 'Modern, distraction-free writing',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+    id: "notion",
+    name: "Notion",
+    description: "Modern, distraction-free writing",
+    gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
   },
   {
-    id: 'github',
-    name: 'GitHub',
-    description: 'Developer-friendly markdown style',
-    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+    id: "github",
+    name: "GitHub",
+    description: "Developer-friendly markdown style",
+    gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
   },
   {
-    id: 'typora',
-    name: 'Typora',
-    description: 'Elegant reading and writing',
-    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+    id: "typora",
+    name: "Typora",
+    description: "Elegant reading and writing",
+    gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
   },
   {
-    id: 'default',
-    name: 'Default',
-    description: 'Clean and minimal design',
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
-  }
-]
+    id: "default",
+    name: "Default",
+    description: "Clean and minimal design",
+    gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+  },
+];
 
 const copyInstallCommand = () => {
-  navigator.clipboard.writeText('npm install benngaihk/Tiptap-UI-Kit')
+  navigator.clipboard.writeText("npm install benngaihk/Tiptap-UI-Kit");
   // Could add a toast notification here
-}
+};
 </script>
 
 <style scoped>
 .landing-page {
   min-height: 100vh;
-  background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s, color 0.3s;
+  background: var(--bg-primary);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 /* Theme Variables */
@@ -353,21 +365,26 @@ const copyInstallCommand = () => {
 }
 
 .hero__icon {
-  margin-bottom: 32px;
   display: inline-block;
+  margin-bottom: 32px;
   animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .hero__title {
+  margin: 0 0 24px;
   font-size: 64px;
   font-weight: 800;
   line-height: 1.2;
-  margin: 0 0 24px;
 }
 
 .gradient-text {
@@ -378,38 +395,38 @@ const copyInstallCommand = () => {
 }
 
 .hero__subtitle {
-  font-size: 24px;
-  color: var(--text-secondary);
   margin: 0 0 32px;
+  font-size: 24px;
   line-height: 1.6;
+  color: var(--text-secondary);
 }
 
 .hero__badges {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
   margin-bottom: 40px;
-  flex-wrap: wrap;
 }
 
 .badge {
   display: inline-flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
   padding: 8px 16px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   text-decoration: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   transition: all 0.2s;
 }
 
 .badge:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .badge--static {
@@ -435,46 +452,51 @@ const copyInstallCommand = () => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .hero__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   justify-content: center;
   margin-bottom: 60px;
-  flex-wrap: wrap;
 }
 
 .btn {
   display: inline-flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   padding: 14px 32px;
-  border: none;
-  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
   text-decoration: none;
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  transition: all 0.2s;
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .btn--primary:hover {
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn--secondary {
-  background: var(--bg-secondary);
   color: var(--text-primary);
+  background: var(--bg-secondary);
   border: 2px solid var(--border-color);
 }
 
@@ -495,9 +517,9 @@ const copyInstallCommand = () => {
 
 .hero__stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 48px;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
 .stat {
@@ -505,10 +527,10 @@ const copyInstallCommand = () => {
 }
 
 .stat__value {
+  margin-bottom: 8px;
   font-size: 36px;
   font-weight: 800;
   color: var(--accent);
-  margin-bottom: 8px;
 }
 
 .stat__label {
@@ -521,8 +543,8 @@ const copyInstallCommand = () => {
 /* Hero Preview */
 .hero__preview {
   max-width: 900px;
-  margin: 60px auto 0;
   padding: 0 20px;
+  margin: 60px auto 0;
 }
 
 /* Features Section */
@@ -532,25 +554,25 @@ const copyInstallCommand = () => {
 }
 
 .section-title {
+  margin: 0 0 16px;
   font-size: 42px;
   font-weight: 700;
   text-align: center;
-  margin: 0 0 16px;
 }
 
 .section-subtitle {
+  margin: 0 0 60px;
   font-size: 18px;
   color: var(--text-secondary);
   text-align: center;
-  margin: 0 0 60px;
 }
 
 .features-grid {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .feature-card {
@@ -562,40 +584,40 @@ const copyInstallCommand = () => {
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
 }
 
 .feature-card__icon {
-  font-size: 48px;
   margin-bottom: 16px;
+  font-size: 48px;
 }
 
 .feature-card__title {
+  margin: 0 0 12px;
   font-size: 20px;
   font-weight: 600;
-  margin: 0 0 12px;
 }
 
 .feature-card__description {
+  margin: 0 0 16px;
   font-size: 15px;
   line-height: 1.6;
   color: var(--text-secondary);
-  margin: 0 0 16px;
 }
 
 .feature-card__tags {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tag {
   padding: 4px 12px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
   font-size: 13px;
   color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-radius: 12px;
 }
 
 /* Themes Preview */
@@ -605,49 +627,49 @@ const copyInstallCommand = () => {
 }
 
 .themes-grid {
-  max-width: 1200px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .theme-card {
-  border-radius: 16px;
   overflow: hidden;
+  cursor: pointer;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
+  border-radius: 16px;
   transition: all 0.3s;
-  cursor: pointer;
 }
 
 .theme-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
 }
 
 .theme-card__preview {
-  height: 180px;
-  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 180px;
+  padding: 20px;
 }
 
 .theme-card__mockup {
   width: 100%;
   max-width: 200px;
+  padding: 12px;
   background: white;
   border-radius: 8px;
-  padding: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .mockup-toolbar {
   height: 8px;
+  margin-bottom: 8px;
   background: linear-gradient(90deg, #e0e0e0 0%, #f5f5f5 100%);
   border-radius: 4px;
-  margin-bottom: 8px;
 }
 
 .mockup-content {
@@ -667,15 +689,15 @@ const copyInstallCommand = () => {
 }
 
 .theme-card__title {
+  margin: 0 0 8px;
   font-size: 18px;
   font-weight: 600;
-  margin: 0 0 8px;
 }
 
 .theme-card__description {
+  margin: 0;
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 0;
 }
 
 /* Tech Stack */
@@ -685,11 +707,11 @@ const copyInstallCommand = () => {
 }
 
 .tech-grid {
-  max-width: 800px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .tech-item {
@@ -697,11 +719,11 @@ const copyInstallCommand = () => {
 }
 
 .tech-item__icon {
-  margin-bottom: 12px;
-  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 48px;
+  margin-bottom: 12px;
   font-size: 32px;
 }
 
@@ -713,8 +735,8 @@ const copyInstallCommand = () => {
 /* CTA Section */
 .cta {
   padding: 80px 24px;
-  background: var(--bg-primary);
   text-align: center;
+  background: var(--bg-primary);
 }
 
 .cta__content {
@@ -723,48 +745,48 @@ const copyInstallCommand = () => {
 }
 
 .cta__title {
+  margin: 0 0 16px;
   font-size: 42px;
   font-weight: 700;
-  margin: 0 0 16px;
 }
 
 .cta__subtitle {
+  margin: 0 0 32px;
   font-size: 18px;
   color: var(--text-secondary);
-  margin: 0 0 32px;
 }
 
 .cta__code {
   display: flex;
+  gap: 12px;
   align-items: center;
   justify-content: center;
-  gap: 12px;
   padding: 16px 24px;
+  margin-bottom: 32px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  margin-bottom: 32px;
 }
 
 .cta__code code {
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-family: Monaco, "Courier New", monospace;
   font-size: 16px;
   color: var(--accent);
 }
 
 .cta__copy {
   padding: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
-  color: var(--text-secondary);
   transition: all 0.2s;
 }
 
 .cta__copy:hover {
-  background: var(--bg-tertiary);
   color: var(--text-primary);
+  background: var(--bg-tertiary);
 }
 
 /* Footer */
@@ -776,9 +798,9 @@ const copyInstallCommand = () => {
 }
 
 .footer__text {
+  margin: 0 0 12px;
   font-size: 14px;
   color: var(--text-secondary);
-  margin: 0 0 12px;
 }
 
 .footer__links {
@@ -798,42 +820,8 @@ const copyInstallCommand = () => {
   color: var(--accent);
 }
 
-.footer__sponsor {
-  margin-bottom: 24px;
-}
-
-.sponsor-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 28px;
-  background: linear-gradient(135deg, #ff813f 0%, #ff6b35 100%);
-  color: white;
-  text-decoration: none;
-  border-radius: 50px;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 129, 63, 0.3);
-}
-
-.sponsor-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(255, 129, 63, 0.4);
-}
-
-.sponsor-btn__icon {
-  font-size: 20px;
-  animation: bounce 2s infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
 /* Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .hero {
     padding: 80px 16px 60px;
   }
@@ -850,11 +838,15 @@ const copyInstallCommand = () => {
     font-size: 32px;
   }
 
-  .features, .themes-preview, .tech-stack, .cta {
+  .features,
+  .themes-preview,
+  .tech-stack,
+  .cta {
     padding: 60px 16px;
   }
 
-  .features-grid, .themes-grid {
+  .features-grid,
+  .themes-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,0 +1,79 @@
+{
+  // ── 编辑器基础 ──────────────────────────────────────────────
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // ── 文件语言关联 ─────────────────────────────────────────────
+  "files.associations": {
+    "*.vue": "vue"
+  },
+
+  // ── Vue / TypeScript ─────────────────────────────────────────
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ── ESLint ───────────────────────────────────────────────────
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"],
+  "eslint.useFlatConfig": true,
+
+  // ── Stylelint ────────────────────────────────────────────────
+  "stylelint.validate": ["css", "scss", "vue"],
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+
+  // ── TypeScript ───────────────────────────────────────────────
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+
+  // ── Volar（Vue 官方 IDE 支持）────────────────────────────────
+  "vue.server.hybridMode": true,
+
+  // ── 搜索/文件排除 ─────────────────────────────────────────────
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/coverage": true,
+    "**/.vitepress/dist": true,
+    "**/.vitepress/cache": true
+  },
+  "files.exclude": {
+    "**/.git": true
+  },
+
+  // ── Git ──────────────────────────────────────────────────────
+  "git.enableSmartCommit": true,
+  "git.autofetch": true
+
+  // 单包库：`@/*` 由 tsconfig.json paths 解析；与参考 monorepo 相同，不设 path-intellisense 的全局 `@` 映射。
+}

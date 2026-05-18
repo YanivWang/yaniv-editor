@@ -13,11 +13,13 @@
   padding: 6px 0;
   overflow: hidden auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
   scrollbar-color: #bfbfbf transparent;
+  scrollbar-width: thin;
   background: var(--tp-menu-bg, #fff);
   border-radius: var(--tp-menu-radius, 8px);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 12%), 0 0 1px rgb(0 0 0 / 8%);
+  box-shadow:
+    0 4px 16px rgb(0 0 0 / 12%),
+    0 0 1px rgb(0 0 0 / 8%);
   animation: slash-fade-in 0.12s ease-out;
   -webkit-overflow-scrolling: touch;
 }
@@ -125,11 +127,11 @@
 }
 
 .slash-command-item-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 12px;
   line-height: 1.3;
   color: var(--tp-color-text-muted, #8c8c8c);
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -144,7 +146,9 @@
 /* ========== 深色模式 ========== */
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-menu {
   background: var(--tp-menu-bg, #1f1f1f);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 40%), 0 0 1px rgb(255 255 255 / 10%);
+  box-shadow:
+    0 4px 16px rgb(0 0 0 / 40%),
+    0 0 1px rgb(255 255 255 / 10%);
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item {
@@ -161,8 +165,12 @@
   background: #2a2a2a;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item.active .slash-command-item-icon,
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item:hover .slash-command-item-icon {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .slash-command-item.active
+  .slash-command-item-icon,
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .slash-command-item:hover
+  .slash-command-item-icon {
   color: var(--tp-color-primary, #4fc3f7);
   background: var(--tp-color-primary-bg, #15395b);
 }
@@ -179,16 +187,18 @@
   color: #808080;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-menu::-webkit-scrollbar-thumb {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .slash-command-menu::-webkit-scrollbar-thumb {
   background: #434343;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-menu::-webkit-scrollbar-thumb:hover {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
+  .slash-command-menu::-webkit-scrollbar-thumb:hover {
   background: #595959;
 }
 
 /* ========== 响应式 ========== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .slash-command-menu {
     min-width: 220px;
     max-width: 280px;

@@ -4,21 +4,21 @@
     :title="t('versionHistory.title')"
     placement="right"
     :width="400"
-    @close="emit('close')"
     class="version-history-panel"
+    @close="emit('close')"
   >
     <!-- 操作按钮 -->
     <div class="version-actions">
       <a-button type="primary" size="small" @click="handleSaveVersion">
         <template #icon><SaveOutlined /></template>
-        {{ t('versionHistory.saveVersion') }}
+        {{ t("versionHistory.saveVersion") }}
       </a-button>
     </div>
 
     <!-- 版本列表 -->
     <div class="version-list">
       <div v-if="versions.length === 0" class="version-empty">
-        {{ t('versionHistory.noVersions') }}
+        {{ t("versionHistory.noVersions") }}
       </div>
 
       <div
@@ -36,7 +36,7 @@
             {{ version.name || formatTime(version.createdAt) }}
           </span>
           <a-tag v-if="version.isAutoSave" size="small" color="default">
-            {{ t('versionHistory.autoSave') }}
+            {{ t("versionHistory.autoSave") }}
           </a-tag>
         </div>
 
@@ -45,7 +45,7 @@
             {{ formatRelativeTime(version.createdAt) }}
           </span>
           <span v-if="version.wordCount" class="version-item__count">
-            {{ version.wordCount }} {{ t('versionHistory.words') }}
+            {{ version.wordCount }} {{ t("versionHistory.words") }}
           </span>
         </div>
 
@@ -71,8 +71,8 @@
             </a-button>
             <template #overlay>
               <a-menu @click="handleMenuClick($event, version)">
-                <a-menu-item key="rename">{{ t('versionHistory.rename') }}</a-menu-item>
-                <a-menu-item key="delete" danger>{{ t('versionHistory.delete') }}</a-menu-item>
+                <a-menu-item key="rename">{{ t("versionHistory.rename") }}</a-menu-item>
+                <a-menu-item key="delete" danger>{{ t("versionHistory.delete") }}</a-menu-item>
               </a-menu>
             </template>
           </a-dropdown>
@@ -83,9 +83,9 @@
     <!-- 对比视图 -->
     <div v-if="selectedVersionId && compareVersionId" class="version-diff">
       <div class="version-diff__header">
-        <span>{{ t('versionHistory.comparing') }}</span>
+        <span>{{ t("versionHistory.comparing") }}</span>
         <a-button type="link" size="small" @click="clearCompare">
-          {{ t('versionHistory.clearCompare') }}
+          {{ t("versionHistory.clearCompare") }}
         </a-button>
       </div>
       <VersionDiffView :changes="diffChanges" />
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { SaveOutlined, RollbackOutlined, DiffOutlined, MoreOutlined } from "@ant-design/icons-vue";
 import {
   Drawer as ADrawer,
   Button as AButton,
@@ -115,120 +115,118 @@ import {
   Modal as AModal,
   Input as AInput,
   message,
-} from 'ant-design-vue'
-import {
-  SaveOutlined,
-  RollbackOutlined,
-  DiffOutlined,
-  MoreOutlined,
-} from '@ant-design/icons-vue'
-import { t } from '@/locales'
-import type { Version, DiffChange } from './types'
-import VersionDiffView from './VersionDiffView.vue'
+} from "ant-design-vue";
+import { ref } from "vue";
+
+import { t } from "@/locales";
+
+import VersionDiffView from "./VersionDiffView.vue";
+
+import type { Version, DiffChange } from "./types";
 
 interface Props {
-  open: boolean
-  versions: Version[]
-  selectedVersionId: string | null
-  compareVersionId: string | null
-  diffChanges: DiffChange[]
+  open: boolean;
+  versions: Version[];
+  selectedVersionId: string | null;
+  compareVersionId: string | null;
+  diffChanges: DiffChange[];
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  close: []
-  save: [name?: string]
-  select: [versionId: string | null]
-  compare: [versionId: string | null]
-  restore: [versionId: string]
-  rename: [versionId: string, name: string]
-  delete: [versionId: string]
-}>()
+  close: [];
+  save: [name?: string];
+  select: [versionId: string | null];
+  compare: [versionId: string | null];
+  restore: [versionId: string];
+  rename: [versionId: string, name: string];
+  delete: [versionId: string];
+}>();
 
 // 重命名相关状态
-const renameModalOpen = ref(false)
-const renameName = ref('')
-const renameVersionId = ref<string | null>(null)
+const renameModalOpen = ref(false);
+const renameName = ref("");
+const renameVersionId = ref<string | null>(null);
 
 // 时间格式化
 function formatTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  return date.toLocaleString('zh-CN', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const date = new Date(timestamp);
+  return date.toLocaleString("zh-CN", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function formatRelativeTime(timestamp: number): string {
-  const now = Date.now()
-  const diff = now - timestamp
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
 
-  if (minutes < 1) return t('versionHistory.justNow')
-  if (minutes < 60) return `${minutes} ${t('versionHistory.minutesAgo')}`
-  if (hours < 24) return `${hours} ${t('versionHistory.hoursAgo')}`
-  return `${days} ${t('versionHistory.daysAgo')}`
+  if (minutes < 1) return t("versionHistory.justNow");
+  if (minutes < 60) return `${minutes} ${t("versionHistory.minutesAgo")}`;
+  if (hours < 24) return `${hours} ${t("versionHistory.hoursAgo")}`;
+  return `${days} ${t("versionHistory.daysAgo")}`;
 }
 
 // 事件处理
 function handleSaveVersion() {
-  emit('save')
-  message.success(t('versionHistory.saved'))
+  emit("save");
+  message.success(t("versionHistory.saved"));
 }
 
 function handleSelectVersion(version: Version) {
-  emit('select', version.id)
+  emit("select", version.id);
 }
 
 function handleRestore(version: Version) {
-  emit('restore', version.id)
-  message.success(t('versionHistory.restored'))
+  emit("restore", version.id);
+  message.success(t("versionHistory.restored"));
 }
 
 function handleToggleCompare(version: Version) {
   if (props.compareVersionId === version.id) {
-    emit('compare', null)
+    emit("compare", null);
   } else {
-    emit('compare', version.id)
+    emit("compare", version.id);
   }
 }
 
 function clearCompare() {
-  emit('compare', null)
+  emit("compare", null);
 }
 
 function handleMenuClick(info: { key: string | number }, version: Version) {
-  const key = String(info.key)
-  if (key === 'rename') {
-    renameVersionId.value = version.id
-    renameName.value = version.name || ''
-    renameModalOpen.value = true
-  } else if (key === 'delete') {
-    emit('delete', version.id)
-    message.success(t('versionHistory.deleted'))
+  const key = String(info.key);
+  if (key === "rename") {
+    renameVersionId.value = version.id;
+    renameName.value = version.name || "";
+    renameModalOpen.value = true;
+  } else if (key === "delete") {
+    emit("delete", version.id);
+    message.success(t("versionHistory.deleted"));
   }
 }
 
 function handleRenameConfirm() {
   if (renameVersionId.value && renameName.value.trim()) {
-    emit('rename', renameVersionId.value, renameName.value.trim())
-    renameModalOpen.value = false
-    renameVersionId.value = null
-    renameName.value = ''
+    emit("rename", renameVersionId.value, renameName.value.trim());
+    renameModalOpen.value = false;
+    renameVersionId.value = null;
+    renameName.value = "";
   }
 }
 </script>
 
 <style>
 .version-history-panel .ant-drawer-body {
-  padding: 0;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 
 .version-actions {
@@ -238,14 +236,14 @@ function handleRenameConfirm() {
 
 .version-list {
   flex: 1;
-  overflow-y: auto;
   padding: 8px 0;
+  overflow-y: auto;
 }
 
 .version-empty {
   padding: 40px 16px;
-  text-align: center;
   color: var(--tp-color-text-muted, #999);
+  text-align: center;
 }
 
 .version-item {
@@ -270,8 +268,8 @@ function handleRenameConfirm() {
 
 .version-item__header {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   margin-bottom: 4px;
 }
 
@@ -299,18 +297,18 @@ function handleRenameConfirm() {
 }
 
 .version-diff {
-  border-top: 1px solid var(--tp-color-border, #e5e5e5);
   max-height: 300px;
   overflow-y: auto;
+  border-top: 1px solid var(--tp-color-border, #e5e5e5);
 }
 
 .version-diff__header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 16px;
-  background-color: var(--tp-color-bg-secondary, #f5f5f5);
   font-size: 13px;
+  background-color: var(--tp-color-bg-secondary, #f5f5f5);
 }
 
 /* 深色模式 */

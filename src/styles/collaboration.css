@@ -6,16 +6,16 @@
 /* 协同编辑用户光标 */
 .collaboration-cursor__caret {
   position: relative;
-  margin-left: -1px;
   margin-right: -1px;
-  border-left: 1px solid #0d0d0d;
-  border-right: 1px solid #0d0d0d;
+  margin-left: -1px;
   word-break: normal;
   pointer-events: none;
+  border-right: 1px solid #0d0d0d;
+  border-left: 1px solid #0d0d0d;
 
   :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
-    border-left-color: #f0f0f0;
     border-right-color: #f0f0f0;
+    border-left-color: #f0f0f0;
   }
 }
 
@@ -24,16 +24,16 @@
   position: absolute;
   top: -1.4em;
   left: -1px;
+  z-index: 1000;
+  padding: 0.1rem 0.3rem;
   font-size: 12px;
   font-style: normal;
   font-weight: 600;
   line-height: normal;
-  user-select: none;
   color: #fff;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px 3px 3px 0;
   white-space: nowrap;
-  z-index: 1000;
+  user-select: none;
+  border-radius: 3px 3px 3px 0;
 }
 
 /* 用户选区高亮 */

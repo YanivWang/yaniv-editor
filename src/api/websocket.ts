@@ -8,10 +8,10 @@
  * Get WebSocket URL for collaboration
  */
 export function getWebSocketUrl(documentId: string): string {
-  const baseUrl = import.meta.env?.VITE_COLLABORATION_WS_URL
+  const baseUrl = import.meta.env?.VITE_COLLABORATION_WS_URL;
   if (!baseUrl) {
-    console.warn('[Tiptap] VITE_COLLABORATION_WS_URL not configured')
-    return ''
+    console.warn("[Tiptap] VITE_COLLABORATION_WS_URL not configured");
+    return "";
   }
-  return `${baseUrl}/${documentId}`
+  return `${baseUrl}/${documentId}`;
 }

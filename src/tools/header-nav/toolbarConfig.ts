@@ -8,47 +8,49 @@
  */
 export interface ToolbarToolsConfig {
   /** 是否显示文本格式工具（粗体、斜体、下划线、删除线） */
-  textFormat?: boolean
+  textFormat?: boolean;
   /** 是否显示颜色选择器（文本颜色、背景颜色） */
-  colorPicker?: boolean
+  colorPicker?: boolean;
   /** 是否显示标题下拉菜单 */
-  heading?: boolean
+  heading?: boolean;
   /** 是否显示列表工具（有序、无序、任务列表） */
-  list?: boolean
+  list?: boolean;
   /** 是否显示对齐工具 */
-  align?: boolean
+  align?: boolean;
   /** 是否显示图片上传工具 */
-  image?: boolean
+  image?: boolean;
   /** 是否显示代码块工具 */
-  codeBlock?: boolean
+  codeBlock?: boolean;
   /** 是否显示链接工具 */
-  link?: boolean
+  link?: boolean;
   /** 是否显示表格工具 */
-  table?: boolean
+  table?: boolean;
   /** 是否显示撤销/重做工具 */
-  undoRedo?: boolean
+  undoRedo?: boolean;
   /** 是否禁用撤销/重做工具（协作模式下需要禁用） */
-  undoRedoDisabled?: boolean
+  undoRedoDisabled?: boolean;
   /** 是否显示清除格式工具 */
-  clearFormat?: boolean
+  clearFormat?: boolean;
   /** 是否显示字体工具 */
-  font?: boolean
+  font?: boolean;
   /** 是否显示行距工具 */
-  lineHeight?: boolean
+  lineHeight?: boolean;
   /** 是否显示下标/上标工具 */
-  subscriptSuperscript?: boolean
+  subscriptSuperscript?: boolean;
   /** 是否显示格式刷工具 */
-  formatPainter?: boolean
+  formatPainter?: boolean;
   /** 是否禁用格式刷工具（协作模式多人时需要禁用） */
-  formatPainterDisabled?: boolean
+  formatPainterDisabled?: boolean;
   /** 是否显示 Word 导入/导出工具 */
-  word?: boolean
+  word?: boolean;
   /** 是否显示模板插入工具 */
-  template?: boolean
+  template?: boolean;
   /** 是否显示图库工具 */
-  gallery?: boolean
+  gallery?: boolean;
   /** 是否显示AI工具 */
-  ai?: boolean
+  ai?: boolean;
+  /** 是否显示查找与替换 */
+  findReplace?: boolean;
 }
 
 /**
@@ -71,7 +73,7 @@ export const DEFAULT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   subscriptSuperscript: false,
   formatPainter: false,
   ai: true,
-}
+};
 
 /**
  * 基础版工具栏配置（只显示基础功能）
@@ -93,7 +95,7 @@ export const BASIC_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   subscriptSuperscript: false,
   formatPainter: false,
   ai: true,
-}
+};
 
 /**
  * 进阶版工具栏配置（包含更多功能）
@@ -118,5 +120,5 @@ export const ADVANCED_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   template: true,
   gallery: true,
   ai: true,
-}
-
+  findReplace: true,
+};

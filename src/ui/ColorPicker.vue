@@ -1,12 +1,8 @@
 <template>
-  <div class="tt-color-picker" ref="containerRef">
+  <div ref="containerRef" class="tt-color-picker">
     <!-- Trigger button -->
     <BaseTooltip :title="title">
-      <button
-        class="tt-color-picker-trigger"
-        type="button"
-        @click="togglePicker"
-      >
+      <button class="tt-color-picker-trigger" type="button" @click="togglePicker">
         <slot name="icon">
           <span class="tt-color-picker-icon">A</span>
         </slot>
@@ -19,23 +15,19 @@
 
     <!-- Popover -->
     <Transition name="tt-picker-fade">
-      <div
-        v-if="isOpen"
-        class="tt-color-picker-popover"
-        @click.stop
-      >
+      <div v-if="isOpen" class="tt-color-picker-popover" @click.stop>
         <!-- Header -->
         <div class="tt-color-picker-header">
           <div
             class="tt-color-picker-preview"
             :style="{ backgroundColor: modelValue || '#000000' }"
           />
-          <span class="tt-color-picker-title">{{ t('editor.colors') }}</span>
+          <span class="tt-color-picker-title">{{ t("editor.colors") }}</span>
           <button
             class="tt-color-picker-clear"
             type="button"
-            @click="handleClear"
             :title="t('editor.clearColor')"
+            @click="handleClear"
           >
             ✕
           </button>
@@ -50,8 +42,8 @@
             :class="{ 'is-selected': normalizeColor(color) === normalizeColor(modelValue) }"
             :style="{ backgroundColor: color }"
             type="button"
-            @click="handleSelect(color)"
             :title="color"
+            @click="handleSelect(color)"
           />
         </div>
 
@@ -60,15 +52,15 @@
           <input
             type="color"
             :value="modelValue || '#000000'"
-            @input="handleCustomInput"
             class="tt-color-picker-input"
+            @input="handleCustomInput"
           />
           <input
             type="text"
             :value="modelValue || '#000000'"
-            @change="handleTextInput"
             class="tt-color-picker-text"
             placeholder="#000000"
+            @change="handleTextInput"
           />
         </div>
       </div>
@@ -77,84 +69,131 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import BaseTooltip from './BaseTooltip.vue'
-import { t } from '@/locales'
+import { ref, onMounted, onUnmounted } from "vue";
+
+import { t } from "@/locales";
+
+import BaseTooltip from "./BaseTooltip.vue";
 
 interface Props {
-  modelValue?: string
-  type?: 'text' | 'background'
-  title?: string
+  modelValue?: string;
+  type?: "text" | "background";
+  title?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'text',
-  title: '',
-})
+  type: "text",
+  title: "",
+});
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | undefined): void
-  (e: 'select', value: string): void
-}>()
+  (e: "update:modelValue", value: string | undefined): void;
+  (e: "select", value: string): void;
+}>();
 
-const isOpen = ref(false)
-const containerRef = ref<HTMLElement | null>(null)
+const isOpen = ref(false);
+const containerRef = ref<HTMLElement | null>(null);
 
 // Default colors (same as source)
 const colors = [
-  '#ffffff', '#f2f2f2', '#e0e0e0', '#ffcccc', '#ffcc99', '#ffffcc', '#ccffcc', '#cce5ff', '#e4d9ff', '#ffd9e6',
-  '#f5f5f5', '#e6e6e6', '#c0c0c0', '#ff9999', '#ff9966', '#ffff99', '#99ff99', '#99ccff', '#ccb3ff', '#ffb3cc',
-  '#d9d9d9', '#cccccc', '#808080', '#ff6666', '#ff9900', '#ffff00', '#66ff66', '#6699ff', '#9966ff', '#ff6699',
-  '#a6a6a6', '#999999', '#595959', '#ff0000', '#ff7700', '#ffd700', '#00ff00', '#0066ff', '#6600cc', '#ff0066',
-  '#000000', '#666666', '#404040', '#990000', '#cc6600', '#cccc00', '#006600', '#003366', '#330066', '#cc0033',
-]
+  "#ffffff",
+  "#f2f2f2",
+  "#e0e0e0",
+  "#ffcccc",
+  "#ffcc99",
+  "#ffffcc",
+  "#ccffcc",
+  "#cce5ff",
+  "#e4d9ff",
+  "#ffd9e6",
+  "#f5f5f5",
+  "#e6e6e6",
+  "#c0c0c0",
+  "#ff9999",
+  "#ff9966",
+  "#ffff99",
+  "#99ff99",
+  "#99ccff",
+  "#ccb3ff",
+  "#ffb3cc",
+  "#d9d9d9",
+  "#cccccc",
+  "#808080",
+  "#ff6666",
+  "#ff9900",
+  "#ffff00",
+  "#66ff66",
+  "#6699ff",
+  "#9966ff",
+  "#ff6699",
+  "#a6a6a6",
+  "#999999",
+  "#595959",
+  "#ff0000",
+  "#ff7700",
+  "#ffd700",
+  "#00ff00",
+  "#0066ff",
+  "#6600cc",
+  "#ff0066",
+  "#000000",
+  "#666666",
+  "#404040",
+  "#990000",
+  "#cc6600",
+  "#cccc00",
+  "#006600",
+  "#003366",
+  "#330066",
+  "#cc0033",
+];
 
-const normalizeColor = (color?: string) => color?.toLowerCase().trim() || ''
+const normalizeColor = (color?: string) => color?.toLowerCase().trim() || "";
 
 const togglePicker = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const handleSelect = (color: string) => {
-  emit('update:modelValue', color)
-  emit('select', color)
-  isOpen.value = false
-}
+  emit("update:modelValue", color);
+  emit("select", color);
+  isOpen.value = false;
+};
 
 const handleClear = () => {
-  const defaultColor = props.type === 'text' ? '#000000' : 'transparent'
-  emit('update:modelValue', defaultColor)
-  emit('select', defaultColor)
-}
+  const defaultColor = props.type === "text" ? "#000000" : "transparent";
+  emit("update:modelValue", defaultColor);
+  emit("select", defaultColor);
+};
 
 const handleCustomInput = (e: Event) => {
-  const value = (e.target as HTMLInputElement).value
-  emit('update:modelValue', value)
-  emit('select', value)
-}
+  const value = (e.target as HTMLInputElement).value;
+  emit("update:modelValue", value);
+  emit("select", value);
+};
 
 const handleTextInput = (e: Event) => {
-  const value = (e.target as HTMLInputElement).value
+  const value = (e.target as HTMLInputElement).value;
   if (/^#[0-9A-Fa-f]{3,6}$/.test(value)) {
-    emit('update:modelValue', value)
-    emit('select', value)
+    emit("update:modelValue", value);
+    emit("select", value);
   }
-}
+};
 
 // Close on click outside
 const handleClickOutside = (e: MouseEvent) => {
   if (containerRef.value && !containerRef.value.contains(e.target as Node)) {
-    isOpen.value = false
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
+  document.addEventListener("click", handleClickOutside);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
 
 <style scoped>
@@ -208,13 +247,13 @@ onUnmounted(() => {
   background: var(--tiptap-bg, #fff);
   border: 1px solid var(--tiptap-border, #e5e5e5);
   border-radius: var(--tiptap-radius-md, 8px);
-  box-shadow: var(--tiptap-shadow-lg, 0 10px 15px rgba(0,0,0,0.1));
+  box-shadow: var(--tiptap-shadow-lg, 0 10px 15px rgba(0, 0, 0, 0.1));
 }
 
 .tt-color-picker-header {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
   margin-bottom: 12px;
 }
 
@@ -269,14 +308,14 @@ onUnmounted(() => {
 }
 
 .tt-color-picker-item:hover {
+  box-shadow: var(--tiptap-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   transform: scale(1.2);
-  box-shadow: var(--tiptap-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
 }
 
 .tt-color-picker-item.is-selected {
-  transform: scale(1.1);
   border-color: var(--tiptap-primary, #3b82f6);
-  box-shadow: 0 0 0 2px var(--tiptap-primary-light, rgba(59,130,246,0.2));
+  box-shadow: 0 0 0 2px var(--tiptap-primary-light, rgba(59, 130, 246, 0.2));
+  transform: scale(1.1);
 }
 
 /* Custom input */
@@ -309,14 +348,16 @@ onUnmounted(() => {
 }
 
 .tt-color-picker-text:focus {
-  border-color: var(--tiptap-primary, #3b82f6);
   outline: none;
+  border-color: var(--tiptap-primary, #3b82f6);
 }
 
 /* Transition */
 .tt-picker-fade-enter-active,
 .tt-picker-fade-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .tt-picker-fade-enter-from,

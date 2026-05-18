@@ -9,18 +9,15 @@
   --table-header-bg: #fafafa;
   --table-cell-bg: #fff;
   --table-selected-bg: rgba(22, 119, 255, 0.1);
-
   --handle-size: 20px;
   --handle-bg: #f5f5f5;
   --handle-bg-hover: #e8e8e8;
   --handle-border: #e0e0e0;
   --handle-border-hover: #d0d0d0;
-  --handle-z-index: 0;  /* 远低于 bubble menu (1000+)，避免遮挡 */
-
+  --handle-z-index: 0; /* 远低于 bubble menu (1000+)，避免遮挡 */
   --button-primary-bg: #1677ff;
   --button-primary-shadow: rgba(22, 119, 255, 0.3);
   --button-primary-shadow-hover: rgba(22, 119, 255, 0.5);
-
   --menu-bg: #fff;
   --menu-border: #e0e0e0;
   --menu-shadow: rgba(0, 0, 0, 0.12);
@@ -28,7 +25,6 @@
   --menu-item-danger-color: #ff4d4f;
   --menu-item-danger-bg: #fff1f0;
   --menu-z-index: 0;
-
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,23 +32,23 @@
 
 /* ========== 基础表格 ========== */
 .ProseMirror table {
-  border-collapse: collapse;
-  table-layout: fixed;
   width: 100%;
   margin: 1em 0;
   overflow: hidden;
+  table-layout: fixed;
+  border-collapse: collapse;
   border: 1px solid var(--table-border-color);
 }
 
 .ProseMirror th,
 .ProseMirror td {
+  position: relative;
+  box-sizing: border-box;
   min-width: 1em;
-  border: 1px solid var(--table-border-color);
   padding: 8px 12px;
   vertical-align: top;
-  box-sizing: border-box;
-  position: relative;
   background: var(--table-cell-bg);
+  border: 1px solid var(--table-border-color);
 }
 
 .ProseMirror th {
@@ -75,15 +71,15 @@
 /* ========== 表格操作手柄（公共样式）========== */
 .umo-table-handle {
   position: absolute;
+  z-index: var(--handle-z-index);
   display: none;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  user-select: none;
   background: var(--handle-bg);
   border: 1px solid var(--handle-border);
-  cursor: pointer;
-  z-index: var(--handle-z-index);
   transition: background var(--transition-normal);
-  user-select: none;
 }
 
 .umo-table-handle.visible {
@@ -107,21 +103,21 @@
 
 /* ========== 操作按钮 ========== */
 .umo-table-more-btn {
+  z-index: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
   color: #999;
-  transition: all var(--transition-normal);
   cursor: pointer;
   opacity: 0;
-  z-index: 0;
+  transition: all var(--transition-normal);
 }
 
 .umo-table-handle:hover .umo-table-more-btn {
-  opacity: 1;
   color: #666;
+  opacity: 1;
 }
 
 .umo-table-more-btn:hover {
@@ -132,19 +128,19 @@
 /* ========== 顶部加号按钮 ========== */
 .umo-table-plus-btn {
   position: absolute;
+  z-index: var(--handle-z-index);
   display: none;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
-  background: var(--button-primary-bg);
   color: #fff;
   cursor: pointer;
-  z-index: var(--handle-z-index);
-  transition: all var(--transition-smooth);
-  box-shadow: 0 2px 8px var(--button-primary-shadow);
   user-select: none;
+  background: var(--button-primary-bg);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px var(--button-primary-shadow);
+  transition: all var(--transition-smooth);
 }
 
 .umo-table-plus-btn.visible {
@@ -152,8 +148,8 @@
 }
 
 .umo-table-plus-btn:hover {
-  transform: scale(1.15);
   box-shadow: 0 4px 12px var(--button-primary-shadow-hover);
+  transform: scale(1.15);
 }
 
 .umo-table-plus-btn:active {
@@ -167,15 +163,15 @@
 /* ========== 下拉菜单 ========== */
 .umo-table-menu {
   position: absolute;
+  z-index: var(--menu-z-index);
   display: none;
   min-width: 150px;
+  padding: 6px;
+  user-select: none;
   background: var(--menu-bg);
   border: 1px solid var(--menu-border);
   border-radius: 8px;
   box-shadow: 0 4px 16px var(--menu-shadow);
-  padding: 6px;
-  z-index: var(--menu-z-index);
-  user-select: none;
   animation: menuFadeIn var(--transition-fast);
 }
 
@@ -234,10 +230,10 @@
 }
 
 /* ========== 响应式 ========== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .ProseMirror {
-    padding-left: 10px;
     padding-right: 10px;
+    padding-left: 10px;
   }
 
   .umo-table-handle,

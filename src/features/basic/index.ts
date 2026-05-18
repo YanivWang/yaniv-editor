@@ -4,12 +4,12 @@
  */
 
 // 功能组件
-export * from './text-format'
-export * from './list'
-export * from './color'
-export * from './heading'
-export * from './align'
-export * from './image'
+export * from "./text-format";
+export * from "./list";
+export * from "./color";
+export * from "./heading";
+export * from "./align";
+export * from "./image";
 
 // 注意：
 // - BasicToolbar 已迁移到 tools/header-nav/ToolbarNav.vue
@@ -18,4 +18,3 @@ export * from './image'
 // - 扩展配置已迁移到 shared/extensions/coreExtensions.ts
 //   如需使用扩展，请直接从 shared/extensions/coreExtensions 导入：
 //   import { getExtensionsByVersion, getBasicExtensions } from '@/extensions/coreExtensions'
-

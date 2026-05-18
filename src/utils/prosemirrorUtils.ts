@@ -3,7 +3,7 @@
  * @description Shared utility functions for ProseMirror operations
  */
 
-import type { Node as ProseMirrorNode, Schema } from '@tiptap/pm/model'
+import type { Node as ProseMirrorNode, Schema } from "@tiptap/pm/model";
 
 /**
  * Build paragraph nodes from text with newlines
@@ -20,32 +20,29 @@ import type { Node as ProseMirrorNode, Schema } from '@tiptap/pm/model'
  * editor.view.dispatch(tr)
  * ```
  */
-export function buildParagraphNodesFromText(
-  text: string,
-  schema: Schema
-): ProseMirrorNode[] {
+export function buildParagraphNodesFromText(text: string, schema: Schema): ProseMirrorNode[] {
   if (!schema.nodes.paragraph) {
-    console.warn('[prosemirrorUtils] Schema does not have paragraph node')
-    return []
+    console.warn("[prosemirrorUtils] Schema does not have paragraph node");
+    return [];
   }
 
-  const lines = text.split(/\r?\n/)
-  const nodes: ProseMirrorNode[] = []
+  const lines = text.split(/\r?\n/);
+  const nodes: ProseMirrorNode[] = [];
 
   for (const line of lines) {
     if (line.length > 0) {
       // Create paragraph with text
-      const textNode = schema.text(line)
-      const paragraphNode = schema.nodes.paragraph.create(null, textNode)
-      nodes.push(paragraphNode)
+      const textNode = schema.text(line);
+      const paragraphNode = schema.nodes.paragraph.create(null, textNode);
+      nodes.push(paragraphNode);
     } else {
       // Create empty paragraph for blank lines
-      const paragraphNode = schema.nodes.paragraph.create()
-      nodes.push(paragraphNode)
+      const paragraphNode = schema.nodes.paragraph.create();
+      nodes.push(paragraphNode);
     }
   }
 
-  return nodes
+  return nodes;
 }
 
 /**
@@ -54,7 +51,7 @@ export function buildParagraphNodesFromText(
  * @returns True if text contains newlines
  */
 export function hasNewlines(text: string): boolean {
-  return /\r?\n/.test(text)
+  return /\r?\n/.test(text);
 }
 
 /**
@@ -65,7 +62,7 @@ export function hasNewlines(text: string): boolean {
  */
 export function isValidSelection(
   selection: { from: number; to: number },
-  docSize: number
+  docSize: number,
 ): boolean {
   return (
     selection.from >= 0 &&
@@ -73,5 +70,5 @@ export function isValidSelection(
     selection.from <= docSize &&
     selection.to <= docSize &&
     selection.from <= selection.to
-  )
+  );
 }

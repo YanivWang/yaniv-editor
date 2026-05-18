@@ -1,16 +1,16 @@
 <template>
   <Popover
     :open="visible"
-    :getPopupContainer="getPopupContainer"
+    :get-popup-container="getPopupContainer"
     placement="bottomLeft"
     :trigger="[]"
-    overlayClassName="ai-suggestion-popover"
+    overlay-class-name="ai-suggestion-popover"
     @update:open="handleVisibleChange"
   >
     <template #content>
       <div class="ai-suggestion-content">
         <div class="ai-suggestion-header">
-          <span class="ai-suggestion-title">{{ t('editor.aiSuggestion') }}</span>
+          <span class="ai-suggestion-title">{{ t("editor.aiSuggestion") }}</span>
           <LoadingOutlined v-if="isStreaming" class="ai-loading-icon" />
         </div>
 
@@ -18,7 +18,7 @@
           <!-- 只在有原文时显示原文框 -->
           <template v-if="originalText">
             <div class="original-text">
-              <div class="text-label">{{ t('editor.originalText') }}</div>
+              <div class="text-label">{{ t("editor.originalText") }}</div>
               <div class="text-content">{{ originalText }}</div>
             </div>
 
@@ -26,30 +26,23 @@
           </template>
 
           <div class="suggested-text">
-            <div class="text-label">{{ originalText ? t('editor.suggestedText') : t('editor.aiContinueWriting') }}</div>
-            <div class="text-content">{{ suggestedText || t('editor.generating') }}</div>
+            <div class="text-label">
+              {{ originalText ? t("editor.suggestedText") : t("editor.aiContinueWriting") }}
+            </div>
+            <div class="text-content">{{ suggestedText || t("editor.generating") }}</div>
           </div>
         </div>
 
         <div class="ai-suggestion-footer">
-          <a-button size="small" @click="handleCancel" :disabled="isStreaming">
-            {{ t('editor.cancel') }}
+          <a-button size="small" :disabled="isStreaming" @click="handleCancel">
+            {{ t("editor.cancel") }}
           </a-button>
           <div class="footer-right">
-            <a-button
-              size="small"
-              @click="handleReject"
-              :disabled="isStreaming"
-            >
-              {{ t('editor.reject') }}
+            <a-button size="small" :disabled="isStreaming" @click="handleReject">
+              {{ t("editor.reject") }}
             </a-button>
-            <a-button
-              type="primary"
-              size="small"
-              @click="handleAccept"
-              :disabled="isStreaming"
-            >
-              {{ t('editor.accept') }}
+            <a-button type="primary" size="small" :disabled="isStreaming" @click="handleAccept">
+              {{ t("editor.accept") }}
             </a-button>
           </div>
         </div>
@@ -62,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Popover, Button as AButton } from 'ant-design-vue';
-import { LoadingOutlined, ArrowDownOutlined } from '@ant-design/icons-vue';
-import { t } from '@/locales';
+import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
+import { Popover, Button as AButton } from "ant-design-vue";
+import { ref, computed } from "vue";
+
+import { t } from "@/locales";
 
 export interface AiSuggestionPopoverProps {
   visible: boolean;
@@ -78,13 +72,13 @@ export interface AiSuggestionPopoverProps {
 
 const props = withDefaults(defineProps<AiSuggestionPopoverProps>(), {
   visible: false,
-  originalText: '',
-  suggestedText: '',
+  originalText: "",
+  suggestedText: "",
   isStreaming: false,
 });
 
 const emit = defineEmits<{
-  'update:visible': [value: boolean];
+  "update:visible": [value: boolean];
   accept: [];
   reject: [];
   cancel: [];
@@ -95,22 +89,22 @@ const anchorRef = ref<HTMLElement>();
 const anchorStyle = computed(() => {
   if (!props.position) {
     return {
-      position: 'absolute',
-      top: '0px',
-      left: '0px',
-      width: '0px',
-      height: '0px',
-      pointerEvents: 'none',
+      position: "absolute",
+      top: "0px",
+      left: "0px",
+      width: "0px",
+      height: "0px",
+      pointerEvents: "none",
     };
   }
 
   return {
-    position: 'absolute',
+    position: "absolute",
     top: `${props.position.top}px`,
     left: `${props.position.left}px`,
-    width: '0px',
-    height: '0px',
-    pointerEvents: 'none',
+    width: "0px",
+    height: "0px",
+    pointerEvents: "none",
   };
 });
 
@@ -119,21 +113,21 @@ const getPopupContainer = () => {
 };
 
 const handleAccept = () => {
-  emit('accept');
+  emit("accept");
 };
 
 const handleReject = () => {
-  emit('reject');
+  emit("reject");
 };
 
 const handleCancel = () => {
-  emit('cancel');
+  emit("cancel");
 };
 
 const handleVisibleChange = (val: boolean) => {
-  emit('update:visible', val);
+  emit("update:visible", val);
   if (!val) {
-    emit('cancel');
+    emit("cancel");
   }
 };
 </script>
@@ -266,4 +260,3 @@ const handleVisibleChange = (val: boolean) => {
   border-top-color: #434343;
 }
 </style>
-

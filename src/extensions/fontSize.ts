@@ -3,18 +3,18 @@
  * @description 自定义字号扩展
  */
 
-import { Extension } from '@tiptap/core'
+import { Extension } from "@tiptap/core";
 
 /**
  * FontSize 扩展
  */
 export const FontSize = Extension.create({
-  name: 'fontSize',
+  name: "fontSize",
 
   addOptions() {
     return {
-      types: ['textStyle'],
-    }
+      types: ["textStyle"],
+    };
   },
 
   addGlobalAttributes() {
@@ -27,16 +27,16 @@ export const FontSize = Extension.create({
             parseHTML: (element) => element.style.fontSize || null,
             renderHTML: (attributes) => {
               if (!attributes.fontSize) {
-                return {}
+                return {};
               }
               return {
                 style: `font-size: ${attributes.fontSize}`,
-              }
+              };
             },
           },
         },
       },
-    ]
+    ];
   },
 
   addCommands() {
@@ -44,14 +44,13 @@ export const FontSize = Extension.create({
       setFontSize:
         (fontSize: string) =>
         ({ chain }) => {
-          return chain().setMark('textStyle', { fontSize }).run()
+          return chain().setMark("textStyle", { fontSize }).run();
         },
       unsetFontSize:
         () =>
         ({ chain }) => {
-          return chain().setMark('textStyle', { fontSize: null }).removeEmptyTextStyle().run()
+          return chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run();
         },
-    }
+    };
   },
-})
-
+});

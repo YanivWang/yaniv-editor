@@ -1,10 +1,7 @@
 <template>
-  <div 
+  <div
     class="device-frame"
-    :class="[
-      `device-frame--${device}`,
-      `device-frame--${orientation}`,
-    ]"
+    :class="[`device-frame--${device}`, `device-frame--${orientation}`]"
     :style="frameStyle"
   >
     <!-- iPad Frame -->
@@ -15,7 +12,7 @@
       </div>
       <div class="device-frame__ipad-button"></div>
     </div>
-    
+
     <!-- iPhone Frame (仅 PC 浏览器预览时显示外框) -->
     <div v-else-if="device === 'mobile' && !isMobileBrowser" class="device-frame__iphone">
       <div class="device-frame__iphone-notch">
@@ -40,70 +37,71 @@
  * DeviceFrame - 设备外框组件
  * @description 为编辑器添加 iPad/iPhone 设备外框
  */
-import { computed } from 'vue'
-import type { DeviceView } from './DeviceSwitcher.vue'
+import { computed } from "vue";
 
-export type Orientation = 'portrait' | 'landscape'
+import type { DeviceView } from "./DeviceSwitcher.vue";
+
+export type Orientation = "portrait" | "landscape";
 
 /**
  * 检测当前是否为手机浏览器
  */
 function detectMobileBrowser(): boolean {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false
-  const ua = navigator.userAgent || ''
-  return /Android.*Mobile|iPhone|iPod|Windows Phone|BlackBerry|Opera Mini|IEMobile/i.test(ua)
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  return /Android.*Mobile|iPhone|iPod|Windows Phone|BlackBerry|Opera Mini|IEMobile/i.test(ua);
 }
 
 interface Props {
   /** 设备类型 */
-  device: DeviceView
+  device: DeviceView;
   /** 屏幕方向 */
-  orientation?: Orientation
+  orientation?: Orientation;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  orientation: 'portrait',
-})
+  orientation: "portrait",
+});
 
 /** 手机浏览器下跳过设备外框，直接展示内容 */
-const isMobileBrowser = detectMobileBrowser()
+const isMobileBrowser = detectMobileBrowser();
 
 // 设备尺寸配置 - 使用最大高度，让内容自适应
 const deviceSizes = {
-  pc: { width: '100%', height: 'auto', maxHeight: 'none' },
+  pc: { width: "100%", height: "auto", maxHeight: "none" },
   pad: {
-    portrait: { width: '820px', height: 'auto', maxHeight: '85vh' },
-    landscape: { width: '100%', height: 'auto', maxHeight: '600px' },
+    portrait: { width: "820px", height: "auto", maxHeight: "85vh" },
+    landscape: { width: "100%", height: "auto", maxHeight: "600px" },
   },
   mobile: {
-    portrait: { width: '430px', height: 'auto', maxHeight: '85vh' },
-    landscape: { width: '100%', height: 'auto', maxHeight: '400px' },
+    portrait: { width: "430px", height: "auto", maxHeight: "85vh" },
+    landscape: { width: "100%", height: "auto", maxHeight: "400px" },
   },
-}
+};
 
 const frameStyle = computed(() => {
   // 手机浏览器下不限制尺寸，全屏展示
-  if (props.device === 'pc' || (props.device === 'mobile' && isMobileBrowser)) {
-    return { width: '100%', height: 'auto' }
+  if (props.device === "pc" || (props.device === "mobile" && isMobileBrowser)) {
+    return { width: "100%", height: "auto" };
   }
 
-  const sizes = deviceSizes[props.device]
-  const size = sizes[props.orientation]
+  const sizes = deviceSizes[props.device];
+  const size = sizes[props.orientation];
   return {
     width: size.width,
     height: size.height,
     maxHeight: size.maxHeight,
-  }
-})
+  };
+});
 </script>
 
 <style scoped>
 .device-frame {
   position: relative;
-  margin: 0 auto;
-  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
+  transition: all 0.3s ease;
 }
 
 /* ===== PC 模式 - 无外框 ===== */
@@ -113,10 +111,10 @@ const frameStyle = computed(() => {
 }
 
 .device-frame__pc {
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -127,10 +125,10 @@ const frameStyle = computed(() => {
   flex-direction: column;
   width: 100%;
   min-height: 500px;
+  padding: 40px 24px 24px;
   background: linear-gradient(145deg, #e8e8e8 0%, #d0d0d0 100%);
   border-radius: 36px;
-  padding: 40px 24px 24px 24px;
-  box-shadow: 
+  box-shadow:
     0 0 0 2px #a8a8a8,
     0 20px 60px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -140,20 +138,20 @@ const frameStyle = computed(() => {
   position: absolute;
   top: 14px;
   left: 50%;
-  transform: translateX(-50%);
+  z-index: 10;
   width: 80px;
   height: 6px;
   background: #333;
   border-radius: 3px;
-  z-index: 10;
+  transform: translateX(-50%);
 }
 
 .device-frame__ipad-screen {
   flex: 1;
   width: 100%;
+  overflow: auto;
   background: #fff;
   border-radius: 8px;
-  overflow: auto;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
@@ -164,16 +162,16 @@ const frameStyle = computed(() => {
 /* iPad 横屏调整 */
 .device-frame--pad.device-frame--landscape .device-frame__ipad {
   flex-direction: row;
-  padding: 24px 40px 24px 24px;
   min-height: 400px;
+  padding: 24px 40px 24px 24px;
 }
 
 .device-frame--pad.device-frame--landscape .device-frame__ipad-notch {
   top: 50%;
   left: 12px;
-  transform: translateY(-50%);
   width: 6px;
   height: 80px;
+  transform: translateY(-50%);
 }
 
 .device-frame--pad.device-frame--landscape .device-frame__ipad-screen {
@@ -188,10 +186,10 @@ const frameStyle = computed(() => {
   flex-direction: column;
   width: 100%;
   min-height: 600px;
+  padding: 48px 12px 32px;
   background: linear-gradient(145deg, #2c2c2c 0%, #1a1a1a 100%);
   border-radius: 44px;
-  padding: 48px 12px 32px 12px;
-  box-shadow: 
+  box-shadow:
     0 0 0 3px #1a1a1a,
     0 0 0 5px #333,
     0 20px 60px rgba(0, 0, 0, 0.4),
@@ -202,16 +200,16 @@ const frameStyle = computed(() => {
   position: absolute;
   top: 12px;
   left: 50%;
-  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
   width: 120px;
   height: 28px;
   background: #1a1a1a;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  z-index: 10;
+  transform: translateX(-50%);
 }
 
 .device-frame__iphone-speaker {
@@ -225,16 +223,16 @@ const frameStyle = computed(() => {
   width: 10px;
   height: 10px;
   background: #222;
-  border-radius: 50%;
   border: 2px solid #333;
+  border-radius: 50%;
 }
 
 .device-frame__iphone-screen {
   flex: 1;
   width: 100%;
+  overflow: auto;
   background: #fff;
   border-radius: 24px;
-  overflow: auto;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
@@ -242,29 +240,29 @@ const frameStyle = computed(() => {
   position: absolute;
   bottom: 8px;
   left: 50%;
-  transform: translateX(-50%);
   width: 100px;
   height: 4px;
   background: #fff;
   border-radius: 2px;
   opacity: 0.8;
+  transform: translateX(-50%);
 }
 
 /* iPhone 横屏调整 */
 .device-frame--mobile.device-frame--landscape .device-frame__iphone {
   flex-direction: row;
-  padding: 12px 32px 12px 48px;
   min-height: 320px;
+  padding: 12px 32px 12px 48px;
 }
 
 .device-frame--mobile.device-frame--landscape .device-frame__iphone-notch {
   top: 50%;
   left: 12px;
-  transform: translateY(-50%);
+  flex-direction: column;
   width: 28px;
   height: 120px;
   border-radius: 16px;
-  flex-direction: column;
+  transform: translateY(-50%);
 }
 
 .device-frame--mobile.device-frame--landscape .device-frame__iphone-speaker {
@@ -278,18 +276,18 @@ const frameStyle = computed(() => {
 }
 
 .device-frame--mobile.device-frame--landscape .device-frame__iphone-home {
-  bottom: 50%;
   right: 8px;
+  bottom: 50%;
   left: auto;
-  transform: translateY(50%);
   width: 4px;
   height: 100px;
+  transform: translateY(50%);
 }
 
 /* ===== 深色模式 ===== */
 [data-theme="dark"] .device-frame__ipad {
   background: linear-gradient(145deg, #3a3a3a 0%, #2a2a2a 100%);
-  box-shadow: 
+  box-shadow:
     0 0 0 2px #555,
     0 20px 60px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -304,19 +302,19 @@ const frameStyle = computed(() => {
 .device-frame__pc :deep(.demo-card),
 .device-frame__ipad-screen :deep(.demo-card),
 .device-frame__iphone-screen :deep(.demo-card) {
-  height: 100%;
-  border-radius: 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0;
 }
 
 .device-frame__pc :deep(.tiptap-pro-editor),
 .device-frame__ipad-screen :deep(.tiptap-pro-editor),
 .device-frame__iphone-screen :deep(.tiptap-pro-editor) {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -335,7 +333,7 @@ const frameStyle = computed(() => {
 .device-frame__ipad-screen :deep(.word-document-container),
 .device-frame__iphone-screen :deep(.word-document-container) {
   flex: 1;
-  overflow-y: auto;
   min-height: 0;
+  overflow-y: auto;
 }
 </style>

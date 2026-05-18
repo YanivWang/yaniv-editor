@@ -1,3 +1,8 @@
+# tsc / vue-tsc 声明应只出现在 dist/；若仍出现在 src 则勿提交
+src/**/*.d.ts
+src/**/*.d.ts.map
+!src/vite-env.d.ts
+
 # Dependencies
 node_modules/
 .pnp
@@ -17,6 +22,7 @@ dist-ssr/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 *.suo
 *.ntvs*
@@ -38,6 +44,12 @@ lerna-debug.log*
 coverage/
 .nyc_output
 
+# Lint / typecheck caches
+.eslintcache
+.stylelintcache
+.pnpm-store/
+*.tsbuildinfo
+
 # Temporary files
 *.tmp
 *.temp
@@ -51,13 +63,6 @@ Thumbs.db
 # Package manager
 package-lock.json
 yarn.lock
-
-# Moltbook
-skills/
-.moltbook.json
-.moltbook-state.json
-.moltbook-feedback.json
-moltbook.log
 
 # ===== Security - Local settings with API keys =====
 .claude/settings.local.json

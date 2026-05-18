@@ -4,9 +4,8 @@
  */
 
 // 扩展导出
-export { FormatPainter, sampleFormats } from './formatPainter'
-export type { FormatPainterStorage, FormatPainterFormats } from './formatPainter'
+export { FormatPainter, sampleFormats } from "./formatPainter";
+export type { FormatPainterStorage, FormatPainterFormats } from "./formatPainter";
 
 // 组件导出
-export { default as FormatPainterButton } from './FormatPainterButton.vue'
-
+export { default as FormatPainterButton } from "./FormatPainterButton.vue";
