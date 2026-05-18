@@ -91,6 +91,7 @@
             <LinkButton v-if="config.link" :editor="editor" />
             <TableButton v-if="config.table" :editor="editor" />
             <ImageUpload v-if="config.image" :editor="editor" />
+            <VideoUpload v-if="config.image" :editor="editor" />
           </div>
 
           <div v-if="config.subscriptSuperscript" class="tool-group">
@@ -166,6 +167,7 @@ import { TableButton } from "@/editor/table";
 import { TemplateButton } from "@/editor/template";
 import { TextFormatButtons } from "@/editor/text-format";
 import { UndoRedoButton } from "@/editor/undo-redo";
+import { VideoUpload } from "@/editor/video";
 import { WordButton } from "@/editor/word";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";

@@ -45,11 +45,11 @@
   },
   "peerDependencies": {
     "@tiptap/core": "^3.0.0",
+    "@tiptap/extension-table-of-contents": "^3.0.0",
+    "@tiptap/extension-unique-id": "^3.0.0",
     "@tiptap/pm": "^3.0.0",
     "@tiptap/starter-kit": "^3.0.0",
     "@tiptap/vue-3": "^3.0.0",
-    "@tiptap/extension-unique-id": "^3.0.0",
-    "@tiptap/extension-table-of-contents": "^3.0.0",
     "vue": "^3.4.0"
   },
   "peerDependenciesMeta": {
@@ -188,6 +188,7 @@
     "file-saver": "^2.0.5",
     "hotkeys-js": "^4.0.4",
     "katex": "^0.16.28",
-    "mammoth": "^1.11.0"
+    "mammoth": "^1.11.0",
+    "vue-router": "^4.6.4"
   }
 }

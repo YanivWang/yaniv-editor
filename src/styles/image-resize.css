@@ -19,6 +19,43 @@
   outline-offset: 2px;
 }
 
+.ProseMirror .video-wrapper {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.ProseMirror .video-wrapper video {
+  display: block;
+  max-width: 100%;
+  transition: outline 0.2s ease;
+}
+
+.ProseMirror .video-wrapper:hover video,
+.ProseMirror .video-wrapper.ProseMirror-selectednode video,
+.ProseMirror .video-wrapper video[data-selected] {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.ProseMirror .video-wrapper[data-align="left"] {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.ProseMirror .video-wrapper[data-align="center"] {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.ProseMirror .video-wrapper[data-align="right"] {
+  margin-right: 0;
+  margin-left: auto;
+}
+
 /* 图片包装器样式 */
 .ProseMirror .image-wrapper {
   position: relative;

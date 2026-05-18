@@ -165,23 +165,24 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   if (bubbleProps.editor.isActive("codeBlock")) return false;
   if (bubbleProps.editor.isActive("table")) return false;
 
-  // 如果选中的是图片节点，不显示悬浮菜单（图片有自己的工具栏）
+  // 如果选中的是媒体节点，不显示悬浮菜单（媒体有自己的工具栏）
   if (bubbleProps.editor.isActive("image")) return false;
+  if (bubbleProps.editor.isActive("video")) return false;
 
-  // 检查选中的节点是否是图片
+  // 检查选中的节点是否是媒体
   const { state } = bubbleProps;
   const { selection } = state;
-  if (selection.node && selection.node.type.name === "image") {
+  if (selection.node && ["image", "video"].includes(selection.node.type.name)) {
     return false;
   }
 
-  // 检查光标前后的节点是否是图片
+  // 检查光标前后的节点是否是媒体
   const $anchor = selection.$anchor;
   const nodeAfter = $anchor.nodeAfter;
   const nodeBefore = $anchor.nodeBefore;
   if (
-    (nodeAfter && nodeAfter.type.name === "image") ||
-    (nodeBefore && nodeBefore.type.name === "image")
+    (nodeAfter && ["image", "video"].includes(nodeAfter.type.name)) ||
+    (nodeBefore && ["image", "video"].includes(nodeBefore.type.name))
   ) {
     return false;
   }

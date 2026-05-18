@@ -45,6 +45,14 @@
       :enabled="props.features?.image ?? false"
     />
 
+    <!-- 功能模块：视频工具栏（预览模式下禁用） -->
+    <VideoToolbar
+      v-if="editorInstance && !isPreviewMode && (props.features?.image ?? false)"
+      :editor="editorInstance"
+      :readonly="readonly"
+      :enabled="props.features?.image ?? false"
+    />
+
     <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
     <FloatingMenu
       v-if="editorInstance && !isPreviewMode && (props.features?.floatingMenu ?? false)"
@@ -121,6 +129,7 @@ import { LinkBubbleMenu } from "@/tools/link-bubble";
 import { SlashCommandMenu, SlashCommandExtension } from "@/tools/slash-command";
 import type { SlashCommandState } from "@/tools/slash-command";
 import { TableToolbar } from "@/tools/table-toolbar";
+import { VideoToolbar } from "@/tools/video-toolbar";
 import { validateTiptapProEditorProps } from "@/utils/validateEditorProps";
 
 import { useEditorFeatures } from "./useEditorFeatures";
