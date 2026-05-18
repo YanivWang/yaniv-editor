@@ -4,7 +4,7 @@
       <div class="demo-header__content">
         <RouterLink class="demo-header__title" :to="{ name: 'home' }">
           <span class="demo-header__icon">T</span>
-          YanivEditor Examples
+          yaniv-editor Examples
         </RouterLink>
         <p class="demo-header__subtitle">Inline editor with hot-swappable feature plugins</p>
       </div>
