@@ -9,7 +9,7 @@ module.exports = {
       "always",
       [
         "core",
-        "demo",
+        "examples",
         "extensions",
         "features",
         "tools",

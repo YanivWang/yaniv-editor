@@ -205,10 +205,10 @@ import { HeadingDropdown } from "@/editor/heading";
 import { ListTools as ListGroup } from "@/editor/list";
 import { TextFormatButtons as TextFormatGroup } from "@/editor/text-format";
 
-import { FontSize } from "../src/extensions/fontSize";
-import "../src/styles/variables.css";
-import "../src/styles/base.css";
-import "../src/styles/toolbar.css";
+import { FontSize } from "../../src/extensions/fontSize";
+import "../../src/styles/variables.css";
+import "../../src/styles/base.css";
+import "../../src/styles/toolbar.css";
 
 defineProps<{
   theme: "light" | "dark";

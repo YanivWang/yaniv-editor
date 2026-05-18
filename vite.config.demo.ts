@@ -22,7 +22,7 @@ function getVendorChunkName(id: string) {
   return `vendor-${packageName.replace("@", "").replace("/", "-")}`;
 }
 
-// Demo build configuration for Vercel/Netlify deployment
+// Examples build configuration for Vercel/Netlify deployment
 export default defineConfig({
   plugins: [vue()],
   resolve: {
@@ -34,9 +34,9 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
-  // Build demo app, not library
+  // Build examples app, not library
   build: {
-    // Keep demo browser targets aligned with the library build and CSS nesting usage.
+    // Keep examples browser targets aligned with the library build and CSS nesting usage.
     target: ["es2022", "chrome105", "safari16", "firefox110", "edge105"],
     outDir: "dist",
     rollupOptions: {

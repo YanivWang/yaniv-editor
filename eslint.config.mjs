@@ -39,7 +39,7 @@ export default tseslint.config(
     ],
   },
   {
-    files: ["src/**/*.{ts,vue,js,mjs}", "demo/**/*.{ts,vue,js,mjs}"],
+    files: ["src/**/*.{ts,vue,js,mjs}", "examples/**/*.{ts,vue,js,mjs}"],
     plugins: { import: importPlugin },
     settings: importPluginSettings,
     rules: {
@@ -67,7 +67,7 @@ export default tseslint.config(
   },
   ...pluginVue.configs["flat/recommended"],
   {
-    files: ["src/**/*.{ts,vue}", "demo/**/*.{ts,vue}"],
+    files: ["src/**/*.{ts,vue}", "examples/**/*.{ts,vue}"],
     extends: [...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
@@ -115,7 +115,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/**/*.vue", "demo/**/*.vue"],
+    files: ["src/**/*.vue", "examples/**/*.vue"],
     languageOptions: {
       parser: vueParser,
       parserOptions: {
@@ -127,7 +127,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/**/*.{js,mjs}", "demo/**/*.{js,mjs}"],
+    files: ["src/**/*.{js,mjs}", "examples/**/*.{js,mjs}"],
     extends: [js.configs.recommended, tseslint.configs.disableTypeChecked],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },

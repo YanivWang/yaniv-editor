@@ -31,9 +31,9 @@ const content = ref("<p>Hello</p>");
 
 ```bash
 pnpm install
-pnpm dev          # 开发库 / demo
+pnpm dev          # 开发库 / examples
 pnpm build        # 构建 npm 包
-pnpm build:demo   # 构建演示站点
+pnpm build:demo   # 构建 examples 演示站点
 pnpm typecheck
 ```
 

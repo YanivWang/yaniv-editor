@@ -9,8 +9,8 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "demo/**/*.ts",
-    "demo/**/*.vue",
+    "examples/**/*.ts",
+    "examples/**/*.vue",
     "vite.config.ts",
     "vite.config.demo.ts"
   ],
