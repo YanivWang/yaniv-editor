@@ -1,5 +1,5 @@
 /**
- * Conventional Commits；scope 与 Tiptap-UI-Kit 目录对齐。
+ * Conventional Commits；scope 与 yaniv-editor 目录对齐。
  */
 module.exports = {
   extends: ["@commitlint/config-conventional"],

@@ -4,6 +4,7 @@
  */
 
 import { Node, mergeAttributes } from "@tiptap/core";
+import { Plugin, NodeSelection, TextSelection } from "@tiptap/pm/state";
 
 export interface VideoOptions {
   HTMLAttributes: Record<string, any>;
@@ -211,6 +212,45 @@ export const Video = Node.create<VideoOptions>({
         },
       };
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        props: {
+          handleDOMEvents: {
+            mousedown(view, mouseEvent) {
+              if (mouseEvent.button !== 0) return false;
+
+              const { selection } = view.state;
+              if (!(selection instanceof NodeSelection) || selection.node.type.name !== "video") {
+                return false;
+              }
+
+              const target = mouseEvent.target as HTMLElement | null;
+              if (!target || target.closest(".video-wrapper")) {
+                return false;
+              }
+
+              const posAtCoords = view.posAtCoords({
+                left: mouseEvent.clientX,
+                top: mouseEvent.clientY,
+              });
+              if (!posAtCoords) return false;
+
+              const $pos = view.state.doc.resolve(posAtCoords.pos);
+              const nextSelection = TextSelection.near($pos);
+
+              mouseEvent.preventDefault();
+              view.dispatch(view.state.tr.setSelection(nextSelection));
+              view.focus();
+
+              return true;
+            },
+          },
+        },
+      }),
+    ];
   },
 
   addCommands() {

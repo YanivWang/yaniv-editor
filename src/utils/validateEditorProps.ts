@@ -4,7 +4,7 @@ import type { TiptapProEditorProps } from "@/core/editorTypes";
 export function validateTiptapProEditorProps(props: TiptapProEditorProps): void {
   const warn = typeof console?.warn === "function" ? console.warn.bind(console) : () => {};
 
-  const zone = `[Tiptap UI Kit]`;
+  const zone = `[yaniv-editor]`;
 
   if (props.version && !["basic", "advanced", "premium"].includes(props.version)) {
     warn(

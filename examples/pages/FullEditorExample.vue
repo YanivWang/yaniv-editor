@@ -9,7 +9,7 @@
         <div class="demo-header__content">
           <RouterLink class="demo-header__title" :to="{ name: 'home' }">
             <span class="demo-header__icon">T</span>
-            Tiptap UI Kit Examples
+            yaniv-editor Examples
           </RouterLink>
           <p class="demo-header__subtitle">Full editor example with themes and device preview</p>
         </div>
@@ -159,7 +159,7 @@ const handleOrientationChange = (orientation: Orientation) => {
 };
 
 const sampleContent = `
-<h1>Welcome to Tiptap UI Kit!</h1>
+<h1>Welcome to yaniv-editor!</h1>
 <p>This is a <strong>beautiful</strong> and <em>customizable</em> rich-text editor built with:</p>
 <ul>
   <li><strong>Tiptap 3</strong> - The headless editor framework</li>

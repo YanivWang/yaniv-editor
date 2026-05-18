@@ -19,7 +19,7 @@ import { computed } from "vue";
 
 import { usePreferences } from "@/adapters";
 
-import { ToolbarDivider } from "./index";
+import ToolbarDivider from "./ToolbarDivider.vue";
 
 interface Props {
   direction?: "horizontal" | "vertical";

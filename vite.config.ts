@@ -41,7 +41,7 @@ export default defineConfig({
     target: ["es2022", "chrome105", "safari16", "firefox110", "edge105"],
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
-      name: "TiptapUIKit",
+      name: "yanivEditor",
       formats: ["es", "cjs"],
       fileName: (format) => (format === "es" ? "index.esm.js" : "index.js"),
     },

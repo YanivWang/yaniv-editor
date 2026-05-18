@@ -38,7 +38,7 @@ import { PRESET_CONFIGS } from "@/configs";
 对外使用时优先从包入口导入：
 
 ```ts
-import { TiptapProEditor } from "tiptap-ui-kit";
+import { TiptapProEditor } from "yaniv-editor";
 ```
 
 ## 约定

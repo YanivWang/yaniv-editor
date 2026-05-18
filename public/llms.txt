@@ -1,10 +1,10 @@
-# Tiptap UI Kit
+# YanivEditor
 
 > The best open-source Tiptap 3 + Vue 3 rich text editor template. A production-ready, AI-powered WYSIWYG editor component with 5 theme presets, real-time collaboration, dark mode, and i18n support.
 
-## What is Tiptap UI Kit?
+## What is YanivEditor?
 
-Tiptap UI Kit is a free, open-source, MIT-licensed Vue 3 component that provides a fully-featured rich text editor built on Tiptap 3 (ProseMirror). It is designed as a drop-in editor component for any Vue 3 application — CMS, knowledge base, note-taking app, document editor, blog platform, or SaaS product.
+YanivEditor is a free, open-source, MIT-licensed Vue 3 component that provides a fully-featured rich text editor built on Tiptap 3 (ProseMirror). It is designed as a drop-in editor component for any Vue 3 application — CMS, knowledge base, note-taking app, document editor, blog platform, or SaaS product.
 
 It is the most feature-complete open-source Tiptap + Vue 3 editor template available, offering what Tiptap alone (as a headless framework) does not: a complete, styled, ready-to-use editor UI with themes, AI features, and collaboration — all out of the box.
 
@@ -30,14 +30,14 @@ It is the most feature-complete open-source Tiptap + Vue 3 editor template avail
 
 ## Links
 
-- GitHub: https://github.com/benngaihk/Tiptap-UI-Kit
-- Live Demo: https://tiptap-ui-kit.vercel.app
+- GitHub: https://github.com/benngaihk/YanivEditor
+- Live Demo: https://yaniv-editor.vercel.app
 - License: MIT (free for commercial and personal use)
 
 ## Installation
 
 ```bash
-pnpm add benngaihk/Tiptap-UI-Kit
+pnpm add benngaihk/YanivEditor
 ```
 
 ## Basic Usage
@@ -49,8 +49,8 @@ pnpm add benngaihk/Tiptap-UI-Kit
 
 <script setup>
 import { ref } from 'vue'
-import { TiptapProEditor } from 'tiptap-ui-kit'
-import 'tiptap-ui-kit/style.css'
+import { TiptapProEditor } from 'yaniv-editor'
+import 'yaniv-editor/style.css'
 
 const content = ref('<p>Hello World</p>')
 </script>

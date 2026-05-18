@@ -1,7 +1,7 @@
 {
-  "name": "tiptap-ui-kit",
+  "name": "yaniv-editor",
   "version": "0.1.0",
-  "description": "Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
+  "description": "yaniv-editor — Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
   "type": "module",
   "packageManager": "pnpm@10.17.0",
   "main": "dist/index.js",
@@ -171,13 +171,13 @@
   ],
   "author": "benngaihk",
   "license": "MIT",
-  "homepage": "https://github.com/benngaihk/Tiptap-UI-Kit#readme",
+  "homepage": "https://github.com/benngaihk/yaniv-editor#readme",
   "bugs": {
-    "url": "https://github.com/benngaihk/Tiptap-UI-Kit/issues"
+    "url": "https://github.com/benngaihk/yaniv-editor/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/benngaihk/Tiptap-UI-Kit.git"
+    "url": "https://github.com/benngaihk/yaniv-editor.git"
   },
   "engines": {
     "node": ">=20.19.5",

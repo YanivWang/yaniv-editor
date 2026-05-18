@@ -263,7 +263,7 @@ const isCollaborationFeatureEnabled = computed(() => getFeatureConfig("collabora
 const shouldShowCollaboration = computed(() => {
   if (isCollaborationFeatureEnabled.value && !collaborationWsUrl.value) {
     console.warn(
-      "[Tiptap UI Kit] Collaboration feature enabled but VITE_COLLABORATION_WS_URL is not configured in .env",
+      "[yaniv-editor] Collaboration feature enabled but VITE_COLLABORATION_WS_URL is not configured in .env",
     );
     return false;
   }

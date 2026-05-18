@@ -1,5 +1,5 @@
 /**
- * Tiptap UI Kit
+ * yaniv-editor
  * Beautiful Tiptap 3 + Vue 3 rich-text editor theme
  */
 
@@ -36,4 +36,4 @@ export type {
 export * from "./composables";
 
 // Styles - users import separately:
-// import 'tiptap-ui-kit/style.css'
+// import 'yaniv-editor/style.css'

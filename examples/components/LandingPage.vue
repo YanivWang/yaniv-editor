@@ -14,14 +14,14 @@
             </defs>
             <rect x="10" y="10" width="80" height="80" rx="15" fill="url(#gradient)" />
             <text x="50" y="65" text-anchor="middle" fill="white" font-size="45" font-weight="bold">
-              T
+              Y
             </text>
           </svg>
         </div>
 
         <!-- Title -->
         <h1 class="hero__title">
-          <span class="gradient-text">Tiptap UI Kit</span>
+          <span class="gradient-text">YanivEditor</span>
         </h1>
 
         <!-- Subtitle -->
@@ -29,7 +29,7 @@
 
         <!-- Badges -->
         <div class="hero__badges">
-          <a href="https://github.com/benngaihk/Tiptap-UI-Kit" target="_blank" class="badge">
+          <a href="https://github.com/benngaihk/YanivEditor" target="_blank" class="badge">
             <svg class="badge__icon" viewBox="0 0 16 16" width="16" height="16">
               <path
                 fill="currentColor"
@@ -57,7 +57,7 @@
             </svg>
           </button>
           <a
-            href="https://github.com/benngaihk/Tiptap-UI-Kit"
+            href="https://github.com/benngaihk/YanivEditor"
             target="_blank"
             class="btn btn--secondary"
           >
@@ -100,7 +100,7 @@
 
     <!-- Features Section -->
     <section class="features">
-      <h2 class="section-title">Why Choose Tiptap UI Kit?</h2>
+      <h2 class="section-title">Why Choose YanivEditor?</h2>
 
       <div class="features-grid">
         <!-- Feature 1 -->
@@ -231,7 +231,7 @@
         <h2 class="cta__title">Ready to Start?</h2>
         <p class="cta__subtitle">Install via npm and start building amazing editors in minutes</p>
         <div class="cta__code">
-          <code>npm install benngaihk/Tiptap-UI-Kit</code>
+          <code>npm install benngaihk/YanivEditor</code>
           <button class="cta__copy" title="Copy to clipboard" @click="copyInstallCommand">
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path
@@ -257,11 +257,11 @@
     <footer class="footer">
       <p class="footer__text">Made with ❤️ by the open source community</p>
       <div class="footer__links">
-        <a href="https://github.com/benngaihk/Tiptap-UI-Kit" target="_blank">GitHub</a>
+        <a href="https://github.com/benngaihk/YanivEditor" target="_blank">GitHub</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/Tiptap-UI-Kit/issues" target="_blank">Issues</a>
+        <a href="https://github.com/benngaihk/YanivEditor/issues" target="_blank">Issues</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/Tiptap-UI-Kit/blob/main/LICENSE" target="_blank"
+        <a href="https://github.com/benngaihk/YanivEditor/blob/main/LICENSE" target="_blank"
           >MIT License</a
         >
       </div>
@@ -316,7 +316,7 @@ const themes = [
 ];
 
 const copyInstallCommand = () => {
-  navigator.clipboard.writeText("npm install benngaihk/Tiptap-UI-Kit");
+  navigator.clipboard.writeText("npm install benngaihk/YanivEditor");
   // Could add a toast notification here
 };
 </script>
