@@ -34,6 +34,9 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
+  server: {
+    port: 9527,
+  },
   // Build examples app, not library
   build: {
     // Keep examples browser targets aligned with the library build and CSS nesting usage.

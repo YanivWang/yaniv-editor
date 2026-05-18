@@ -36,6 +36,9 @@ export default defineConfig({
       "@": resolve(__dirname, "src"),
     },
   },
+  server: {
+    port: 9527,
+  },
   build: {
     // Modern browsers that support CSS nesting
     target: ["es2022", "chrome105", "safari16", "firefox110", "edge105"],
