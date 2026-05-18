@@ -17,7 +17,10 @@ export default defineConfig({
       strictOutput: false, // Don't fail on declaration errors
       skipDiagnostics: true, // Skip type diagnostics to avoid vue-types issue
       // Exclude files that use ant-design-vue Popover (causes vue-types path issues)
-      exclude: ["src/ai/shared/CustomAiPopover.vue", "src/ai/shared/AiSuggestionPopover.vue"],
+      exclude: [
+        "src/features/ai/shared/CustomAiPopover.vue",
+        "src/features/ai/shared/AiSuggestionPopover.vue",
+      ],
       beforeWriteFile: (filePath, content) => {
         // Filter out problematic type references
         return { filePath, content };
@@ -26,6 +29,10 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "@/editor": resolve(__dirname, "src/components/editor"),
+      "@/base": resolve(__dirname, "src/components/base"),
+      "@/tools": resolve(__dirname, "src/components/tools"),
+      "@/ai": resolve(__dirname, "src/features/ai"),
       "@": resolve(__dirname, "src"),
     },
   },

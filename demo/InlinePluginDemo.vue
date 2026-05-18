@@ -191,26 +191,21 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
-import { ref, computed, onMounted, onBeforeUnmount, reactive, watch } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, reactive } from "vue";
 
-import { FontSize } from "../src/extensions/fontSize";
-
-// Feature Components
 import {
   UndoRedoGroup,
   FontSizeDropdown,
   CodeBlockButton,
   LinkButton,
   FormatClearButton,
-} from "../src/features/advanced";
-import { AlignDropdown as AlignGroup } from "../src/features/basic/align";
-import { HeadingDropdown } from "../src/features/basic/heading";
-import { ListTools as ListGroup } from "../src/features/basic/list";
-import { TextFormatButtons as TextFormatGroup } from "../src/features/basic/text-format";
+} from "@/editor";
+import { AlignDropdown as AlignGroup } from "@/editor/align";
+import { HeadingDropdown } from "@/editor/heading";
+import { ListTools as ListGroup } from "@/editor/list";
+import { TextFormatButtons as TextFormatGroup } from "@/editor/text-format";
 
-// Icons
-
-// Styles
+import { FontSize } from "../src/extensions/fontSize";
 import "../src/styles/variables.css";
 import "../src/styles/base.css";
 import "../src/styles/toolbar.css";

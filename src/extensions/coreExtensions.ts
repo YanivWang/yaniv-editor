@@ -32,19 +32,19 @@ import {
   TranslationExtension,
   AiHighlightMark,
 } from "@/ai";
-import { MathExtension } from "@/extensions/math";
-import { SearchReplace } from "@/extensions/searchReplace";
-import { FormatPainter } from "@/features/advanced/format-painter";
-import { ResizableImage } from "@/features/basic/image";
 
 // import { CodeBlock } from '@tiptap/extension-code-block'
 
 import { FontSize } from "./fontSize";
+import { FormatPainter } from "./formatPainter";
 import { LineHeight } from "./lineHeight";
 import { ListShortcuts } from "./listShortcuts";
-import { OfficePaste, type OfficePasteOptions } from "./officePaste";
+import { MathExtension } from "./math";
+import { OfficePaste, type OfficePasteOptions } from "./office-paste";
 import { PasteImage } from "./pasteImage";
+import { ResizableImage } from "./resizableImage";
 import { resolveExtensionGates, type ResolvedExtensionGates } from "./resolveExtensionGates";
+import { SearchReplace } from "./search-replace";
 import { Video } from "./video";
 
 import type { AnyExtension } from "@tiptap/core";

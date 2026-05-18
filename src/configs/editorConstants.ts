@@ -210,7 +210,6 @@ export const UI_CONFIG = {
 } as const;
 
 /**
- * @note 所有类型定义已统一迁移到 shared/configs/toolbar.ts
- * 如需使用类型，请从 shared/configs/toolbar 导入
- * 此文件仅保留常量配置，类型定义已移除
+ * @note 此文件仅保留常量配置。
+ * 工具栏与菜单类型请从 `@/configs/toolbarTypes` 导入。
  */

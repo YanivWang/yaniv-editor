@@ -28,6 +28,14 @@
     /* Paths */
     "baseUrl": ".",
     "paths": {
+      "@/editor": ["src/components/editor"],
+      "@/editor/*": ["src/components/editor/*"],
+      "@/base": ["src/components/base"],
+      "@/base/*": ["src/components/base/*"],
+      "@/tools": ["src/components/tools"],
+      "@/tools/*": ["src/components/tools/*"],
+      "@/ai": ["src/features/ai"],
+      "@/ai/*": ["src/features/ai/*"],
       "@/*": ["src/*"],
       "vue-types": ["node_modules/vue-types"]
     },
@@ -36,5 +44,5 @@
     "types": ["vite/client", "node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "exclude": ["node_modules", "dist", "src/tools/collaboration"]
+  "exclude": ["node_modules", "dist"]
 }

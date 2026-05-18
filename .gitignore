@@ -47,6 +47,7 @@ coverage/
 # Lint / typecheck caches
 .eslintcache
 .stylelintcache
+eslint-report.json
 .pnpm-store/
 *.tsbuildinfo
 

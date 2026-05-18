@@ -6,7 +6,7 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 
-import { isOfficeHtml } from "@/extensions/officePaste/utils";
+import { isOfficeHtml } from "@/extensions/office-paste/utils";
 
 import type { EditorView } from "@tiptap/pm/view";
 

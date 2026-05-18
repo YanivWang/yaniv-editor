@@ -6,12 +6,12 @@
 // Core Editor
 export { default as TiptapProEditor } from "./core/TiptapProEditor.vue";
 export type * from "./core/editorTypes";
-export * from "./core/editorConfig";
+export * from "./configs/editorConfig";
 export {
   applyExtensionGatesToToolbarConfig,
   CAPABILITY_TO_GATE,
   type EditorCapabilityId,
-} from "./core/editorCapabilityMap";
+} from "./configs/editorCapabilityMap";
 
 // Themes
 export * from "./themes";
@@ -23,7 +23,7 @@ export * from "./locales";
 export * from "./adapters";
 
 // AI Module
-export * from "./ai";
+export * from "./features/ai";
 
 // Extension feature gates（高级接入：与编辑器 props 对齐）
 export { resolveExtensionGates } from "./extensions/resolveExtensionGates";

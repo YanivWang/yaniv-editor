@@ -104,20 +104,9 @@ import { Modal } from "ant-design-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
 import { useUserStore } from "@/adapters";
-import { applyExtensionGatesToToolbarConfig } from "@/core/editorCapabilityMap";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
-import {
-  A4_WIDTH_PX,
-  A4_HEIGHT_PX,
-  PAGE_PADDING_TOP_PX,
-  PAGE_PADDING_BOTTOM_PX,
-  PAGE_CONTENT_HEIGHT_PX,
-} from "@/extensions/pageConstants";
 // @vben/locales removed - using built-in i18n
-import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
-import { createI18n, useI18n as useTiptapI18n, type LocaleCode, t } from "@/locales";
-
-// 公共工具栏
+import { t } from "@/locales";
 import { CollaborationToggle, useCollaboration, normalizeContent } from "@/tools/collaboration";
 import {
   DragHandleMenu,
@@ -126,26 +115,17 @@ import {
 } from "@/tools/drag-handle-menu";
 import { FloatingMenu } from "@/tools/floating-menu";
 import { FooterNav } from "@/tools/footer-nav";
-import {
-  ToolbarNav,
-  BASIC_TOOLBAR_CONFIG,
-  ADVANCED_TOOLBAR_CONFIG,
-  type ToolbarToolsConfig,
-} from "@/tools/header-nav";
-
-// 功能模块组件
+import { ToolbarNav } from "@/tools/header-nav";
 import { ImageToolbar } from "@/tools/image-toolbar";
 import { LinkBubbleMenu } from "@/tools/link-bubble";
 import { SlashCommandMenu, SlashCommandExtension } from "@/tools/slash-command";
 import type { SlashCommandState } from "@/tools/slash-command";
 import { TableToolbar } from "@/tools/table-toolbar";
-
-// 协作编辑模块（统一从 collaboration 模块导入）
-
-// 用户信息获取
-
-// 扩展配置（根据版本动态加载）
 import { validateTiptapProEditorProps } from "@/utils/validateEditorProps";
+
+import { useEditorFeatures } from "./useEditorFeatures";
+import { useEditorI18n } from "./useEditorI18n";
+import { useEditorPagination } from "./useEditorPagination";
 
 import type { TiptapProEditorProps } from "./editorTypes";
 
@@ -194,8 +174,8 @@ type SlashCommandMenuInstance = {
 
 const dragHandleMenuRef = ref<DragHandleMenuInstance | null>(null);
 const slashCommandMenuRef = ref<SlashCommandMenuInstance | null>(null);
-const totalPages = ref(1);
-const zoomLevel = ref(100);
+const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
+  useEditorPagination(containerRef);
 const isFirstInit = ref(true);
 const isInitializing = ref(false);
 
@@ -251,22 +231,18 @@ watch(
   { immediate: true },
 );
 
-/**
- * 获取功能配置值
- */
-const getFeatureConfig = (featureName: "headerNav" | "footerNav" | "collaboration"): boolean => {
-  if (props.features?.[featureName] !== undefined) {
-    return props.features[featureName];
-  }
-  if (props.versionConfig?.features?.[featureName] !== undefined) {
-    return props.versionConfig.features[featureName];
-  }
-  return false;
-};
+const disableCollaborativeHistory = computed(
+  () => isCollaborationAvailable.value && collaboration.collaboratorsCount.value > 1,
+);
 
-// ===== 功能显示控制 =====
-const shouldShowHeaderNav = computed(() => getFeatureConfig("headerNav"));
-const shouldShowFooterNav = computed(() => getFeatureConfig("footerNav"));
+const {
+  getFeatureConfig,
+  shouldShowHeaderNav,
+  shouldShowFooterNav,
+  resolvedExtensionGates,
+  toolbarConfig,
+  showStatusShortcutHints,
+} = useEditorFeatures(props, disableCollaborativeHistory);
 
 // 协作功能需要环境变量配置 VITE_COLLABORATION_WS_URL
 const collaborationWsUrl = computed(() => import.meta.env?.VITE_COLLABORATION_WS_URL || "");
@@ -321,107 +297,8 @@ watch(
   },
 );
 
-/** 与 props 对齐的扩展门控（table/image/math/ai/formatPainter） */
-const resolvedExtensionGates = computed(() =>
-  resolveExtensionGates({
-    version: props.version,
-    features: props.features,
-    versionConfig: props.versionConfig,
-  }),
-);
-
-// ===== 工具栏配置 =====
-const toolbarConfig = computed<ToolbarToolsConfig>(() => {
-  // 协作模式下，两人及以上时禁用撤销/重做和格式刷按钮
-  // 单人时不禁用，保持正常使用体验
-  const disableUndoRedo =
-    isCollaborationAvailable.value && collaboration.collaboratorsCount.value > 1;
-
-  let base: ToolbarToolsConfig;
-  switch (props.version) {
-    case "advanced":
-    case "premium":
-      base = {
-        ...ADVANCED_TOOLBAR_CONFIG,
-        codeBlock: true,
-        link: true,
-        table: true,
-        font: true,
-        lineHeight: true,
-        clearFormat: true,
-        undoRedo: true,
-        undoRedoDisabled: disableUndoRedo,
-        subscriptSuperscript: true,
-        formatPainter: true,
-        formatPainterDisabled: disableUndoRedo,
-      };
-      break;
-    case "basic":
-    default:
-      base = {
-        ...BASIC_TOOLBAR_CONFIG,
-        undoRedo: true,
-        undoRedoDisabled: disableUndoRedo,
-      };
-  }
-
-  return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);
-});
-
-/** 底部状态栏：常用快捷键提示（类 Word 辅助反馈） */
-const showStatusShortcutHints = computed(() => props.features?.statusShortcutHints !== false);
-
 // ===== 国际化 =====
-// Use locale from props instead of @vben/locales
-const currentLocale = computed(() => props.locale || "zh-CN");
-
-const mapLocaleToTiptapLocale = (locale: string): LocaleCode => {
-  const localeMap: Record<string, LocaleCode> = {
-    "zh-CN": "zh-CN",
-    "zh-TW": "zh-TW",
-    "zh-HK": "zh-TW",
-    "en-US": "en-US",
-    en: "en-US",
-  };
-  if (localeMap[locale]) return localeMap[locale];
-  if (locale.startsWith("zh"))
-    return locale.includes("TW") || locale.includes("HK") ? "zh-TW" : "zh-CN";
-  if (locale.startsWith("en")) return "en-US";
-  return "zh-CN";
-};
-
-const initTiptapI18n = () => {
-  const tiptapLocale = mapLocaleToTiptapLocale(currentLocale.value);
-  createI18n({ locale: tiptapLocale, fallbackLocale: "en-US" });
-};
-
-initTiptapI18n();
-
-watch(
-  () => currentLocale.value,
-  (newLocale) => {
-    const tiptapLocale = mapLocaleToTiptapLocale(newLocale);
-    const tiptapI18n = useTiptapI18n();
-    tiptapI18n.setLocale(tiptapLocale);
-  },
-  { immediate: false },
-);
-
-// ===== 页面计算 =====
-const calculatePages = () => {
-  nextTick(() => {
-    const proseMirrorEl = containerRef.value?.querySelector(".ProseMirror");
-    if (!proseMirrorEl) return;
-
-    const style = getComputedStyle(proseMirrorEl);
-    const paddingTop = parseFloat(style.paddingTop) || 0;
-    const paddingBottom = parseFloat(style.paddingBottom) || 0;
-    const contentHeight = proseMirrorEl.scrollHeight - (paddingTop + paddingBottom);
-    const pageContentHeight = A4_HEIGHT_PX - (paddingTop + paddingBottom);
-    const pages = Math.ceil(contentHeight / pageContentHeight);
-    totalPages.value = Math.max(pages, 1);
-  });
-};
+useEditorI18n(props);
 
 // ===== 编辑器内容管理 =====
 const getEditorContent = () => {
@@ -559,16 +436,7 @@ const initEditor = async () => {
       collaboration.setEditor(editor.value);
     }
 
-    // 初始化 CSS 变量
-    if (containerRef.value) {
-      containerRef.value.style.setProperty("--a4-width-px", `${A4_WIDTH_PX}px`);
-      containerRef.value.style.setProperty("--padding-top-px", `${PAGE_PADDING_TOP_PX}px`);
-      containerRef.value.style.setProperty("--padding-bottom-px", `${PAGE_PADDING_BOTTOM_PX}px`);
-      containerRef.value.style.setProperty(
-        "--page-content-height-px",
-        `${PAGE_CONTENT_HEIGHT_PX}px`,
-      );
-    }
+    initPageCssVariables();
 
     calculatePages();
   } catch (error) {

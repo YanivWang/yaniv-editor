@@ -282,7 +282,7 @@ const demoScript: DemoStep[] = [
   { action: "addLine", line: { html: "", class: "line-code", tag: "pre" } },
   {
     action: "type",
-    text: '<span class="code-kw">import</span> { TiptapEditor } <span class="code-kw">from</span> <span class="code-str">\'tiptap-ui-kit\'</span>',
+    text: '<span class="code-kw">import</span> { TiptapProEditor } <span class="code-kw">from</span> <span class="code-str">\'tiptap-ui-kit\'</span>',
     lineIndex: 7,
     duration: 25,
   },

@@ -124,7 +124,12 @@
 import { theme as antTheme } from "ant-design-vue";
 import { ref, computed, watch, onMounted } from "vue";
 
-import { PRESET_CONFIGS } from "../src/core/editorConfig";
+import {
+  DeviceSwitcher,
+  DeviceFrame,
+  type Orientation,
+} from "../src/components/tools/device-switcher";
+import { PRESET_CONFIGS } from "../src/configs/editorConfig";
 import TiptapProEditor from "../src/core/TiptapProEditor.vue";
 import { createI18n, type LocaleCode } from "../src/locales";
 import {
@@ -134,13 +139,12 @@ import {
   type DeviceView,
   THEME_PRESETS,
 } from "../src/themes";
-import { DeviceSwitcher, DeviceFrame, type Orientation } from "../src/tools/device-switcher";
 
 import EditorAutoDemo from "./EditorAutoDemo.vue";
 import InlinePluginDemo from "./InlinePluginDemo.vue";
 import LandingPage from "./LandingPage.vue";
 
-import type { FeatureFlags, ThemePreset } from "../src/core/editorConfig";
+import type { FeatureFlags, ThemePreset } from "../src/configs/editorConfig";
 import type { Editor } from "@tiptap/vue-3";
 
 // 导入主题预设 CSS

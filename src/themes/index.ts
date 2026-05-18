@@ -3,7 +3,7 @@
  * API for theme switching and customization
  */
 
-import type { ThemeMode, ThemePreset } from "@/core/editorConfig";
+import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 
 /** Current theme state */
 let currentPreset: ThemePreset = "default";
