@@ -155,6 +155,7 @@ import { ColorPicker } from "@/editor/color";
 import FindReplaceButton from "@/editor/find-replace/FindReplaceButton.vue";
 import { FontFamilySelect, FontSizeSelect } from "@/editor/font";
 import { ClearFormatButton } from "@/editor/format-clear";
+import { FormatPainterButton } from "@/editor/format-painter";
 import { GalleryButton } from "@/editor/gallery";
 import { HeadingDropdown } from "@/editor/heading";
 import { ImageUpload } from "@/editor/image";

@@ -385,7 +385,9 @@ onMounted(() => {
   editor.value = new Editor({
     content: inlineContent,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        underline: false,
+      }),
       Underline,
       TextStyle,
       FontSize,

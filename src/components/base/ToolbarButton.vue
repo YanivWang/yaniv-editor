@@ -8,6 +8,7 @@
       ]"
       :disabled="disabled"
       type="button"
+      @mousedown.prevent
       @click="onClick"
       @dblclick="onDblClick"
     >
