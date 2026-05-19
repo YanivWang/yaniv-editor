@@ -3,7 +3,10 @@
  * Provides AI streaming capabilities using user configuration or environment variables
  */
 
+import { getProviderInfo } from "@/ai/config/types";
 import { getAiRequestConfig } from "@/ai/config/useAiConfig";
+import { createAiAdapter } from "@/ai/factory";
+import type { AiMessage, AiProvider } from "@/ai/types";
 
 // AI Callback interface used by the extensions
 export interface AiStreamCallback {
@@ -28,12 +31,19 @@ export function normalizeAiError(error: unknown): Error {
   return new Error("AI 请求失败");
 }
 
+interface ResolvedAiConfig {
+  provider: AiProvider;
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+  timeout: number;
+}
+
 /**
  * Load API configuration
  * Priority: User config > Environment variables > Defaults
  */
-function getAiConfig() {
-  // First check user config (localStorage)
+function getAiConfig(): ResolvedAiConfig {
   const userConfig = getAiRequestConfig();
   if (userConfig) {
     return {
@@ -45,10 +55,11 @@ function getAiConfig() {
     };
   }
 
-  // Fall back to environment variables
   const env = import.meta.env || {};
+  const provider = (env.VITE_AI_PROVIDER || "openai") as AiProvider;
+
   return {
-    provider: env.VITE_AI_PROVIDER || "openai",
+    provider,
     apiKey: env.VITE_AI_API_KEY || "",
     baseUrl: env.VITE_AI_BASE_URL || "",
     model: env.VITE_AI_MODEL || "gpt-4o-mini",
@@ -56,16 +67,20 @@ function getAiConfig() {
   };
 }
 
-// Get base URL for provider
-function getBaseUrl(provider: string, customUrl: string): string {
-  if (customUrl) return customUrl;
-  const urls: Record<string, string> = {
-    openai: "https://api.openai.com/v1",
-    aliyun: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    deepseek: "https://api.deepseek.com/v1",
-    ollama: "http://localhost:11434/api",
-  };
-  return urls[provider] || urls.openai;
+/** 是否已配置可用的 AI（Ollama 等无需 API Key 的提供商单独判断） */
+function isAiConfigured(config: ResolvedAiConfig): boolean {
+  const providerInfo = getProviderInfo(config.provider);
+  if (!providerInfo) return false;
+
+  if (providerInfo.requiresApiKey) {
+    return Boolean(config.apiKey?.trim());
+  }
+
+  if (config.provider === "ollama" || config.provider === "custom") {
+    return Boolean(config.baseUrl?.trim());
+  }
+
+  return true;
 }
 
 // Default timeout for AI requests (60 seconds)
@@ -132,7 +147,7 @@ async function simulateAiStream(
 }
 
 /**
- * Send streaming request to AI provider with timeout control
+ * Send streaming request via configured adapter, or demo stream when unconfigured
  */
 async function sendStreamingRequest(
   prompt: string,
@@ -142,8 +157,7 @@ async function sendStreamingRequest(
 ): Promise<void> {
   const config = getAiConfig();
 
-  // If no API key configured, show demo/simulation instead of error
-  if (!config.apiKey) {
+  if (!isAiConfigured(config)) {
     await simulateAiStream(callback, demoType || "custom");
     return;
   }
@@ -153,119 +167,27 @@ async function sendStreamingRequest(
     return;
   }
 
-  const baseUrl = getBaseUrl(config.provider, config.baseUrl);
-  const timeout = config.timeout || DEFAULT_TIMEOUT;
+  const messages: AiMessage[] = [
+    { role: "system", content: prompt },
+    { role: "user", content },
+  ];
 
-  const controller = new AbortController();
-  let abortedByTimeout = false;
-  const timeoutId = setTimeout(() => {
-    abortedByTimeout = true;
-    controller.abort();
-  }, timeout);
-
-  const externalSignal = callback.signal;
-  const onExternalAbort = () => controller.abort();
-  if (externalSignal) {
-    if (externalSignal.aborted) {
-      clearTimeout(timeoutId);
-      callback.onStop?.();
-      return;
-    }
-    externalSignal.addEventListener("abort", onExternalAbort, { once: true });
-  }
-
-  let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+  const adapter = createAiAdapter({
+    provider: config.provider,
+    apiKey: config.apiKey,
+    baseUrl: config.baseUrl,
+    model: config.model,
+  });
 
   try {
-    callback.onStart?.();
-
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages: [
-          { role: "system", content: prompt },
-          { role: "user", content },
-        ],
-        stream: true,
-      }),
-      signal: controller.signal,
+    await adapter.chatStream(messages, {
+      onStart: () => callback.onStart?.(),
+      onToken: (token) => callback.onMessage?.({ content: token }),
+      onComplete: () => callback.onStop?.(),
+      onError: (error) => callback.onError?.(normalizeAiError(error)),
     });
-
-    if (!response.ok) {
-      let detail = "";
-      try {
-        detail = (await response.text()).slice(0, 400);
-      } catch {
-        // ignore
-      }
-      throw new Error(
-        detail
-          ? `AI 接口错误 (${response.status})：${detail}`
-          : `AI 接口错误：HTTP ${response.status} ${response.statusText}`,
-      );
-    }
-
-    reader = response.body?.getReader() ?? null;
-    if (!reader) {
-      throw new Error("响应体为空，无法读取流式内容");
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        if (!line.trim() || !line.startsWith("data: ")) continue;
-        const data = line.slice(6);
-        if (data === "[DONE]") continue;
-
-        try {
-          const parsed = JSON.parse(data);
-          const messageContent = parsed.choices?.[0]?.delta?.content;
-          if (messageContent) {
-            callback.onMessage?.({ content: messageContent });
-          }
-        } catch {
-          // Skip invalid JSON
-        }
-      }
-    }
-
-    callback.onStop?.();
   } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      if (abortedByTimeout) {
-        callback.onError?.(new Error("AI 请求超时，请稍后重试。"));
-      } else {
-        callback.onStop?.();
-      }
-    } else {
-      callback.onError?.(normalizeAiError(error));
-    }
-  } finally {
-    clearTimeout(timeoutId);
-    if (externalSignal) {
-      externalSignal.removeEventListener("abort", onExternalAbort);
-    }
-    if (reader) {
-      try {
-        await reader.cancel();
-      } catch {
-        // Ignore cancel errors
-      }
-    }
+    callback.onError?.(normalizeAiError(error));
   }
 }
 

@@ -24,7 +24,7 @@
             :key="item.key + ':with-children'"
           >
             <div class="ai-menu-translate-split" @mouseenter="onRowEnter" @mouseleave="onRowLeave">
-              <span class="ai-menu-translate-split__main" @click.stop="onTranslateDefault(item)">
+              <span class="ai-menu-translate-split__main" @click.stop="onTranslateDefault()">
                 <component :is="item.icon" v-if="item.icon" class="ai-menu-item__icon" />
                 <span class="ai-menu-item__label">{{ item.label }}</span>
               </span>
@@ -81,6 +81,8 @@
       </a-menu>
     </template>
   </a-dropdown>
+
+  <AiSettingsModal v-model:open="showSettings" />
 </template>
 
 <script setup lang="ts">
@@ -92,12 +94,14 @@ import {
   FileTextOutlined,
   BulbOutlined,
   TranslationOutlined,
+  SettingOutlined,
 } from "@ant-design/icons-vue";
 import { Tooltip as ATooltip } from "ant-design-vue";
 import { ref, computed, nextTick } from "vue";
 
 import { t } from "@/locales";
 
+import AiSettingsModal from "./components/AiSettingsModal.vue";
 import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./translation";
 
 import type { Editor } from "@tiptap/core";
@@ -116,6 +120,7 @@ export interface MenuItemConfig {
 
 // 下拉菜单打开状态（用于控制 Tooltip 显示）
 const dropdownOpen = ref(false);
+const showSettings = ref(false);
 
 interface Props {
   editor: Editor;
@@ -197,42 +202,95 @@ function findItemByKey(items: MenuItemConfig[], key: string): MenuItemConfig | u
   return undefined;
 }
 
-function onMenuClick(info: { key: string }) {
-  const item = findItemByKey(menuItems.value, info.key);
-  if (!item) return;
+/** 菜单关闭后恢复选区并在同一 chain 中执行命令，避免 mismatched transaction */
+function runAiCommandAfterMenuClose(
+  run: (editor: Editor, selection: { from: number; to: number }) => void,
+) {
+  const { editor } = props;
+  if (!editor) return;
 
-  // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
-  // 使用 requestAnimationFrame 确保在下一个渲染周期执行，避免与菜单关闭动画冲突
+  const selection = { from: editor.state.selection.from, to: editor.state.selection.to };
+
   nextTick(() => {
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        try {
-          item.action?.();
-        } catch (error) {
-          console.error("[AI Menu] Error executing command:", error);
-        }
-      }, 50); // 短暂延迟，确保菜单完全关闭
+      try {
+        run(editor, selection);
+      } catch (error) {
+        console.error("[AI Menu] Error executing command:", error);
+      }
     });
   });
 }
 
-function onTranslateDefault(item: MenuItemConfig) {
+function runEditorAiChain(
+  editor: Editor,
+  selection: { from: number; to: number },
+  command: "continueWriting" | "polish" | "summarize" | "customAi" | "translate",
+  targetLang?: string,
+) {
+  const chain = editor.chain().focus().setTextSelection(selection);
+
+  switch (command) {
+    case "continueWriting":
+      (chain as any).continueWriting().run();
+      break;
+    case "polish":
+      (chain as any).polish().run();
+      break;
+    case "summarize":
+      (chain as any).summarize().run();
+      break;
+    case "customAi":
+      (chain as any).customAi().run();
+      break;
+    case "translate":
+      (chain as any).translate(targetLang).run();
+      break;
+  }
+}
+
+function onMenuClick(info: { key: string }) {
+  if (info.key === "settings") {
+    showSettings.value = true;
+    return;
+  }
+
+  if (info.key.startsWith("translate-")) {
+    const child = findItemByKey(menuItems.value, info.key);
+    if (!child) return;
+    runAiCommandAfterMenuClose((editor, selection) => {
+      const lang = LANGUAGE_CODES.find((l) => `translate-${l.code}` === info.key);
+      if (lang) {
+        setTranslateLang(t(`editor.lang.${lang.key}`));
+      }
+      runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "英文");
+    });
+    return;
+  }
+
+  const commandMap: Record<string, "continueWriting" | "polish" | "summarize" | "customAi"> = {
+    continueWriting: "continueWriting",
+    polish: "polish",
+    summarize: "summarize",
+    customAi: "customAi",
+  };
+
+  const command = commandMap[info.key];
+  if (!command) return;
+
+  runAiCommandAfterMenuClose((editor, selection) => {
+    runEditorAiChain(editor, selection, command);
+  });
+}
+
+function onTranslateDefault() {
   if (!hasSelectedLang.value) {
     overlayOpen.value = true;
     return;
   }
 
-  // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
-  nextTick(() => {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        try {
-          item.action?.();
-        } catch (error) {
-          console.error("[AI Menu] Error executing translate:", error);
-        }
-      }, 50);
-    });
+  runAiCommandAfterMenuClose((editor, selection) => {
+    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "英文");
   });
 }
 
@@ -240,17 +298,12 @@ function onTranslateLangClick(info: { key: string }) {
   const child = findItemByKey(menuItems.value, info.key);
   if (!child) return;
 
-  // 延迟执行，确保菜单关闭后再执行命令，避免事务冲突
-  nextTick(() => {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        try {
-          child.action?.();
-        } catch (error) {
-          console.error("[AI Menu] Error executing translate:", error);
-        }
-      }, 50);
-    });
+  runAiCommandAfterMenuClose((editor, selection) => {
+    const lang = LANGUAGE_CODES.find((l) => `translate-${l.code}` === info.key);
+    if (lang) {
+      setTranslateLang(t(`editor.lang.${lang.key}`));
+    }
+    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "英文");
   });
 }
 
@@ -526,6 +579,16 @@ const menuItems = computed(() => {
           danger: false,
         };
       }),
+    },
+    {
+      key: "settings",
+      label: t("aiSettings.title"),
+      icon: SettingOutlined,
+      action: () => {
+        showSettings.value = true;
+      },
+      disabled: false,
+      danger: false,
     },
   ] as MenuItemConfig[];
 });

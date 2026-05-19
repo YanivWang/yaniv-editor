@@ -50,12 +50,20 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
           const { selection } = state;
           const { from, to } = selection;
 
-          // Get selected text
-          const selectedText = state.doc.textBetween(from, to, " ");
+          let selectedText = state.doc.textBetween(from, to, " ");
+          let contextRange = { from, to };
+          let insertPosition = to;
+
+          // 无选区时：使用当前段落作为续写上下文（光标处续写）
+          if (!selectedText.trim() && from === to) {
+            const blockStart = selection.$from.start();
+            selectedText = state.doc.textBetween(blockStart, from, " ").trim();
+            contextRange = { from: blockStart, to: from };
+            insertPosition = from;
+          }
 
           if (!selectedText.trim()) {
-            console.warn("[Continue Writing] No text selected");
-            // 显示用户友好的提示
+            console.warn("[Continue Writing] No text to continue from");
             notification.warning({
               message: t("editor.pleaseSelectText"),
               description: t("editor.continueWritingRequiresSelection"),
@@ -65,25 +73,18 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             return false;
           }
 
-          // Save the original selected text range for highlighting
-          const originalSelectedRange = { from, to };
+          const originalSelection = { from: insertPosition, to: insertPosition };
 
-          // For continue writing, we insert after the selection
-          // So we use the 'to' position as the start
-          const originalSelection = { from: to, to };
-
-          // Get full document context
           const fullText = state.doc.textBetween(0, state.doc.content.size, " ");
           const sysPrompt = `以下係完整嘅文件內容:\n\n${fullText}`;
 
-          // Perform AI continue writing
           performContinueWriting(
             editor,
             selectedText,
             sysPrompt,
             originalSelection,
-            to,
-            originalSelectedRange,
+            insertPosition,
+            contextRange,
           );
 
           return true;

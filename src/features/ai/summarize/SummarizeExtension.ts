@@ -28,11 +28,18 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
         ({ state, editor }) => {
           const { selection } = state;
           const { from, to } = selection;
-          const selectedText = state.doc.textBetween(from, to, " ");
+          let selectedText = state.doc.textBetween(from, to, " ");
+          let summaryRange = { from, to };
+
+          // 无选区时总结全文
+          if (!selectedText.trim()) {
+            const docSize = state.doc.content.size;
+            selectedText = state.doc.textBetween(0, docSize, " ").trim();
+            summaryRange = { from: 0, to: docSize };
+          }
 
           if (!selectedText.trim()) {
-            console.warn("[Summarize] No text selected");
-            // 显示用户友好的提示
+            console.warn("[Summarize] No text to summarize");
             notification.warning({
               message: t("editor.pleaseSelectText"),
               description: t("editor.summarizeRequiresSelection"),
@@ -42,7 +49,7 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
             return false;
           }
 
-          performSummarize(editor, selectedText, { from, to });
+          performSummarize(editor, selectedText, summaryRange);
           return true;
         },
     };

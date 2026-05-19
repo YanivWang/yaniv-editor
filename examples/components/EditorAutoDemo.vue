@@ -204,9 +204,11 @@ const ICON_MAP: Record<string, string> = {
  * 查找工具栏按钮 (支持直接按钮 + 下拉按钮 + AI 按钮)
  */
 function findToolbarButton(id: string): HTMLElement | null {
-  // AI 按钮
+  // AI 按钮（兼容 AiMenuButton 与 AiToolbarMenu）
   if (id === "ai") {
-    return document.querySelector(".ai-toolbar-trigger");
+    return (
+      document.querySelector(".ai-menu-button") || document.querySelector(".ai-toolbar-trigger")
+    );
   }
 
   // Heading 按钮: 按 data-level 或文本内容
