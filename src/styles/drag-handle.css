@@ -66,6 +66,17 @@
   background: #a3a3a3;
 }
 
+/* ===== 拖动拖影（Drag Image） ===== */
+.drag-handle__drag-image {
+  position: fixed;
+  top: -10000px;
+  left: 0;
+  margin: 0;
+  pointer-events: none;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 /* ===== 拖动定位线（Dropcursor） ===== */
 .prosemirror-dropcursor-block {
   box-sizing: border-box;

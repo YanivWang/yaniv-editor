@@ -210,6 +210,68 @@ function serializeDragData(view: EditorView, selection: NodeSelection): string {
   return container.innerHTML;
 }
 
+const DRAG_IMAGE_STYLE_PROPS = [
+  "font-family",
+  "font-size",
+  "font-weight",
+  "font-style",
+  "line-height",
+  "letter-spacing",
+  "color",
+  "text-align",
+  "text-decoration",
+  "text-transform",
+  "padding",
+  "border",
+  "border-radius",
+  "background",
+  "background-color",
+  "list-style-type",
+  "list-style-position",
+  "white-space",
+  "width",
+  "height",
+  "max-width",
+  "max-height",
+  "object-fit",
+] as const;
+
+function copyComputedStyles(source: Element, clone: Element): void {
+  if (!(source instanceof HTMLElement) || !(clone instanceof HTMLElement)) {
+    return;
+  }
+
+  const computed = window.getComputedStyle(source);
+  for (const prop of DRAG_IMAGE_STYLE_PROPS) {
+    clone.style.setProperty(prop, computed.getPropertyValue(prop));
+  }
+
+  clone.style.margin = "0";
+  clone.style.boxShadow = "none";
+
+  const sourceChildren = source.children;
+  const cloneChildren = clone.children;
+  for (let index = 0; index < sourceChildren.length; index += 1) {
+    copyComputedStyles(sourceChildren[index], cloneChildren[index]);
+  }
+}
+
+function createTransparentDragImage(source: HTMLElement): HTMLElement {
+  const rect = source.getBoundingClientRect();
+  const dragImage = source.cloneNode(true) as HTMLElement;
+
+  copyComputedStyles(source, dragImage);
+
+  dragImage.classList.add("drag-handle__drag-image");
+  dragImage.style.width = `${rect.width}px`;
+  dragImage.style.background = "transparent";
+  dragImage.style.backgroundColor = "transparent";
+  dragImage.style.boxShadow = "none";
+
+  document.body.appendChild(dragImage);
+  return dragImage;
+}
+
 export const DragHandleExtension = Extension.create({
   name: "dragHandle",
 
@@ -287,6 +349,8 @@ export const DragHandleExtension = Extension.create({
             }
 
             const selection = NodeSelection.create(view.state.doc, currentTarget.pos);
+            const targetRect = currentTarget.dom.getBoundingClientRect();
+            const dragImage = createTransparentDragImage(currentTarget.dom);
 
             setDraggingState(true);
             view.dragging = {
@@ -301,10 +365,8 @@ export const DragHandleExtension = Extension.create({
             event.dataTransfer.setData("text/html", serializeDragData(view, selection));
             event.dataTransfer.setData("text/plain", currentTarget.node.textContent);
             event.dataTransfer.effectAllowed = "move";
-
-            const targetRect = currentTarget.dom.getBoundingClientRect();
             event.dataTransfer.setDragImage(
-              currentTarget.dom,
+              dragImage,
               Math.min(24, targetRect.width / 2),
               Math.min(24, targetRect.height / 2),
             );
@@ -313,6 +375,9 @@ export const DragHandleExtension = Extension.create({
           handle.addEventListener("dragend", () => {
             setDraggingState(false);
             handle.classList.remove("is-dragging");
+            document.querySelectorAll(".drag-handle__drag-image").forEach((element) => {
+              element.remove();
+            });
             hideHandle();
           });
 
