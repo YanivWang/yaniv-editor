@@ -55,14 +55,28 @@
 /**
  * EditorAutoDemo - 增强版编辑器自动化演示
  * @description 结合 page-agent 的动画光标 + Maestro 的声明式动作，
- *              模拟真实用户操作编辑器，展示所有特色功能（含 AI 写作演示）
+ *              模拟真实用户操作编辑器，展示特色功能（P0/P1/P2：排版、媒体、AI、查找、格式刷、大纲、斜杠、浮动菜单、拖拽、缩放等）
  */
 import { ref, computed, nextTick, onBeforeUnmount } from "vue";
 
-import type { Editor } from "@tiptap/core";
+import {
+  builtinTemplates,
+  normalizeTemplateHtml,
+} from "../../src/components/editor/template/templates";
+import { exportToWord } from "../../src/components/editor/word/wordExport";
+
+import type { Editor as TiptapEditor } from "@tiptap/core";
+
+/**
+ * 演示脚本用的编辑器类型。
+ * YanivEditor 在运行时注册了 StarterKit / 扩展命令，但 @tiptap/core 默认的 SingleCommands 未包含它们。
+ */
+type DemoEditor = Omit<TiptapEditor, "commands"> & {
+  commands: Record<string, (...args: unknown[]) => boolean>;
+};
 
 interface Props {
-  getEditor: () => Editor | null;
+  getEditor: () => DemoEditor | null;
   visible?: boolean;
   typingSpeed?: number;
   playLabel?: string;
@@ -122,6 +136,45 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
 
 async function pause(ms: number, signal: AbortSignal) {
   await delay(ms, signal);
+}
+
+/** 安全执行编辑器命令，避免单次失败中断整段演示 */
+function safeEditorRun(fn: () => unknown): boolean {
+  try {
+    fn();
+    return true;
+  } catch (error) {
+    console.warn("[EditorAutoDemo] Editor command skipped:", error);
+    return false;
+  }
+}
+
+/** 基于当前文档状态创建 chain，避免 stale transaction */
+function runEditorChain(
+  editor: DemoEditor,
+  build: (chain: ReturnType<DemoEditor["chain"]>) => ReturnType<DemoEditor["chain"]>,
+) {
+  return safeEditorRun(() => {
+    build(editor.chain().focus()).run();
+  });
+}
+
+/** 等待 ProseMirror / 格式刷等插件处理完异步选区变更 */
+async function settleEditor(signal: AbortSignal) {
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+  await pause(50, signal);
+}
+
+/** 分节执行：单节失败不阻断后续图片、AI 等演示 */
+async function runDemoSection(label: string, signal: AbortSignal, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") throw error;
+    console.warn(`[EditorAutoDemo] Section "${label}" skipped:`, error);
+  }
 }
 
 // ===== 光标动画引擎 =====
@@ -189,16 +242,70 @@ const ICON_MAP: Record<string, string> = {
   strike: "strikethrough",
   orderedList: "ordered-list",
   bulletList: "unordered-list",
+  taskList: "check-square",
   code: "code",
   undo: "undo",
   redo: "redo",
   link: "link",
+  picture: "picture",
+  textColor: "font-colors",
+  highlight: "highlight",
   table: "table",
   superscript: "sort-descending",
   subscript: "sort-ascending",
   heading: "font-size",
+  findReplace: "search",
+  formatPainter: "format-painter",
+  outline: "apartment",
   math: "function",
+  word: "file-word",
+  template: "snippets",
+  gallery: "appstore",
+  video: "video-camera",
 };
+
+const SLASH_COMMAND_LABELS: Record<string, string[]> = {
+  codeBlock: ["Code Block", "代码块"],
+  table: ["Table", "表格"],
+  blockquote: ["Blockquote", "引用"],
+};
+
+const ALIGN_MENU_LABELS: Record<string, string[]> = {
+  right: ["Align Right", "右对齐"],
+  justify: ["Justify", "两端对齐", "两端"],
+};
+
+const CODE_DROPDOWN_LABELS: Record<string, string[]> = {
+  inlineCode: ["Inline Code", "行内代码"],
+};
+
+const DEMO_LINK_URL = "https://github.com/YanivWang/yaniv-editor";
+const DEMO_IMAGE_URL = "https://picsum.photos/seed/yaniv-editor-demo/520/180";
+const DEMO_VIDEO_URL = "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+const DEMO_WORD_IMPORT_HTML =
+  "<h3>Imported from Word</h3><p>Sample content converted from <strong>.docx</strong> (mammoth).</p>";
+
+const WORD_MENU_LABELS: Record<string, string[]> = {
+  import: ["Import Word", "导入 Word", "导入"],
+  export: ["Export Word", "导出 Word", "导出"],
+};
+
+const MATH_MENU_LABELS: Record<string, string[]> = {
+  inline: ["Inline Formula", "行内公式", "Inline"],
+  block: ["Block Formula", "块级公式", "Block"],
+};
+
+const AI_MENU_LABELS: Record<string, string[]> = {
+  polish: ["Polish", "润色"],
+  summarize: ["Summarize", "摘要"],
+  translate: ["Translate", "翻译"],
+  continueWriting: ["Continue Writing", "续写"],
+};
+
+interface TapOptions {
+  /** 触发原生 click（用于打开下拉、Popover 等） */
+  click?: boolean;
+}
 
 /**
  * 查找工具栏按钮 (支持直接按钮 + 下拉按钮 + AI 按钮)
@@ -247,6 +354,38 @@ function findToolbarButton(id: string): HTMLElement | null {
   return document.querySelector(id);
 }
 
+function findToolbarControl(id: string): HTMLElement | null {
+  if (id === "fontFamily") {
+    return document.querySelector(".font-family-select .ant-select-selector");
+  }
+  if (id === "fontSize") {
+    return document.querySelector(".font-size-select .ant-select-selector");
+  }
+  return findToolbarButton(id);
+}
+
+function findSlashCommandItem(itemId: string): HTMLElement | null {
+  const labels = SLASH_COMMAND_LABELS[itemId] ?? [];
+  for (const btn of document.querySelectorAll(".slash-command-item")) {
+    const title = btn.querySelector(".slash-command-item-title")?.textContent?.trim() ?? "";
+    if (labels.some((label) => title.includes(label))) {
+      return btn as HTMLElement;
+    }
+  }
+  return null;
+}
+
+function findTableBubbleButton(toolName: "addRowAfter" | "mergeCells"): HTMLElement | null {
+  const menu = document.querySelector(".table-bubble-menu");
+  if (!menu) return null;
+  const buttons = menu.querySelectorAll(".table-menu-btn");
+  const indexMap: Record<typeof toolName, number> = {
+    addRowAfter: 1,
+    mergeCells: 6,
+  };
+  return (buttons[indexMap[toolName]] as HTMLElement) ?? null;
+}
+
 function getCenter(el: HTMLElement): { x: number; y: number } {
   const rect = el.getBoundingClientRect();
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -257,7 +396,10 @@ function getCenter(el: HTMLElement): { x: number; y: number } {
 /**
  * 在文档中查找文本的最后一次出现位置
  */
-function findLastTextPos(editor: Editor, searchText: string): { from: number; to: number } | null {
+function findLastTextPos(
+  editor: DemoEditor,
+  searchText: string,
+): { from: number; to: number } | null {
   let lastMatch: { from: number; to: number } | null = null;
   editor.state.doc.descendants((node, pos) => {
     if (node.isText && node.text) {
@@ -272,29 +414,506 @@ function findLastTextPos(editor: Editor, searchText: string): { from: number; to
   return lastMatch;
 }
 
+function findSubtextPos(
+  editor: DemoEditor,
+  context: string,
+  target: string,
+): { from: number; to: number } | null {
+  let result: { from: number; to: number } | null = null;
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isText && node.text) {
+      const ctxIdx = node.text.lastIndexOf(context);
+      if (ctxIdx !== -1) {
+        const tgtIdx = context.indexOf(target);
+        if (tgtIdx !== -1) {
+          const from = pos + ctxIdx + tgtIdx;
+          result = { from, to: from + target.length };
+        }
+      }
+    }
+  });
+  return result;
+}
+
 // ===== 声明式动作 (Maestro 风格) =====
 
-async function tapOn(buttonId: string, signal: AbortSignal, action?: () => void) {
+function isElementVisible(el: Element): boolean {
+  const rect = el.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0;
+}
+
+async function tapElement(
+  el: Element | null | undefined,
+  signal: AbortSignal,
+  options?: TapOptions,
+) {
   signal.throwIfAborted();
-  const el = findToolbarButton(buttonId);
-
-  if (el) {
-    const { x, y } = getCenter(el);
-    await moveCursorTo(x, y, signal);
-
-    el.style.setProperty("background", "var(--menu-btn-hover-bg, #f5f5f5)");
-    await pause(120, signal);
-
-    el.style.setProperty("background", "#ddd");
-    await triggerRipple(signal);
-    el.style.removeProperty("background");
+  if (!(el instanceof HTMLElement)) {
+    await pause(100, signal);
+    return;
   }
 
+  const { x, y } = getCenter(el);
+  await moveCursorTo(x, y, signal);
+
+  el.style.setProperty("background", "var(--menu-btn-hover-bg, #f5f5f5)");
+  await pause(120, signal);
+
+  el.style.setProperty("background", "#ddd");
+  await triggerRipple(signal);
+  el.style.removeProperty("background");
+
+  if (options?.click) {
+    el.click();
+  }
+
+  await pause(100, signal);
+}
+
+async function tapOn(
+  buttonId: string,
+  signal: AbortSignal,
+  action?: () => void,
+  options?: TapOptions,
+) {
+  signal.throwIfAborted();
+  const el = findToolbarButton(buttonId);
+  await tapElement(el, signal, options);
+  if (action) safeEditorRun(action);
+  await pause(100, signal);
+}
+
+async function tapControl(
+  controlId: string,
+  signal: AbortSignal,
+  action?: () => void,
+  options?: TapOptions,
+) {
+  signal.throwIfAborted();
+  const el = findToolbarControl(controlId);
+  await tapElement(el, signal, options);
   action?.();
   await pause(100, signal);
 }
 
-async function moveToEditor(editor: Editor, signal: AbortSignal) {
+async function selectSlashCommand(editor: DemoEditor, itemId: string, signal: AbortSignal) {
+  await pause(350, signal);
+  const el = findSlashCommandItem(itemId);
+  if (el) {
+    await tapElement(el, signal, { click: true });
+  } else if (itemId === "codeBlock") {
+    safeEditorRun(() => editor.commands.setCodeBlock({ language: "typescript" }));
+  } else if (itemId === "table") {
+    runEditorChain(editor, (chain) => chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }));
+  } else if (itemId === "blockquote") {
+    safeEditorRun(() => editor.commands.setBlockquote());
+  }
+  await pause(150, signal);
+  await dismissAllPopups(editor, signal);
+}
+
+function findDropdownMenuItem(labels: string[]): HTMLElement | null {
+  for (const item of document.querySelectorAll(".ant-dropdown-menu-item")) {
+    if (!isElementVisible(item)) continue;
+    const text = item.textContent?.trim() ?? "";
+    if (labels.some((label) => text.includes(label))) {
+      return item as HTMLElement;
+    }
+  }
+  return null;
+}
+
+async function tapAlignOption(
+  editor: DemoEditor,
+  align: "right" | "justify",
+  signal: AbortSignal,
+  action: () => void,
+) {
+  await tapOn("align", signal, undefined, { click: true });
+  await pause(250, signal);
+  const item = findDropdownMenuItem(ALIGN_MENU_LABELS[align] ?? []);
+  if (item) {
+    await tapElement(item, signal, { click: true });
+  }
+  action();
+  await pause(150, signal);
+  await dismissAllPopups(editor, signal);
+}
+
+async function tapCodeDropdownItem(
+  editor: DemoEditor,
+  itemKey: keyof typeof CODE_DROPDOWN_LABELS,
+  signal: AbortSignal,
+) {
+  await tapOn("code", signal, undefined, { click: true });
+  await pause(250, signal);
+  const item = findDropdownMenuItem(CODE_DROPDOWN_LABELS[itemKey] ?? []);
+  if (item) {
+    await tapElement(item, signal, { click: true });
+  } else {
+    safeEditorRun(() => editor.commands.toggleCode());
+  }
+  await pause(150, signal);
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoFloatingMenu(
+  editor: DemoEditor,
+  searchText: string,
+  signal: AbortSignal,
+  applyBold = true,
+) {
+  await selectText(editor, searchText, signal);
+  await pause(450, signal);
+
+  const menu = document.querySelector(".bubble-menu.floating-menu");
+  const boldIcon = menu?.querySelector(".anticon-bold");
+  const boldBtn = boldIcon?.closest(".tt-toolbar-button") as HTMLElement | null;
+
+  if (boldBtn && applyBold) {
+    await tapElement(boldBtn, signal, { click: true });
+    editor.commands.toggleBold();
+  } else if (applyBold) {
+    editor.commands.toggleBold();
+  }
+
+  await pause(300, signal);
+}
+
+async function demoLinkBubbleMenu(editor: DemoEditor, searchText: string, signal: AbortSignal) {
+  const match = findLastTextPos(editor, searchText);
+  if (!match) return;
+
+  safeEditorRun(() => editor.commands.setTextSelection(match));
+  await settleEditor(signal);
+  if (!editor.isActive("link")) return;
+
+  await pause(450, signal);
+
+  const bubble = document.querySelector(".link-bubble-menu-content");
+  const editBtn = bubble?.querySelector(".link-action-btn") as HTMLElement | null;
+  if (editBtn) {
+    await tapElement(editBtn, signal, { click: true });
+    await pause(250, signal);
+    await dismissAllPopups(editor, signal);
+  }
+}
+
+async function showDragHandleAtText(editor: DemoEditor, searchText: string, signal: AbortSignal) {
+  const match = findLastTextPos(editor, searchText);
+  if (!match) return;
+
+  editor.commands.setTextSelection(match.from);
+  await pause(150, signal);
+
+  try {
+    const coords = editor.view.coordsAtPos(match.from);
+    const editorDom = editor.view.dom;
+    const rect = editorDom.getBoundingClientRect();
+    const paddingLeft = Number.parseFloat(window.getComputedStyle(editorDom).paddingLeft) || 0;
+    const clientX = rect.left + Math.max(paddingLeft * 0.35, 12);
+    const clientY = coords.top + 12;
+
+    editorDom.dispatchEvent(
+      new MouseEvent("mousemove", { clientX, clientY, bubbles: true, cancelable: true }),
+    );
+    await pause(300, signal);
+
+    const handle = document.querySelector(".drag-handle.is-visible");
+    if (handle) {
+      await tapElement(handle, signal);
+      handle.classList.add("is-dragging");
+      await pause(350, signal);
+      handle.classList.remove("is-dragging");
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function queryVisible(selector: string): HTMLElement[] {
+  return Array.from(document.querySelectorAll(selector)).filter(isElementVisible) as HTMLElement[];
+}
+
+async function closeTopModal(signal: AbortSignal) {
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+  await pause(200, signal);
+}
+
+async function dismissMathEditor(signal: AbortSignal) {
+  const acceptBtn = Array.from(document.querySelectorAll("button")).find((btn) => {
+    const label = btn.textContent?.trim() ?? "";
+    return label === "接受" || label === "Accept";
+  });
+  if (acceptBtn) {
+    await tapElement(acceptBtn, signal, { click: true });
+    await pause(150, signal);
+  }
+}
+
+async function clickAllModalCloses(signal: AbortSignal) {
+  for (const btn of queryVisible(".ant-modal-close")) {
+    await tapElement(btn, signal, { click: true });
+    await pause(120, signal);
+  }
+}
+
+/** 再次点击已展开的工具栏下拉，使其收起 */
+async function dismissOpenDropdownTriggers(signal: AbortSignal) {
+  const selectors = [
+    ".ant-dropdown-open",
+    '.tt-dropdown-btn[aria-expanded="true"]',
+    ".ant-dropdown-trigger.ant-dropdown-open",
+  ];
+  for (const selector of selectors) {
+    for (const el of queryVisible(selector)) {
+      await tapElement(el, signal, { click: true });
+      await pause(100, signal);
+    }
+  }
+}
+
+async function dismissFindReplaceModal(signal: AbortSignal) {
+  const panel = document.querySelector(".tp-find-replace");
+  if (!panel || !isElementVisible(panel)) return;
+
+  const closeBtn = panel
+    .closest(".ant-modal")
+    ?.querySelector(".ant-modal-close") as HTMLElement | null;
+  if (closeBtn) {
+    await tapElement(closeBtn, signal, { click: true });
+  } else {
+    await closeTopModal(signal);
+  }
+  await pause(200, signal);
+}
+
+/** 点击编辑区，收起工具栏 Dropdown / 子菜单 */
+async function dismissToolbarDropdowns(editor: DemoEditor, signal: AbortSignal) {
+  await moveToEditor(editor, signal);
+  safeEditorRun(() => editor.commands.focus());
+
+  const dom = editor.view.dom;
+  const rect = dom.getBoundingClientRect();
+  const clientX = rect.left + rect.width / 2;
+  const clientY = rect.top + Math.min(rect.height / 2, 80);
+
+  for (const type of ["mousedown", "mouseup", "click"] as const) {
+    dom.dispatchEvent(
+      new MouseEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        clientX,
+        clientY,
+        view: window,
+      }),
+    );
+  }
+  await pause(180, signal);
+}
+
+/**
+ * 关闭演示过程中打开的所有浮层：Modal、查找替换、代码语言菜单、公式编辑器等
+ */
+async function dismissAllPopups(editor: DemoEditor, signal: AbortSignal) {
+  await dismissMathEditor(signal);
+  await dismissFindReplaceModal(signal);
+  await clickAllModalCloses(signal);
+
+  // 点击页面空白处，收起挂到 body 的 Dropdown / Popover
+  for (const type of ["mousedown", "mouseup", "click"] as const) {
+    document.body.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true }));
+  }
+  await pause(100, signal);
+
+  await dismissOpenDropdownTriggers(signal);
+  await dismissToolbarDropdowns(editor, signal);
+
+  for (let i = 0; i < 2; i++) {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await pause(100, signal);
+  }
+}
+
+/** 演示结束或关键节点：多次清理，避免浮层叠在一起 */
+async function closeAllOverlays(editor: DemoEditor, signal: AbortSignal) {
+  for (let i = 0; i < 3; i++) {
+    await dismissAllPopups(editor, signal);
+  }
+}
+
+async function tapWordMenuItem(editor: DemoEditor, item: "import" | "export", signal: AbortSignal) {
+  await tapOn("word", signal, undefined, { click: true });
+  await pause(250, signal);
+  const itemEl = findDropdownMenuItem(WORD_MENU_LABELS[item] ?? []);
+  if (itemEl) {
+    await tapElement(itemEl, signal, { click: true });
+  }
+  await pause(200, signal);
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoMathInsert(
+  editor: DemoEditor,
+  type: "inline" | "block",
+  latex: string,
+  signal: AbortSignal,
+) {
+  let insertedViaMenu = false;
+  const mathBtn = findToolbarButton("math");
+
+  if (mathBtn) {
+    await tapOn("math", signal, undefined, { click: true });
+    await pause(250, signal);
+    const menuItem = findDropdownMenuItem(MATH_MENU_LABELS[type] ?? []);
+    if (menuItem) {
+      await tapElement(menuItem, signal, { click: true });
+      insertedViaMenu = true;
+      await pause(200, signal);
+    }
+  }
+
+  await moveToEditor(editor, signal);
+  if (insertedViaMenu && editor.isActive("math")) {
+    safeEditorRun(() => editor.commands.updateMath(latex));
+    await pause(200, signal);
+    await dismissMathEditor(signal);
+  } else {
+    safeEditorRun(() => {
+      const chain = editor.chain().focus() as any;
+      if (type === "inline") {
+        chain.insertInlineMath(latex).run();
+      } else {
+        chain.insertBlockMath(latex).run();
+      }
+    });
+  }
+  await pause(300, signal);
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoTemplateInsert(editor: DemoEditor, signal: AbortSignal) {
+  await tapOn("template", signal, undefined, { click: true });
+  await pause(350, signal);
+
+  const card = document.querySelector(".template-card");
+  if (card) {
+    await tapElement(card, signal, { click: true });
+  } else {
+    const tpl = builtinTemplates[0];
+    if (tpl) {
+      editor.chain().focus().insertContent(normalizeTemplateHtml(tpl.content)).run();
+    }
+  }
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoGalleryInsert(editor: DemoEditor, signal: AbortSignal) {
+  await tapOn("gallery", signal, undefined, { click: true });
+  await pause(400, signal);
+
+  const firstItem = document.querySelector(".gallery-item");
+  if (firstItem) {
+    await tapElement(firstItem, signal, { click: true });
+    await pause(200, signal);
+    const insertBtn = document.querySelector(".gallery-footer .ant-btn-primary");
+    if (insertBtn) {
+      await tapElement(insertBtn, signal, { click: true });
+    }
+  } else {
+    editor.chain().focus().setImage({ src: DEMO_IMAGE_URL, alt: "Gallery demo" }).run();
+  }
+
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoVideoInsert(editor: DemoEditor, signal: AbortSignal) {
+  await tapOn("video", signal, undefined, { click: true });
+  await pause(300, signal);
+  editor
+    .chain()
+    .focus()
+    .insertContent({ type: "video", attrs: { src: DEMO_VIDEO_URL } })
+    .run();
+  await dismissAllPopups(editor, signal);
+}
+
+async function demoZoomFooter(signal: AbortSignal) {
+  const footer = document.querySelector(".footer-nav-container");
+  if (!footer) return;
+
+  const buttons = footer.querySelectorAll(".ant-btn");
+  const zoomOut = buttons[0] as HTMLElement | undefined;
+  const resetBtn = buttons[2] as HTMLElement | undefined;
+
+  if (zoomOut) {
+    await tapElement(zoomOut, signal, { click: true });
+    await pause(150, signal);
+    await tapElement(zoomOut, signal, { click: true });
+    await pause(300, signal);
+  }
+
+  if (resetBtn) {
+    await tapElement(resetBtn, signal, { click: true });
+    await pause(250, signal);
+  }
+}
+
+async function prepareFindReplace(editor: DemoEditor, signal: AbortSignal) {
+  editor.commands.setSearchReplaceTerm("draft");
+  editor.commands.setSearchReplaceReplaceTerm("final");
+  editor.commands.resetSearchReplaceIndex();
+  await pause(200, signal);
+}
+
+async function tapFindReplaceModalAction(action: "findNext" | "replace", signal: AbortSignal) {
+  const buttons = document.querySelectorAll(".tp-find-replace-actions .ant-btn");
+  const index = action === "replace" ? 2 : 1;
+  await tapElement(buttons[index] ?? null, signal, { click: true });
+}
+
+function findAiMenuItem(menuKey: string): HTMLElement | null {
+  for (const selector of [
+    `.ant-dropdown-menu-item[data-menu-id="${menuKey}"]`,
+    `.ant-dropdown-menu-item[data-menu-id$="/${menuKey}"]`,
+  ]) {
+    const el = document.querySelector(selector);
+    if (el && isElementVisible(el)) return el as HTMLElement;
+  }
+
+  const labels = AI_MENU_LABELS[menuKey] ?? [];
+  for (const item of document.querySelectorAll(".ant-dropdown-menu-item")) {
+    if (!isElementVisible(item)) continue;
+    const text = item.textContent?.trim() ?? "";
+    if (labels.some((label) => text.includes(label))) {
+      return item as HTMLElement;
+    }
+  }
+
+  return null;
+}
+
+async function hoverAiMenuItem(menuKey: string, signal: AbortSignal) {
+  const el = findAiMenuItem(menuKey);
+  if (!el) return;
+
+  const { x, y } = getCenter(el);
+  await moveCursorTo(x, y, signal);
+  el.style.setProperty("background", "var(--menu-btn-hover-bg, #f5f5f5)");
+  await pause(400, signal);
+  el.style.removeProperty("background");
+}
+
+async function openAiMenu(signal: AbortSignal) {
+  await tapOn("ai", signal, undefined, { click: true });
+  await pause(350, signal);
+}
+
+async function closeAiMenu(editor: DemoEditor, signal: AbortSignal) {
+  await dismissAllPopups(editor, signal);
+}
+
+async function moveToEditor(editor: DemoEditor, signal: AbortSignal) {
   try {
     const { from } = editor.state.selection;
     const coords = editor.view.coordsAtPos(from);
@@ -306,10 +925,10 @@ async function moveToEditor(editor: Editor, signal: AbortSignal) {
   }
 }
 
-async function typeText(editor: Editor, text: string, speed: number, signal: AbortSignal) {
+async function typeText(editor: DemoEditor, text: string, speed: number, signal: AbortSignal) {
   for (let i = 0; i < text.length; i++) {
     signal.throwIfAborted();
-    editor.commands.insertContent(text[i]);
+    if (!safeEditorRun(() => editor.commands.insertContent(text[i]))) return;
 
     if (i % 8 === 0) {
       try {
@@ -329,10 +948,10 @@ async function typeText(editor: Editor, text: string, speed: number, signal: Abo
 /**
  * 模拟 AI 流式输出 (变速打字 + 句尾停顿)
  */
-async function simulateAiStream(editor: Editor, text: string, signal: AbortSignal) {
+async function simulateAiStream(editor: DemoEditor, text: string, signal: AbortSignal) {
   for (let i = 0; i < text.length; i++) {
     signal.throwIfAborted();
-    editor.commands.insertContent(text[i]);
+    if (!safeEditorRun(() => editor.commands.insertContent(text[i]))) return;
 
     const char = text[i];
     let charDelay = 10 + Math.random() * 15;
@@ -361,7 +980,7 @@ async function simulateAiStream(editor: Editor, text: string, signal: AbortSigna
 /**
  * 选择文本 (基于 ProseMirror 节点精准查找)
  */
-async function selectText(editor: Editor, searchText: string, signal: AbortSignal) {
+async function selectText(editor: DemoEditor, searchText: string, signal: AbortSignal) {
   const match = findLastTextPos(editor, searchText);
   if (!match) return;
 
@@ -373,340 +992,693 @@ async function selectText(editor: Editor, searchText: string, signal: AbortSigna
     /* ignore */
   }
 
-  editor.commands.setTextSelection(match);
-  await pause(200, signal);
+  safeEditorRun(() => editor.commands.setTextSelection(match));
+  await settleEditor(signal);
 }
 
 /**
  * 在上下文中选择子文本 (例如: 在 "mc2" 中选中 "2")
  */
-async function selectSubtext(editor: Editor, context: string, target: string, signal: AbortSignal) {
-  let lastMatch: { from: number; to: number } | null = null;
-  editor.state.doc.descendants((node, pos) => {
-    if (node.isText && node.text) {
-      const ctxIdx = node.text.lastIndexOf(context);
-      if (ctxIdx !== -1) {
-        const tgtIdx = context.indexOf(target);
-        if (tgtIdx !== -1) {
-          const from = pos + ctxIdx + tgtIdx;
-          lastMatch = { from, to: from + target.length };
-        }
-      }
-    }
-  });
-
-  if (!lastMatch) return;
+async function selectSubtext(
+  editor: DemoEditor,
+  context: string,
+  target: string,
+  signal: AbortSignal,
+) {
+  const match = findSubtextPos(editor, context, target);
+  if (!match) return;
 
   try {
-    const coords = editor.view.coordsAtPos(lastMatch.from);
+    const coords = editor.view.coordsAtPos(match.from);
     await moveCursorTo(coords.left, coords.top, signal);
     await pause(150, signal);
   } catch {
     /* ignore */
   }
 
-  editor.commands.setTextSelection(lastMatch);
-  await pause(200, signal);
+  safeEditorRun(() => editor.commands.setTextSelection(match));
+  await settleEditor(signal);
 }
 
-function newLine(editor: Editor) {
-  editor.commands.enter();
-  editor.commands.setParagraph();
+function newLine(editor: DemoEditor) {
+  safeEditorRun(() => editor.commands.enter());
+  safeEditorRun(() => editor.commands.setParagraph());
 }
 
-function exitBlock(editor: Editor) {
-  editor.commands.enter();
-  editor.commands.enter();
+function exitBlock(editor: DemoEditor) {
+  safeEditorRun(() => editor.commands.enter());
+  safeEditorRun(() => editor.commands.enter());
 }
 
-function moveCursorToEnd(editor: Editor) {
-  editor.commands.setTextSelection(editor.state.doc.content.size - 1);
+function moveCursorToEnd(editor: DemoEditor) {
+  safeEditorRun(() => {
+    const end = editor.state.doc.content.size;
+    editor.commands.setTextSelection(Math.max(1, end - 1));
+  });
+}
+
+function resetFormatPainter(editor: DemoEditor) {
+  safeEditorRun(() => editor.commands.cancelFormatPainting());
 }
 
 // ===== 演示脚本: 全功能展示 (含 AI) =====
 
-async function runDemoScript(editor: Editor, signal: AbortSignal) {
+async function runDemoScript(editor: DemoEditor, signal: AbortSignal) {
   const speed = props.typingSpeed;
   const fast = Math.max(Math.floor(speed / 2), 15);
 
-  editor.commands.clearContent();
+  safeEditorRun(() => editor.commands.clearContent());
+  resetFormatPainter(editor);
+  await closeAllOverlays(editor, signal);
   cursorX.value = window.innerWidth / 2;
   cursorY.value = window.innerHeight / 2;
   cursorVisible.value = true;
   await pause(400, signal);
 
-  // ===== 1. 标题 + 居中对齐 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 1 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Yaniv Editor - Feature Showcase", speed, signal);
-  await pause(300, signal);
+  await runDemoSection("intro-align", signal, async () => {
+    // ===== 1. 标题 + 居中对齐 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 1 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Yaniv Editor - Feature Showcase", speed, signal);
+    await pause(300, signal);
 
-  await tapOn("align", signal, () => editor.commands.setTextAlign("center"));
-  await pause(400, signal);
+    await tapOn("align", signal, () => editor.commands.setTextAlign("center"));
+    await pause(400, signal);
 
-  editor.commands.enter();
-  editor.commands.setParagraph();
-  editor.commands.setTextAlign("left");
-  await pause(200, signal);
-
-  // ===== 2. 文本格式 (先输入，再选中格式化) =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Rich Text Formatting", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
-
-  await moveToEditor(editor, signal);
-  await typeText(
-    editor,
-    "This editor supports bold, italic, underline and strikethrough styles.",
-    speed,
-    signal,
-  );
-  await pause(400, signal);
-
-  // 选中每个关键词并格式化
-  await selectText(editor, "bold", signal);
-  await tapOn("bold", signal, () => editor.commands.toggleBold());
-
-  await selectText(editor, "italic", signal);
-  await tapOn("italic", signal, () => editor.commands.toggleItalic());
-
-  await selectText(editor, "underline", signal);
-  await tapOn("underline", signal, () => {
-    (editor.chain().focus() as any).toggleUnderline().run();
-  });
-
-  await selectText(editor, "strikethrough", signal);
-  await tapOn("strike", signal, () => editor.commands.toggleStrike());
-
-  await pause(400, signal);
-  moveCursorToEnd(editor);
-  exitBlock(editor);
-
-  // ===== 3. 有序列表 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Feature Highlights", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
-
-  await tapOn("orderedList", signal, () => editor.commands.toggleOrderedList());
-  await moveToEditor(editor, signal);
-  await typeText(editor, "20+ pluggable toolbar features", speed, signal);
-  editor.commands.enter();
-  await typeText(editor, "5 theme presets: Word, Notion, GitHub, Typora, Default", speed, signal);
-  editor.commands.enter();
-  await typeText(editor, "AI-powered writing with streaming support", speed, signal);
-  await pause(300, signal);
-
-  // 选中 "AI-powered" 并加粗
-  await selectText(editor, "AI-powered", signal);
-  await tapOn("bold", signal, () => editor.commands.toggleBold());
-  await pause(200, signal);
-  moveCursorToEnd(editor);
-  exitBlock(editor);
-
-  // ===== 4. 上标 / 下标 (先输入，再选中格式化) =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Scientific Notation", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
-
-  // 输入公式文本
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Einstein's equation: E = mc2", speed, signal);
-  await pause(200, signal);
-
-  // 选中 "mc2" 中的 "2"，应用上标
-  await selectSubtext(editor, "mc2", "2", signal);
-  await tapOn("superscript", signal, () => editor.chain().focus().toggleSuperscript().run());
-
-  moveCursorToEnd(editor);
-  await moveToEditor(editor, signal);
-  await typeText(editor, "    Water molecule: H2O", speed, signal);
-  await pause(200, signal);
-
-  // 选中 "H2O" 中的 "2"，应用下标
-  await selectSubtext(editor, "H2O", "2", signal);
-  await tapOn("subscript", signal, () => editor.chain().focus().toggleSubscript().run());
-
-  moveCursorToEnd(editor);
-  await pause(400, signal);
-  exitBlock(editor);
-
-  // ===== 5. 表格 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Data Table", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
-
-  await tapOn("table", signal, () => {
-    editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true });
-  });
-  await pause(400, signal);
-
-  // 填充表头
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Feature", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "Status", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "Description", fast, signal);
-
-  // 第 1 行
-  editor.commands.goToNextCell();
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Rich Text", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "✅ Ready", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "20+ formats", fast, signal);
-
-  // 第 2 行
-  editor.commands.goToNextCell();
-  await moveToEditor(editor, signal);
-  await typeText(editor, "AI Writing", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "✅ Ready", fast, signal);
-  editor.commands.goToNextCell();
-  await typeText(editor, "Streaming output", fast, signal);
-  await pause(500, signal);
-
-  // 退出表格
-  try {
-    moveCursorToEnd(editor);
     editor.commands.enter();
-  } catch {
-    /* ignore */
-  }
-  await pause(200, signal);
+    editor.commands.setParagraph();
+    editor.commands.setTextAlign("left");
+    await pause(200, signal);
 
-  // ===== 6. 代码块 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Code Block", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
+    // H3 + 右对齐 / 两端对齐
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 3 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "H3 subsection — alignment options below.", speed, signal);
+    await pause(250, signal);
 
-  await tapOn("code", signal, () => {
-    editor.commands.setCodeBlock({ language: "typescript" });
+    await tapAlignOption(editor, "right", signal, () => editor.commands.setTextAlign("right"));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Right-aligned paragraph for layout demos.", speed, signal);
+    await pause(250, signal);
+    newLine(editor);
+
+    await tapAlignOption(editor, "justify", signal, () => editor.commands.setTextAlign("justify"));
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "Justified text fills the line width evenly across the full editor page.",
+      speed,
+      signal,
+    );
+    await pause(300, signal);
+    editor.commands.setParagraph();
+    editor.commands.setTextAlign("left");
+    exitBlock(editor);
+
+    // ===== 2. 文本格式 (先输入，再选中格式化) =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Rich Text Formatting", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "This editor supports bold, italic, underline and strikethrough styles.",
+      speed,
+      signal,
+    );
+    await pause(400, signal);
+
+    // 选中每个关键词并格式化
+    await selectText(editor, "bold", signal);
+    await tapOn("bold", signal, () => editor.commands.toggleBold());
+
+    await selectText(editor, "italic", signal);
+    await tapOn("italic", signal, () => editor.commands.toggleItalic());
+
+    await selectText(editor, "underline", signal);
+    await tapOn("underline", signal, () => {
+      (editor.chain().focus() as any).toggleUnderline().run();
+    });
+
+    await selectText(editor, "strikethrough", signal);
+    await tapOn("strike", signal, () => editor.commands.toggleStrike());
+
+    // 行内代码
+    await selectText(editor, "styles", signal);
+    await tapCodeDropdownItem(editor, "inlineCode", signal);
+
+    await pause(300, signal);
+    newLine(editor);
+
+    // 浮动菜单（选中文本时出现）
+    await demoFloatingMenu(editor, "supports", signal);
+
+    // 颜色 + 撤销重做
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Highlight important ideas in your document.", speed, signal);
+    await pause(300, signal);
+
+    await selectText(editor, "important", signal);
+    await tapOn("textColor", signal, () => {
+      editor.chain().focus().setColor("#e74c3c").run();
+    });
+
+    await selectText(editor, "important", signal);
+    await tapOn("highlight", signal, () => {
+      editor.chain().focus().setHighlight({ color: "#fff3cd" }).run();
+    });
+
+    // 单行插入，避免与上文逐字输入共享撤销栈导致文档错乱
+    await moveToEditor(editor, signal);
+    safeEditorRun(() => editor.commands.insertContent(" Try undo and redo on this word."));
+    await pause(200, signal);
+    await selectText(editor, "undo", signal);
+    await tapOn("bold", signal, () => editor.commands.toggleBold());
+    await pause(200, signal);
+    await tapOn("undo", signal, () => editor.commands.undo());
+    await pause(200, signal);
+    await tapOn("redo", signal, () => editor.commands.redo());
+
+    await pause(300, signal);
+    newLine(editor);
+
+    // 字体与字号
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Typography controls for font family and size.", speed, signal);
+    await pause(200, signal);
+
+    await selectText(editor, "Typography", signal);
+    await tapControl("fontFamily", signal, () => {
+      editor.chain().focus().setFontFamily("Arial").run();
+    });
+
+    await selectText(editor, "size", signal);
+    await tapControl("fontSize", signal, () => {
+      editor.chain().focus().setFontSize("20px").run();
+    });
+
+    await pause(300, signal);
+    newLine(editor);
+
+    // 格式刷
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Source style sample.", speed, signal);
+    safeEditorRun(() => editor.commands.enter());
+    await typeText(editor, "Plain target line.", speed, signal);
+    await pause(200, signal);
+
+    resetFormatPainter(editor);
+    await selectText(editor, "Source style", signal);
+    safeEditorRun(() => editor.commands.toggleBold());
+    runEditorChain(editor, (chain) => chain.setColor("#2563eb"));
+    await tapOn("formatPainter", signal, () => editor.commands.startFormatPainting(1));
+    await settleEditor(signal);
+
+    await selectText(editor, "Plain target", signal);
+    await settleEditor(signal);
+    safeEditorRun(() => editor.commands.applyFormat());
+    resetFormatPainter(editor);
+    await settleEditor(signal);
+
+    await pause(400, signal);
+    moveCursorToEnd(editor);
+    exitBlock(editor);
   });
-  await moveToEditor(editor, signal);
 
-  const codeSnippet = `import { Editor } from '@tiptap/core'
+  await runDemoSection("lists", signal, async () => {
+    // ===== 3. 有序列表 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Feature Highlights", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await tapOn("orderedList", signal, () => editor.commands.toggleOrderedList());
+    await moveToEditor(editor, signal);
+    await typeText(editor, "20+ pluggable toolbar features", speed, signal);
+    safeEditorRun(() => editor.commands.enter());
+    await typeText(editor, "5 theme presets: Word, Notion, GitHub, Typora, Default", speed, signal);
+    safeEditorRun(() => editor.commands.enter());
+    await typeText(editor, "AI-powered writing with streaming support", speed, signal);
+    await pause(300, signal);
+
+    // 选中 "AI-powered" 并加粗
+    await selectText(editor, "AI-powered", signal);
+    await tapOn("bold", signal, () => editor.commands.toggleBold());
+    await pause(200, signal);
+    moveCursorToEnd(editor);
+    exitBlock(editor);
+
+    // ===== 3b. 任务列表 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Task List", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await tapOn("taskList", signal, () => {
+      (editor.chain().focus() as any).toggleTaskList?.().run();
+    });
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Review toolbar features", speed, signal);
+    safeEditorRun(() => editor.commands.enter());
+    await typeText(editor, "Try AI writing assistant", speed, signal);
+    safeEditorRun(() => editor.commands.enter());
+    await typeText(editor, "Ship the next release", speed, signal);
+    await pause(300, signal);
+    moveCursorToEnd(editor);
+    exitBlock(editor);
+  });
+
+  await runDemoSection("links-media", signal, async () => {
+    // ===== 3c. 链接与图片 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Links & Media", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Visit our documentation for more details.", speed, signal);
+    await pause(200, signal);
+
+    const docLinkMatch = findLastTextPos(editor, "documentation");
+    await selectText(editor, "documentation", signal);
+    await tapOn("link", signal, () => {
+      if (docLinkMatch) {
+        runEditorChain(editor, (chain) =>
+          chain.setTextSelection(docLinkMatch).setLink({ href: DEMO_LINK_URL, target: "_blank" }),
+        );
+      }
+    });
+    await settleEditor(signal);
+    await pause(300, signal);
+
+    // 链接气泡菜单
+    await demoLinkBubbleMenu(editor, "documentation", signal);
+
+    newLine(editor);
+    await moveToEditor(editor, signal);
+    await tapOn("picture", signal, () => {
+      safeEditorRun(() =>
+        editor.chain().focus().setImage({ src: DEMO_IMAGE_URL, alt: "Yaniv Editor demo" }).run(),
+      );
+    });
+    await pause(500, signal);
+    safeEditorRun(() => moveCursorToEnd(editor));
+    exitBlock(editor);
+  });
+
+  await runDemoSection("word-template-gallery-video", signal, async () => {
+    // ===== 3c-2. Word / 模板 / 图库 / 视频 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Document Tools & Media", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    // Word 导入（展示弹窗 + 模拟 mammoth 结果）
+    await tapWordMenuItem(editor, "import", signal);
+    await pause(450, signal);
+    await dismissAllPopups(editor, signal);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Word import preview: ", fast, signal);
+    editor.commands.insertContent(DEMO_WORD_IMPORT_HTML);
+    await pause(350, signal);
+    newLine(editor);
+
+    // Word 导出（打开弹窗后确认，或回退为直接导出）
+    await tapWordMenuItem(editor, "export", signal);
+    await pause(350, signal);
+    const exportOkBtn = document.querySelector(".ant-modal-footer .ant-btn-primary");
+    if (exportOkBtn) {
+      await tapElement(exportOkBtn, signal, { click: true });
+      await pause(400, signal);
+    } else {
+      try {
+        await exportToWord(editor.getHTML(), "yaniv-editor-demo");
+      } catch {
+        /* 演示环境导出失败时忽略 */
+      }
+    }
+    await dismissAllPopups(editor, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    // 模板插入
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Insert from template gallery:", fast, signal);
+    await pause(200, signal);
+    await demoTemplateInsert(editor, signal);
+    newLine(editor);
+
+    // 图库（复用文档内已有图片）
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Re-insert from image gallery:", fast, signal);
+    await pause(200, signal);
+    await demoGalleryInsert(editor, signal);
+    newLine(editor);
+
+    // 视频上传
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Embedded video:", fast, signal);
+    await pause(200, signal);
+    await demoVideoInsert(editor, signal);
+    await pause(300, signal);
+    safeEditorRun(() => moveCursorToEnd(editor));
+    exitBlock(editor);
+  });
+
+  await runDemoSection("find-replace", signal, async () => {
+    // ===== 3d. 查找替换 =====
+    await dismissAllPopups(editor, signal);
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Find & Replace", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "This draft needs polish. Save the draft before you publish.",
+      speed,
+      signal,
+    );
+    await pause(300, signal);
+
+    await tapOn("findReplace", signal, undefined, { click: true });
+    await pause(300, signal);
+    await prepareFindReplace(editor, signal);
+    await tapFindReplaceModalAction("findNext", signal);
+    await tapFindReplaceModalAction("replace", signal);
+    await dismissFindReplaceModal(signal);
+    await dismissAllPopups(editor, signal);
+    safeEditorRun(() => moveCursorToEnd(editor));
+    exitBlock(editor);
+  });
+
+  await runDemoSection("scientific-notation", signal, async () => {
+    // ===== 4. 上标 / 下标 (先输入，再选中格式化) =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Scientific Notation", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    // 输入公式文本
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Einstein's equation: E = mc2", speed, signal);
+    await pause(200, signal);
+
+    // 选中 "mc2" 中的 "2"，应用上标
+    await selectSubtext(editor, "mc2", "2", signal);
+    await tapOn("superscript", signal, () => editor.chain().focus().toggleSuperscript().run());
+
+    moveCursorToEnd(editor);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "    Water molecule: H2O", speed, signal);
+    await pause(200, signal);
+
+    // 选中 "H2O" 中的 "2"，应用下标
+    await selectSubtext(editor, "H2O", "2", signal);
+    await tapOn("subscript", signal, () => editor.chain().focus().toggleSubscript().run());
+
+    await pause(300, signal);
+    newLine(editor);
+
+    // 数学公式（LaTeX / KaTeX）
+    await moveToEditor(editor, signal);
+    await typeText(editor, "LaTeX inline ", speed, signal);
+    await demoMathInsert(editor, "inline", "E=mc^2", signal);
+    await typeText(editor, " and block formula below:", speed, signal);
+    await pause(200, signal);
+    newLine(editor);
+    await demoMathInsert(editor, "block", "\\int_0^1 x^2\\,dx = \\frac{1}{3}", signal);
+
+    safeEditorRun(() => moveCursorToEnd(editor));
+    await pause(400, signal);
+    exitBlock(editor);
+  });
+
+  await runDemoSection("table", signal, async () => {
+    // ===== 5. 表格 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Data Table", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await tapOn("table", signal, () => {
+      editor.commands.insertTable({ rows: 3, cols: 3, withHeaderRow: true });
+    });
+    await pause(400, signal);
+
+    // 填充表头
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Feature", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "Status", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "Description", fast, signal);
+
+    // 第 1 行
+    editor.commands.goToNextCell();
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Rich Text", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "✅ Ready", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "20+ formats", fast, signal);
+
+    // 第 2 行
+    editor.commands.goToNextCell();
+    await moveToEditor(editor, signal);
+    await typeText(editor, "AI Writing", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "✅ Ready", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "Streaming output", fast, signal);
+    await pause(400, signal);
+
+    // 表格悬浮工具栏：插入行
+    editor.commands.focus();
+    await pause(250, signal);
+    const addRowBtn = findTableBubbleButton("addRowAfter");
+    await tapElement(addRowBtn, signal, { click: true });
+    editor.commands.addRowAfter();
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Slash Command", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "✅ Ready", fast, signal);
+    editor.commands.goToNextCell();
+    await typeText(editor, "Quick insert via /", fast, signal);
+    await pause(400, signal);
+
+    // 退出表格
+    try {
+      moveCursorToEnd(editor);
+      editor.commands.enter();
+    } catch {
+      /* ignore */
+    }
+    await pause(200, signal);
+  });
+
+  await runDemoSection("code-block", signal, async () => {
+    // ===== 6. 代码块 =====
+    await dismissAllPopups(editor, signal);
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Code Block", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    safeEditorRun(() => editor.commands.setCodeBlock({ language: "typescript" }));
+    await dismissAllPopups(editor, signal);
+    await moveToEditor(editor, signal);
+
+    const codeSnippet = `import { Editor } from '@tiptap/core'
 import { StarterKit } from '@tiptap/starter-kit'
 
 const editor = new Editor({
   extensions: [StarterKit],
   content: '<p>Hello Tiptap!</p>'
 })`;
-  await typeText(editor, codeSnippet, fast, signal);
-  await pause(500, signal);
+    await typeText(editor, codeSnippet, fast, signal);
+    await pause(500, signal);
 
-  editor.commands.exitCode();
-  editor.commands.enter();
+    editor.commands.exitCode();
+    editor.commands.enter();
+  });
 
-  // ===== 7. 引用块 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Blockquote", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
+  await runDemoSection("slash-outline", signal, async () => {
+    // ===== 7. 引用块（斜杠命令插入） =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Blockquote via Slash", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
 
-  editor.commands.setBlockquote();
-  await moveToEditor(editor, signal);
-  await typeText(
-    editor,
-    "The best editor is one that gets out of your way and lets creativity flow.",
-    speed,
-    signal,
-  );
-  await pause(400, signal);
-  exitBlock(editor);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "/", speed, signal);
+    await selectSlashCommand(editor, "blockquote", signal);
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "The best editor is one that gets out of your way and lets creativity flow.",
+      speed,
+      signal,
+    );
+    await pause(400, signal);
+    exitBlock(editor);
 
-  // ===== 8. AI 写作演示 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "AI-Powered Writing", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
+    // ===== 7b. 文档大纲 =====
+    await tapOn("outline", signal, undefined, { click: true });
+    await pause(450, signal);
 
-  // 用户输入部分文本
-  await moveToEditor(editor, signal);
-  await typeText(
-    editor,
-    "AI can enhance your writing workflow. Here is a live demo:",
-    speed,
-    signal,
-  );
-  newLine(editor);
-  await pause(200, signal);
-
-  await moveToEditor(editor, signal);
-  await typeText(editor, "The future of content editing is", speed, signal);
-  await pause(400, signal);
-
-  // 移动到 AI 按钮并点击 (视觉效果)
-  await tapOn("ai", signal);
-  await pause(1200, signal); // AI "思考中"
-
-  // 模拟 AI 流式输出
-  await moveToEditor(editor, signal);
-  const aiResponse =
-    " intelligent and adaptive. With AI integration, writers can generate content on the fly, polish their prose for clarity and style, translate seamlessly between languages, and get instant summaries of lengthy documents — all without leaving the editor.";
-  await simulateAiStream(editor, aiResponse, signal);
-  await pause(600, signal);
-
-  newLine(editor);
-  await pause(200, signal);
-  await moveToEditor(editor, signal);
-  await typeText(editor, "AI features include: ", speed, signal);
-
-  // 用粗体列出 AI 功能
-  const aiFeatures = ["Continue Writing", "Polish", "Translate", "Summarize", "Custom Prompts"];
-  for (let i = 0; i < aiFeatures.length; i++) {
-    const feature = aiFeatures[i];
-    await typeText(editor, feature, fast, signal);
-    if (i < aiFeatures.length - 1) {
-      await typeText(editor, " · ", fast, signal);
+    const outlineItem =
+      document.querySelector(".tp-outline-panel__item") ??
+      document.querySelector(".tp-outline-panel__item.is-active");
+    if (outlineItem) {
+      await tapElement(outlineItem, signal, { click: true });
+      await pause(450, signal);
     }
-  }
-  await pause(300, signal);
 
-  // 选中每个功能名加粗
-  for (const feature of aiFeatures) {
-    await selectText(editor, feature, signal);
-    await tapOn("bold", signal, () => editor.commands.toggleBold());
-  }
+    await tapOn("outline", signal, undefined, { click: true });
+    await pause(250, signal);
+    await dismissAllPopups(editor, signal);
 
-  await pause(400, signal);
-  moveCursorToEnd(editor);
-  exitBlock(editor);
+    // ===== 7c. 斜杠命令 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Slash Command", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
 
-  // ===== 9. 无序列表 =====
-  await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Tech Stack", speed, signal);
-  await pause(300, signal);
-  newLine(editor);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "/", speed, signal);
+    await selectSlashCommand(editor, "codeBlock", signal);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "const demo = 'typed after /code';", fast, signal);
+    await pause(300, signal);
+    editor.commands.exitCode();
+    editor.commands.enter();
+    await pause(200, signal);
+  });
 
-  await tapOn("bulletList", signal, () => editor.commands.toggleBulletList());
-  await moveToEditor(editor, signal);
-  await typeText(editor, "Vue 3 + Tiptap 3 + TypeScript", speed, signal);
-  editor.commands.enter();
-  await typeText(editor, "Light / Dark mode with 5 theme presets", speed, signal);
-  editor.commands.enter();
-  await typeText(editor, "i18n: English, 简体中文, 繁體中文", speed, signal);
-  editor.commands.enter();
-  await typeText(editor, "AI: Continue Writing, Polish, Translate, Summarize", speed, signal);
-  await pause(300, signal);
-  exitBlock(editor);
+  await runDemoSection("ai-writing", signal, async () => {
+    // ===== 8. AI 写作演示 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "AI-Powered Writing", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    // 用户输入部分文本
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "AI can enhance your writing workflow. Here is a live demo:",
+      speed,
+      signal,
+    );
+    newLine(editor);
+    await pause(200, signal);
+
+    await moveToEditor(editor, signal);
+    await typeText(editor, "The future of content editing is", speed, signal);
+    await pause(400, signal);
+
+    // 展开 AI 菜单并浏览子功能
+    await openAiMenu(signal);
+    for (const menuKey of ["polish", "summarize", "translate"] as const) {
+      await hoverAiMenuItem(menuKey, signal);
+    }
+    await closeAiMenu(editor, signal);
+
+    // 模拟续写流式输出（不触发真实 API）
+    await pause(400, signal);
+    await moveToEditor(editor, signal);
+    const aiResponse =
+      " intelligent and adaptive. With AI integration, writers can generate content on the fly, polish their prose for clarity and style, translate seamlessly between languages, and get instant summaries of lengthy documents — all without leaving the editor.";
+    await simulateAiStream(editor, aiResponse, signal);
+    await pause(600, signal);
+
+    newLine(editor);
+    await pause(200, signal);
+    await moveToEditor(editor, signal);
+    await typeText(editor, "AI features include: ", speed, signal);
+
+    // 用粗体列出 AI 功能
+    const aiFeatures = ["Continue Writing", "Polish", "Translate", "Summarize", "Custom Prompts"];
+    for (let i = 0; i < aiFeatures.length; i++) {
+      const feature = aiFeatures[i];
+      await typeText(editor, feature, fast, signal);
+      if (i < aiFeatures.length - 1) {
+        await typeText(editor, " · ", fast, signal);
+      }
+    }
+    await pause(300, signal);
+
+    // 选中每个功能名加粗
+    for (const feature of aiFeatures) {
+      await selectText(editor, feature, signal);
+      await tapOn("bold", signal, () => editor.commands.toggleBold());
+    }
+
+    await pause(400, signal);
+    safeEditorRun(() => moveCursorToEnd(editor));
+    exitBlock(editor);
+  });
+
+  await runDemoSection("bullet-list-drag-zoom", signal, async () => {
+    // ===== 9. 无序列表 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Tech Stack", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await tapOn("bulletList", signal, () => editor.commands.toggleBulletList());
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Vue 3 + Tiptap 3 + TypeScript", speed, signal);
+    editor.commands.enter();
+    await typeText(editor, "Light / Dark mode with 5 theme presets", speed, signal);
+    editor.commands.enter();
+    await typeText(editor, "i18n: English, 简体中文, 繁體中文", speed, signal);
+    editor.commands.enter();
+    await typeText(editor, "AI: Continue Writing, Polish, Translate, Summarize", speed, signal);
+    await pause(300, signal);
+    exitBlock(editor);
+
+    // ===== 9b. 块拖拽 + 底部缩放 =====
+    await tapOn("heading", signal, () => editor.commands.setHeading({ level: 2 }));
+    await moveToEditor(editor, signal);
+    await typeText(editor, "Drag Handle & Zoom", speed, signal);
+    await pause(300, signal);
+    newLine(editor);
+
+    await moveToEditor(editor, signal);
+    await typeText(
+      editor,
+      "Hover the left gutter to reveal the drag handle, then adjust zoom in the footer.",
+      speed,
+      signal,
+    );
+    await pause(300, signal);
+
+    await showDragHandleAtText(editor, "Hover the left gutter", signal);
+    await demoZoomFooter(signal);
+    await pause(400, signal);
+    exitBlock(editor);
+  });
 
   // ===== 10. 分隔线 + 结尾 =====
-  editor.commands.setHorizontalRule();
+  safeEditorRun(() => editor.commands.setHorizontalRule());
   await pause(300, signal);
 
   await moveToEditor(editor, signal);
@@ -718,6 +1690,7 @@ const editor = new Editor({
   await tapOn("bold", signal, () => editor.commands.toggleBold());
   await pause(600, signal);
 
+  await closeAllOverlays(editor, signal);
   cursorVisible.value = false;
 }
 

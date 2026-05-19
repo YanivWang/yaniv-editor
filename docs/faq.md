@@ -155,5 +155,6 @@ pnpm docs:preview
 
 ## 反馈与贡献
 
+- [项目结构](/contributing/project-structure) — 源码目录与新增功能约定
 - [GitHub Issues](https://github.com/YanivWang/yaniv-editor/issues)
 - [GitHub 仓库](https://github.com/YanivWang/yaniv-editor)

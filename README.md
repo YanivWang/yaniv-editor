@@ -62,14 +62,15 @@ function handleUpdate(content: unknown) {
 
 ## 文档
 
-| 章节        | 链接                                                                 |
-| ----------- | -------------------------------------------------------------------- |
-| 快速开始    | [docs/guide/getting-started.md](docs/guide/getting-started.md)       |
-| Full Editor | [docs/guide/full-editor.md](docs/guide/full-editor.md)               |
-| Inline 拼装 | [docs/guide/inline-composition.md](docs/guide/inline-composition.md) |
-| 功能总览    | [docs/features/overview.md](docs/features/overview.md)               |
-| API         | [docs/api/yaniv-editor.md](docs/api/yaniv-editor.md)                 |
-| FAQ         | [docs/faq.md](docs/faq.md)                                           |
+| 章节        | 链接                                                                             |
+| ----------- | -------------------------------------------------------------------------------- |
+| 快速开始    | [docs/guide/getting-started.md](docs/guide/getting-started.md)                   |
+| Full Editor | [docs/guide/full-editor.md](docs/guide/full-editor.md)                           |
+| Inline 拼装 | [docs/guide/inline-composition.md](docs/guide/inline-composition.md)             |
+| 功能总览    | [docs/features/overview.md](docs/features/overview.md)                           |
+| API         | [docs/api/yaniv-editor.md](docs/api/yaniv-editor.md)                             |
+| FAQ         | [docs/faq.md](docs/faq.md)                                                       |
+| 项目结构    | [docs/contributing/project-structure.md](docs/contributing/project-structure.md) |
 
 本地预览文档站点：
 

@@ -13,6 +13,7 @@ export default defineConfig({
       { text: "功能", link: "/features/overview" },
       { text: "API", link: "/api/yaniv-editor" },
       { text: "FAQ", link: "/faq" },
+      { text: "贡献", link: "/contributing/project-structure" },
       {
         text: "示例",
         link: "https://github.com/YanivWang/yaniv-editor",
@@ -53,6 +54,12 @@ export default defineConfig({
             { text: "功能配置", link: "/api/features-config" },
             { text: "Composables", link: "/api/composables" },
           ],
+        },
+      ],
+      "/contributing/": [
+        {
+          text: "贡献",
+          items: [{ text: "项目结构", link: "/contributing/project-structure" }],
         },
       ],
     },

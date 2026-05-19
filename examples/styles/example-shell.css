@@ -123,22 +123,29 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-.demo-locale-select,
-.demo-theme-select {
-  padding: 8px 16px;
+.demo-header-select {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 12px;
   font-size: 14px;
+  font-weight: 500;
   color: #fff;
+  white-space: nowrap;
   cursor: pointer;
-  outline: none;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   border-radius: 8px;
+  transition: background 0.2s ease;
 }
 
-.demo-locale-select option,
-.demo-theme-select option {
-  color: #fff;
-  background: #1a1a1a;
+.demo-header-select:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.demo-header-select__arrow {
+  font-size: 10px;
+  opacity: 0.85;
 }
 
 .demo-main {

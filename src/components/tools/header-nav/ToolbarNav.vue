@@ -99,8 +99,9 @@
             <VideoUpload v-if="config.image" :editor="editor" />
           </div>
 
-          <div v-if="config.subscriptSuperscript" class="tool-group">
-            <SubscriptSuperscriptButton :editor="editor" />
+          <div v-if="config.subscriptSuperscript || config.math" class="tool-group">
+            <SubscriptSuperscriptButton v-if="config.subscriptSuperscript" :editor="editor" />
+            <MathButton v-if="config.math" :editor="editor" />
           </div>
 
           <div v-if="config.word" class="tool-group">
@@ -168,6 +169,7 @@ import { HeadingDropdown } from "@/editor/heading";
 import { ImageUpload } from "@/editor/image";
 import { LinkButton } from "@/editor/link";
 import { ListTools } from "@/editor/list";
+import { MathButton } from "@/editor/math";
 import { OutlineToggleButton } from "@/editor/outline";
 import { SubscriptSuperscriptButton } from "@/editor/subscript-superscript";
 import { TableButton } from "@/editor/table";
@@ -222,6 +224,7 @@ const showSection = computed(() => {
       c.table ||
       c.image ||
       c.subscriptSuperscript ||
+      c.math ||
       c.word ||
       c.template ||
       c.gallery

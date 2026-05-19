@@ -1,6 +1,6 @@
 <template>
   <ToolbarButton
-    :icon="UnorderedListOutlined"
+    :icon="ApartmentOutlined"
     :title="t('editor.outlineToggle')"
     :active="visible"
     @click="toggle"
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { UnorderedListOutlined } from "@ant-design/icons-vue";
+import { ApartmentOutlined } from "@ant-design/icons-vue";
 
 import { ToolbarButton } from "@/base";
 import { t } from "@/locales";

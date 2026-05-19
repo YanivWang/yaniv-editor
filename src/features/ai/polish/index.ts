@@ -5,4 +5,3 @@
 
 export { PolishExtension } from "./PolishExtension";
 export type { PolishOptions } from "./PolishExtension";
-export { default as PolishButton } from "./PolishButton.vue";

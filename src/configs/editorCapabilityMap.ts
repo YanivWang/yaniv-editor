@@ -47,6 +47,7 @@ export function applyExtensionGatesToToolbarConfig(
     ...base,
     table: !!(base.table && gates.table),
     image: !!(base.image && gates.image),
+    math: !!(base.math && gates.math),
     formatPainter: !!(base.formatPainter && gates.formatPainter),
     ai: !!(base.ai && gates.ai),
     findReplace: base.findReplace !== false && gates.searchReplace,

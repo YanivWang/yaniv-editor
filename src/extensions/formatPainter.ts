@@ -255,7 +255,7 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
        */
       applyFormat:
         () =>
-        ({ editor }) => {
+        ({ editor, chain }) => {
           // 检查格式刷是否已激活
           if (!this.storage.isActive) {
             return false;
@@ -288,76 +288,57 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
           const { from, to } = editor.state.selection;
 
           try {
-            // 应用文本级格式
-            const chain = editor.chain().focus();
+            // 必须使用命令 props 的 chain，避免 editor.chain() 二次 dispatch 导致 transaction 不匹配
+            let cmd = chain().focus();
 
-            // 处理粗体
-            if (formats.bold) chain.setMark("bold");
-            else chain.unsetMark("bold");
+            if (formats.bold) cmd = cmd.setMark("bold");
+            else cmd = cmd.unsetMark("bold");
 
-            // 处理斜体
-            if (formats.italic) chain.setMark("italic");
-            else chain.unsetMark("italic");
+            if (formats.italic) cmd = cmd.setMark("italic");
+            else cmd = cmd.unsetMark("italic");
 
-            // 处理下划线
-            if (formats.underline) chain.setMark("underline");
-            else chain.unsetMark("underline");
+            if (formats.underline) cmd = cmd.setMark("underline");
+            else cmd = cmd.unsetMark("underline");
 
-            // 处理删除线
-            if (formats.strike) chain.setMark("strike");
-            else chain.unsetMark("strike");
+            if (formats.strike) cmd = cmd.setMark("strike");
+            else cmd = cmd.unsetMark("strike");
 
-            // 处理上下标（互斥，先清除再设置）
-            chain.unsetMark("subscript").unsetMark("superscript");
-            if (formats.subscript) chain.setMark("subscript");
-            else if (formats.superscript) chain.setMark("superscript");
+            cmd = cmd.unsetMark("subscript").unsetMark("superscript");
+            if (formats.subscript) cmd = cmd.setMark("subscript");
+            else if (formats.superscript) cmd = cmd.setMark("superscript");
 
-            // 构建 textStyle 属性对象
-            const textStyleAttrs: any = {};
+            const textStyleAttrs: Record<string, string> = {};
             if (formats.color) textStyleAttrs.color = formats.color;
             if (formats.fontFamily) textStyleAttrs.fontFamily = formats.fontFamily;
             if (formats.fontSize) textStyleAttrs.fontSize = formats.fontSize;
 
-            // 应用 textStyle（如果有属性）
             if (Object.keys(textStyleAttrs).length > 0) {
-              chain.setMark("textStyle", textStyleAttrs);
+              cmd = cmd.setMark("textStyle", textStyleAttrs);
             } else {
-              chain.unsetMark("textStyle");
+              cmd = cmd.unsetMark("textStyle");
             }
 
-            // 处理背景高亮
             if (formats.highlight) {
-              (chain as any).setHighlight({ color: formats.highlight });
-            } else {
-              (chain as any).unsetHighlight?.();
+              cmd = (cmd as any).setHighlight({ color: formats.highlight });
+            } else if ((cmd as any).unsetHighlight) {
+              cmd = (cmd as any).unsetHighlight();
             }
 
-            // 执行所有文本级格式
-            chain.run();
-
-            // 处理段落级格式（对齐和行距）
             if (formats.textAlign) {
-              editor
-                .chain()
-                .focus()
-                .setTextSelection({ from, to })
-                .setTextAlign(formats.textAlign)
-                .run();
+              cmd = cmd.setTextSelection({ from, to }).setTextAlign(formats.textAlign);
             }
 
             if (formats.lineHeight) {
-              editor
-                .chain()
-                .focus()
-                .setTextSelection({ from, to })
-                .setLineHeight(formats.lineHeight)
-                .run();
+              cmd = cmd.setTextSelection({ from, to }).setLineHeight(formats.lineHeight);
+            }
+
+            if (!cmd.run()) {
+              return false;
             }
           } catch (error) {
             return false;
           }
 
-          // 如果不是连续模式，应用后关闭格式刷
           if (!this.storage.isContinuous) {
             this.storage.isActive = false;
             updateCursorStyle(editor, false);

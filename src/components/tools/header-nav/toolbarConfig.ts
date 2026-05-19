@@ -37,6 +37,8 @@ export interface ToolbarToolsConfig {
   lineHeight?: boolean;
   /** 是否显示下标/上标工具 */
   subscriptSuperscript?: boolean;
+  /** 是否显示数学公式工具 */
+  math?: boolean;
   /** 是否显示格式刷工具 */
   formatPainter?: boolean;
   /** 是否禁用格式刷按钮 */
@@ -117,6 +119,7 @@ export const ADVANCED_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   font: true,
   lineHeight: true,
   subscriptSuperscript: true,
+  math: true,
   formatPainter: true,
   word: true,
   template: true,

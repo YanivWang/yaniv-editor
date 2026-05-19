@@ -33,33 +33,39 @@
         {{ theme === "light" ? t("demo.theme.dark") : t("demo.theme.light") }}
       </button>
 
-      <select
-        v-if="showThemePreset"
-        :value="themePreset"
-        class="demo-theme-select"
-        @change="handleThemePresetChange"
-      >
-        <option value="word">{{ t("demo.themePreset.word") }}</option>
-        <option value="notion">{{ t("demo.themePreset.notion") }}</option>
-        <option value="github">{{ t("demo.themePreset.github") }}</option>
-        <option value="typora">{{ t("demo.themePreset.typora") }}</option>
-      </select>
+      <a-dropdown v-if="showThemePreset" :trigger="['click']" placement="bottomLeft">
+        <button type="button" class="demo-header-select">
+          <span>{{ currentThemePresetLabel }}</span>
+          <DownOutlined class="demo-header-select__arrow" />
+        </button>
+        <template #overlay>
+          <a-menu :selected-keys="[themePreset]" @click="handleThemePresetMenuClick">
+            <a-menu-item v-for="option in themePresetOptions" :key="option.value">
+              {{ option.label }}
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
 
-      <select
-        v-if="showLocaleSelect"
-        :value="locale"
-        class="demo-locale-select"
-        @change="handleLocaleChange"
-      >
-        <option value="en-US">{{ t("demo.locale.enUS") }}</option>
-        <option value="zh-CN">{{ t("demo.locale.zhCN") }}</option>
-        <option value="zh-TW">{{ t("demo.locale.zhTW") }}</option>
-      </select>
+      <a-dropdown v-if="showLocaleSelect" :trigger="['click']" placement="bottomLeft">
+        <button type="button" class="demo-header-select">
+          <span>{{ currentLocaleLabel }}</span>
+          <DownOutlined class="demo-header-select__arrow" />
+        </button>
+        <template #overlay>
+          <a-menu :selected-keys="[locale]" @click="handleLocaleMenuClick">
+            <a-menu-item v-for="option in localeOptions" :key="option.value">
+              {{ option.label }}
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
+import { DownOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
@@ -71,6 +77,7 @@ import {
 import { t, type LocaleCode } from "../../src/locales";
 
 import type { ThemePreset } from "../../src/configs/editorConfig";
+import type { MenuInfo } from "ant-design-vue/es/menu/src/interface";
 
 const props = withDefaults(
   defineProps<{
@@ -115,14 +122,33 @@ const themeToggleTitle = computed(() =>
   props.theme === "light" ? t("demo.theme.switchToDark") : t("demo.theme.switchToLight"),
 );
 
-const handleThemePresetChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
-  emit("update:themePreset", target.value as ThemePreset);
+const themePresetOptions = computed(() => [
+  { value: "word" as const, label: t("demo.themePreset.word") },
+  { value: "notion" as const, label: t("demo.themePreset.notion") },
+  { value: "github" as const, label: t("demo.themePreset.github") },
+  { value: "typora" as const, label: t("demo.themePreset.typora") },
+]);
+
+const localeOptions = computed(() => [
+  { value: "en-US" as const, label: t("demo.locale.enUS") },
+  { value: "zh-CN" as const, label: t("demo.locale.zhCN") },
+  { value: "zh-TW" as const, label: t("demo.locale.zhTW") },
+]);
+
+const currentThemePresetLabel = computed(
+  () => themePresetOptions.value.find((option) => option.value === props.themePreset)?.label ?? "",
+);
+
+const currentLocaleLabel = computed(
+  () => localeOptions.value.find((option) => option.value === props.locale)?.label ?? "",
+);
+
+const handleThemePresetMenuClick = ({ key }: MenuInfo) => {
+  emit("update:themePreset", key as ThemePreset);
 };
 
-const handleLocaleChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
-  emit("update:locale", target.value as LocaleCode);
+const handleLocaleMenuClick = ({ key }: MenuInfo) => {
+  emit("update:locale", key as LocaleCode);
 };
 </script>
 
