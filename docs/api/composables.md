@@ -70,14 +70,7 @@ const label = t("editor.bold");
 ## 主题 API
 
 ```ts
-import {
-  setTheme,
-  getTheme,
-  toggleThemeMode,
-  registerTheme,
-  setDeviceView,
-  setOrientation,
-} from "@yanivjs/yaniv-editor";
+import { setTheme, getTheme, toggleThemeMode, registerTheme } from "@yanivjs/yaniv-editor";
 ```
 
 详见 [主题与样式](/guide/theming)。

@@ -36,6 +36,11 @@
   --tiptap-toolbar-btn-disabled: #cccccc;
   --tiptap-toolbar-btn-text: var(--tiptap-text);
 
+  /* ===== Toolbar Button (shared by inline & word mode) ===== */
+  --menu-btn-color: var(--tiptap-text);
+  --menu-btn-hover-bg: var(--tiptap-toolbar-btn-hover);
+  --menu-primary: var(--tiptap-primary);
+
   /* ===== Bubble Menu ===== */
   --tiptap-bubble-bg: #ffffff;
   --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -113,6 +118,10 @@
   --tiptap-toolbar-bg: #262626;
   --tiptap-toolbar-btn-hover: #333333;
   --tiptap-toolbar-btn-active: #404040;
+  --tiptap-toolbar-btn-text: var(--tiptap-text);
+  --menu-btn-color: #f0f0f0;
+  --menu-btn-hover-bg: #303030;
+  --menu-primary: #4fc3f7;
   --tiptap-bubble-bg: #262626;
   --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   --tiptap-code-bg: #2a2a2a;

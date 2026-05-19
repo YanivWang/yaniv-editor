@@ -79,6 +79,14 @@ function onDblClick() {
   opacity: 0.5;
 }
 
+[data-theme="dark"] .tt-toolbar-button {
+  color: var(--menu-btn-color, #f0f0f0);
+}
+
+[data-theme="dark"] .tt-toolbar-button:disabled {
+  color: #666;
+}
+
 .tt-toolbar-button--small {
   height: 28px;
 }
@@ -93,6 +101,10 @@ function onDblClick() {
 
 .tt-toolbar-button:hover:not(:disabled) {
   background: var(--menu-btn-hover-bg, #f5f5f5);
+}
+
+[data-theme="dark"] .tt-toolbar-button:hover:not(:disabled) {
+  background: var(--menu-btn-hover-bg, #303030);
 }
 
 .tt-toolbar-button:active:not(:disabled) {

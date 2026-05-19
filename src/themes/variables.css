@@ -65,11 +65,6 @@
   --tiptap-toolbar-button-active: #e5e7eb;
   --tiptap-toolbar-divider: #e5e7eb;
 
-  /* ===== Device View ===== */
-  --tiptap-device-width-pc: 100%;
-  --tiptap-device-width-pad: 768px;
-  --tiptap-device-width-mobile: 375px;
-
   /* ===== Z-index ===== */
   --tiptap-z-dropdown: 100;
   --tiptap-z-bubble: 200;

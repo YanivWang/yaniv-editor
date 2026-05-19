@@ -4,7 +4,7 @@ export const demoEnUS: DemoMessages = {
   demo: {
     appTitle: "Yaniv Editor Examples",
     subtitle: {
-      fullEditor: "Full editor example with themes and device preview",
+      fullEditor: "Full editor example with theme switching",
       inlinePlugins: "Inline editor with hot-swappable feature plugins",
     },
     nav: {
@@ -29,19 +29,21 @@ export const demoEnUS: DemoMessages = {
       zhCN: "简体中文",
       zhTW: "繁體中文",
     },
-    autoDemo: {
-      play: "Watch Auto Demo",
-      stop: "Stop",
-      replay: "Replay Demo",
-    },
-    device: {
-      desktop: "Desktop",
-      tablet: "Tablet (iPad)",
-      mobile: "Mobile (iPhone)",
-    },
     inline: {
-      title: "Inline Editor",
-      subtitle: "Compact inline editor with hot-swappable feature plugins",
+      sampleContent: `<h2>Inline Editor</h2>
+<p>A <strong>compact</strong> rich-text editor built for <em>embedded surfaces</em>—comment boxes, chat bubbles, table cells, and card descriptions—without the weight of a full-page editor.</p>
+<h3>Pluggable Toolbar</h3>
+<p>The <strong>Feature Plugins</strong> panel on the right supports <strong>hot-swapping</strong>: toggle plugins and the toolbar above updates <em>instantly</em>. Try Minimal / Writer / Standard / Full presets, or mix your own set.</p>
+<ul>
+  <li><strong>Text format</strong>: bold, italic, underline, strikethrough</li>
+  <li><strong>Headings &amp; lists</strong>: multi-level titles, bullet, numbered, and task lists</li>
+  <li><strong>Font size &amp; alignment</strong>: fine-tune paragraph layout</li>
+  <li><strong>Links &amp; code blocks</strong>: insert hyperlinks or highlighted code snippets</li>
+</ul>
+<blockquote>
+  <p><strong>Tip:</strong> Enable Alignment, Link, or Code Block from the panel, then select text to use those tools.</p>
+</blockquote>
+<p>Keep editing below to feel how <strong>lightweight and customizable</strong> inline editing can be—trim tools to the scenario and keep the UI clean.</p>`,
       emptyToolbar: "Toggle plugins from the panel to add toolbar features",
       stats: "{characters} characters · {words} words",
       pluginsActive: "{enabled}/{total} plugins active",

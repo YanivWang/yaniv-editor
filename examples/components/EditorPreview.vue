@@ -177,9 +177,9 @@ let animationTimer: ReturnType<typeof setTimeout> | null = null;
 let aborted = false;
 
 const mobileLabels = [
-  { text: "5 Themes", color: "linear-gradient(135deg, #667eea, #764ba2)" },
-  { text: "AI Powered", color: "linear-gradient(135deg, #f093fb, #f5576c)" },
-  { text: "Word", color: "linear-gradient(135deg, #4facfe, #00f2fe)" },
+  { text: "5 Themes", color: "#0ea5e9" },
+  { text: "AI Powered", color: "#38bdf8" },
+  { text: "Word", color: "#06b6d4" },
 ];
 
 interface DemoStep {
@@ -392,6 +392,12 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .editor-preview {
+  --demo-bg: #f4f7fb;
+  --demo-accent: #0ea5e9;
+  --demo-accent-hover: #0284c7;
+  --demo-accent-soft: #e0f2fe;
+  --demo-accent-muted: #bae6fd;
+
   position: relative;
   width: 100%;
   max-width: 780px;
@@ -399,26 +405,27 @@ onBeforeUnmount(() => {
   perspective: 1200px;
 }
 
-/* Animated gradient glow behind the window */
+.editor-preview[data-theme="dark"] {
+  --demo-accent: #38bdf8;
+  --demo-accent-hover: #7dd3fc;
+  --demo-accent-soft: #0c4a6e;
+  --demo-accent-muted: #075985;
+}
+
+/* Soft glow behind the window */
 .editor-preview__glow {
   position: absolute;
   inset: -20px;
   z-index: 0;
-  background: conic-gradient(
-    from 0deg,
-    #667eea33,
-    #764ba233,
-    #f093fb33,
-    #f5576c33,
-    #43e97b33,
-    #38f9d733,
-    #4facfe33,
-    #667eea33
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in sRGB, var(--demo-accent) 25%, transparent) 0%,
+    transparent 70%
   );
   border-radius: 24px;
-  opacity: 0.6;
+  opacity: 0.7;
   filter: blur(40px);
-  animation: glow-rotate 8s linear infinite;
+  animation: glow-pulse 6s ease-in-out infinite;
 }
 
 .editor-preview[data-theme="dark"] .editor-preview__glow {
@@ -426,15 +433,15 @@ onBeforeUnmount(() => {
   filter: blur(50px);
 }
 
-@keyframes glow-rotate {
-  0% {
-    transform: rotate(0deg) scale(1);
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
   }
   50% {
-    transform: rotate(180deg) scale(1.05);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
+    opacity: 0.75;
+    transform: scale(1.03);
   }
 }
 
@@ -498,8 +505,8 @@ onBeforeUnmount(() => {
   --ep-text-secondary: #6b7280;
   --ep-btn-bg: #f3f4f6;
   --ep-code-bg: #f8fafc;
-  --ep-quote-border: #667eea;
-  --ep-quote-bg: rgba(102, 126, 234, 0.04);
+  --ep-quote-border: var(--demo-accent, #0ea5e9);
+  --ep-quote-bg: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 6%, transparent);
   --ep-h1: #111827;
   --ep-h2: #374151;
 }
@@ -592,7 +599,7 @@ onBeforeUnmount(() => {
 .toolbar-btn.glow {
   color: var(--ep-text, #333);
   background: var(--ep-btn-bg);
-  box-shadow: 0 0 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 0 12px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 30%, transparent);
 }
 
 .toolbar-btn.icon-btn {
@@ -605,15 +612,15 @@ onBeforeUnmount(() => {
   font-size: 10px;
   color: #fff;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--demo-accent, #0ea5e9);
   border-radius: 6px;
   transition: all 0.3s ease;
 }
 
 .toolbar-btn.ai-btn.ai-pulse {
   box-shadow:
-    0 0 20px rgba(102, 126, 234, 0.5),
-    0 0 40px rgba(118, 75, 162, 0.3);
+    0 0 20px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 45%, transparent),
+    0 0 40px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 20%, transparent);
   transform: scale(1.08);
 }
 
@@ -701,7 +708,7 @@ onBeforeUnmount(() => {
   width: 6px;
   height: 6px;
   content: "";
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--demo-accent, #0ea5e9);
   border-radius: 50%;
 }
 
@@ -738,8 +745,8 @@ onBeforeUnmount(() => {
   padding: 8px 12px;
   font-size: 13.5px;
   color: var(--ep-text-secondary);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.06), rgba(118, 75, 162, 0.06));
-  border: 1px solid rgba(102, 126, 234, 0.12);
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 6%, transparent);
+  border: 1px solid color-mix(in sRGB, var(--demo-accent, #0ea5e9) 15%, transparent);
   border-radius: 8px;
 }
 
@@ -752,7 +759,7 @@ onBeforeUnmount(() => {
   vertical-align: middle;
   color: #fff;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--demo-accent, #0ea5e9);
   border-radius: 4px;
 }
 
@@ -763,9 +770,9 @@ onBeforeUnmount(() => {
   height: 20px;
   margin-left: 1px;
   vertical-align: text-bottom;
-  background: linear-gradient(180deg, #667eea, #764ba2);
+  background: var(--demo-accent, #0ea5e9);
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 0 8px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 40%, transparent);
 }
 
 .cursor--blink {
@@ -844,12 +851,12 @@ onBeforeUnmount(() => {
   color: #333;
   background: rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 4px 20px rgba(102, 126, 234, 0.15),
-    0 0 0 1px rgba(102, 126, 234, 0.1);
+    0 4px 20px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 15%, transparent),
+    0 0 0 1px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 10%, transparent);
 }
 
 .label--themes .floating-label__icon {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--demo-accent, #0ea5e9);
 }
 
 .label--ai {
@@ -858,12 +865,12 @@ onBeforeUnmount(() => {
   color: #333;
   background: rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 4px 20px rgba(240, 147, 251, 0.15),
-    0 0 0 1px rgba(240, 147, 251, 0.1);
+    0 4px 20px color-mix(in sRGB, var(--demo-accent-muted, #38bdf8) 15%, transparent),
+    0 0 0 1px color-mix(in sRGB, var(--demo-accent-muted, #38bdf8) 10%, transparent);
 }
 
 .label--ai .floating-label__icon {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
+  background: var(--demo-accent-muted, #38bdf8);
 }
 
 .label--word {
@@ -872,12 +879,12 @@ onBeforeUnmount(() => {
   color: #333;
   background: rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 4px 20px rgba(79, 172, 254, 0.15),
-    0 0 0 1px rgba(79, 172, 254, 0.1);
+    0 4px 20px color-mix(in sRGB, #06b6d4 15%, transparent),
+    0 0 0 1px color-mix(in sRGB, #06b6d4 10%, transparent);
 }
 
 .label--word .floating-label__icon {
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  background: #06b6d4;
 }
 
 .editor-preview[data-theme="dark"] .floating-label {
@@ -887,20 +894,20 @@ onBeforeUnmount(() => {
 
 .editor-preview[data-theme="dark"] .label--themes {
   box-shadow:
-    0 4px 20px rgba(102, 126, 234, 0.2),
-    0 0 0 1px rgba(102, 126, 234, 0.15);
+    0 4px 20px color-mix(in sRGB, var(--demo-accent, #38bdf8) 20%, transparent),
+    0 0 0 1px color-mix(in sRGB, var(--demo-accent, #38bdf8) 15%, transparent);
 }
 
 .editor-preview[data-theme="dark"] .label--ai {
   box-shadow:
-    0 4px 20px rgba(240, 147, 251, 0.2),
-    0 0 0 1px rgba(240, 147, 251, 0.15);
+    0 4px 20px color-mix(in sRGB, var(--demo-accent-muted, #7dd3fc) 20%, transparent),
+    0 0 0 1px color-mix(in sRGB, var(--demo-accent-muted, #7dd3fc) 15%, transparent);
 }
 
 .editor-preview[data-theme="dark"] .label--word {
   box-shadow:
-    0 4px 20px rgba(79, 172, 254, 0.2),
-    0 0 0 1px rgba(79, 172, 254, 0.15);
+    0 4px 20px color-mix(in sRGB, #22d3ee 20%, transparent),
+    0 0 0 1px color-mix(in sRGB, #22d3ee 15%, transparent);
 }
 
 @keyframes float-label {

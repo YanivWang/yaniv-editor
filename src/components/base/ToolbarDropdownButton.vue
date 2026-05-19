@@ -264,6 +264,15 @@ function onTranslateLangClick(info: { key: string }) {
   background: var(--menu-btn-hover-bg, #f5f5f5);
 }
 
+[data-theme="dark"] .tt-dropdown-btn {
+  color: var(--menu-btn-color, #f0f0f0);
+}
+
+[data-theme="dark"] .tt-dropdown-btn:hover {
+  color: var(--menu-btn-color, #f0f0f0);
+  background: var(--menu-btn-hover-bg, #303030);
+}
+
 .tt-dropdown-btn.is-active {
   color: var(--menu-primary, #1890ff);
   background: #e6f4ff;

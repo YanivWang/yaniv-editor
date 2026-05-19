@@ -18,17 +18,6 @@
         </RouterLink>
       </nav>
 
-      <DeviceSwitcher
-        v-if="showDeviceSwitcher"
-        :model-value="deviceView"
-        :orientation="deviceOrientation"
-        :labels="deviceLabels"
-        @update:model-value="emit('update:deviceView', $event)"
-        @update:orientation="emit('update:deviceOrientation', $event)"
-        @change="emit('deviceChange', $event)"
-        @orientation-change="emit('orientationChange', $event)"
-      />
-
       <button class="demo-theme-toggle" :title="themeToggleTitle" @click="emit('toggleTheme')">
         {{ theme === "light" ? t("demo.theme.dark") : t("demo.theme.light") }}
       </button>
@@ -69,11 +58,6 @@ import { DownOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
 
-import {
-  DeviceSwitcher,
-  type DeviceView,
-  type Orientation,
-} from "../../src/components/tools/device-switcher";
 import { t, type LocaleCode } from "../../src/locales";
 
 import type { ThemePreset } from "../../src/configs/editorConfig";
@@ -84,21 +68,15 @@ const props = withDefaults(
     subtitleKey: string;
     theme: "light" | "dark";
     showLocaleSelect?: boolean;
-    showDeviceSwitcher?: boolean;
     showThemePreset?: boolean;
     themePreset?: ThemePreset;
     locale?: LocaleCode;
-    deviceView?: DeviceView;
-    deviceOrientation?: Orientation;
   }>(),
   {
     showLocaleSelect: false,
-    showDeviceSwitcher: false,
     showThemePreset: false,
     themePreset: "word",
     locale: "zh-CN",
-    deviceView: "pc",
-    deviceOrientation: "portrait",
   },
 );
 
@@ -106,17 +84,7 @@ const emit = defineEmits<{
   toggleTheme: [];
   "update:locale": [value: LocaleCode];
   "update:themePreset": [value: ThemePreset];
-  "update:deviceView": [value: DeviceView];
-  "update:deviceOrientation": [value: Orientation];
-  deviceChange: [value: DeviceView];
-  orientationChange: [value: Orientation];
 }>();
-
-const deviceLabels = computed(() => ({
-  pc: t("demo.device.desktop"),
-  pad: t("demo.device.tablet"),
-  mobile: t("demo.device.mobile"),
-}));
 
 const themeToggleTitle = computed(() =>
   props.theme === "light" ? t("demo.theme.switchToDark") : t("demo.theme.switchToLight"),

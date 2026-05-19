@@ -27,19 +27,8 @@ export interface DemoMessages {
       zhCN: string;
       zhTW: string;
     };
-    autoDemo: {
-      play: string;
-      stop: string;
-      replay: string;
-    };
-    device: {
-      desktop: string;
-      tablet: string;
-      mobile: string;
-    };
     inline: {
-      title: string;
-      subtitle: string;
+      sampleContent: string;
       emptyToolbar: string;
       stats: string;
       pluginsActive: string;

@@ -83,19 +83,6 @@ setTheme("custom", "light");
 
 变量名参见 `src/styles/variables.css`。
 
-## 响应式与设备视图
-
-主题模块还提供设备视图 API（主要用于 Demo 设备框）：
-
-```ts
-import { setDeviceView, setOrientation } from "@yanivjs/yaniv-editor";
-
-setDeviceView("mobile"); // pc | pad | mobile
-setOrientation("portrait"); // portrait | landscape
-```
-
-会在 `document.documentElement` 设置 `data-device` 与 `data-orientation`。
-
 ## 国际化
 
 编辑器 UI 文案通过 `locale` prop 控制：

@@ -1,26 +1,5 @@
 <template>
   <div class="inline-demo" :data-theme="theme">
-    <!-- Section Header -->
-    <div class="inline-demo__header">
-      <h2 class="inline-demo__title">
-        <span class="inline-demo__title-icon">
-          <svg
-            viewBox="0 0 24 24"
-            width="28"
-            height="28"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="3" />
-            <path d="M9 3v18M3 9h18" />
-          </svg>
-        </span>
-        {{ t("demo.inline.title") }}
-      </h2>
-      <p class="inline-demo__subtitle">{{ t("demo.inline.subtitle") }}</p>
-    </div>
-
     <div class="inline-demo__body">
       <!-- Left: Inline Editor -->
       <div class="inline-demo__editor-area">
@@ -225,59 +204,70 @@ interface LocalizedPlugin extends PluginDef {
 }
 
 // Plugin definitions
+const pluginIconColors = [
+  "#e0f2fe",
+  "#dbeafe",
+  "#cffafe",
+  "#ccfbf1",
+  "#d1fae5",
+  "#ecfccb",
+  "#fef3c7",
+  "#e0e7ff",
+] as const;
+
 const allPlugins = reactive<PluginDef[]>([
   {
     id: "undoRedo",
     enabled: true,
-    color: "linear-gradient(135deg, #667eea, #764ba2)",
+    color: pluginIconColors[0],
     iconComponent: UndoOutlined,
   },
   {
     id: "heading",
     enabled: true,
-    color: "linear-gradient(135deg, #f093fb, #f5576c)",
+    color: pluginIconColors[1],
     iconComponent: FontColorsOutlined,
   },
   {
     id: "textFormat",
     enabled: true,
-    color: "linear-gradient(135deg, #4facfe, #00f2fe)",
+    color: pluginIconColors[2],
     iconComponent: BoldOutlined,
   },
   {
     id: "fontSize",
     enabled: false,
-    color: "linear-gradient(135deg, #43e97b, #38f9d7)",
+    color: pluginIconColors[3],
     iconComponent: FontSizeOutlined,
   },
   {
     id: "list",
     enabled: true,
-    color: "linear-gradient(135deg, #fa709a, #fee140)",
+    color: pluginIconColors[4],
     iconComponent: OrderedListOutlined,
   },
   {
     id: "align",
     enabled: false,
-    color: "linear-gradient(135deg, #a18cd1, #fbc2eb)",
+    color: pluginIconColors[5],
     iconComponent: AlignLeftOutlined,
   },
   {
     id: "link",
     enabled: false,
-    color: "linear-gradient(135deg, #ffecd2, #fcb69f)",
+    color: pluginIconColors[6],
     iconComponent: LinkOutlined,
   },
   {
     id: "codeBlock",
     enabled: false,
-    color: "linear-gradient(135deg, #89f7fe, #66a6ff)",
+    color: pluginIconColors[7],
     iconComponent: CodeOutlined,
   },
   {
     id: "formatClear",
     enabled: false,
-    color: "linear-gradient(135deg, #fddb92, #d1fdff)",
+    color: pluginIconColors[0],
     iconComponent: ClearOutlined,
   },
 ]);
@@ -368,17 +358,8 @@ function applyPreset(preset: (typeof presets)[0]) {
   activePreset.value = preset.id;
 }
 
-const inlineContent = `<h2>Inline Editor Demo</h2>
-<p>This is a <strong>compact inline editor</strong> with a <em>pluggable</em> toolbar system. Try toggling the plugins on the right panel!</p>
-<ul>
-  <li>Each plugin can be <strong>added or removed</strong> at runtime</li>
-  <li>The toolbar updates <em>instantly</em> with smooth animations</li>
-  <li>Choose from presets or customize your own combination</li>
-</ul>
-<p>This editor is perfect for <strong>comments</strong>, <strong>chat messages</strong>, <strong>inline editing</strong>, and any scenario where a full-page editor is too heavy.</p>`;
-
 const editor = useEditor({
-  content: inlineContent,
+  content: t("demo.inline.sampleContent"),
   extensions: [
     StarterKit.configure({
       underline: false,
@@ -428,48 +409,18 @@ onBeforeUnmount(() => {
 <style scoped>
 /* ===== Layout ===== */
 .inline-demo {
-  max-width: 1200px;
-  padding: 0 24px;
+  --inline-demo-gap: 24px;
+
+  width: 100%;
+  max-width: 960px;
+  padding: var(--inline-demo-gap);
   margin: 0 auto;
-}
-
-.inline-demo__header {
-  margin-bottom: 40px;
-  text-align: center;
-}
-
-.inline-demo__title {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  margin: 0 0 12px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.inline-demo__title-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-}
-
-.inline-demo__subtitle {
-  margin: 0;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.75);
 }
 
 .inline-demo__body {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 24px;
+  gap: var(--inline-demo-gap);
   align-items: start;
 }
 
@@ -491,8 +442,8 @@ onBeforeUnmount(() => {
 
 .inline-editor-card:focus-within {
   box-shadow:
-    0 8px 32px rgba(102, 126, 234, 0.12),
-    0 0 0 2px rgba(102, 126, 234, 0.2);
+    0 8px 32px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 12%, transparent),
+    0 0 0 2px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 35%, transparent);
 }
 
 /* ===== Inline Toolbar ===== */
@@ -562,8 +513,8 @@ onBeforeUnmount(() => {
 
 /* ===== Editor Content ===== */
 .inline-editor-content {
-  min-height: 280px;
-  max-height: 500px;
+  min-height: 0;
+  max-height: 520px;
   padding: 20px 24px;
   overflow-y: auto;
 }
@@ -617,8 +568,8 @@ onBeforeUnmount(() => {
 .inline-editor-content :deep(.inline-prose blockquote) {
   padding: 0.5em 1em;
   margin: 1em 0;
-  background: rgba(102, 126, 234, 0.04);
-  border-left: 3px solid #667eea;
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 6%, transparent);
+  border-left: 3px solid var(--demo-accent, #0ea5e9);
   border-radius: 0 8px 8px 0;
 }
 
@@ -631,7 +582,7 @@ onBeforeUnmount(() => {
 }
 
 .inline-editor-content :deep(.inline-prose a) {
-  color: #667eea;
+  color: var(--demo-accent, #0ea5e9);
   text-decoration: underline;
 }
 
@@ -661,15 +612,15 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 2px 8px;
   font-weight: 500;
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.08);
+  color: var(--demo-accent, #0ea5e9);
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 10%, transparent);
   border-radius: 10px;
 }
 
 /* ===== Plugin Panel ===== */
 .inline-demo__panel {
   position: sticky;
-  top: 24px;
+  top: var(--inline-demo-gap);
 }
 
 .plugin-panel {
@@ -713,15 +664,15 @@ onBeforeUnmount(() => {
 }
 
 .plugin-panel__btn:hover {
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.04);
-  border-color: rgba(102, 126, 234, 0.3);
+  color: var(--demo-accent, #0ea5e9);
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 6%, transparent);
+  border-color: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 35%, transparent);
 }
 
 .plugin-panel__btn--active {
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.08);
-  border-color: rgba(102, 126, 234, 0.3);
+  color: var(--demo-accent, #0ea5e9);
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 10%, transparent);
+  border-color: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 35%, transparent);
 }
 
 /* ===== Presets ===== */
@@ -752,9 +703,9 @@ onBeforeUnmount(() => {
 }
 
 .preset-btn--active {
-  background: rgba(102, 126, 234, 0.06);
-  border-color: rgba(102, 126, 234, 0.4);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+  background: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 8%, transparent);
+  border-color: color-mix(in sRGB, var(--demo-accent, #0ea5e9) 40%, transparent);
+  box-shadow: 0 2px 8px color-mix(in sRGB, var(--demo-accent, #0ea5e9) 12%, transparent);
 }
 
 .preset-btn__icon {
@@ -765,8 +716,8 @@ onBeforeUnmount(() => {
   height: 28px;
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: var(--demo-accent, #0ea5e9);
+  background: var(--demo-accent-soft, #e0f2fe);
   border-radius: 8px;
 }
 
@@ -799,7 +750,10 @@ onBeforeUnmount(() => {
 }
 
 .plugin-item--enabled {
-  background: var(--item-active-bg, rgba(102, 126, 234, 0.04));
+  background: var(
+    --item-active-bg,
+    color-mix(in sRGB, var(--demo-accent, #0ea5e9) 6%, transparent)
+  );
 }
 
 .plugin-item__info {
@@ -817,7 +771,7 @@ onBeforeUnmount(() => {
   width: 32px;
   height: 32px;
   font-size: 14px;
-  color: #fff;
+  color: var(--demo-accent, #0ea5e9);
   border-radius: 8px;
   transition:
     transform 0.2s,
@@ -874,7 +828,7 @@ onBeforeUnmount(() => {
 }
 
 .plugin-item__toggle.is-on .plugin-item__toggle-track {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: var(--demo-accent, #0ea5e9);
 }
 
 .plugin-item__toggle-thumb {
@@ -904,7 +858,7 @@ onBeforeUnmount(() => {
   --text-muted: #666680;
   --toggle-off-bg: #3a3a4a;
   --item-hover-bg: rgba(255, 255, 255, 0.04);
-  --item-active-bg: rgba(102, 126, 234, 0.08);
+  --item-active-bg: color-mix(in sRGB, var(--demo-accent, #38bdf8) 12%, transparent);
   --preset-bg: #252535;
   --preset-hover-bg: #2a2a3a;
 }
@@ -913,10 +867,20 @@ onBeforeUnmount(() => {
   background: rgba(225, 29, 72, 0.12);
 }
 
+.inline-demo[data-theme="dark"] .inline-toolbar :deep(.ant-select-selector) {
+  color: var(--text-primary, #e0e0f0) !important;
+  background: #252535 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.inline-demo[data-theme="dark"] .inline-toolbar :deep(.ant-select-arrow) {
+  color: var(--text-muted, #94a3b8);
+}
+
 .inline-demo[data-theme="dark"] .inline-editor-card:focus-within {
   box-shadow:
-    0 8px 32px rgba(102, 126, 234, 0.08),
-    0 0 0 2px rgba(102, 126, 234, 0.15);
+    0 8px 32px color-mix(in sRGB, var(--demo-accent, #38bdf8) 10%, transparent),
+    0 0 0 2px color-mix(in sRGB, var(--demo-accent, #38bdf8) 25%, transparent);
 }
 
 /* ===== Responsive ===== */
@@ -931,10 +895,6 @@ onBeforeUnmount(() => {
 
   .plugin-panel__list {
     max-height: 300px;
-  }
-
-  .inline-demo__title {
-    font-size: 26px;
   }
 }
 </style>
