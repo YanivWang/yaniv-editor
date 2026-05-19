@@ -1,3 +1,5 @@
+@import "./_shared.css";
+
 /**
  * Default Theme Preset
  * 通用 Web 编辑器风格（非 Word 分页纸张）
@@ -36,14 +38,12 @@
 .yaniv-editor.theme-default .document-content .ProseMirror h2 {
   margin: 24px 0 12px;
   font-size: 1.5rem;
-  font-weight: 600;
   color: var(--tiptap-text);
 }
 
 .yaniv-editor.theme-default .document-content .ProseMirror h3 {
   margin: 20px 0 8px;
   font-size: 1.25rem;
-  font-weight: 600;
   color: var(--tiptap-text);
 }
 

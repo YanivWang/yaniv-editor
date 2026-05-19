@@ -25,6 +25,7 @@ import { computed } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { t } from "@/locales";
+import "@/types/tiptapExtensions";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
@@ -70,7 +71,7 @@ const listItems = computed(() => {
       name: "taskList",
       icon: CheckSquareOutlined,
       title: t("editor.taskList"),
-      action: () => runCommand((chain) => (chain as any).toggleTaskList?.() ?? chain)(),
+      action: () => runCommand((chain) => chain.toggleTaskList())(),
     });
   }
 

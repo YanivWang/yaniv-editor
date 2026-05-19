@@ -12,7 +12,6 @@ import type { AiAdapter, AiConfig, AiProvider } from "./types";
 const adapterFactories: Record<AiProvider, (config: AiConfig) => AiAdapter> = {
   openai: createOpenAiAdapter,
   deepseek: createOpenAiAdapter,
-  anthropic: createOpenAiAdapter,
   aliyun: createAliyunAdapter,
   ollama: createOllamaAdapter,
   custom: createOpenAiAdapter,

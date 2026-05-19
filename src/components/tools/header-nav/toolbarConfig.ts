@@ -58,29 +58,7 @@ export interface ToolbarToolsConfig {
 }
 
 /**
- * 默认工具栏配置（显示所有工具）
- */
-export const DEFAULT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
-  textFormat: true,
-  colorPicker: true,
-  heading: true,
-  list: true,
-  align: true,
-  image: true,
-  codeBlock: false,
-  link: false,
-  table: false,
-  undoRedo: false,
-  clearFormat: false,
-  font: false,
-  lineHeight: false,
-  subscriptSuperscript: false,
-  formatPainter: false,
-  ai: true,
-};
-
-/**
- * 基础版工具栏配置（只显示基础功能）
+ * 基础版工具栏配置
  */
 export const BASIC_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   textFormat: true,

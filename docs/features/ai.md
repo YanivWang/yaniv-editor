@@ -23,14 +23,13 @@ VITE_AI_API_KEY=sk-...
 
 支持的 `VITE_AI_PROVIDER`：
 
-| Provider    | 说明                        |
-| ----------- | --------------------------- |
-| `openai`    | OpenAI GPT 系列             |
-| `deepseek`  | DeepSeek                    |
-| `anthropic` | Claude                      |
-| `aliyun`    | 通义千问（兼容模式）        |
-| `ollama`    | 本地 Ollama（无需 API Key） |
-| `custom`    | 自定义 OpenAI 兼容端点      |
+| Provider   | 说明                        |
+| ---------- | --------------------------- |
+| `openai`   | OpenAI GPT 系列             |
+| `deepseek` | DeepSeek                    |
+| `aliyun`   | 通义千问（兼容模式）        |
+| `ollama`   | 本地 Ollama（无需 API Key） |
+| `custom`   | 自定义 OpenAI 兼容端点      |
 
 ### 方式二：编辑器内设置（用户级）
 
@@ -63,11 +62,12 @@ AI 结果以建议形式展示，用户确认后写入文档（`AiHighlightMark`
 ## 架构
 
 ```text
-AiToolbarMenu (工具栏)
-  → useAi({ adapter }) ──┐
-                         ├── aiClient (src/features/ai/client.ts)
-PolishExtension / …      │      → createAiAdapter (OpenAI 兼容流式 API)
-  → aiClient ────────────┘
+AiMenuButton (工具栏 / 浮动菜单)
+  → editor.commands.polish() 等 Tiptap 命令
+PolishExtension / SummarizeExtension / …
+  → aiClient (src/features/ai/client.ts)
+       → createAiAdapter（OpenAI 兼容流式 API）
+  → aiSuggestionManager（建议气泡 + 高亮，续写 / 自定义 AI 除外）
 ```
 
 ## 安全提示

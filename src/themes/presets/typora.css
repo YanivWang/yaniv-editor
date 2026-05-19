@@ -1,3 +1,5 @@
+@import "./_shared.css";
+
 /**
  * Typora Theme Preset
  * 类似 Typora 的极简写作风格
@@ -77,7 +79,6 @@
   margin-top: 24px;
   margin-bottom: 12px;
   font-size: 22px;
-  font-weight: 600;
 }
 
 /* Typora 风格 - 高行高舒适阅读 */

@@ -121,11 +121,10 @@ import { SlashCommandExtension } from "@/components/tools/slash-command";
 import type { SlashCommandState } from "@/components/tools/slash-command";
 import { TableToolbar } from "@/components/tools/table-toolbar";
 import { VideoToolbar } from "@/components/tools/video-toolbar";
-import { getExtensionsByVersion } from "@/extensions/coreExtensions";
+import { buildEditorExtensions } from "@/extensions/coreExtensions";
 import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
 import { validateYanivEditorProps } from "@/utils/validateEditorProps";
-
 
 import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 import { useEditorFeatures } from "./useEditorFeatures";
@@ -261,7 +260,7 @@ const initEditor = async () => {
 
     // 获取扩展配置
     const enableImageResize = props.version !== "basic";
-    const extensions = getExtensionsByVersion(props.version, {
+    const extensions = buildEditorExtensions(props.version, {
       enableImageResize,
       features: resolvedExtensionGates.value,
       outline: {

@@ -67,7 +67,7 @@ async function uploadImage(file: File): Promise<string> {
 
 ## 粘贴 Office 图片
 
-从 Word 粘贴含图片内容时，`OfficePaste` 会触发提示 Modal，引导用户单独上传图片。可在 `getExtensionsByVersion` 的 `officePaste.onPasteFromOfficeWithImages` 自定义行为。
+从 Word 粘贴含图片内容时，`OfficePaste` 会触发提示 Modal，引导用户单独上传图片。可在 `buildEditorExtensions` 的 `officePaste.onPasteFromOfficeWithImages` 自定义行为。
 
 ## 相关配置
 

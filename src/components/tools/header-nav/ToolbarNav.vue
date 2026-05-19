@@ -181,7 +181,7 @@ import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
-import { DEFAULT_TOOLBAR_CONFIG } from "./toolbarConfig";
+import { BASIC_TOOLBAR_CONFIG } from "./toolbarConfig";
 
 import type { ToolbarToolsConfig } from "./toolbarConfig";
 import type { Editor } from "@tiptap/vue-3";
@@ -197,7 +197,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  config: () => DEFAULT_TOOLBAR_CONFIG,
+  config: () => BASIC_TOOLBAR_CONFIG,
   enabled: true,
 });
 
@@ -206,7 +206,7 @@ const editor = computed(() => props.editor ?? null);
 // ===== 合并配置 =====
 const config = computed(() => {
   return {
-    ...DEFAULT_TOOLBAR_CONFIG,
+    ...BASIC_TOOLBAR_CONFIG,
     ...props.config,
   };
 });

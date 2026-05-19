@@ -5,7 +5,7 @@
 
 import type { EditorVersion, FeatureConfig } from "@/core/editorTypes";
 
-/** 解析后的门控（全部显式布尔，供 getExtensionsByVersion 使用） */
+/** 解析后的门控（全部显式布尔，供 buildEditorExtensions 使用） */
 export interface ResolvedExtensionGates {
   table: boolean;
   image: boolean;
@@ -21,7 +21,7 @@ export interface ResolvedExtensionGates {
 }
 
 export interface ResolveExtensionGatesInput {
-  /** 与 YanivEditor.version / getExtensionsByVersion 一致 */
+  /** 与 YanivEditor.version / buildEditorExtensions 一致 */
   version: EditorVersion;
   features?: FeatureConfig;
 }

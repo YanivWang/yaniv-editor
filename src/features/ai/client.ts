@@ -28,6 +28,10 @@ interface ResolvedAiConfig {
 
 const DEFAULT_TIMEOUT = 60000;
 
+function isAiDemoMode(): boolean {
+  return typeof import.meta !== "undefined" && import.meta.env?.VITE_AI_DEMO_MODE === "true";
+}
+
 /** 统一错误对象，便于 UI 与扩展展示 */
 export function normalizeAiError(error: unknown): Error {
   if (error instanceof Error) return error;
@@ -84,10 +88,7 @@ function resolveAdapter(explicit?: AiAdapter): AiAdapter {
   });
 }
 
-async function simulateAiStream(
-  callbacks: AiStreamCallbacks,
-  demoType: AiDemoType,
-): Promise<void> {
+async function simulateAiStream(callbacks: AiStreamCallbacks, demoType: AiDemoType): Promise<void> {
   const demoMessages: Record<AiDemoType, string> = {
     continue:
       "这是 AI 续写功能的演示效果。\n\n💡 提示：要使用真实的 AI 功能，请在工具栏的 AI 设置中配置您的 API Key。\n\n支持的 AI 提供商：\n• OpenAI (GPT-4, GPT-3.5)\n• 阿里云通义千问\n• DeepSeek\n• Ollama (本地部署)\n\n配置后，AI 将根据您的内容智能续写，帮助您快速完成文档创作。",
@@ -163,7 +164,15 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
     demoType: AiDemoType = "custom",
   ): Promise<void> {
     if (!fixedAdapter && !isAiConfigured(getAiConfig())) {
-      await simulateAiStream(callbacks, demoType);
+      if (isAiDemoMode()) {
+        await simulateAiStream(callbacks, demoType);
+      } else {
+        callbacks.onError?.(
+          new Error(
+            "请先在工具栏 AI 设置中配置 API Key，或设置 VITE_AI_DEMO_MODE=true 启用演示模式",
+          ),
+        );
+      }
       return;
     }
 
@@ -200,15 +209,8 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
     chat,
     chatStream: sendStreamingRequest,
 
-    continueWriting(
-      content: string,
-      contextPrompt: string,
-      callbacks: AiStreamCallbacks,
-    ): void {
-      const prompt = buildExtensionSystemPrompt(
-        AI_PROMPTS.continueWriting.system,
-        contextPrompt,
-      );
+    continueWriting(content: string, contextPrompt: string, callbacks: AiStreamCallbacks): void {
+      const prompt = buildExtensionSystemPrompt(AI_PROMPTS.continueWriting.system, contextPrompt);
       sendStreamingRequest(prompt, content, callbacks, "continue");
     },
 

@@ -37,7 +37,7 @@
 关闭 Excel 表格粘贴（宿主传入）：
 
 ```ts
-getExtensionsByVersion("advanced", {
+buildEditorExtensions("advanced", {
   officePaste: {
     excelTablePaste: false,
   },

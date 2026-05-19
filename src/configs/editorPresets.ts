@@ -48,15 +48,9 @@ export const editorPresets = {
   notion: {
     version: "advanced",
     features: {
+      ...productionFeatures,
       headerNav: false,
       footerNav: false,
-      floatingMenu: true,
-      slashCommand: true,
-      linkBubbleMenu: true,
-      tableToolbar: true,
-      image: true,
-      table: true,
-      dragHandle: true,
     },
   },
 } as const satisfies Record<string, { version: EditorVersion; features: FeatureConfig }>;

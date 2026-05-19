@@ -17,7 +17,7 @@ YanivEditor
 └── FooterNav           # 底部缩放 / 字数统计
 ```
 
-扩展注册由 `getExtensionsByVersion()` 完成，UI 显示由 `useEditorFeatures()` 与 `features` 门控对齐。
+扩展注册由 `buildEditorExtensions()` 完成，UI 显示由 `useEditorFeatures()` 与 `features` 门控对齐。
 
 ## 基础用法
 

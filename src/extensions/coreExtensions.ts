@@ -79,8 +79,8 @@ export interface ExtensionsOptions {
  * 根据版本获取扩展配置
  * @param _version 编辑器版本（扩展差异主要通过 options.features 门控）
  */
-export function getExtensionsByVersion(
-  _version: EditorVersion = DEFAULT_EDITOR_VERSION,
+export function buildEditorExtensions(
+  version: EditorVersion = DEFAULT_EDITOR_VERSION,
   options: ExtensionsOptions = {},
 ): AnyExtension[] {
   const { enableImageResize = true, officePaste, outline: outlineOptions } = options;
@@ -88,7 +88,7 @@ export function getExtensionsByVersion(
   const gates: ResolvedExtensionGates =
     options.features ??
     resolveExtensionGates({
-      version: _version,
+      version,
     });
 
   const extensions: AnyExtension[] = [];

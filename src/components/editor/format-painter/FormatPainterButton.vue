@@ -37,13 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const editor = computed(() => props.editor ?? null);
 
-// ===== 类型定义 =====
-interface EditorWithStorage {
-  storage?: {
-    formatPainter?: FormatPainterStorage;
-  };
-}
-
 // ===== 禁用状态检查 =====
 /**
  * 计算是否禁用格式刷
@@ -57,8 +50,7 @@ const isDisabled = computed(() => {
  * 获取格式刷存储对象
  */
 function getFormatPainterStorage(): FormatPainterStorage | undefined {
-  const e = editor.value as EditorWithStorage | null;
-  return e?.storage?.formatPainter;
+  return editor.value?.storage.formatPainter;
 }
 
 // 使用响应式 ref 订阅编辑器事件，确保激活态能实时更新
@@ -119,7 +111,7 @@ onBeforeUnmount(() => {
  * @description 单击格式刷按钮，采样格式或应用格式
  */
 function toggleFormatPainter() {
-  const e = editor.value as any;
+  const e = editor.value;
   if (!e) return;
 
   // 检查是否禁用，如果禁用则提示
@@ -128,7 +120,7 @@ function toggleFormatPainter() {
     return;
   }
 
-  const active = e.storage?.formatPainter?.isActive ?? false;
+  const active = e.storage.formatPainter?.isActive ?? false;
 
   if (!active) {
     // 格式刷未激活：检查是否有选中内容
@@ -162,7 +154,7 @@ function toggleFormatPainter() {
  * @description 双击格式刷按钮，开启连续应用模式
  */
 function toggleFormatPainterContinuous() {
-  const e = editor.value as any;
+  const e = editor.value;
   if (!e) return;
 
   // 检查是否禁用，如果禁用则提示
@@ -171,7 +163,7 @@ function toggleFormatPainterContinuous() {
     return;
   }
 
-  const active = e.storage?.formatPainter?.isActive ?? false;
+  const active = e.storage.formatPainter?.isActive ?? false;
 
   if (!active) {
     // 格式刷未激活：检查是否有选中内容

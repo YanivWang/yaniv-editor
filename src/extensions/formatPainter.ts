@@ -3,12 +3,17 @@
  * @description 采样当前选区样式并应用到目标选区
  */
 import { Extension } from "@tiptap/core";
+import "@tiptap/extension-highlight";
 import { Plugin } from "@tiptap/pm/state";
 
 import type { Editor } from "@tiptap/core";
 
 // 为自定义命令添加类型声明，以扩展 RawCommands
 declare module "@tiptap/core" {
+  interface Storage {
+    formatPainter: FormatPainterStorage;
+  }
+
   interface Commands<ReturnType> {
     formatPainter: {
       /**
@@ -51,8 +56,6 @@ export interface FormatPainterStorage {
 }
 
 /** 本地存储的键名 */
-const STORAGE_KEY = "yaniv_format_painter_formats";
-
 export type FormatPainterFormats = FormatPainterStorage["formats"];
 
 /**
@@ -105,45 +108,6 @@ export function sampleFormats(editor: Editor): FormatPainterFormats | null {
 }
 
 /**
- * 保存格式到浏览器本地存储
- * @param formats - 格式对象
- */
-function saveFormatsToStorage(formats: FormatPainterFormats): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(formats));
-  } catch (error) {
-    // ignore
-  }
-}
-
-/**
- * 从浏览器本地存储加载格式
- * @returns 格式对象，如果不存在则返回 null
- */
-function loadFormatsFromStorage(): FormatPainterFormats | null {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      return JSON.parse(data) as FormatPainterFormats;
-    }
-  } catch (error) {
-    // ignore
-  }
-  return null;
-}
-
-/**
- * 清除浏览器本地存储中的格式
- */
-function clearFormatsFromStorage(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    // ignore
-  }
-}
-
-/**
  * 更新格式刷光标样式
  * @param editor - Tiptap 编辑器实例
  * @param add - 是否添加样式类，true 为添加，false 为移除
@@ -166,12 +130,10 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
   name: "formatPainter",
 
   addStorage() {
-    // 尝试从本地存储恢复格式
-    const savedFormats = loadFormatsFromStorage();
     return {
       isActive: false,
       isContinuous: false,
-      formats: savedFormats || {},
+      formats: {},
     };
   },
 
@@ -201,12 +163,9 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
             return false;
           }
 
-          // 保存格式到内存和本地存储
           this.storage.formats = formats;
           this.storage.isActive = true;
-          // 如果传入 2 则为连续模式，否则（1 或 undefined）为单次模式
           this.storage.isContinuous = mode === 2;
-          saveFormatsToStorage(formats);
 
           // 更新光标样式
           updateCursorStyle(editor, true);
@@ -237,11 +196,9 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
             return false;
           }
 
-          // 保存格式到内存和本地存储
           this.storage.formats = formats;
           this.storage.isActive = true;
           this.storage.isContinuous = true;
-          saveFormatsToStorage(formats);
 
           // 更新光标样式
           updateCursorStyle(editor, true);
@@ -271,16 +228,7 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
             return false;
           }
 
-          // 检查是否有格式信息（优先从内存，其次从本地存储）
-          let formats = this.storage.formats;
-          if (!formats || Object.keys(formats).length === 0) {
-            const savedFormats = loadFormatsFromStorage();
-            if (savedFormats) {
-              this.storage.formats = savedFormats;
-              formats = savedFormats;
-            }
-          }
-
+          const formats = this.storage.formats;
           if (!formats || Object.keys(formats).length === 0) {
             return false;
           }
@@ -319,9 +267,9 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
             }
 
             if (formats.highlight) {
-              cmd = (cmd as any).setHighlight({ color: formats.highlight });
-            } else if ((cmd as any).unsetHighlight) {
-              cmd = (cmd as any).unsetHighlight();
+              cmd = cmd.setHighlight({ color: formats.highlight });
+            } else {
+              cmd = cmd.unsetHighlight();
             }
 
             if (formats.textAlign) {
@@ -357,7 +305,6 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
           this.storage.isActive = false;
           this.storage.isContinuous = false;
           this.storage.formats = {};
-          clearFormatsFromStorage();
           updateCursorStyle(editor, false);
           return true;
         },

@@ -82,6 +82,8 @@ function getStoredConfig(): Omit<AiUserConfig, "apiKey"> | null {
         timeout: parsed.timeout || DEFAULT_CONFIG.timeout,
         enabled: parsed.enabled !== false,
         updatedAt: parsed.updatedAt || Date.now(),
+        translateTargetLang:
+          typeof parsed.translateTargetLang === "string" ? parsed.translateTargetLang : undefined,
       };
     }
   } catch {
@@ -174,11 +176,4 @@ export function getAiConfigStore(): AiConfigStore {
     storeInstance = createAiConfigStore();
   }
   return storeInstance;
-}
-
-/**
- * 重置存储实例（用于测试）
- */
-export function resetAiConfigStore(): void {
-  storeInstance = null;
 }

@@ -7,7 +7,6 @@ import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
 
-
 /**
  * 版本类型
  */
@@ -36,8 +35,6 @@ export interface FeatureConfig {
   officePaste?: boolean;
   /** 是否启用表格工具栏（默认关闭，需显式开启） */
   tableToolbar?: boolean;
-  /** 是否启用@提及功能 */
-  mention?: boolean;
   /** 是否启用斜杠命令菜单（输入 / 弹出块类型选择） */
   slashCommand?: boolean;
   /** 是否启用左侧六点拖拽手柄（只拖动排序，不带菜单；默认开启） */

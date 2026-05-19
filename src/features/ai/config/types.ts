@@ -4,7 +4,7 @@
  */
 
 /** 支持的 AI 提供商 */
-export type AiProvider = "openai" | "deepseek" | "anthropic" | "aliyun" | "ollama" | "custom";
+export type AiProvider = "openai" | "deepseek" | "aliyun" | "ollama" | "custom";
 
 /** AI 提供商信息 */
 export interface AiProviderInfo {
@@ -40,6 +40,8 @@ export interface AiUserConfig {
   enabled: boolean;
   /** 最后更新时间 */
   updatedAt: number;
+  /** 翻译目标语言（界面标签，如「英文」） */
+  translateTargetLang?: string;
 }
 
 /** AI 配置状态 */
@@ -103,15 +105,6 @@ export const AI_PROVIDERS: AiProviderInfo[] = [
     defaultModel: "deepseek-chat",
     requiresApiKey: true,
     docsUrl: "https://platform.deepseek.com/docs",
-  },
-  {
-    id: "anthropic",
-    name: "Anthropic",
-    description: "Claude 3.5 Sonnet, Claude 3 Opus 等模型",
-    defaultEndpoint: "https://api.anthropic.com/v1",
-    defaultModel: "claude-3-5-sonnet-20241022",
-    requiresApiKey: true,
-    docsUrl: "https://docs.anthropic.com",
   },
   {
     id: "aliyun",

@@ -99,6 +99,7 @@ import {
 import { Tooltip as ATooltip } from "ant-design-vue";
 import { ref, computed, nextTick } from "vue";
 
+import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";
 
 import AiSettingsModal from "./components/AiSettingsModal.vue";
@@ -106,17 +107,6 @@ import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./transl
 
 import type { Editor } from "@tiptap/core";
 import type { Component } from "vue";
-
-// 菜单项配置类型
-export interface MenuItemConfig {
-  key: string;
-  label: string;
-  icon?: Component;
-  action?: () => void;
-  disabled?: boolean;
-  danger?: boolean;
-  children?: MenuItemConfig[];
-}
 
 // 下拉菜单打开状态（用于控制 Tooltip 显示）
 const dropdownOpen = ref(false);
@@ -232,19 +222,19 @@ function runEditorAiChain(
 
   switch (command) {
     case "continueWriting":
-      (chain as any).continueWriting().run();
+      chain.continueWriting().run();
       break;
     case "polish":
-      (chain as any).polish().run();
+      chain.polish().run();
       break;
     case "summarize":
-      (chain as any).summarize().run();
+      chain.summarize().run();
       break;
     case "customAi":
-      (chain as any).customAi().run();
+      chain.customAi().run();
       break;
     case "translate":
-      (chain as any).translate(targetLang).run();
+      chain.translate(targetLang).run();
       break;
   }
 }
@@ -313,285 +303,44 @@ function handleOpenChange(open: boolean) {
   }
 }
 
-// 构建菜单项
-const menuItems = computed(() => {
-  const { editor } = props;
-
-  return [
-    {
-      key: "continueWriting",
-      label: t("editor.continueWriting"),
-      icon: ThunderboltOutlined,
-      action: () => {
-        if (!editor) return;
-
-        try {
-          // 验证编辑器状态
-          const { state } = editor;
-          const { selection, doc } = state;
-          const docSize = doc.content.size;
-
-          // 验证 selection 是否有效
-          if (
-            selection.from < 0 ||
-            selection.to < 0 ||
-            selection.from > docSize ||
-            selection.to > docSize ||
-            selection.from > selection.to
-          ) {
-            console.warn("[AI Menu] Invalid selection, cannot execute continueWriting");
-            return;
-          }
-
-          // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).continueWriting === "function") {
-            const result = editor.chain().focus().continueWriting().run();
-            if (!result) {
-              console.warn("[AI Menu] continueWriting command returned false");
-            }
-          } else {
-            console.warn("[AI Menu] continueWriting command not available");
-            editor.commands.focus();
-          }
-        } catch (error) {
-          console.error("[AI Menu] Error executing continueWriting:", error);
-        }
-      },
-      disabled: false,
-      danger: false,
-    },
-    {
-      key: "polish",
-      label: t("editor.polish"),
-      icon: EditOutlined,
-      action: () => {
-        if (!editor) return;
-
-        try {
-          // 验证编辑器状态
-          const { state } = editor;
-          const { selection, doc } = state;
-          const docSize = doc.content.size;
-
-          // 验证 selection 是否有效
-          if (
-            selection.from < 0 ||
-            selection.to < 0 ||
-            selection.from > docSize ||
-            selection.to > docSize ||
-            selection.from > selection.to
-          ) {
-            console.warn("[AI Menu] Invalid selection, cannot execute polish");
-            return;
-          }
-
-          // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).polish === "function") {
-            const result = editor.chain().focus().polish().run();
-            if (!result) {
-              console.warn("[AI Menu] polish command returned false");
-            }
-          } else {
-            console.warn("[AI Menu] polish command not available");
-            editor.commands.focus();
-          }
-        } catch (error) {
-          console.error("[AI Menu] Error executing polish:", error);
-        }
-      },
-      disabled: false,
-      danger: false,
-    },
-    {
-      key: "summarize",
-      label: t("editor.summarize"),
-      icon: FileTextOutlined,
-      action: () => {
-        if (!editor) return;
-
-        try {
-          // 验证编辑器状态
-          const { state } = editor;
-          const { selection, doc } = state;
-          const docSize = doc.content.size;
-
-          // 验证 selection 是否有效
-          if (
-            selection.from < 0 ||
-            selection.to < 0 ||
-            selection.from > docSize ||
-            selection.to > docSize ||
-            selection.from > selection.to
-          ) {
-            console.warn("[AI Menu] Invalid selection, cannot execute summarize");
-            return;
-          }
-
-          // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).summarize === "function") {
-            const result = editor.chain().focus().summarize().run();
-            if (!result) {
-              console.warn("[AI Menu] summarize command returned false");
-            }
-          } else {
-            console.warn("[AI Menu] summarize command not available");
-            editor.commands.focus();
-          }
-        } catch (error) {
-          console.error("[AI Menu] Error executing summarize:", error);
-        }
-      },
-      disabled: false,
-      danger: false,
-    },
-    {
-      key: "customAi",
-      label: t("editor.customAi"),
-      icon: BulbOutlined,
-      action: () => {
-        if (!editor) return;
-
-        try {
-          // 验证编辑器状态
-          const { state } = editor;
-          const { selection, doc } = state;
-          const docSize = doc.content.size;
-
-          // 验证 selection 是否有效
-          if (
-            selection.from < 0 ||
-            selection.to < 0 ||
-            selection.from > docSize ||
-            selection.to > docSize ||
-            selection.from > selection.to
-          ) {
-            console.warn("[AI Menu] Invalid selection, cannot execute customAi");
-            return;
-          }
-
-          // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).customAi === "function") {
-            const result = editor.chain().focus().customAi().run();
-            if (!result) {
-              console.warn("[AI Menu] customAi command returned false");
-            }
-          } else {
-            console.warn("[AI Menu] customAi command not available");
-            editor.commands.focus();
-          }
-        } catch (error) {
-          console.error("[AI Menu] Error executing customAi:", error);
-        }
-      },
-      disabled: false,
-      danger: false,
-    },
-    {
-      key: "translate",
-      label: currentTranslateLang.value
-        ? t("editor.translateTo", { lang: currentTranslateLang.value })
-        : t("editor.translate"),
-      icon: TranslationOutlined,
-      action: () => {
-        if (!editor) return;
-
-        try {
-          // 验证编辑器状态
-          const { state } = editor;
-          const { selection, doc } = state;
-          const docSize = doc.content.size;
-
-          // 验证 selection 是否有效
-          if (
-            selection.from < 0 ||
-            selection.to < 0 ||
-            selection.from > docSize ||
-            selection.to > docSize ||
-            selection.from > selection.to
-          ) {
-            console.warn("[AI Menu] Invalid selection, cannot execute translate");
-            return;
-          }
-
-          // 使用保存的语言或默认语言
-          const targetLang = currentTranslateLang.value || "英文";
-
-          // 使用 chain 确保命令在同一个事务中执行
-          if (typeof (editor.commands as any).translate === "function") {
-            const result = editor.chain().focus().translate(targetLang).run();
-            if (!result) {
-              console.warn("[AI Menu] translate command returned false");
-            }
-          } else {
-            console.warn("[AI Menu] translate command not available");
-            editor.commands.focus();
-          }
-        } catch (error) {
-          console.error("[AI Menu] Error executing translate:", error);
-        }
-      },
-      disabled: false,
-      danger: false,
-      children: LANGUAGE_CODES.map(({ code, key }) => {
-        const langLabel = t(`editor.lang.${key}`);
-        return {
-          key: `translate-${code}`,
-          label: langLabel,
-          action: () => {
-            if (!editor) return;
-
-            // 设置并保存语言选择
-            setTranslateLang(langLabel);
-
-            try {
-              // 验证编辑器状态
-              const { state } = editor;
-              const { selection, doc } = state;
-              const docSize = doc.content.size;
-
-              // 验证 selection 是否有效
-              if (
-                selection.from < 0 ||
-                selection.to < 0 ||
-                selection.from > docSize ||
-                selection.to > docSize ||
-                selection.from > selection.to
-              ) {
-                console.warn("[AI Menu] Invalid selection, cannot execute translate");
-                return;
-              }
-
-              // 使用 chain 确保命令在同一个事务中执行
-              if (typeof (editor.commands as any).translate === "function") {
-                const result = editor.chain().focus().translate(langLabel).run();
-                if (!result) {
-                  console.warn("[AI Menu] translate command returned false");
-                }
-              } else {
-                console.warn("[AI Menu] translate command not available");
-                editor.commands.focus();
-              }
-            } catch (error) {
-              console.error("[AI Menu] Error executing translate:", error);
-            }
-          },
-          disabled: false,
-          danger: false,
-        };
-      }),
-    },
-    {
-      key: "settings",
-      label: t("aiSettings.title"),
-      icon: SettingOutlined,
-      action: () => {
-        showSettings.value = true;
-      },
-      disabled: false,
-      danger: false,
-    },
-  ] as MenuItemConfig[];
-});
+const menuItems = computed((): MenuItemConfig[] => [
+  {
+    key: "continueWriting",
+    label: t("editor.continueWriting"),
+    icon: ThunderboltOutlined,
+  },
+  {
+    key: "polish",
+    label: t("editor.polish"),
+    icon: EditOutlined,
+  },
+  {
+    key: "summarize",
+    label: t("editor.summarize"),
+    icon: FileTextOutlined,
+  },
+  {
+    key: "customAi",
+    label: t("editor.customAi"),
+    icon: BulbOutlined,
+  },
+  {
+    key: "translate",
+    label: currentTranslateLang.value
+      ? t("editor.translateTo", { lang: currentTranslateLang.value })
+      : t("editor.translate"),
+    icon: TranslationOutlined,
+    children: LANGUAGE_CODES.map(({ code, key }) => ({
+      key: `translate-${code}`,
+      label: t(`editor.lang.${key}`),
+    })),
+  },
+  {
+    key: "settings",
+    label: t("aiSettings.title"),
+    icon: SettingOutlined,
+  },
+]);
 </script>
 
 <style scoped>

@@ -30,24 +30,10 @@ export function useEditorFeatures(props: YanivEditorProps) {
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
-    const base: ToolbarToolsConfig =
+    const base =
       resolvedVersion.value === "advanced"
-        ? {
-            ...ADVANCED_TOOLBAR_CONFIG,
-            codeBlock: true,
-            link: true,
-            table: true,
-            font: true,
-            lineHeight: true,
-            clearFormat: true,
-            undoRedo: true,
-            subscriptSuperscript: true,
-            formatPainter: true,
-          }
-        : {
-            ...BASIC_TOOLBAR_CONFIG,
-            undoRedo: true,
-          };
+        ? ADVANCED_TOOLBAR_CONFIG
+        : { ...BASIC_TOOLBAR_CONFIG, undoRedo: true };
 
     return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);
   });

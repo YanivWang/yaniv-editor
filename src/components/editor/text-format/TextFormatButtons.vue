@@ -26,6 +26,7 @@ import { computed } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { t } from "@/locales";
+import "@/types/tiptapExtensions";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
@@ -67,7 +68,7 @@ const textFormats = computed<TextFormat[]>(() => [
     name: "underline",
     icon: UnderlineOutlined,
     title: t("editor.underline"),
-    action: () => runCommand((chain) => (chain as any).toggleUnderline?.() ?? chain)(),
+    action: () => runCommand((chain) => chain.toggleUnderline())(),
   },
   {
     name: "strike",

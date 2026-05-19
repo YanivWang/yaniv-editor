@@ -62,7 +62,6 @@ async function testConnection(config: AiUserConfig): Promise<ConnectionTestResul
   try {
     // 构建测试请求
     let testUrl = endpoint;
-    let testBody: string;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -83,26 +82,13 @@ async function testConnection(config: AiUserConfig): Promise<ConnectionTestResul
       return { success: true, message: "连接成功", latency };
     }
 
-    if (config.provider === "anthropic") {
-      // Anthropic 使用不同的头部
-      headers["x-api-key"] = config.apiKey;
-      headers["anthropic-version"] = "2023-06-01";
-      testUrl = endpoint.replace(/\/$/, "") + "/messages";
-      testBody = JSON.stringify({
-        model: config.model || providerInfo.defaultModel,
-        max_tokens: 1,
-        messages: [{ role: "user", content: "Hi" }],
-      });
-    } else {
-      // OpenAI 兼容接口
-      headers["Authorization"] = `Bearer ${config.apiKey}`;
-      testUrl = endpoint.replace(/\/$/, "") + "/chat/completions";
-      testBody = JSON.stringify({
-        model: config.model || providerInfo.defaultModel,
-        max_tokens: 1,
-        messages: [{ role: "user", content: "Hi" }],
-      });
-    }
+    headers["Authorization"] = `Bearer ${config.apiKey}`;
+    testUrl = endpoint.replace(/\/$/, "") + "/chat/completions";
+    const testBody = JSON.stringify({
+      model: config.model || providerInfo.defaultModel,
+      max_tokens: 1,
+      messages: [{ role: "user", content: "Hi" }],
+    });
 
     const response = await fetch(testUrl, {
       method: "POST",
