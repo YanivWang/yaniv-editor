@@ -65,15 +65,7 @@ import {
 } from "../../src/components/editor/template/templates";
 import { exportToWord } from "../../src/components/editor/word/wordExport";
 
-import type { Editor as TiptapEditor } from "@tiptap/core";
-
-/**
- * 演示脚本用的编辑器类型。
- * YanivEditor 在运行时注册了 StarterKit / 扩展命令，但 @tiptap/core 默认的 SingleCommands 未包含它们。
- */
-type DemoEditor = Omit<TiptapEditor, "commands"> & {
-  commands: Record<string, (...args: unknown[]) => boolean>;
-};
+import type { DemoEditor } from "../types/demo-editor";
 
 interface Props {
   getEditor: () => DemoEditor | null;
@@ -168,7 +160,7 @@ async function settleEditor(signal: AbortSignal) {
 }
 
 /** 分节执行：单节失败不阻断后续图片、AI 等演示 */
-async function runDemoSection(label: string, signal: AbortSignal, fn: () => Promise<void>) {
+async function runDemoSection(label: string, _signal: AbortSignal, fn: () => Promise<void>) {
   try {
     await fn();
   } catch (error) {
@@ -1709,8 +1701,8 @@ async function startDemo() {
     await runDemoScript(editor, abortController.signal);
     isFinished.value = true;
     emit("finish");
-  } catch (e: any) {
-    if (e.name !== "AbortError") {
+  } catch (e: unknown) {
+    if (!(e instanceof DOMException && e.name === "AbortError")) {
       console.error("[EditorAutoDemo] Script error:", e);
     }
   } finally {

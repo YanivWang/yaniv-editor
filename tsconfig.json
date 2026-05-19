@@ -43,6 +43,12 @@
     /* Types */
     "types": ["vite/client", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "examples/**/*.ts",
+    "examples/**/*.vue"
+  ],
   "exclude": ["node_modules", "dist"]
 }

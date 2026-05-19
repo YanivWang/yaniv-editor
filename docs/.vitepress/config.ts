@@ -64,10 +64,6 @@ export default defineConfig({
       ],
     },
     socialLinks: [{ icon: "github", link: "https://github.com/YanivWang/yaniv-editor" }],
-    footer: {
-      message: "MIT Licensed",
-      copyright: "Copyright © Yaniv Editor contributors",
-    },
     search: {
       provider: "local",
     },

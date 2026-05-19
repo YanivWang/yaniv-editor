@@ -6,7 +6,7 @@
 
 开箱即用的编辑器主题与组件库：多视觉预设、可插拔工具栏、功能门控、AI 辅助写作与 Word 互转；支持 **Full Editor** 一站式接入与 **Inline** 按需拼装两种集成方式。
 
-[![npm version](https://img.shields.io/npm/v/@yanivjs/yaniv-editor?logo=npm&logoColor=white)](https://www.npmjs.com/package/@yanivjs/yaniv-editor) [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)](https://vuejs.org/) [![Tiptap 3](https://img.shields.io/badge/Tiptap-3-000000?logo=prosemirror&logoColor=white)](https://tiptap.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/) [![pnpm](https://img.shields.io/badge/pnpm-≥10.17-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/) [![Node.js ≥20](https://img.shields.io/badge/Node.js-≥20.19-green?logo=node.js&logoColor=white)](https://nodejs.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@yanivjs/yaniv-editor?logo=npm&logoColor=white)](https://www.npmjs.com/package/@yanivjs/yaniv-editor) [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)](https://vuejs.org/) [![Tiptap 3](https://img.shields.io/badge/Tiptap-3-000000?logo=prosemirror&logoColor=white)](https://tiptap.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/) [![pnpm](https://img.shields.io/badge/pnpm-≥10.17-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/) [![Node.js ≥20](https://img.shields.io/badge/Node.js-≥20.19-green?logo=node.js&logoColor=white)](https://nodejs.org/)
 
 [**完整文档**](docs/index.md) · [**快速开始**](docs/guide/getting-started.md) · [**功能总览**](docs/features/overview.md) · [**GitHub**](https://github.com/YanivWang/yaniv-editor) · [**npm**](https://www.npmjs.com/package/@yanivjs/yaniv-editor)
 
@@ -28,7 +28,6 @@
 - [文档导航](#文档导航)
 - [AI 配置（可选）](#ai-配置可选)
 - [代码质量与提交约定](#代码质量与提交约定)
-- [许可证](#许可证)
 
 ---
 
@@ -301,7 +300,3 @@ docs: 更新 README 与功能总览
 ```
 
 ---
-
-## 许可证
-
-[MIT](LICENSE) — Copyright © benngaihk

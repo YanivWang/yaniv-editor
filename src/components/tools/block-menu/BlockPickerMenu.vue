@@ -123,8 +123,9 @@ function selectItem(item: BlockMenuItemDef) {
   const editor = props.editor;
   if (!editor || !mode.value) return;
 
-  if (isMediaBlockId(item.id)) {
-    const accept = item.id === "image" ? "image/*" : "video/*";
+  const blockId = item.id;
+  if (isMediaBlockId(blockId)) {
+    const accept = blockId === "image" ? "image/*" : "video/*";
     const currentMode = mode.value;
     const context = insertContext.value;
 
@@ -142,7 +143,7 @@ function selectItem(item: BlockMenuItemDef) {
 
       void pickMediaFile(accept).then((src) => {
         if (!src) return;
-        insertBlockMediaAt(editor, insertPos, item.id, src);
+        insertBlockMediaAt(editor, insertPos, blockId, src);
       });
 
       return;
@@ -153,7 +154,7 @@ function selectItem(item: BlockMenuItemDef) {
     void pickMediaFile(accept).then((src) => {
       if (!src) return;
       if (context) {
-        insertBlockMediaAt(editor, context.insertPos, item.id, src);
+        insertBlockMediaAt(editor, context.insertPos, blockId, src);
       }
     });
 

@@ -1,7 +1,7 @@
 <template>
   <header class="demo-header">
     <div class="demo-header__content">
-      <RouterLink class="demo-header__title" :to="{ name: 'home' }">
+      <RouterLink class="demo-header__title" :to="{ name: 'full-editor' }">
         <span class="demo-header__icon">Y</span>
         {{ t("demo.appTitle") }}
       </RouterLink>

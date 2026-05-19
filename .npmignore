@@ -6,7 +6,6 @@ node_modules/
 *.log
 *.md
 !README.md
-!LICENSE
 
 # Config files
 .editorconfig

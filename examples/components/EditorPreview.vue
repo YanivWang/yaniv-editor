@@ -166,7 +166,7 @@ interface ContentLine {
   tag?: string;
 }
 
-const rootRef = ref<HTMLElement | null>(null);
+// const rootRef = ref<HTMLElement | null>(null);
 const visibleLines = ref<ContentLine[]>([]);
 const isTyping = ref(false);
 const activeFormat = ref("");

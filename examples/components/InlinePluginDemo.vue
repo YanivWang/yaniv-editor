@@ -184,9 +184,8 @@ import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import { ref, computed, onMounted, onBeforeUnmount, reactive } from "vue";
-
+import { useEditor, EditorContent } from "@tiptap/vue-3";
+import { ref, computed, onBeforeUnmount, reactive } from "vue";
 
 import {
   UndoRedoGroup,
@@ -202,6 +201,8 @@ import { TextFormatButtons as TextFormatGroup } from "@/editor/text-format";
 
 import { FontSize } from "../../src/extensions/fontSize";
 import { t } from "../../src/locales";
+
+import type { Component } from "vue";
 import "../../src/styles/variables.css";
 import "../../src/styles/base.css";
 import "../../src/styles/toolbar.css";
@@ -214,7 +215,7 @@ interface PluginDef {
   id: string;
   enabled: boolean;
   color: string;
-  iconComponent?: any;
+  iconComponent?: Component;
   iconSvg?: string;
 }
 
@@ -367,8 +368,41 @@ function applyPreset(preset: (typeof presets)[0]) {
   activePreset.value = preset.id;
 }
 
-// Editor
-const editor = ref<Editor | null>(null);
+const inlineContent = `<h2>Inline Editor Demo</h2>
+<p>This is a <strong>compact inline editor</strong> with a <em>pluggable</em> toolbar system. Try toggling the plugins on the right panel!</p>
+<ul>
+  <li>Each plugin can be <strong>added or removed</strong> at runtime</li>
+  <li>The toolbar updates <em>instantly</em> with smooth animations</li>
+  <li>Choose from presets or customize your own combination</li>
+</ul>
+<p>This editor is perfect for <strong>comments</strong>, <strong>chat messages</strong>, <strong>inline editing</strong>, and any scenario where a full-page editor is too heavy.</p>`;
+
+const editor = useEditor({
+  content: inlineContent,
+  extensions: [
+    StarterKit.configure({
+      underline: false,
+    }),
+    Underline,
+    TextStyle,
+    FontSize,
+    TextAlign.configure({
+      types: ["heading", "paragraph"],
+    }),
+    Placeholder.configure({
+      placeholder: "Start typing...",
+    }),
+    TaskList,
+    TaskItem.configure({ nested: true }),
+    CharacterCount,
+  ],
+  editorProps: {
+    attributes: {
+      class: "inline-prose",
+    },
+  },
+});
+
 const characterCount = computed(() => editor.value?.storage.characterCount?.characters() || 0);
 const wordCount = computed(() => editor.value?.storage.characterCount?.words() || 0);
 
@@ -385,43 +419,6 @@ const pluginsActiveText = computed(() =>
     total: String(totalCount.value),
   }),
 );
-
-const inlineContent = `<h2>Inline Editor Demo</h2>
-<p>This is a <strong>compact inline editor</strong> with a <em>pluggable</em> toolbar system. Try toggling the plugins on the right panel!</p>
-<ul>
-  <li>Each plugin can be <strong>added or removed</strong> at runtime</li>
-  <li>The toolbar updates <em>instantly</em> with smooth animations</li>
-  <li>Choose from presets or customize your own combination</li>
-</ul>
-<p>This editor is perfect for <strong>comments</strong>, <strong>chat messages</strong>, <strong>inline editing</strong>, and any scenario where a full-page editor is too heavy.</p>`;
-
-onMounted(() => {
-  editor.value = new Editor({
-    content: inlineContent,
-    extensions: [
-      StarterKit.configure({
-        underline: false,
-      }),
-      Underline,
-      TextStyle,
-      FontSize,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-      Placeholder.configure({
-        placeholder: "Start typing...",
-      }),
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      CharacterCount,
-    ],
-    editorProps: {
-      attributes: {
-        class: "inline-prose",
-      },
-    },
-  });
-});
 
 onBeforeUnmount(() => {
   editor.value?.destroy();

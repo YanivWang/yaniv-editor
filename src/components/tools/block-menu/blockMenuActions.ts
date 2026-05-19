@@ -77,10 +77,12 @@ function focusInsertPos(editor: Editor, insertPos: number): void {
   view.focus();
 }
 
-const MEDIA_BLOCK_IDS = new Set<BlockMenuItemId>(["image", "video"]);
+export type MediaBlockId = "image" | "video";
 
-export function isMediaBlockId(blockId: BlockMenuItemId): boolean {
-  return MEDIA_BLOCK_IDS.has(blockId);
+const MEDIA_BLOCK_IDS = new Set<MediaBlockId>(["image", "video"]);
+
+export function isMediaBlockId(blockId: BlockMenuItemId): blockId is MediaBlockId {
+  return MEDIA_BLOCK_IDS.has(blockId as MediaBlockId);
 }
 
 /** 打开系统文件选择器，返回 Data URL */
@@ -115,7 +117,7 @@ export function pickMediaFile(accept: string): Promise<string | null> {
 export function insertBlockMediaAt(
   editor: Editor,
   insertPos: number,
-  blockId: "image" | "video",
+  blockId: MediaBlockId,
   src: string,
 ): void {
   editor.chain().insertContentAt(insertPos, { type: blockId, attrs: { src } }).focus().run();

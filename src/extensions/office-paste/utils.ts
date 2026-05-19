@@ -1,5 +1,5 @@
 /**
- * Office / WPS 剪贴 HTML 辅助（思路参考 Umo Editor office-paste，MIT）
+ * Office / WPS 剪贴 HTML 辅助（思路参考 Umo Editor office-paste）
  */
 
 export function parseRomanNumber(roman: string): number {

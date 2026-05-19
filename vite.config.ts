@@ -13,9 +13,8 @@ export default defineConfig({
       insertTypesEntry: true,
       outDir: "dist",
       rollupTypes: true, // Bundle all .d.ts into one file
-      logLevel: "error", // Only show errors
-      strictOutput: false, // Don't fail on declaration errors
-      skipDiagnostics: true, // Skip type diagnostics to avoid vue-types issue
+      logLevel: "error",
+      strictOutput: false,
       // Exclude files that use ant-design-vue Popover (causes vue-types path issues)
       exclude: [
         "src/features/ai/shared/CustomAiPopover.vue",
@@ -88,7 +87,6 @@ export default defineConfig({
     },
     cssCodeSplit: false,
   },
-  // Define for license validation
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __VERSION__: JSON.stringify(process.env.npm_package_version || "0.1.0"),

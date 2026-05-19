@@ -61,6 +61,7 @@ import { t, useI18n, type LocaleCode } from "../../src/locales";
 import { setDeviceView, setOrientation, setTheme, type DeviceView } from "../../src/themes";
 import DemoAppHeader from "../components/DemoAppHeader.vue";
 import EditorAutoDemo from "../components/EditorAutoDemo.vue";
+import { asDemoEditor } from "../types/demo-editor";
 
 import type { ThemePreset } from "../../src/configs/editorConfig";
 import type { Editor } from "@tiptap/vue-3";
@@ -145,7 +146,7 @@ type YanivEditorInstance = {
 };
 
 const editorRef = ref<YanivEditorInstance | null>(null);
-const getEditorInstance = () => editorRef.value?.getEditor() ?? null;
+const getEditorInstance = () => asDemoEditor(editorRef.value?.getEditor() ?? null);
 
 const editorContent = ref<unknown>(null);
 const handleUpdate = (content: unknown) => {
