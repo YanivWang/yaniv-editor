@@ -8,8 +8,8 @@ import { DEFAULT_CONFIG, getProviderInfo } from "./types";
 import type { AiUserConfig, AiConfigStore } from "./types";
 
 /** 存储键 */
-const STORAGE_KEY = "tiptap-ai-config";
-const API_KEY_STORAGE_KEY = "tiptap-ai-apikey";
+const STORAGE_KEY = "yaniv-ai-config";
+const API_KEY_STORAGE_KEY = "yaniv-ai-apikey";
 
 /**
  * 简单的混淆编码（非加密，仅防止明文存储）

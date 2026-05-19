@@ -25,11 +25,11 @@ export interface FeatureConfig {
   math?: boolean;
   /** 是否注册 AI 相关扩展（默认 true；显式 false 关闭） */
   ai?: boolean;
-  /** 是否注册格式刷扩展（默认随版本：basic 为 false，advanced 为 true；可显式覆盖） */
+  /** 是否注册格式刷扩展（默认 true） */
   formatPainter?: boolean;
-  /** 标题锚点 UniqueID + 目录（TableOfContents）扩展；进阶版默认开 */
+  /** 标题锚点 UniqueID + 目录（TableOfContents）扩展（默认 true） */
   outline?: boolean;
-  /** 查找替换扩展 */
+  /** 查找替换扩展（默认 true） */
   searchReplace?: boolean;
   /** 强化 Office/WPS HTML 粘贴；默认开启，显式 false 关闭 */
   officePaste?: boolean;
@@ -51,6 +51,8 @@ export interface FeatureConfig {
   footerNav?: boolean;
   /** 底部状态栏是否显示常用快捷键说明（与缩放、字数并列）；默认 true */
   statusShortcutHints?: boolean;
+  /** 工具栏密度：compact 仅保留基础排版工具 */
+  toolbar?: "full" | "compact";
 }
 
 /**
@@ -85,17 +87,6 @@ export interface YanivEditorProps {
    * @default 'light'
    */
   themeMode?: ThemeMode;
-}
-
-/**
- * 编辑器实例引用
- */
-export interface EditorInstance {
-  editor: Editor | null;
-  getEditor: () => Editor | null;
-  getJSON: () => JSONContent | null;
-  getHTML: () => string;
-  getText: () => string;
 }
 
 /**

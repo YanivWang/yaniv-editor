@@ -8,4 +8,4 @@ export { default as ToolbarNav } from "./ToolbarNav.vue";
 
 // 配置导出
 export type { ToolbarToolsConfig } from "./toolbarConfig";
-export { BASIC_TOOLBAR_CONFIG, ADVANCED_TOOLBAR_CONFIG } from "./toolbarConfig";
+export { COMPACT_TOOLBAR_CONFIG, FULL_TOOLBAR_CONFIG } from "./toolbarConfig";

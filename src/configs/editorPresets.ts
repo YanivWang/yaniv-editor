@@ -7,6 +7,17 @@ export type EditorPresetProps = Pick<YanivEditorProps, "version" | "features">;
 
 export type EditorPresetName = keyof typeof editorPresets;
 
+/** 精简档位：基础排版 + 顶栏 */
+const compactFeatures = {
+  toolbar: "compact",
+  headerNav: true,
+  table: false,
+  math: false,
+  formatPainter: false,
+  outline: false,
+  searchReplace: false,
+} as const satisfies FeatureConfig;
+
 /** 生产环境推荐：完整工具栏 + 常用体验模块 */
 const productionFeatures = {
   headerNav: true,
@@ -33,15 +44,15 @@ export const editorPresets = {
   /** 基础档位 + 顶栏 */
   basic: {
     version: "basic",
-    features: {
-      headerNav: true,
-    },
+    features: compactFeatures,
   },
 
-  /** 最小：基础档位，无顶栏 */
+  /** 最小：精简工具栏，无顶栏 */
   minimal: {
     version: "basic",
-    features: {},
+    features: {
+      toolbar: "compact",
+    },
   },
 
   /** Notion 风格：隐藏固定工具栏，启用浮动菜单、斜杠菜单与块级操作体验 */

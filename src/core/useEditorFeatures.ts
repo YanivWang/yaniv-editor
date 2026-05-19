@@ -1,20 +1,18 @@
 import { computed } from "vue";
 
 import {
-  BASIC_TOOLBAR_CONFIG,
-  ADVANCED_TOOLBAR_CONFIG,
+  COMPACT_TOOLBAR_CONFIG,
+  FULL_TOOLBAR_CONFIG,
   type ToolbarToolsConfig,
 } from "@/components/tools/header-nav";
 import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
 import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
 
-import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
+import type { YanivEditorProps } from "./editorTypes";
 
 type FeatureName = "headerNav" | "footerNav";
 
 export function useEditorFeatures(props: YanivEditorProps) {
-  const resolvedVersion = computed(() => props.version ?? DEFAULT_EDITOR_VERSION);
-
   const getFeatureConfig = (featureName: FeatureName): boolean => {
     return props.features?.[featureName] === true;
   };
@@ -24,16 +22,13 @@ export function useEditorFeatures(props: YanivEditorProps) {
 
   const resolvedExtensionGates = computed(() =>
     resolveExtensionGates({
-      version: resolvedVersion.value,
       features: props.features,
     }),
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
     const base =
-      resolvedVersion.value === "advanced"
-        ? ADVANCED_TOOLBAR_CONFIG
-        : { ...BASIC_TOOLBAR_CONFIG, undoRedo: true };
+      props.features?.toolbar === "compact" ? COMPACT_TOOLBAR_CONFIG : FULL_TOOLBAR_CONFIG;
 
     return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);
   });
@@ -41,7 +36,6 @@ export function useEditorFeatures(props: YanivEditorProps) {
   const showStatusShortcutHints = computed(() => props.features?.statusShortcutHints !== false);
 
   return {
-    getFeatureConfig,
     shouldShowHeaderNav,
     shouldShowFooterNav,
     resolvedExtensionGates,

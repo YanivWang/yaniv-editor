@@ -18,8 +18,8 @@
             <FormatPainterButton :editor="editor" :disabled="config.formatPainterDisabled" />
           </div>
 
-          <div v-if="config.findReplace" class="tool-group">
-            <FindReplaceButton :editor="editor" :hotkeys-enabled="!!config.findReplace" />
+          <div v-if="config.searchReplace" class="tool-group">
+            <FindReplaceButton :editor="editor" :hotkeys-enabled="!!config.searchReplace" />
           </div>
 
           <div v-if="config.outline" class="tool-group">
@@ -181,7 +181,7 @@ import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
-import { BASIC_TOOLBAR_CONFIG } from "./toolbarConfig";
+import { FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 
 import type { ToolbarToolsConfig } from "./toolbarConfig";
 import type { Editor } from "@tiptap/vue-3";
@@ -197,7 +197,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  config: () => BASIC_TOOLBAR_CONFIG,
+  config: () => FULL_TOOLBAR_CONFIG,
   enabled: true,
 });
 
@@ -206,7 +206,7 @@ const editor = computed(() => props.editor ?? null);
 // ===== 合并配置 =====
 const config = computed(() => {
   return {
-    ...BASIC_TOOLBAR_CONFIG,
+    ...FULL_TOOLBAR_CONFIG,
     ...props.config,
   };
 });
@@ -216,7 +216,7 @@ const showSection = computed(() => {
   const c = config.value;
   const ed = editor.value;
   return {
-    document: !!(c.undoRedo || c.formatPainter || c.findReplace || c.outline || c.clearFormat),
+    document: !!(c.undoRedo || c.formatPainter || c.searchReplace || c.outline || c.clearFormat),
     typography: !!(c.font || c.textFormat || c.codeBlock || c.colorPicker),
     paragraph: !!(c.heading || c.list || c.align),
     insert: !!(

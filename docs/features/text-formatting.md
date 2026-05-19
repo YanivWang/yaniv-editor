@@ -48,7 +48,7 @@
 - 快捷键：`Ctrl/Cmd + F`（通过 `useFindReplaceHotkey`）
 - 扩展：`SearchReplace`
 - 门控：`features.searchReplace`（advanced 默认开启）
-- 工具栏：`FindReplaceButton`（`findReplace` 配置项）
+- 工具栏：`FindReplaceButton`（`searchReplace` 配置项）
 
 ## 斜杠命令
 

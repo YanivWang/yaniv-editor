@@ -11,7 +11,6 @@ export type { AiProvider } from "./config/types";
 export interface AiConfig {
   provider: AiProvider;
   apiKey?: string;
-  apiSecret?: string; // For Aliyun
   baseUrl?: string;
   model?: string;
   temperature?: number;
@@ -59,13 +58,4 @@ export interface AiAdapter {
     callbacks: AiStreamCallbacks,
     options?: Partial<AiConfig>,
   ): Promise<void>;
-}
-
-/** AI feature options for editor extensions */
-export interface AiFeatureOptions {
-  adapter: AiAdapter;
-  systemPrompt?: string;
-  onStart?: () => void;
-  onComplete?: (text: string) => void;
-  onError?: (error: Error) => void;
 }

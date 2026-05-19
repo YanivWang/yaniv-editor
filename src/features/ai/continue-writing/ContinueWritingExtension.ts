@@ -1,9 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
-import { aiClient } from "@/features/ai/client";
-import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
-import { buildDocumentContextPrompt } from "@/features/ai/shared/runAiSuggestionStream";
+import { runAiContinueWritingStream } from "@/features/ai/shared/runAiSuggestionStream";
 import { t } from "@/locales";
 
 export type ContinueWritingOptions = Record<string, never>;
@@ -40,38 +38,13 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             return false;
           }
 
-          aiSuggestionManager.showContinueWriting(
+          runAiContinueWritingStream(
             editor,
             selectedText,
             contextRange,
             insertPosition,
+            t("editor.continueWriting"),
           );
-
-          let accumulated = "";
-          aiClient.continueWriting(selectedText, buildDocumentContextPrompt(editor), {
-            onStart: () => {
-              accumulated = "";
-            },
-            onToken: (token) => {
-              if (!token) return;
-              accumulated += token;
-              aiSuggestionManager.updateSuggestion(accumulated);
-            },
-            onComplete: () => {
-              aiSuggestionManager.stopStreaming();
-              aiSuggestionManager.updateSuggestion(accumulated);
-            },
-            onError: (error) => {
-              console.error("[Continue Writing]", error);
-              aiSuggestionManager.hide();
-              notification.error({
-                message: t("editor.continueWriting"),
-                description: error.message,
-                duration: 3,
-                placement: "topRight",
-              });
-            },
-          });
 
           return true;
         },

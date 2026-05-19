@@ -10,7 +10,6 @@ import type { AiConfig, AiProvider } from "./types";
 const ENV_KEYS = {
   provider: "VITE_AI_PROVIDER",
   apiKey: "VITE_AI_API_KEY",
-  apiSecret: "VITE_AI_API_SECRET",
   baseUrl: "VITE_AI_BASE_URL",
   model: "VITE_AI_MODEL",
   temperature: "VITE_AI_TEMPERATURE",
@@ -48,7 +47,6 @@ export function loadAiConfig(): AiConfig {
   return {
     provider,
     apiKey: getEnv(ENV_KEYS.apiKey),
-    apiSecret: getEnv(ENV_KEYS.apiSecret),
     baseUrl: getEnv(ENV_KEYS.baseUrl) || defaults.baseUrl,
     model: getEnv(ENV_KEYS.model) || defaults.model,
     temperature: parseFloat(getEnv(ENV_KEYS.temperature) || "0.7"),
@@ -66,7 +64,6 @@ export function createAiConfig(config: Partial<AiConfig>): AiConfig {
   return {
     provider,
     apiKey: config.apiKey,
-    apiSecret: config.apiSecret,
     baseUrl: config.baseUrl || defaults.baseUrl,
     model: config.model || defaults.model,
     temperature: config.temperature ?? 0.7,

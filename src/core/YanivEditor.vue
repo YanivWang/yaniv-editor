@@ -259,7 +259,7 @@ const initEditor = async () => {
     }
 
     // 获取扩展配置
-    const enableImageResize = props.version !== "basic";
+    const enableImageResize = resolvedExtensionGates.value.image;
     const extensions = buildEditorExtensions(props.version, {
       enableImageResize,
       features: resolvedExtensionGates.value,

@@ -195,20 +195,7 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
     }
   }
 
-  async function chat(systemPrompt: string, userContent: string): Promise<string> {
-    const messages: AiMessage[] = [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userContent },
-    ];
-    const adapter = resolveAdapter(fixedAdapter);
-    const response = await adapter.chat(messages);
-    return response.content;
-  }
-
   return {
-    chat,
-    chatStream: sendStreamingRequest,
-
     continueWriting(content: string, contextPrompt: string, callbacks: AiStreamCallbacks): void {
       const prompt = buildExtensionSystemPrompt(AI_PROMPTS.continueWriting.system, contextPrompt);
       sendStreamingRequest(prompt, content, callbacks, "continue");

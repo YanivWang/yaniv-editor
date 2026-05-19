@@ -203,13 +203,6 @@ export function useAiConfig() {
     state.value.testError = null;
   }
 
-  function getRequestConfig() {
-    const resolved = getAiRequestConfig();
-    if (!resolved) return null;
-    const { endpoint, apiKey, model, timeout } = resolved;
-    return { endpoint, apiKey, model, timeout };
-  }
-
   return {
     // 状态
     config: readonly(config),
@@ -227,7 +220,6 @@ export function useAiConfig() {
     setProvider,
     testConnection: testConnectionAsync,
     clearConfig,
-    getRequestConfig,
   };
 }
 

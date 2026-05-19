@@ -52,15 +52,15 @@ export interface ToolbarToolsConfig {
   /** 是否显示AI工具 */
   ai?: boolean;
   /** 是否显示查找与替换 */
-  findReplace?: boolean;
+  searchReplace?: boolean;
   /** 是否显示大纲侧栏开关 */
   outline?: boolean;
 }
 
 /**
- * 基础版工具栏配置
+ * 精简工具栏（基础排版）
  */
-export const BASIC_TOOLBAR_CONFIG: ToolbarToolsConfig = {
+export const COMPACT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   textFormat: true,
   colorPicker: true,
   heading: true,
@@ -70,7 +70,7 @@ export const BASIC_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   codeBlock: false,
   link: false,
   table: false,
-  undoRedo: false,
+  undoRedo: true,
   clearFormat: false,
   font: false,
   lineHeight: false,
@@ -80,9 +80,9 @@ export const BASIC_TOOLBAR_CONFIG: ToolbarToolsConfig = {
 };
 
 /**
- * 进阶版工具栏配置（包含更多功能）
+ * 完整工具栏
  */
-export const ADVANCED_TOOLBAR_CONFIG: ToolbarToolsConfig = {
+export const FULL_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   textFormat: true,
   colorPicker: true,
   heading: true,
@@ -103,6 +103,6 @@ export const ADVANCED_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   template: true,
   gallery: true,
   ai: true,
-  findReplace: true,
+  searchReplace: true,
   outline: true,
 };
