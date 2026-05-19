@@ -58,14 +58,6 @@
       :editor="editorInstance"
     />
 
-    <!-- 功能模块：六个点菜单（预览模式下禁用） -->
-    <DragHandleMenu
-      v-if="editorInstance && !isPreviewMode && (props.features?.dragHandleMenu ?? false)"
-      ref="dragHandleMenuRef"
-      :editor="editorInstance"
-      :readonly="readonly"
-    />
-
     <!-- Word 文档区域容器 -->
     <div ref="containerRef" class="word-document-container">
       <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
@@ -104,11 +96,6 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
-import {
-  DragHandleMenu,
-  DragHandleWithMenuExtension,
-  type DragHandleClickEvent,
-} from "@/tools/drag-handle-menu";
 import { FloatingMenu } from "@/tools/floating-menu";
 import { FooterNav } from "@/tools/footer-nav";
 import { ToolbarNav } from "@/tools/header-nav";
@@ -133,7 +120,6 @@ import "@/styles/word-mode.css";
 import "@/styles/toolbar.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
-import "@/styles/drag-handle-with-menu.css";
 import "@/styles/image-resize.css";
 import "@/styles/slash-command.css";
 
@@ -157,16 +143,12 @@ const editor = shallowRef<Editor | null>(null);
 const editorError = ref<string | null>(null);
 const containerRef = ref<HTMLElement | null>(null);
 
-type DragHandleMenuInstance = {
-  handleDragHandleClick: (event: DragHandleClickEvent) => void;
-};
 type SlashCommandMenuInstance = {
   activate: (state: SlashCommandState) => void;
   hide: () => void;
   updateQuery: (query: string) => void;
 };
 
-const dragHandleMenuRef = ref<DragHandleMenuInstance | null>(null);
 const slashCommandMenuRef = ref<SlashCommandMenuInstance | null>(null);
 const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
   useEditorPagination(containerRef);
@@ -245,15 +227,6 @@ const initEditor = async () => {
       },
     });
 
-    // 添加拖拽手柄扩展
-    if (props.features?.dragHandleMenu) {
-      extensions.push(
-        DragHandleWithMenuExtension.configure({
-          onHandleClick: (event) => dragHandleMenuRef.value?.handleDragHandleClick(event),
-        }),
-      );
-    }
-
     // 添加斜杠命令扩展
     if (props.features?.slashCommand) {
       extensions.push(
@@ -331,11 +304,6 @@ const watchAndReinit = (
     }
   });
 };
-
-watchAndReinit(
-  () => props.features?.dragHandleMenu,
-  (newVal, oldVal) => (newVal ?? false) !== (oldVal ?? false),
-);
 
 watchAndReinit(
   () => props.features?.slashCommand,

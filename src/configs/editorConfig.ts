@@ -33,7 +33,6 @@ export interface FeatureFlags {
   // 工具
   headerNav?: boolean;
   footerNav?: boolean;
-  dragHandleMenu?: boolean;
   floatingMenu?: boolean;
   linkBubbleMenu?: boolean;
   tableToolbar?: boolean;
@@ -119,7 +118,6 @@ export const PRESET_CONFIGS = {
       zoom: true,
       headerNav: true,
       footerNav: true,
-      dragHandleMenu: true,
       linkBubbleMenu: true,
       tableToolbar: true,
       imageToolbar: true,
@@ -146,7 +144,6 @@ export const PRESET_CONFIGS = {
       clearFormat: true,
       headerNav: true,
       footerNav: true,
-      dragHandleMenu: true,
       floatingMenu: true,
       linkBubbleMenu: true,
       tableToolbar: true,
@@ -165,9 +162,6 @@ export const PRESET_CONFIGS = {
       // 浮动工具栏（选中文字时显示）
       floatingMenu: true,
       linkBubbleMenu: true,
-
-      // 拖拽排序（六个点菜单）
-      dragHandleMenu: true,
 
       // 隐藏固定工具栏中的其他按钮
       heading: false,

@@ -71,6 +71,7 @@ export default tseslint.config(
     extends: [...tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       parserOptions: {
+        extraFileExtensions: [".vue"],
         project: "./tsconfig.eslint.json",
         tsconfigRootDir,
       },

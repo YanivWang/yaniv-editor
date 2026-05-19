@@ -6,7 +6,7 @@
 
 - `src/components/base`：通用 UI 基元，例如按钮、分组、下拉按钮、Tooltip。
 - `src/components/editor`：需要 `Editor` 实例才能工作的编辑器功能控件。
-- `src/components/tools`：编辑器外围编排组件，例如头部工具栏、底部导航、浮动菜单、图片工具栏、表格工具栏、拖拽手柄菜单。
+- `src/components/tools`：编辑器外围编排组件，例如头部工具栏、底部导航、浮动菜单、图片工具栏、表格工具栏。
 - `src/features/ai`：AI 适配器、AI 扩展、AI 菜单组件与配置。
 - `src/core`：主编辑器编排入口，目前只保留 `TiptapProEditor` 相关核心文件。
 - `src/configs`：公共配置、常量、功能预设、能力映射和工具栏/菜单类型。

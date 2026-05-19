@@ -14,10 +14,6 @@ export type EditorVersion = "basic" | "advanced" | "premium";
  * 编辑器功能配置
  */
 export interface FeatureConfig {
-  /** 是否启用拖拽功能 */
-  dragHandle?: boolean;
-  /** 是否启用六个点（拖拽手柄菜单）功能 */
-  dragHandleMenu?: boolean;
   /** 是否启用表格功能 */
   table?: boolean;
   /** 是否注册数学公式扩展（默认 true；false 时移除公式能力） */
