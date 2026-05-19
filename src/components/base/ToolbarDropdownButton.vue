@@ -126,19 +126,19 @@ function onMenuClick(info: { key: string }) {
   height: 32px;
   padding: 0 6px;
   line-height: 1;
-  color: var(--tiptap-toolbar-btn-text);
-  border-radius: var(--tiptap-radius-sm);
-  transition: all var(--tiptap-transition-normal);
+  color: var(--ye-toolbar-btn-text);
+  border-radius: var(--ye-radius-sm);
+  transition: all var(--ye-transition-normal);
 }
 
 .ye-dropdown-btn:hover {
-  color: var(--tiptap-toolbar-btn-text);
-  background: var(--tiptap-toolbar-btn-hover);
+  color: var(--ye-toolbar-btn-text);
+  background: var(--ye-toolbar-btn-hover);
 }
 
 .ye-dropdown-btn.is-active {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 .ye-dropdown-btn .ant-btn-icon {
@@ -233,7 +233,7 @@ function onMenuClick(info: { key: string }) {
 }
 
 .ye-dropdown-overlay .ant-dropdown-menu-item-selected {
-  color: var(--tiptap-primary) !important;
-  background: var(--tiptap-primary-light) !important;
+  color: var(--ye-primary) !important;
+  background: var(--ye-primary-light) !important;
 }
 </style>

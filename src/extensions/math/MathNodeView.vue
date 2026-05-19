@@ -165,7 +165,7 @@ watch(
 }
 
 .math-node-wrapper.is-selected .math-display {
-  outline: 2px solid var(--tiptap-primary);
+  outline: 2px solid var(--ye-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -190,12 +190,12 @@ watch(
 
 .math-empty {
   font-style: italic;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
 }
 
 .math-placeholder {
   font-style: italic;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
 }
 
 .math-error {
@@ -210,8 +210,8 @@ watch(
   gap: 8px;
   min-width: 300px;
   padding: 12px;
-  background: var(--tiptap-bg);
-  border: 1px solid var(--tiptap-border);
+  background: var(--ye-bg);
+  border: 1px solid var(--ye-border);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -230,23 +230,23 @@ watch(
   font-family: "Fira Code", Monaco, monospace;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
   resize: vertical;
   outline: none;
-  background: var(--tiptap-bg-secondary);
-  border: 1px solid var(--tiptap-border);
+  background: var(--ye-bg-secondary);
+  border: 1px solid var(--ye-border);
   border-radius: 4px;
 }
 
 .math-editor__input:focus {
-  border-color: var(--tiptap-primary);
+  border-color: var(--ye-primary);
 }
 
 .math-editor__preview {
   min-height: 40px;
   padding: 8px;
   text-align: center;
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
   border-radius: 4px;
 }
 
@@ -266,17 +266,17 @@ watch(
 }
 
 .math-btn--cancel {
-  color: var(--tiptap-text);
-  background: var(--tiptap-bg-secondary);
+  color: var(--ye-text);
+  background: var(--ye-bg-secondary);
 }
 
 .math-btn--cancel:hover {
-  background: var(--tiptap-border);
+  background: var(--ye-border);
 }
 
 .math-btn--save {
   color: #fff;
-  background: var(--tiptap-primary);
+  background: var(--ye-primary);
 }
 
 .math-btn--save:hover {

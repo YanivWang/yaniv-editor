@@ -7,36 +7,36 @@
 
 .yaniv-editor.theme-word {
   /* A4 纸张（与 pageConstants / useEditorPagination 一致，运行时仍可覆盖） */
-  --tiptap-doc-page-width: 794px;
-  --tiptap-doc-page-min-height: 939px;
-  --tiptap-doc-padding-top: 96px;
-  --tiptap-doc-padding-bottom: 96px;
-  --tiptap-doc-padding-inline: 92px;
-  --tiptap-doc-page-padding: 0;
-  --tiptap-doc-container-padding-y: 20px;
-  --tiptap-bg: #ffffff;
-  --tiptap-bg-secondary: #f2f2f2;
-  --tiptap-bg-hover: #e6e6e6;
-  --tiptap-toolbar-bg: #f3f3f3;
-  --tiptap-text: #000000;
-  --tiptap-text-secondary: #444444;
-  --tiptap-text-muted: #888888;
-  --tiptap-border: #d4d4d4;
-  --tiptap-border-hover: #b3b3b3;
-  --tiptap-border-focus: #0078d4;
-  --tiptap-radius-sm: 2px;
-  --tiptap-radius-md: 3px;
-  --tiptap-radius-lg: 4px;
-  --tiptap-primary: #0078d4;
-  --tiptap-primary-hover: #106ebe;
-  --tiptap-code-bg: #f4f4f4;
-  --tiptap-code-text: #333333;
-  --tiptap-blockquote-border: #d4d4d4;
-  --tiptap-blockquote-bg: #f9f9f9;
-  --tiptap-link: #0563c1;
-  --tiptap-font-family: "Calibri", "Segoe UI", arial, sans-serif;
-  --tiptap-font-size: 11pt;
-  --tiptap-line-height: 1.5;
+  --ye-doc-page-width: 794px;
+  --ye-doc-page-min-height: 939px;
+  --ye-doc-padding-top: 96px;
+  --ye-doc-padding-bottom: 96px;
+  --ye-doc-padding-inline: 92px;
+  --ye-doc-page-padding: 0;
+  --ye-doc-container-padding-y: 20px;
+  --ye-bg: #ffffff;
+  --ye-bg-secondary: #f2f2f2;
+  --ye-bg-hover: #e6e6e6;
+  --ye-toolbar-bg: #f3f3f3;
+  --ye-text: #000000;
+  --ye-text-secondary: #444444;
+  --ye-text-muted: #888888;
+  --ye-border: #d4d4d4;
+  --ye-border-hover: #b3b3b3;
+  --ye-border-focus: #0078d4;
+  --ye-radius-sm: 2px;
+  --ye-radius-md: 3px;
+  --ye-radius-lg: 4px;
+  --ye-primary: #0078d4;
+  --ye-primary-hover: #106ebe;
+  --ye-code-bg: #f4f4f4;
+  --ye-code-text: #333333;
+  --ye-blockquote-border: #d4d4d4;
+  --ye-blockquote-bg: #f9f9f9;
+  --ye-link: #0563c1;
+  --ye-font-family: "Calibri", "Segoe UI", arial, sans-serif;
+  --ye-font-size: 11pt;
+  --ye-line-height: 1.5;
 }
 
 /* Word 风格 - 厚重工具栏 (sticky 定位) */
@@ -52,7 +52,7 @@
 /* Word 风格 - A4 纸张 */
 .yaniv-editor.theme-word .continuous-pages {
   border-radius: 0;
-  box-shadow: var(--tiptap-shadow-md);
+  box-shadow: var(--ye-shadow-md);
 }
 
 /* Word 风格 - 专业标题 */
@@ -61,7 +61,7 @@
   margin-bottom: 12px;
   font-size: 26pt;
   font-weight: bold;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 .yaniv-editor.theme-word .ProseMirror h2 {
@@ -88,18 +88,18 @@
 
 /* Word 深色模式 */
 .yaniv-editor.theme-word[data-theme="dark"] {
-  --tiptap-bg: #1e1e1e;
-  --tiptap-bg-secondary: #252525;
-  --tiptap-bg-hover: #3e3e3e;
-  --tiptap-toolbar-bg: #2d2d2d;
-  --tiptap-text: #d4d4d4;
-  --tiptap-text-secondary: #9e9e9e;
-  --tiptap-text-muted: #6e6e6e;
-  --tiptap-border: #3e3e3e;
-  --tiptap-border-hover: #4e4e4e;
-  --tiptap-code-bg: #2d2d2d;
-  --tiptap-blockquote-bg: #2d2d2d;
-  --tiptap-link: #4fc3f7;
+  --ye-bg: #1e1e1e;
+  --ye-bg-secondary: #252525;
+  --ye-bg-hover: #3e3e3e;
+  --ye-toolbar-bg: #2d2d2d;
+  --ye-text: #d4d4d4;
+  --ye-text-secondary: #9e9e9e;
+  --ye-text-muted: #6e6e6e;
+  --ye-border: #3e3e3e;
+  --ye-border-hover: #4e4e4e;
+  --ye-code-bg: #2d2d2d;
+  --ye-blockquote-bg: #2d2d2d;
+  --ye-link: #4fc3f7;
 }
 
 .yaniv-editor.theme-word[data-theme="dark"] .document-toolbar {

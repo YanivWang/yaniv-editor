@@ -65,16 +65,16 @@ function onDblClick() {
   min-width: 32px;
   padding: 0 6px;
   line-height: 1;
-  color: var(--tiptap-toolbar-btn-text);
+  color: var(--ye-toolbar-btn-text);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: var(--tiptap-radius-sm);
-  transition: all var(--tiptap-transition-normal);
+  border-radius: var(--ye-radius-sm);
+  transition: all var(--ye-transition-normal);
 }
 
 .ye-toolbar-button:disabled {
-  color: var(--tiptap-toolbar-btn-disabled);
+  color: var(--ye-toolbar-btn-disabled);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -92,25 +92,25 @@ function onDblClick() {
 }
 
 .ye-toolbar-button:hover:not(:disabled) {
-  background: var(--tiptap-toolbar-btn-hover);
+  background: var(--ye-toolbar-btn-hover);
 }
 
 .ye-toolbar-button:active:not(:disabled) {
-  background: var(--tiptap-toolbar-btn-active);
+  background: var(--ye-toolbar-btn-active);
 }
 
 .ye-toolbar-button.is-active {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 .ye-toolbar-button.is-danger {
-  color: var(--tiptap-danger);
+  color: var(--ye-danger);
 }
 
 .ye-toolbar-button.is-danger:hover:not(:disabled) {
   color: #fff;
-  background: var(--tiptap-danger);
+  background: var(--ye-danger);
 }
 
 .ye-toolbar-button__content {

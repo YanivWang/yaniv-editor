@@ -4,16 +4,14 @@ import { aiClient } from "../client";
 
 import { removeAiHighlight } from "./AiHighlightMark";
 import { aiSuggestionManager } from "./aiSuggestionManager";
+import { buildDocumentContextPrompt } from "./documentContext";
+
+export { buildDocumentContextPrompt } from "./documentContext";
 
 import type { AiStreamCallbacks } from "../types";
 import type { Editor } from "@tiptap/core";
 
 type StreamInvoker = (content: string, sysPrompt: string, callbacks: AiStreamCallbacks) => void;
-
-export function buildDocumentContextPrompt(editor: Editor): string {
-  const fullText = editor.state.doc.textBetween(0, editor.state.doc.content.size, " ");
-  return `以下係完整嘅文件內容:\n\n${fullText}`;
-}
 
 function runStream(
   editor: Editor,

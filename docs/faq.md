@@ -18,8 +18,6 @@
 GET /api/documents/:id → :initial-content="data.content"
 ```
 
-`documentId` prop 当前**不会**自动触发网络请求。
-
 ### initialContent 支持哪些格式？
 
 - HTML 字符串：`'<p>Hello</p>'`
@@ -34,7 +32,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 检查：
 
-1. `version="advanced"` 且 `features.ai !== false`
+1. `features.ai !== false`（默认 true）
 2. `features.headerNav: true`（AI 按钮在工具栏）
 3. 已配置 `VITE_AI_API_KEY` 或在 AI 设置面板保存了 Key
 4. 网络可访问对应 Provider
@@ -69,7 +67,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ### @提及（@mention）支持吗？
 
-`FeatureConfig.mention` 为预留字段，**尚无实现**。
+**尚无实现**，需基于 Tiptap mention 扩展自行集成。
 
 ### 有版本历史吗？
 

@@ -23,13 +23,13 @@ YanivEditor
 
 ```vue
 <script setup lang="ts">
-import { YanivEditor } from "@yanivjs/yaniv-editor";
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 </script>
 
 <template>
   <YanivEditor
-    version="advanced"
+    v-bind="editorPresets.production"
     locale="zh-CN"
     theme-preset="word"
     theme-mode="light"
@@ -53,14 +53,14 @@ import "@yanivjs/yaniv-editor/style.css";
 通过 `theme-preset` / `theme-mode` 控制视觉，预设 CSS 由组件按需加载。详见 [主题与样式](/guide/theming)。
 :::
 
-## 版本与工具栏
+## 工具栏密度
 
-| version    | 工具栏配置                | 默认扩展门控                   |
-| ---------- | ------------------------- | ------------------------------ |
-| `basic`    | `COMPACT_TOOLBAR_CONFIG`  | 无格式刷、大纲、查找替换       |
-| `advanced` | `ADVANCED_TOOLBAR_CONFIG` | 格式刷、大纲、查找替换默认开启 |
+| `features.toolbar` | 工具栏配置               | 典型预设     |
+| ------------------ | ------------------------ | ------------ |
+| `compact`          | `COMPACT_TOOLBAR_CONFIG` | `basic`      |
+| `full`（默认）     | `FULL_TOOLBAR_CONFIG`    | `production` |
 
-`advanced` 工具栏包含：撤销/重做、格式刷、查找替换、字体、文本格式、颜色、标题、列表、对齐、链接、表格、图片、视频、上下标、Word、模板、图库、AI。
+完整工具栏包含：撤销/重做、格式刷、查找替换、字体、文本格式、颜色、标题、列表、对齐、链接、表格、图片、视频、上下标、Word、模板、图库、AI。
 
 ## 常用 features 开关
 

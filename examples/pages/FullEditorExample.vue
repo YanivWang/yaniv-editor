@@ -70,12 +70,12 @@ watch(locale, (newLocale) => {
 
 onMounted(() => {
   registerTheme("custom", {
-    "--tiptap-primary": "#6366f1",
-    "--tiptap-primary-hover": "#4f46e5",
-    "--tiptap-bg": "#faf5ff",
-    "--tiptap-bg-secondary": "#f3e8ff",
-    "--tiptap-text": "#1e1b4b",
-    "--tiptap-border": "#c4b5fd",
+    "--ye-primary": "#6366f1",
+    "--ye-primary-hover": "#4f46e5",
+    "--ye-bg": "#faf5ff",
+    "--ye-bg-secondary": "#f3e8ff",
+    "--ye-text": "#1e1b4b",
+    "--ye-border": "#c4b5fd",
   });
 });
 
@@ -86,7 +86,7 @@ const sampleContent = `
 <ul>
   <li><strong>完整编辑</strong> — 标题、列表、表格、图片、视频、代码块、数学公式等</li>
   <li><strong>灵活集成</strong> — Full Editor 一站式接入，或 Inline 模式按需拼装工具栏</li>
-  <li><strong>功能门控</strong> — 通过 version 与 features 精确控制扩展与界面显示</li>
+  <li><strong>功能门控</strong> — 通过 features 或 editorPresets 精确控制扩展与界面显示</li>
   <li><strong>多主题</strong> — Word / Notion / GitHub / Typora，支持明暗色与跟随系统</li>
 </ul>
 <h2>文本与排版</h2>

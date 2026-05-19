@@ -4,7 +4,6 @@
  */
 
 export { buildEditorExtensions } from "./coreExtensions";
-export type { EditorVersion } from "@/core/editorTypes";
 export { resolveExtensionGates } from "./resolveExtensionGates";
 export type { ResolvedExtensionGates, ResolveExtensionGatesInput } from "./resolveExtensionGates";
 export { OfficePaste } from "./office-paste";

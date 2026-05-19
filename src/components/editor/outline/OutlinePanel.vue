@@ -126,8 +126,8 @@ onBeforeUnmount(() => {
   min-width: 220px;
   max-width: 220px;
   height: 100%;
-  background: var(--tiptap-bg);
-  border-right: 1px solid var(--tiptap-border);
+  background: var(--ye-bg);
+  border-right: 1px solid var(--ye-border);
 }
 
 .outline-panel__header {
@@ -136,13 +136,13 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--tiptap-border);
+  border-bottom: 1px solid var(--ye-border);
 }
 
 .outline-panel__title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 .outline-panel__close {
@@ -152,15 +152,15 @@ onBeforeUnmount(() => {
   width: 24px;
   height: 24px;
   padding: 0;
-  color: var(--tiptap-text-secondary);
+  color: var(--ye-text-secondary);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: var(--tiptap-radius-sm);
-  transition: background var(--tiptap-transition-normal);
+  border-radius: var(--ye-radius-sm);
+  transition: background var(--ye-transition-normal);
 
   &:hover {
-    background: var(--tiptap-bg-hover);
+    background: var(--ye-bg-hover);
   }
 }
 
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
   padding: 16px 12px;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
 }
 
 .outline-panel__list {
@@ -189,24 +189,24 @@ onBeforeUnmount(() => {
   padding: 6px 12px 6px 0;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--tiptap-text-secondary);
+  color: var(--ye-text-secondary);
   text-align: left;
   cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 0;
   transition:
-    color var(--tiptap-transition-normal),
-    background var(--tiptap-transition-normal);
+    color var(--ye-transition-normal),
+    background var(--ye-transition-normal);
 
   &:hover {
-    color: var(--tiptap-primary);
-    background: var(--tiptap-bg-hover);
+    color: var(--ye-primary);
+    background: var(--ye-bg-hover);
   }
 
   &.is-active {
-    color: var(--tiptap-primary);
-    background: var(--tiptap-primary-light);
+    color: var(--ye-primary);
+    background: var(--ye-primary-light);
   }
 }
 

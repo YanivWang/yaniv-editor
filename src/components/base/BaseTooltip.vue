@@ -39,7 +39,7 @@ const showTooltip = ref(false);
 
 .ye-tooltip {
   position: absolute;
-  z-index: var(--tiptap-z-bubble);
+  z-index: var(--ye-z-bubble);
   padding: 6px 10px;
   font-size: 12px;
   line-height: 1.4;
@@ -47,7 +47,7 @@ const showTooltip = ref(false);
   white-space: nowrap;
   pointer-events: none;
   background: rgba(0, 0, 0, 0.85);
-  border-radius: var(--tiptap-radius-sm);
+  border-radius: var(--ye-radius-sm);
 }
 
 .ye-tooltip--top {

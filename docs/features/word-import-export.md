@@ -1,6 +1,6 @@
 # Word 导入导出
 
-advanced 工具栏提供 Word 文档互转能力（`WordButton`）。
+完整工具栏（`FULL_TOOLBAR_CONFIG`）提供 Word 文档互转能力（`WordButton`）。
 
 ## 依赖
 
@@ -18,7 +18,7 @@ advanced 工具栏提供 Word 文档互转能力（`WordButton`）。
 
 ## 使用
 
-在 `version="advanced"` 且工具栏启用 `word: true`（`ADVANCED_TOOLBAR_CONFIG` 默认包含）时，工具栏会出现 Word 按钮。
+在 `features.headerNav: true` 且完整工具栏时，会出现 Word 按钮。
 
 也可单独使用底层 API：
 

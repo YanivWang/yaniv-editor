@@ -26,7 +26,7 @@ features:
   - title: AI 辅助写作
     details: 续写、润色、摘要、翻译与自定义指令，可对接 OpenAI、DeepSeek、通义千问、Ollama 等。
   - title: 可配置功能门控
-    details: 通过 version 与 features 精确控制扩展注册与工具栏显示，避免 UI 与能力不一致。
+    details: 通过 features 精确控制扩展注册与工具栏显示，避免 UI 与能力不一致。
   - title: 面向生产集成
     details: 暴露 getJSON / getHTML / getText，内容持久化、图片 OSS 上传由业务层接入。
 ---
@@ -35,7 +35,7 @@ features:
 
 | 场景                    | 推荐方案                                   |
 | ----------------------- | ------------------------------------------ |
-| CMS / 博客 / 知识库正文 | `YanivEditor` + `version="advanced"`       |
+| CMS / 博客 / 知识库正文 | `YanivEditor` + `editorPresets.production` |
 | 内网文档（单人编辑）    | Full Editor + 自建保存 API                 |
 | 评论 / 聊天 / 表单内嵌  | Inline 按需拼装 `@/editor` 组件            |
 | 多人实时协作文档        | 当前未内置，需基于 Tiptap 协作扩展自行扩展 |

@@ -7,38 +7,38 @@
 
 /* ===== Notion 主题变量 ===== */
 .yaniv-editor.theme-notion {
-  --tiptap-doc-page-width: 900px;
-  --tiptap-doc-page-padding: 0 96px;
-  --tiptap-doc-padding-top: 32px;
-  --tiptap-doc-padding-bottom: 100px;
-  --tiptap-doc-padding-inline: 0;
-  --tiptap-doc-page-min-height: calc(100vh - 100px);
-  --tiptap-doc-container-padding-y: 0;
-  --tiptap-bg: #ffffff;
-  --tiptap-bg-secondary: #ffffff;
-  --tiptap-bg-hover: rgba(55, 53, 47, 0.08);
-  --tiptap-toolbar-bg: #ffffff;
-  --tiptap-text: #37352f;
-  --tiptap-text-secondary: #787774;
-  --tiptap-text-muted: #9b9a97;
-  --tiptap-border: rgba(55, 53, 47, 0.09);
-  --tiptap-border-hover: rgba(55, 53, 47, 0.16);
-  --tiptap-border-focus: #2eaadc;
-  --tiptap-radius-sm: 4px;
-  --tiptap-radius-md: 6px;
-  --tiptap-radius-lg: 8px;
-  --tiptap-primary: #2eaadc;
-  --tiptap-primary-hover: #2596be;
-  --tiptap-code-bg: rgba(135, 131, 120, 0.15);
-  --tiptap-code-text: #eb5757;
-  --tiptap-blockquote-border: rgba(55, 53, 47, 0.16);
-  --tiptap-blockquote-bg: transparent;
-  --tiptap-link: rgb(35, 131, 226);
-  --tiptap-font-family:
+  --ye-doc-page-width: 900px;
+  --ye-doc-page-padding: 0 96px;
+  --ye-doc-padding-top: 32px;
+  --ye-doc-padding-bottom: 100px;
+  --ye-doc-padding-inline: 0;
+  --ye-doc-page-min-height: calc(100vh - 100px);
+  --ye-doc-container-padding-y: 0;
+  --ye-bg: #ffffff;
+  --ye-bg-secondary: #ffffff;
+  --ye-bg-hover: rgba(55, 53, 47, 0.08);
+  --ye-toolbar-bg: #ffffff;
+  --ye-text: #37352f;
+  --ye-text-secondary: #787774;
+  --ye-text-muted: #9b9a97;
+  --ye-border: rgba(55, 53, 47, 0.09);
+  --ye-border-hover: rgba(55, 53, 47, 0.16);
+  --ye-border-focus: #2eaadc;
+  --ye-radius-sm: 4px;
+  --ye-radius-md: 6px;
+  --ye-radius-lg: 8px;
+  --ye-primary: #2eaadc;
+  --ye-primary-hover: #2596be;
+  --ye-code-bg: rgba(135, 131, 120, 0.15);
+  --ye-code-text: #eb5757;
+  --ye-blockquote-border: rgba(55, 53, 47, 0.16);
+  --ye-blockquote-bg: transparent;
+  --ye-link: rgb(35, 131, 226);
+  --ye-font-family:
     ui-sans-serif, -apple-system, blinkmacsystemfont, "Segoe UI Variable Display", "Segoe UI",
     helvetica, "Apple Color Emoji", arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-  --tiptap-font-size: 16px;
-  --tiptap-line-height: 1.5;
+  --ye-font-size: 16px;
+  --ye-line-height: 1.5;
 }
 
 /* ===== Notion 风格 - 全宽无纸张边框布局 ===== */
@@ -47,12 +47,12 @@
 }
 
 .yaniv-editor.theme-notion .document-container {
-  background: var(--tiptap-bg);
+  background: var(--ye-bg);
 }
 
 /* 隐藏纸张阴影和边框 */
 .yaniv-editor.theme-notion .continuous-pages {
-  background: var(--tiptap-bg);
+  background: var(--ye-bg);
   border-radius: 0;
   box-shadow: none;
 }
@@ -97,8 +97,8 @@
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
 .yaniv-editor.theme-notion .document-content .ProseMirror {
-  color: var(--tiptap-text);
-  background: var(--tiptap-bg);
+  color: var(--ye-text);
+  background: var(--ye-bg);
 }
 
 /* ===== Notion 风格 - 大标题 ===== */
@@ -154,7 +154,7 @@
 }
 
 .yaniv-editor.theme-notion .ProseMirror li::marker {
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 /* 任务列表：与 Notion 列表项保持相同行距 */
@@ -182,13 +182,13 @@
 .yaniv-editor.theme-notion .ProseMirror blockquote {
   padding-left: 14px;
   margin: 8px 0;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
   border-left: 3px solid currentColor;
 }
 
 /* ===== Notion 风格 - 链接 ===== */
 .yaniv-editor.theme-notion .ProseMirror a {
-  color: var(--tiptap-link);
+  color: var(--ye-link);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -231,19 +231,19 @@
 
 /* ===== Notion 深色模式 ===== */
 .yaniv-editor.theme-notion[data-theme="dark"] {
-  --tiptap-bg: #191919;
-  --tiptap-bg-secondary: #191919;
-  --tiptap-bg-hover: rgba(255, 255, 255, 0.055);
-  --tiptap-toolbar-bg: #191919;
-  --tiptap-text: rgba(255, 255, 255, 0.9);
-  --tiptap-text-secondary: rgba(255, 255, 255, 0.6);
-  --tiptap-text-muted: rgba(255, 255, 255, 0.4);
-  --tiptap-border: rgba(255, 255, 255, 0.09);
-  --tiptap-border-hover: rgba(255, 255, 255, 0.16);
-  --tiptap-code-bg: rgba(135, 131, 120, 0.15);
-  --tiptap-code-text: #ff7369;
-  --tiptap-blockquote-border: rgba(255, 255, 255, 0.15);
-  --tiptap-link: rgb(82, 156, 202);
+  --ye-bg: #191919;
+  --ye-bg-secondary: #191919;
+  --ye-bg-hover: rgba(255, 255, 255, 0.055);
+  --ye-toolbar-bg: #191919;
+  --ye-text: rgba(255, 255, 255, 0.9);
+  --ye-text-secondary: rgba(255, 255, 255, 0.6);
+  --ye-text-muted: rgba(255, 255, 255, 0.4);
+  --ye-border: rgba(255, 255, 255, 0.09);
+  --ye-border-hover: rgba(255, 255, 255, 0.16);
+  --ye-code-bg: rgba(135, 131, 120, 0.15);
+  --ye-code-text: #ff7369;
+  --ye-blockquote-border: rgba(255, 255, 255, 0.15);
+  --ye-link: rgb(82, 156, 202);
 }
 
 .yaniv-editor.theme-notion.document-layout[data-theme="dark"],

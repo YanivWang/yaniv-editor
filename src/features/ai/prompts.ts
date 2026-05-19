@@ -4,6 +4,9 @@
  */
 
 export const AI_PROMPTS = {
+  /** 续写 / 润色 / 翻译等扩展附带的文档上下文 */
+  documentContext: (fullText: string) => `以下是完整的文档内容：\n\n${fullText}`,
+
   continueWriting: {
     system: `你是一位专业的写作助手。你的任务是根据用户提供的内容进行续写。
 要求：

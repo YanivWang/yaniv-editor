@@ -3,154 +3,154 @@
  *
  * - 浅色：:root
  * - 深色：[data-theme="dark"]（由 YanivEditor themeMode 设置在编辑器根节点）
- * - 视觉预设：.yaniv-editor.theme-{preset} 覆盖部分 token（见 src/themes/presets/）
+ * - 设计 token 前缀：--ye-*（视觉预设见 src/themes/presets/）
  */
 
 :root {
   /* ===== Color Palette ===== */
-  --tiptap-primary: #3b82f6;
-  --tiptap-primary-hover: #2563eb;
-  --tiptap-primary-light: rgba(59, 130, 246, 0.1);
+  --ye-primary: #3b82f6;
+  --ye-primary-hover: #2563eb;
+  --ye-primary-light: rgba(59, 130, 246, 0.1);
 
   /* ===== Semantic ===== */
-  --tiptap-danger: #ef4444;
-  --tiptap-danger-bg: #fef2f2;
+  --ye-danger: #ef4444;
+  --ye-danger-bg: #fef2f2;
 
   /* ===== Editor Core ===== */
-  --tiptap-bg: #ffffff;
-  --tiptap-bg-secondary: #f9fafb;
-  --tiptap-bg-hover: #f3f4f6;
-  --tiptap-text: #1a1a1a;
-  --tiptap-text-secondary: #666666;
-  --tiptap-text-muted: #999999;
-  --tiptap-placeholder-color: #ccc;
+  --ye-bg: #ffffff;
+  --ye-bg-secondary: #f9fafb;
+  --ye-bg-hover: #f3f4f6;
+  --ye-text: #1a1a1a;
+  --ye-text-secondary: #666666;
+  --ye-text-muted: #999999;
+  --ye-placeholder-color: #ccc;
 
   /* ===== Borders ===== */
-  --tiptap-border: #e5e5e5;
-  --tiptap-border-hover: #d0d0d0;
-  --tiptap-border-focus: var(--tiptap-primary);
+  --ye-border: #e5e5e5;
+  --ye-border-hover: #d0d0d0;
+  --ye-border-focus: var(--ye-primary);
 
   /* ===== Selection & Caret ===== */
-  --tiptap-selection: rgba(59, 130, 246, 0.2);
-  --tiptap-caret: var(--tiptap-primary);
+  --ye-selection: rgba(59, 130, 246, 0.2);
+  --ye-caret: var(--ye-primary);
 
   /* ===== Toolbar ===== */
-  --tiptap-toolbar-bg: #fafafa;
-  --tiptap-toolbar-border: var(--tiptap-border);
-  --tiptap-toolbar-btn-bg: transparent;
-  --tiptap-toolbar-btn-hover: #f0f0f0;
-  --tiptap-toolbar-btn-active: #e5e5e5;
-  --tiptap-toolbar-btn-disabled: #cccccc;
-  --tiptap-toolbar-btn-text: var(--tiptap-text);
-  --tiptap-toolbar-divider: #e5e7eb;
+  --ye-toolbar-bg: #fafafa;
+  --ye-toolbar-border: var(--ye-border);
+  --ye-toolbar-btn-bg: transparent;
+  --ye-toolbar-btn-hover: #f0f0f0;
+  --ye-toolbar-btn-active: #e5e5e5;
+  --ye-toolbar-btn-disabled: #cccccc;
+  --ye-toolbar-btn-text: var(--ye-text);
+  --ye-toolbar-divider: #e5e7eb;
 
   /* ===== Bubble / Floating Menu ===== */
-  --tiptap-bubble-bg: #ffffff;
-  --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --tiptap-bubble-border: var(--tiptap-border);
+  --ye-bubble-bg: #ffffff;
+  --ye-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --ye-bubble-border: var(--ye-border);
 
   /* ===== Toolbar Button Size ===== */
-  --tiptap-btn-size: 32px;
-  --tiptap-btn-size-sm: 28px;
-  --tiptap-btn-icon-size: 16px;
+  --ye-btn-size: 32px;
+  --ye-btn-size-sm: 28px;
+  --ye-btn-icon-size: 16px;
 
   /* ===== Code ===== */
-  --tiptap-code-bg: #f5f5f5;
-  --tiptap-code-text: #e11d48;
-  --tiptap-codeblock-bg: #1e1e1e;
-  --tiptap-codeblock-text: #d4d4d4;
+  --ye-code-bg: #f5f5f5;
+  --ye-code-text: #e11d48;
+  --ye-codeblock-bg: #1e1e1e;
+  --ye-codeblock-text: #d4d4d4;
 
   /* ===== Table ===== */
-  --tiptap-table-border: #d0d0d0;
-  --tiptap-table-header-bg: #f5f5f5;
-  --tiptap-table-selected: rgba(59, 130, 246, 0.1);
-  --tiptap-table-selected-bg: rgba(59, 130, 246, 0.1);
+  --ye-table-border: #d0d0d0;
+  --ye-table-header-bg: #f5f5f5;
+  --ye-table-selected: rgba(59, 130, 246, 0.1);
+  --ye-table-selected-bg: rgba(59, 130, 246, 0.1);
 
   /* ===== Blockquote ===== */
-  --tiptap-blockquote-border: var(--tiptap-primary);
-  --tiptap-blockquote-bg: #f9fafb;
+  --ye-blockquote-border: var(--ye-primary);
+  --ye-blockquote-bg: #f9fafb;
 
   /* ===== Link ===== */
-  --tiptap-link: var(--tiptap-primary);
-  --tiptap-link-hover: var(--tiptap-primary-hover);
+  --ye-link: var(--ye-primary);
+  --ye-link-hover: var(--ye-primary-hover);
 
   /* ===== Typography ===== */
-  --tiptap-font-family:
+  --ye-font-family:
     -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
-  --tiptap-font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
-  --tiptap-font-size: 16px;
-  --tiptap-line-height: 1.75;
+  --ye-font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
+  --ye-font-size: 16px;
+  --ye-line-height: 1.75;
 
   /* ===== Spacing ===== */
-  --tiptap-spacing-xs: 4px;
-  --tiptap-spacing-sm: 8px;
-  --tiptap-spacing-md: 16px;
-  --tiptap-spacing-lg: 24px;
-  --tiptap-spacing-xl: 32px;
+  --ye-spacing-xs: 4px;
+  --ye-spacing-sm: 8px;
+  --ye-spacing-md: 16px;
+  --ye-spacing-lg: 24px;
+  --ye-spacing-xl: 32px;
 
   /* ===== Border Radius ===== */
-  --tiptap-radius-sm: 4px;
-  --tiptap-radius-md: 8px;
-  --tiptap-radius-lg: 12px;
-  --tiptap-radius-full: 9999px;
+  --ye-radius-sm: 4px;
+  --ye-radius-md: 8px;
+  --ye-radius-lg: 12px;
+  --ye-radius-full: 9999px;
 
   /* ===== Shadows ===== */
-  --tiptap-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --tiptap-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --tiptap-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ye-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --ye-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
   /* ===== Transitions ===== */
-  --tiptap-transition-fast: 0.1s ease;
-  --tiptap-transition-normal: 0.2s ease;
-  --tiptap-transition-slow: 0.3s ease;
+  --ye-transition-fast: 0.1s ease;
+  --ye-transition-normal: 0.2s ease;
+  --ye-transition-slow: 0.3s ease;
 
   /* ===== Z-Index ===== */
-  --tiptap-z-toolbar: 100;
-  --tiptap-z-dropdown: 100;
-  --tiptap-z-bubble: 200;
-  --tiptap-z-modal: 300;
+  --ye-z-toolbar: 100;
+  --ye-z-dropdown: 100;
+  --ye-z-bubble: 200;
+  --ye-z-modal: 300;
 
   /* ===== Document Layout（默认 A4 / Word；各 theme preset 可覆盖） ===== */
-  --tiptap-doc-page-width: 794px;
-  --tiptap-doc-page-min-height: 939px;
-  --tiptap-doc-padding-top: 96px;
-  --tiptap-doc-padding-bottom: 96px;
-  --tiptap-doc-padding-inline: 92px;
-  --tiptap-doc-page-padding: 0;
-  --tiptap-doc-page-cut-height: 16px;
-  --tiptap-doc-container-padding-y: 20px;
+  --ye-doc-page-width: 794px;
+  --ye-doc-page-min-height: 939px;
+  --ye-doc-padding-top: 96px;
+  --ye-doc-padding-bottom: 96px;
+  --ye-doc-padding-inline: 92px;
+  --ye-doc-page-padding: 0;
+  --ye-doc-page-cut-height: 16px;
+  --ye-doc-container-padding-y: 20px;
 }
 
 /* ===== Dark Mode（唯一约定：data-theme="dark"） ===== */
 [data-theme="dark"] {
-  --tiptap-primary: #60a5fa;
-  --tiptap-primary-hover: #93c5fd;
-  --tiptap-primary-light: rgba(96, 165, 250, 0.15);
-  --tiptap-danger: #f87171;
-  --tiptap-danger-bg: #3f1d1d;
-  --tiptap-bg: #1a1a1a;
-  --tiptap-bg-secondary: #111827;
-  --tiptap-bg-hover: #374151;
-  --tiptap-text: #e5e5e5;
-  --tiptap-text-secondary: #a3a3a3;
-  --tiptap-text-muted: #737373;
-  --tiptap-placeholder-color: #666;
-  --tiptap-border: #333333;
-  --tiptap-border-hover: #444444;
-  --tiptap-selection: rgba(96, 165, 250, 0.25);
-  --tiptap-toolbar-bg: #262626;
-  --tiptap-toolbar-btn-hover: #333333;
-  --tiptap-toolbar-btn-active: #404040;
-  --tiptap-toolbar-btn-text: var(--tiptap-text);
-  --tiptap-toolbar-divider: #374151;
-  --tiptap-bubble-bg: #262626;
-  --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --tiptap-code-bg: #2a2a2a;
-  --tiptap-code-text: #f472b6;
-  --tiptap-codeblock-bg: #0d0d0d;
-  --tiptap-table-header-bg: #2a2a2a;
-  --tiptap-blockquote-bg: #262626;
-  --tiptap-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --tiptap-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --tiptap-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --ye-primary: #60a5fa;
+  --ye-primary-hover: #93c5fd;
+  --ye-primary-light: rgba(96, 165, 250, 0.15);
+  --ye-danger: #f87171;
+  --ye-danger-bg: #3f1d1d;
+  --ye-bg: #1a1a1a;
+  --ye-bg-secondary: #111827;
+  --ye-bg-hover: #374151;
+  --ye-text: #e5e5e5;
+  --ye-text-secondary: #a3a3a3;
+  --ye-text-muted: #737373;
+  --ye-placeholder-color: #666;
+  --ye-border: #333333;
+  --ye-border-hover: #444444;
+  --ye-selection: rgba(96, 165, 250, 0.25);
+  --ye-toolbar-bg: #262626;
+  --ye-toolbar-btn-hover: #333333;
+  --ye-toolbar-btn-active: #404040;
+  --ye-toolbar-btn-text: var(--ye-text);
+  --ye-toolbar-divider: #374151;
+  --ye-bubble-bg: #262626;
+  --ye-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --ye-code-bg: #2a2a2a;
+  --ye-code-text: #f472b6;
+  --ye-codeblock-bg: #0d0d0d;
+  --ye-table-header-bg: #2a2a2a;
+  --ye-blockquote-bg: #262626;
+  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --ye-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --ye-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }

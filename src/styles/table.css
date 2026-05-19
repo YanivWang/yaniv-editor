@@ -10,9 +10,9 @@
   z-index: 1001 !important;
   display: flex;
   padding: 6px 8px;
-  background: var(--tiptap-bubble-bg);
-  border-radius: var(--tiptap-radius-md);
-  box-shadow: var(--tiptap-bubble-shadow);
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
 }
 
 /* 工具栏内容 */
@@ -40,11 +40,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--tiptap-btn-size);
-  height: var(--tiptap-btn-size);
+  width: var(--ye-btn-size);
+  height: var(--ye-btn-size);
   padding: 0;
-  font-size: var(--tiptap-btn-icon-size);
-  color: var(--tiptap-text);
+  font-size: var(--ye-btn-icon-size);
+  color: var(--ye-text);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -53,8 +53,8 @@
 }
 
 .table-menu-btn:hover:not(:disabled) {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-bg-hover);
+  color: var(--ye-primary);
+  background: var(--ye-bg-hover);
   transform: translateY(-1px);
 }
 
@@ -68,7 +68,7 @@
 }
 
 .table-menu-btn:disabled {
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -79,17 +79,17 @@
 
 /* 危险操作按钮 */
 .table-menu-btn--danger {
-  color: var(--tiptap-danger);
+  color: var(--ye-danger);
 }
 
 .table-menu-btn--danger:hover:not(:disabled) {
-  color: var(--tiptap-danger);
-  background: var(--tiptap-danger-bg);
+  color: var(--ye-danger);
+  background: var(--ye-danger-bg);
 }
 
 /* 图标样式 */
 .table-menu-btn .anticon {
-  font-size: var(--tiptap-btn-icon-size);
+  font-size: var(--ye-btn-icon-size);
 }
 
 /* 表格边框样式类 */
@@ -145,8 +145,8 @@
 
   .table-menu-btn {
     flex-shrink: 0;
-    width: var(--tiptap-btn-size-sm);
-    height: var(--tiptap-btn-size-sm);
+    width: var(--ye-btn-size-sm);
+    height: var(--ye-btn-size-sm);
   }
 
   .table-menu-btn :deep(.anticon) {

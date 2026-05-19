@@ -241,7 +241,7 @@ function insertSelected() {
 }
 
 .gallery-item.is-selected {
-  border-color: var(--tiptap-primary);
+  border-color: var(--ye-primary);
 }
 
 .gallery-item__img {
@@ -256,7 +256,7 @@ function insertSelected() {
   right: 6px;
   font-size: 20px;
   line-height: 1;
-  color: var(--tiptap-primary);
+  color: var(--ye-primary);
   background: #fff;
   border-radius: 50%;
 }

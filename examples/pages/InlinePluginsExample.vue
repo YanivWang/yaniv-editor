@@ -44,12 +44,12 @@ const antdTheme = computed(() => ({
 
 onMounted(() => {
   registerTheme("custom", {
-    "--tiptap-primary": "#6366f1",
-    "--tiptap-primary-hover": "#4f46e5",
-    "--tiptap-bg": "#faf5ff",
-    "--tiptap-bg-secondary": "#f3e8ff",
-    "--tiptap-text": "#1e1b4b",
-    "--tiptap-border": "#c4b5fd",
+    "--ye-primary": "#6366f1",
+    "--ye-primary-hover": "#4f46e5",
+    "--ye-bg": "#faf5ff",
+    "--ye-bg-secondary": "#f3e8ff",
+    "--ye-text": "#1e1b4b",
+    "--ye-border": "#c4b5fd",
   });
 });
 </script>

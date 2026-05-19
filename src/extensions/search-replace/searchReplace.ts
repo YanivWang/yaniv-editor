@@ -5,9 +5,9 @@ import { Extension, type Editor } from "@tiptap/core";
 import { EditorState, Plugin, PluginKey, Transaction } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
-export const searchReplacePluginKey = new PluginKey("tpSearchReplace");
+export const searchReplacePluginKey = new PluginKey("yanivSearchReplace");
 
-const META_FORCE = "tpSearchReplaceForce";
+const META_FORCE = "yanivSearchReplaceForce";
 
 type SearchReplaceStorage = {
   searchTerm: string;

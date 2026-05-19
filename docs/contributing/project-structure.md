@@ -36,7 +36,7 @@ src/index.ts
 
 ```ts
 import { TextFormatButtons } from "@/components/editor/text-format";
-import { ToolbarNav, ADVANCED_TOOLBAR_CONFIG } from "@/components/tools/header-nav";
+import { ToolbarNav, FULL_TOOLBAR_CONFIG } from "@/components/tools/header-nav";
 import { ToolbarButton } from "@/components/base";
 import { editorPresets } from "@/configs/editorPresets";
 ```
@@ -58,5 +58,5 @@ import { YanivEditor } from "@yanivjs/yaniv-editor";
 ## 相关文档
 
 - [Inline 按需拼装](/guide/inline-composition) — 按需引用 `editor` 组件的集成方式
-- [功能配置](/api/features-config) — `version` 与 `features` 门控
+- [功能配置](/api/features-config) — `features` 门控
 - [FAQ · 反馈与贡献](/faq#反馈与贡献)

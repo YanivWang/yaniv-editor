@@ -14,7 +14,6 @@ import "@yanivjs/yaniv-editor/style.css";
 
 | Prop                | 类型                          | 默认值             | 说明                                          |
 | ------------------- | ----------------------------- | ------------------ | --------------------------------------------- |
-| `version`           | `'basic' \| 'advanced'`       | `'advanced'`       | 工具栏档位与扩展门控基准                      |
 | `initialContent`    | `string \| object`            | `'<p>开始编辑...'` | 初始内容，支持 HTML 或 ProseMirror JSON       |
 | `features`          | `FeatureConfig`               | —                  | 功能门控，见 [功能配置](/api/features-config) |
 | `locale`            | `string`                      | `'zh-CN'`          | 界面语言                                      |
@@ -22,13 +21,16 @@ import "@yanivjs/yaniv-editor/style.css";
 | `themeMode`         | `'light' \| 'dark' \| 'auto'` | `'light'`          | 明暗模式，`auto` 跟随系统                     |
 | `readonly`          | `boolean`                     | `false`            | 只读模式                                      |
 | `previewMode`       | `boolean`                     | `false`            | 预览模式（无工具栏、不可编辑）                |
-| `documentId`        | `string`                      | —                  | 预留字段，当前不触发加载/保存                 |
 | `tableMenuShowMode` | `1 \| 2`                      | `2`                | 表格工具栏显示时机                            |
 | `zoomBarPlacement`  | `'bottom' \| 'belowToolbar'`  | `'bottom'`         | 缩放条位置                                    |
 
 ### FeatureConfig 速查
 
-详见 [功能配置](/api/features-config)。
+详见 [功能配置](/api/features-config)。推荐使用 `editorPresets.production`：
+
+```vue
+<YanivEditor v-bind="editorPresets.production" />
+```
 
 ## Events
 
@@ -56,7 +58,7 @@ interface YanivEditorExpose {
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import { YanivEditor } from "@yanivjs/yaniv-editor";
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 
@@ -65,12 +67,11 @@ function exportContent() {
   const html = editorRef.value?.getHTML();
   const text = editorRef.value?.getText();
   const tiptap = editorRef.value?.getEditor();
-  // tiptap 可用于执行自定义 Tiptap 命令
 }
 </script>
 
 <template>
-  <YanivEditor ref="editorRef" version="advanced" @update="onUpdate" />
+  <YanivEditor ref="editorRef" v-bind="editorPresets.production" @update="onUpdate" />
 </template>
 ```
 
@@ -78,8 +79,8 @@ function exportContent() {
 
 ```vue
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { YanivEditor } from "@yanivjs/yaniv-editor";
+import { ref } from "vue";
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
@@ -96,20 +97,11 @@ async function save() {
 <template>
   <YanivEditor
     ref="editorRef"
-    version="advanced"
+    v-bind="editorPresets.production"
     locale="zh-CN"
     theme-preset="word"
     theme-mode="light"
     :initial-content="'<h1>标题</h1><p>正文</p>'"
-    :features="{
-      headerNav: true,
-      footerNav: true,
-      floatingMenu: true,
-      slashCommand: true,
-      linkBubbleMenu: true,
-      tableToolbar: true,
-      ai: true,
-    }"
     @update="(c) => console.log('updated', c)"
   />
 </template>
@@ -119,17 +111,10 @@ async function save() {
 
 ```ts
 import type {
-  EditorVersion,
   FeatureConfig,
   EditorPresetProps,
   EditorPresetName,
   YanivEditorProps,
   YanivEditorExpose,
-  EditorInstance,
 } from "@yanivjs/yaniv-editor";
 ```
-
-## 相关
-
-- [功能配置](/api/features-config)
-- [resolveExtensionGates](/api/features-config#resolveextensiongates)

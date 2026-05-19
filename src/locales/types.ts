@@ -400,30 +400,6 @@ export interface TiptapLocale {
     };
   };
 
-  // 版本历史
-  versionHistory: {
-    title: string;
-    saveVersion: string;
-    noVersions: string;
-    autoSave: string;
-    words: string;
-    justNow: string;
-    minutesAgo: string;
-    hoursAgo: string;
-    daysAgo: string;
-    restore: string;
-    compare: string;
-    rename: string;
-    delete: string;
-    comparing: string;
-    clearCompare: string;
-    versionName: string;
-    saved: string;
-    restored: string;
-    deleted: string;
-    noDiff: string;
-  };
-
   // 斜杠命令菜单
   slashCommand: {
     noResults: string;

@@ -15,8 +15,8 @@
   overscroll-behavior: contain;
   scrollbar-color: #bfbfbf transparent;
   scrollbar-width: thin;
-  background: var(--tiptap-bubble-bg);
-  border-radius: var(--tiptap-radius-md);
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
   box-shadow:
     0 4px 16px rgb(0 0 0 / 12%),
     0 0 1px rgb(0 0 0 / 8%);
@@ -65,7 +65,7 @@
   padding: 8px 14px 4px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   user-select: none;
@@ -79,7 +79,7 @@
   width: 100%;
   padding: 8px 14px;
   font-size: 14px;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
   text-align: left;
   cursor: pointer;
   background: transparent;
@@ -89,7 +89,7 @@
 
 .block-picker-item:hover,
 .block-picker-item.active {
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
 }
 
 .block-picker-item-icon {
@@ -100,15 +100,15 @@
   width: 36px;
   height: 36px;
   font-size: 18px;
-  color: var(--tiptap-text-secondary);
-  background: var(--tiptap-bg-secondary);
+  color: var(--ye-text-secondary);
+  background: var(--ye-bg-secondary);
   border-radius: 6px;
 }
 
 .block-picker-item.active .block-picker-item-icon,
 .block-picker-item:hover .block-picker-item-icon {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 .block-picker-item-content {
@@ -123,7 +123,7 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 .block-picker-item-desc {
@@ -131,7 +131,7 @@
   text-overflow: ellipsis;
   font-size: 12px;
   line-height: 1.3;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
   white-space: nowrap;
 }
 
@@ -139,13 +139,13 @@
 .block-picker-empty {
   padding: 16px 14px;
   font-size: 13px;
-  color: var(--tiptap-text-muted);
+  color: var(--ye-text-muted);
   text-align: center;
 }
 
 /* ========== 深色模式 ========== */
 [data-theme="dark"] .block-picker-menu {
-  background: var(--tiptap-bubble-bg);
+  background: var(--ye-bubble-bg);
   box-shadow:
     0 4px 16px rgb(0 0 0 / 40%),
     0 0 1px rgb(255 255 255 / 10%);
@@ -167,8 +167,8 @@
 
 [data-theme="dark"] .block-picker-item.active .block-picker-item-icon,
 [data-theme="dark"] .block-picker-item:hover .block-picker-item-icon {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 [data-theme="dark"] .block-picker-item-title {

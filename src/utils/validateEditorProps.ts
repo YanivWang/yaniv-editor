@@ -6,10 +6,6 @@ export function validateYanivEditorProps(props: YanivEditorProps): void {
 
   const zone = `[Yaniv Editor]`;
 
-  if (props.version && !["basic", "advanced"].includes(props.version)) {
-    warn(`${zone} Unrecognized props.version="${props.version}". Expected basic | advanced.`);
-  }
-
   const placement = props.zoomBarPlacement;
   if (placement && placement !== "bottom" && placement !== "belowToolbar") {
     warn(

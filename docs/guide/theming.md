@@ -34,10 +34,10 @@ import "@yanivjs/yaniv-editor/style.css";
 
 ## 皮肤 vs 功能配置
 
-| 层       | 控制方式                                    | 作用                             |
-| -------- | ------------------------------------------- | -------------------------------- |
-| **皮肤** | `themePreset` + 预设 CSS                    | 颜色、字体、纸张布局、工具栏外观 |
-| **功能** | `version` + `features` 或 `editorPresets.*` | 扩展注册、工具栏显隐、斜杠菜单等 |
+| 层       | 控制方式                        | 作用                             |
+| -------- | ------------------------------- | -------------------------------- |
+| **皮肤** | `themePreset` + 预设 CSS        | 颜色、字体、纸张布局、工具栏外观 |
+| **功能** | `features` 或 `editorPresets.*` | 扩展注册、工具栏显隐、斜杠菜单等 |
 
 Notion 风格示例（两者同时使用）：
 
@@ -93,9 +93,9 @@ const resolvedShellTheme = useResolvedThemeMode(themeMode);
 import { registerTheme } from "@yanivjs/yaniv-editor";
 
 registerTheme("custom", {
-  "--tiptap-primary": "#6366f1",
-  "--tiptap-bg": "#faf5ff",
-  "--tiptap-text": "#1e1b4b",
+  "--ye-primary": "#6366f1",
+  "--ye-bg": "#faf5ff",
+  "--ye-text": "#1e1b4b",
 });
 ```
 
@@ -103,66 +103,66 @@ registerTheme("custom", {
 <YanivEditor theme-preset="custom" theme-mode="light" />
 ```
 
-变量名须为 `--tiptap-*`。完整定义见 `src/styles/variables.css`；下表为**可覆盖的公开 token**（`registerTheme` / 预设 CSS 请只改这些）。
+变量名须为 `--ye-*`。完整定义见 `src/styles/variables.css`；下表为**可覆盖的公开 token**（`registerTheme` / 预设 CSS 请只改这些）。
 
 ### Design Token 参考
 
-| 分类     | 变量                                                         | 说明                                                    |
-| -------- | ------------------------------------------------------------ | ------------------------------------------------------- |
-| 主色     | `--tiptap-primary`                                           | 主色、链接、激活态                                      |
-|          | `--tiptap-primary-hover`                                     | 主色悬停                                                |
-|          | `--tiptap-primary-light`                                     | 主色浅底（选中、激活背景）                              |
-| 语义     | `--tiptap-danger`                                            | 危险操作文字/边框                                       |
-|          | `--tiptap-danger-bg`                                         | 危险操作背景                                            |
-| 表面     | `--tiptap-bg`                                                | 主背景                                                  |
-|          | `--tiptap-bg-secondary`                                      | 次级背景、侧栏、代码块浅底                              |
-|          | `--tiptap-bg-hover`                                          | 悬停背景                                                |
-| 文字     | `--tiptap-text`                                              | 主文字                                                  |
-|          | `--tiptap-text-secondary`                                    | 次要文字                                                |
-|          | `--tiptap-text-muted`                                        | 弱化、占位                                              |
-|          | `--tiptap-placeholder-color`                                 | 编辑器占位符                                            |
-| 边框     | `--tiptap-border`                                            | 默认边框                                                |
-|          | `--tiptap-border-hover`                                      | 边框悬停                                                |
-|          | `--tiptap-border-focus`                                      | 焦点边框（通常等于 primary）                            |
-| 选区     | `--tiptap-selection`                                         | 文本选区背景                                            |
-|          | `--tiptap-caret`                                             | 光标颜色                                                |
-| 工具栏   | `--tiptap-toolbar-bg`                                        | 顶栏背景                                                |
-|          | `--tiptap-toolbar-border`                                    | 顶栏底边                                                |
-|          | `--tiptap-toolbar-btn-text`                                  | 工具栏按钮文字                                          |
-|          | `--tiptap-toolbar-btn-hover`                                 | 工具栏按钮悬停                                          |
-|          | `--tiptap-toolbar-btn-active`                                | 工具栏按钮按下                                          |
-|          | `--tiptap-toolbar-btn-disabled`                              | 禁用按钮                                                |
-|          | `--tiptap-toolbar-divider`                                   | 工具栏分隔线                                            |
-| 气泡菜单 | `--tiptap-bubble-bg`                                         | 气泡/浮动菜单背景                                       |
-|          | `--tiptap-bubble-shadow`                                     | 气泡阴影                                                |
-|          | `--tiptap-bubble-border`                                     | 气泡边框                                                |
-| 按钮尺寸 | `--tiptap-btn-size`                                          | 菜单内按钮宽高（默认 32px）                             |
-|          | `--tiptap-btn-size-sm`                                       | 小屏按钮（默认 28px）                                   |
-|          | `--tiptap-btn-icon-size`                                     | 菜单按钮图标字号                                        |
-| 代码     | `--tiptap-code-bg` / `--tiptap-code-text`                    | 行内代码                                                |
-|          | `--tiptap-codeblock-bg` / `--tiptap-codeblock-text`          | 代码块                                                  |
-| 表格     | `--tiptap-table-border`                                      | 表格边框                                                |
-|          | `--tiptap-table-header-bg`                                   | 表头背景                                                |
-|          | `--tiptap-table-selected`                                    | 选中单元格高亮                                          |
-| 引用     | `--tiptap-blockquote-border` / `--tiptap-blockquote-bg`      | 引用块                                                  |
-| 链接     | `--tiptap-link` / `--tiptap-link-hover`                      | 文档内链接                                              |
-| 排版     | `--tiptap-font-family` / `--tiptap-font-mono`                | 字体                                                    |
-|          | `--tiptap-font-size` / `--tiptap-line-height`                | 字号与行高                                              |
-| 间距     | `--tiptap-spacing-xs` … `--tiptap-spacing-xl`                | 4px 阶梯                                                |
-| 圆角     | `--tiptap-radius-sm` … `--tiptap-radius-full`                | 圆角                                                    |
-| 阴影     | `--tiptap-shadow-sm` / `--md` / `--lg`                       | 阴影                                                    |
-| 动效     | `--tiptap-transition-fast` / `--normal` / `--slow`           | 过渡时长                                                |
-| 层级     | `--tiptap-z-toolbar` / `--dropdown` / `--bubble` / `--modal` | z-index                                                 |
-| 文档布局 | `--tiptap-doc-page-width`                                    | 纸张/内容区最大宽度                                     |
-|          | `--tiptap-doc-page-min-height`                               | 单页最小高度                                            |
-|          | `--tiptap-doc-padding-top` / `--bottom` / `--inline`         | 编辑区内边距                                            |
-|          | `--tiptap-doc-page-padding`                                  | `.continuous-pages` 外层 padding（如 Notion 左右 96px） |
-|          | `--tiptap-doc-container-padding-y`                           | 滚动容器上下留白                                        |
-|          | `--tiptap-doc-page-cut-height`                               | 分页裁切线高度（预留）                                  |
+| 分类     | 变量                                                     | 说明                                                    |
+| -------- | -------------------------------------------------------- | ------------------------------------------------------- |
+| 主色     | `--ye-primary`                                           | 主色、链接、激活态                                      |
+|          | `--ye-primary-hover`                                     | 主色悬停                                                |
+|          | `--ye-primary-light`                                     | 主色浅底（选中、激活背景）                              |
+| 语义     | `--ye-danger`                                            | 危险操作文字/边框                                       |
+|          | `--ye-danger-bg`                                         | 危险操作背景                                            |
+| 表面     | `--ye-bg`                                                | 主背景                                                  |
+|          | `--ye-bg-secondary`                                      | 次级背景、侧栏、代码块浅底                              |
+|          | `--ye-bg-hover`                                          | 悬停背景                                                |
+| 文字     | `--ye-text`                                              | 主文字                                                  |
+|          | `--ye-text-secondary`                                    | 次要文字                                                |
+|          | `--ye-text-muted`                                        | 弱化、占位                                              |
+|          | `--ye-placeholder-color`                                 | 编辑器占位符                                            |
+| 边框     | `--ye-border`                                            | 默认边框                                                |
+|          | `--ye-border-hover`                                      | 边框悬停                                                |
+|          | `--ye-border-focus`                                      | 焦点边框（通常等于 primary）                            |
+| 选区     | `--ye-selection`                                         | 文本选区背景                                            |
+|          | `--ye-caret`                                             | 光标颜色                                                |
+| 工具栏   | `--ye-toolbar-bg`                                        | 顶栏背景                                                |
+|          | `--ye-toolbar-border`                                    | 顶栏底边                                                |
+|          | `--ye-toolbar-btn-text`                                  | 工具栏按钮文字                                          |
+|          | `--ye-toolbar-btn-hover`                                 | 工具栏按钮悬停                                          |
+|          | `--ye-toolbar-btn-active`                                | 工具栏按钮按下                                          |
+|          | `--ye-toolbar-btn-disabled`                              | 禁用按钮                                                |
+|          | `--ye-toolbar-divider`                                   | 工具栏分隔线                                            |
+| 气泡菜单 | `--ye-bubble-bg`                                         | 气泡/浮动菜单背景                                       |
+|          | `--ye-bubble-shadow`                                     | 气泡阴影                                                |
+|          | `--ye-bubble-border`                                     | 气泡边框                                                |
+| 按钮尺寸 | `--ye-btn-size`                                          | 菜单内按钮宽高（默认 32px）                             |
+|          | `--ye-btn-size-sm`                                       | 小屏按钮（默认 28px）                                   |
+|          | `--ye-btn-icon-size`                                     | 菜单按钮图标字号                                        |
+| 代码     | `--ye-code-bg` / `--ye-code-text`                        | 行内代码                                                |
+|          | `--ye-codeblock-bg` / `--ye-codeblock-text`              | 代码块                                                  |
+| 表格     | `--ye-table-border`                                      | 表格边框                                                |
+|          | `--ye-table-header-bg`                                   | 表头背景                                                |
+|          | `--ye-table-selected`                                    | 选中单元格高亮                                          |
+| 引用     | `--ye-blockquote-border` / `--ye-blockquote-bg`          | 引用块                                                  |
+| 链接     | `--ye-link` / `--ye-link-hover`                          | 文档内链接                                              |
+| 排版     | `--ye-font-family` / `--ye-font-mono`                    | 字体                                                    |
+|          | `--ye-font-size` / `--ye-line-height`                    | 字号与行高                                              |
+| 间距     | `--ye-spacing-xs` … `--ye-spacing-xl`                    | 4px 阶梯                                                |
+| 圆角     | `--ye-radius-sm` … `--ye-radius-full`                    | 圆角                                                    |
+| 阴影     | `--ye-shadow-sm` / `--md` / `--lg`                       | 阴影                                                    |
+| 动效     | `--ye-transition-fast` / `--normal` / `--slow`           | 过渡时长                                                |
+| 层级     | `--ye-z-toolbar` / `--dropdown` / `--bubble` / `--modal` | z-index                                                 |
+| 文档布局 | `--ye-doc-page-width`                                    | 纸张/内容区最大宽度                                     |
+|          | `--ye-doc-page-min-height`                               | 单页最小高度                                            |
+|          | `--ye-doc-padding-top` / `--bottom` / `--inline`         | 编辑区内边距                                            |
+|          | `--ye-doc-page-padding`                                  | `.continuous-pages` 外层 padding（如 Notion 左右 96px） |
+|          | `--ye-doc-container-padding-y`                           | 滚动容器上下留白                                        |
+|          | `--ye-doc-page-cut-height`                               | 分页裁切线高度（预留）                                  |
 
 文档布局尺寸由 `variables.css` 提供默认值（A4），各 **theme preset**（`src/themes/presets/*.css`）覆盖；Word 分页时 `useEditorPagination` 会在运行时写入同名字符串变量。
 
-组件样式应直接使用 `var(--tiptap-*)`，不要写硬编码 fallback。基础组件类名前缀为 `ye-`（如 `ye-toolbar-button`）。
+组件样式应直接使用 `var(--ye-*)`，不要写硬编码 fallback。基础组件类名前缀为 `ye-`（如 `ye-toolbar-button`）。
 
 ### 跟随系统（auto）
 

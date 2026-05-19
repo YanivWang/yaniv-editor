@@ -51,7 +51,6 @@ function save() {
 <template>
   <YanivEditor
     ref="editorRef"
-    version="advanced"
     locale="zh-CN"
     :initial-content="'<p>Hello Yaniv!</p>'"
     :features="{
@@ -73,7 +72,6 @@ function save() {
 ```vue
 <YanivEditor
   ref="editorRef"
-  version="advanced"
   locale="zh-CN"
   :initial-content="loadedContent"
   :features="{
@@ -107,17 +105,6 @@ const res = await fetch("/api/documents/123");
 const { content } = await res.json();
 // content 可以是 HTML 字符串或 ProseMirror JSON
 ```
-
-`documentId` prop 已预留用于未来扩展，**当前版本不会自动加载或保存文档**。
-
-## 版本选择
-
-| version    | 说明                               |
-| ---------- | ---------------------------------- |
-| `basic`    | 基础工具栏，无格式刷/查找替换/大纲 |
-| `advanced` | **默认**，完整工具栏与进阶扩展     |
-
-工具栏按钮范围由 `version` 决定；扩展是否注册由 `features` 与 `resolveExtensionGates` 共同决定。详见 [功能配置](/api/features-config)。
 
 ## 预设配置
 

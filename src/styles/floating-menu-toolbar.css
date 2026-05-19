@@ -8,33 +8,33 @@
   z-index: 999;
   display: flex;
   padding: 4px;
-  background: var(--tiptap-bubble-bg);
-  border-radius: var(--tiptap-radius-md);
-  box-shadow: var(--tiptap-bubble-shadow);
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
 }
 
 /* 浮动菜单按钮 */
 .floating-btn {
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 [data-theme="dark"] .floating-btn {
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 [data-theme="dark"] .floating-btn:hover {
-  color: var(--tiptap-text);
-  background: var(--tiptap-bg-hover);
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
 }
 
 [data-theme="dark"] .floating-btn.active {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 /* 标题按钮 */
 .floating-menu .heading-btn {
-  font-family: var(--tiptap-font-family);
+  font-family: var(--ye-font-family);
   font-size: 14px;
   font-weight: bold;
 }
@@ -51,7 +51,7 @@
   gap: 2px;
   align-items: center;
   padding: 0 4px;
-  border-right: 1px solid var(--tiptap-border);
+  border-right: 1px solid var(--ye-border);
 }
 
 .menu-group:last-child {
@@ -63,33 +63,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--tiptap-btn-size);
-  height: var(--tiptap-btn-size);
-  color: var(--tiptap-text-secondary);
+  width: var(--ye-btn-size);
+  height: var(--ye-btn-size);
+  color: var(--ye-text-secondary);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: var(--tiptap-radius-sm);
-  transition: all var(--tiptap-transition-normal);
+  border-radius: var(--ye-radius-sm);
+  transition: all var(--ye-transition-normal);
 }
 
 .menu-btn:hover {
-  color: var(--tiptap-text);
-  background: var(--tiptap-bg-hover);
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
 }
 
 .menu-btn.active {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }
 
 .menu-btn .anticon {
-  font-size: var(--tiptap-btn-icon-size);
+  font-size: var(--ye-btn-icon-size);
 }
 
 /* 浮动菜单动画 */
 .ProseMirror-floatingmenu {
-  animation: tiptap-slide-in 0.2s ease-in-out;
+  animation: ye-slide-in 0.2s ease-in-out;
 }
 
 /* Tippy 样式重置 */
@@ -111,8 +111,8 @@
   }
 
   .menu-btn {
-    width: var(--tiptap-btn-size-sm);
-    height: var(--tiptap-btn-size-sm);
+    width: var(--ye-btn-size-sm);
+    height: var(--ye-btn-size-sm);
   }
 
   .menu-btn .anticon {
@@ -122,25 +122,25 @@
 
 /* 深色模式 */
 [data-theme="dark"] .floating-menu {
-  background: var(--tiptap-bubble-bg);
-  box-shadow: var(--tiptap-bubble-shadow);
+  background: var(--ye-bubble-bg);
+  box-shadow: var(--ye-bubble-shadow);
 }
 
 [data-theme="dark"] .floating-group,
 [data-theme="dark"] .menu-group {
-  border-right-color: var(--tiptap-border);
+  border-right-color: var(--ye-border);
 }
 
 [data-theme="dark"] .menu-btn {
-  color: var(--tiptap-text-secondary);
+  color: var(--ye-text-secondary);
 }
 
 [data-theme="dark"] .menu-btn:hover {
-  color: var(--tiptap-text);
-  background: var(--tiptap-bg-hover);
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
 }
 
 [data-theme="dark"] .menu-btn.active {
-  color: var(--tiptap-primary);
-  background: var(--tiptap-primary-light);
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
 }

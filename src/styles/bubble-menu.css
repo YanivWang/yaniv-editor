@@ -8,31 +8,31 @@
   z-index: 1010;
   display: flex;
   padding: 4px;
-  background: var(--tiptap-bubble-bg);
-  border-radius: var(--tiptap-radius-md);
-  box-shadow: var(--tiptap-bubble-shadow);
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
 }
 
 /* 暗黑模式 - 气泡菜单 */
 [data-theme="dark"] .bubble-menu {
-  background: var(--tiptap-bubble-bg);
-  border: 1px solid var(--tiptap-border);
-  box-shadow: var(--tiptap-bubble-shadow);
+  background: var(--ye-bubble-bg);
+  border: 1px solid var(--ye-border);
+  box-shadow: var(--ye-bubble-shadow);
 }
 
 /* 气泡菜单按钮 */
 .bubble-btn {
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 /* 暗黑模式 - 按钮 */
 [data-theme="dark"] .bubble-btn {
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 /* 标题按钮 */
 .heading-btn {
-  font-family: var(--tiptap-font-family);
+  font-family: var(--ye-font-family);
   font-size: 14px;
   font-weight: bold;
 }
@@ -43,26 +43,26 @@
   grid-template-columns: repeat(8, 24px);
   gap: 8px;
   padding: 12px;
-  background: var(--tiptap-bubble-bg);
-  border-radius: var(--tiptap-radius-sm);
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-sm);
 }
 
 .color-item {
   width: 24px;
   height: 24px;
   cursor: pointer;
-  border: 1px solid var(--tiptap-border);
-  border-radius: var(--tiptap-radius-sm);
-  transition: transform var(--tiptap-transition-normal);
+  border: 1px solid var(--ye-border);
+  border-radius: var(--ye-radius-sm);
+  transition: transform var(--ye-transition-normal);
 }
 
 .color-item:hover {
-  box-shadow: var(--tiptap-shadow-md);
+  box-shadow: var(--ye-shadow-md);
   transform: scale(1.2);
 }
 
 [data-theme="dark"] .color-item:hover {
-  box-shadow: var(--tiptap-shadow-lg);
+  box-shadow: var(--ye-shadow-lg);
 }
 
 /* 响应式 */

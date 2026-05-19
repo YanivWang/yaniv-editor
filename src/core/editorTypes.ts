@@ -1,19 +1,11 @@
 /**
  * Yaniv Editor Types
- * @description 档位（version）+ 功能开关（features）
+ * @description 功能开关（features）驱动扩展注册与 UI
  */
 import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
-
-/**
- * 版本类型
- */
-export type EditorVersion = "basic" | "advanced";
-
-/** 未传 version 时的默认档位 */
-export const DEFAULT_EDITOR_VERSION = "advanced" as const satisfies EditorVersion;
 
 /**
  * 编辑器功能配置
@@ -59,21 +51,17 @@ export interface FeatureConfig {
  * 编辑器 Props
  */
 export interface YanivEditorProps {
-  /** 档位：工具栏与部分扩展的默认集合（basic / advanced） */
-  version?: EditorVersion;
   /** 缩放条位置：底部固定或工具栏下方 */
   zoomBarPlacement?: "bottom" | "belowToolbar";
   /** 是否为只读模式 */
   readonly?: boolean;
   /** 是否为预览模式（无头部/底部导航，不可编辑，不可点击） */
   previewMode?: boolean;
-  /** 文档 ID（供业务层加载/保存，编辑器不会自动请求） */
-  documentId?: string;
   /** 初始内容 - 可以是 HTML 字符串或 JSON 对象（ProseMirror 格式） */
   initialContent?: string | object;
   /** 表格悬浮框显示模式：1=聚焦显示；2=单元格选中显示 */
   tableMenuShowMode?: 1 | 2;
-  /** 功能开关：在 version 默认之上覆盖扩展注册与部分 UI */
+  /** 功能开关：控制扩展注册与 UI 显隐 */
   features?: FeatureConfig;
   /** 语言设置 */
   locale?: string;

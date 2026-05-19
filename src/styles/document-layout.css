@@ -9,11 +9,11 @@
   height: 100%;
   min-height: 0; /* 允许 flex 子元素收缩 */
   overflow: hidden; /* 容器不滚动，由内部 document-container 滚动 */
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
 }
 
 [data-theme="dark"] .yaniv-editor.document-layout {
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
 }
 
 /* 文档区域容器 - 这是唯一可滚动的区域 */
@@ -23,7 +23,7 @@
   flex: 1;
   flex-direction: column;
   min-height: 0; /* 关键：允许 flex 子元素收缩 */
-  padding: var(--tiptap-doc-container-padding-y) 0;
+  padding: var(--ye-doc-container-padding-y) 0;
   overflow: hidden auto;
   scrollbar-gutter: stable;
   overscroll-behavior-y: contain;
@@ -40,24 +40,23 @@
 /* 连续页面容器 */
 .continuous-pages {
   position: relative;
-  max-width: var(--tiptap-doc-page-width);
-  padding: var(--tiptap-doc-page-padding);
+  max-width: var(--ye-doc-page-width);
+  padding: var(--ye-doc-page-padding);
   margin: 0 auto;
-  background: var(--tiptap-bg);
-  box-shadow: var(--tiptap-shadow-md);
+  background: var(--ye-bg);
+  box-shadow: var(--ye-shadow-md);
 }
 
 /* ===== 文档内容区 ===== */
 .document-content .ProseMirror {
-  min-height: var(--tiptap-doc-page-min-height);
-  padding: var(--tiptap-doc-padding-top) var(--tiptap-doc-padding-inline)
-    var(--tiptap-doc-padding-bottom);
-  font-family: var(--tiptap-font-family);
-  font-size: var(--tiptap-font-size);
-  line-height: var(--tiptap-line-height);
-  color: var(--tiptap-text);
+  min-height: var(--ye-doc-page-min-height);
+  padding: var(--ye-doc-padding-top) var(--ye-doc-padding-inline) var(--ye-doc-padding-bottom);
+  font-family: var(--ye-font-family);
+  font-size: var(--ye-font-size);
+  line-height: var(--ye-line-height);
+  color: var(--ye-text);
   outline: none;
-  background: var(--tiptap-bg);
+  background: var(--ye-bg);
 }
 
 /* 格式刷激活态光标 */
@@ -116,7 +115,7 @@
     vertical-align: top;
     word-break: break-word;
     overflow-wrap: anywhere;
-    border: 1px solid var(--tiptap-table-border);
+    border: 1px solid var(--ye-table-border);
 
     > * {
       margin-bottom: 0;
@@ -126,7 +125,7 @@
   th {
     font-weight: bold;
     text-align: left;
-    background-color: var(--tiptap-table-header-bg);
+    background-color: var(--ye-table-header-bg);
   }
 
   /* 选中单元格样式 */
@@ -136,7 +135,7 @@
     z-index: 2;
     pointer-events: none;
     content: "";
-    background: var(--tiptap-table-selected-bg);
+    background: var(--ye-table-selected-bg);
   }
 
   /* 列调整大小手柄 */
@@ -147,7 +146,7 @@
     bottom: -2px;
     width: 4px;
     pointer-events: none;
-    background-color: var(--tiptap-primary);
+    background-color: var(--ye-primary);
   }
 }
 
@@ -177,13 +176,13 @@
   font-weight: 400 !important;
   line-height: 1.5 !important;
   vertical-align: baseline !important;
-  color: var(--tiptap-text) !important;
+  color: var(--ye-text) !important;
   letter-spacing: 0 !important;
   word-break: break-word !important;
   white-space: pre !important;
-  background: var(--tiptap-code-bg) !important;
-  border: 1px solid var(--tiptap-border) !important;
-  border-radius: var(--tiptap-radius-sm) !important;
+  background: var(--ye-code-bg) !important;
+  border: 1px solid var(--ye-border) !important;
+  border-radius: var(--ye-radius-sm) !important;
 }
 
 /* 确保行内代码在段落、列表、表格、标题中正确显示 */
@@ -215,19 +214,19 @@
   font-weight: 400 !important;
   line-height: 1.5 !important;
   vertical-align: baseline !important;
-  color: var(--tiptap-text) !important;
+  color: var(--ye-text) !important;
   letter-spacing: 0 !important;
   word-break: break-word !important;
   white-space: pre !important;
-  background: var(--tiptap-code-bg) !important;
-  border: 1px solid var(--tiptap-border) !important;
-  border-radius: var(--tiptap-radius-sm) !important;
+  background: var(--ye-code-bg) !important;
+  border: 1px solid var(--ye-border) !important;
+  border-radius: var(--ye-radius-sm) !important;
 }
 
 /* 行内代码在链接中的样式 */
 .document-content .ProseMirror a code.inline-code,
 .document-content .ProseMirror a code:not(pre code) {
-  color: var(--tiptap-link) !important;
+  color: var(--ye-link) !important;
 }
 
 /* 行内代码在强调文本中的样式 */
@@ -240,7 +239,7 @@
 
 /* Word 链接样式 */
 .document-content .ProseMirror a {
-  color: var(--tiptap-link);
+  color: var(--ye-link);
   word-break: break-word;
   text-decoration: underline;
   pointer-events: auto; /* 确保链接可以接收点击事件 */
@@ -261,7 +260,7 @@
   display: block;
   width: 20px;
   content: "";
-  border-top: 1px solid var(--tiptap-text);
+  border-top: 1px solid var(--ye-text);
   animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
 }
 
@@ -280,10 +279,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--tiptap-doc-page-min-height);
+  min-height: var(--ye-doc-page-min-height);
   font-size: 14px;
-  color: var(--tiptap-text-muted);
-  background: var(--tiptap-bg);
+  color: var(--ye-text-muted);
+  background: var(--ye-bg);
 }
 
 /* ===== 预览模式样式 ===== */

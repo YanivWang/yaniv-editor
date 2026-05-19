@@ -126,10 +126,11 @@ import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
 import { validateYanivEditorProps } from "@/utils/validateEditorProps";
 
-import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
+
+import type { YanivEditorProps } from "./editorTypes";
 
 // 样式（variables.css 需最先加载以定义 CSS 变量，base.css 需在其他样式之前加载）
 import "@/styles/variables.css";
@@ -150,7 +151,6 @@ const props = withDefaults(defineProps<YanivEditorProps>(), {
   readonly: false,
   previewMode: false,
   initialContent: "<p>开始编辑你的文档...</p>",
-  version: DEFAULT_EDITOR_VERSION,
   themePreset: "default",
   themeMode: "light",
 });
@@ -260,7 +260,7 @@ const initEditor = async () => {
 
     // 获取扩展配置
     const enableImageResize = resolvedExtensionGates.value.image;
-    const extensions = buildEditorExtensions(props.version, {
+    const extensions = buildEditorExtensions({
       enableImageResize,
       features: resolvedExtensionGates.value,
       outline: {

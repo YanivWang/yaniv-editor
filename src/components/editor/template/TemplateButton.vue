@@ -103,7 +103,7 @@ function insertTemplate(tpl: TemplateItem) {
 
 .template-card:hover {
   background: #f0f5ff;
-  border-color: var(--tiptap-primary);
+  border-color: var(--ye-primary);
 }
 
 [data-theme="dark"] .template-card {
@@ -123,7 +123,7 @@ function insertTemplate(tpl: TemplateItem) {
   width: 36px;
   height: 36px;
   font-size: 20px;
-  color: var(--tiptap-primary);
+  color: var(--ye-primary);
   background: #e6f4ff;
   border-radius: 8px;
 }

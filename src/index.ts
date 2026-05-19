@@ -6,7 +6,6 @@
 // Core Editor
 export { default as YanivEditor } from "./core/YanivEditor.vue";
 export type * from "./core/editorTypes";
-export { DEFAULT_EDITOR_VERSION } from "./core/editorTypes";
 export * from "./configs/editorConfig";
 export { editorPresets, mergeEditorPreset } from "./configs/editorPresets";
 export type { EditorPresetName, EditorPresetProps } from "./configs/editorPresets";

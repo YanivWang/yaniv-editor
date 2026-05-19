@@ -2,6 +2,7 @@ import { notification } from "ant-design-vue";
 import { createApp, h, ref } from "vue";
 
 import { aiClient } from "@/features/ai/client";
+import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
 import { t } from "@/locales";
 import {
   buildParagraphNodesFromText,
@@ -141,7 +142,7 @@ class AiSuggestionManager {
     aiClient.customCommand(
       this.state.originalText,
       prompt,
-      "你係一個專業嘅文本處理助手。直接返回處理結果,唔好加任何解釋。",
+      this.editor ? buildDocumentContextPrompt(this.editor) : "",
       {
         onStart: () => {
           accumulated = "";

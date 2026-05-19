@@ -23,7 +23,6 @@ import { Underline } from "@tiptap/extension-underline";
 import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 
-import { DEFAULT_EDITOR_VERSION, type EditorVersion } from "@/core/editorTypes";
 import {
   CustomAiExtension,
   ContinueWritingExtension,
@@ -78,10 +77,7 @@ export interface ExtensionsOptions {
 /**
  * 构建编辑器扩展列表（能力由 options.features 门控）
  */
-export function buildEditorExtensions(
-  _version: EditorVersion = DEFAULT_EDITOR_VERSION,
-  options: ExtensionsOptions = {},
-): AnyExtension[] {
+export function buildEditorExtensions(options: ExtensionsOptions = {}): AnyExtension[] {
   const { enableImageResize = true, officePaste, outline: outlineOptions } = options;
 
   const gates: ResolvedExtensionGates = options.features ?? resolveExtensionGates();

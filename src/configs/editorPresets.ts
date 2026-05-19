@@ -1,9 +1,11 @@
 /**
- * 编辑器集成预设 — 与 YanivEditor 的 version / features 同构，可直接 v-bind
+ * 编辑器集成预设 — 与 YanivEditor features 同构，可直接 v-bind
  */
-import type { EditorVersion, FeatureConfig, YanivEditorProps } from "@/core/editorTypes";
+import type { FeatureConfig } from "@/core/editorTypes";
 
-export type EditorPresetProps = Pick<YanivEditorProps, "version" | "features">;
+export interface EditorPresetProps {
+  features?: FeatureConfig;
+}
 
 export type EditorPresetName = keyof typeof editorPresets;
 
@@ -37,19 +39,16 @@ const productionFeatures = {
 export const editorPresets = {
   /** 生产推荐 */
   production: {
-    version: "advanced",
     features: productionFeatures,
   },
 
   /** 基础档位 + 顶栏 */
   basic: {
-    version: "basic",
     features: compactFeatures,
   },
 
   /** 最小：精简工具栏，无顶栏 */
   minimal: {
-    version: "basic",
     features: {
       toolbar: "compact",
     },
@@ -57,14 +56,13 @@ export const editorPresets = {
 
   /** Notion 风格：隐藏固定工具栏，启用浮动菜单、斜杠菜单与块级操作体验 */
   notion: {
-    version: "advanced",
     features: {
       ...productionFeatures,
       headerNav: false,
       footerNav: false,
     },
   },
-} as const satisfies Record<string, { version: EditorVersion; features: FeatureConfig }>;
+} as const satisfies Record<string, EditorPresetProps>;
 
 /** 合并预设与自定义覆盖 */
 export function mergeEditorPreset(
@@ -73,7 +71,6 @@ export function mergeEditorPreset(
 ): EditorPresetProps {
   const base = typeof preset === "string" ? editorPresets[preset] : preset;
   return {
-    version: overrides?.version ?? base.version,
     features: {
       ...base.features,
       ...overrides?.features,

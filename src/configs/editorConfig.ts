@@ -1,5 +1,5 @@
 /**
- * 主题与 Demo 辅助类型（编辑器能力请使用 version + features / editorPresets）
+ * 主题与 Demo 辅助类型（编辑器能力请使用 features / editorPresets）
  */
 
 /** Theme mode */

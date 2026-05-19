@@ -11,11 +11,11 @@
           :aria-label="t('editor.toolbarSectionDocument')"
         >
           <div v-if="config.undoRedo" class="tool-group">
-            <UndoRedoButton :editor="editor" :disabled="config.undoRedoDisabled" />
+            <UndoRedoButton :editor="editor" />
           </div>
 
           <div v-if="config.formatPainter" class="tool-group">
-            <FormatPainterButton :editor="editor" :disabled="config.formatPainterDisabled" />
+            <FormatPainterButton :editor="editor" />
           </div>
 
           <div v-if="config.searchReplace" class="tool-group">

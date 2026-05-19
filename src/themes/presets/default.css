@@ -7,44 +7,44 @@
  */
 
 .yaniv-editor.theme-default {
-  --tiptap-bg-secondary: #f5f5f5;
-  --tiptap-doc-page-width: 960px;
-  --tiptap-doc-page-min-height: 480px;
-  --tiptap-doc-padding-top: 40px;
-  --tiptap-doc-padding-bottom: 40px;
-  --tiptap-doc-padding-inline: 56px;
-  --tiptap-doc-container-padding-y: 24px;
+  --ye-bg-secondary: #f5f5f5;
+  --ye-doc-page-width: 960px;
+  --ye-doc-page-min-height: 480px;
+  --ye-doc-padding-top: 40px;
+  --ye-doc-padding-bottom: 40px;
+  --ye-doc-padding-inline: 56px;
+  --ye-doc-container-padding-y: 24px;
 }
 
 /* 浅灰画布，区别于 Word 的深灰纸张背景 */
 .yaniv-editor.theme-default.document-layout {
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
 }
 
 /* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
 .yaniv-editor.theme-default .continuous-pages {
-  border: 1px solid var(--tiptap-border);
-  border-radius: var(--tiptap-radius-md);
-  box-shadow: var(--tiptap-shadow-sm);
+  border: 1px solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-shadow-sm);
 }
 
 .yaniv-editor.theme-default .document-content .ProseMirror h1 {
   margin: 0 0 16px;
   font-size: 1.875rem;
   font-weight: 700;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 .yaniv-editor.theme-default .document-content .ProseMirror h2 {
   margin: 24px 0 12px;
   font-size: 1.5rem;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 .yaniv-editor.theme-default .document-content .ProseMirror h3 {
   margin: 20px 0 8px;
   font-size: 1.25rem;
-  color: var(--tiptap-text);
+  color: var(--ye-text);
 }
 
 /* 扁平工具栏，无 Word 渐变 */
@@ -53,19 +53,19 @@
   top: 0;
   z-index: 100;
   padding: 6px 12px;
-  background: var(--tiptap-toolbar-bg) !important;
-  border-bottom: 1px solid var(--tiptap-border) !important;
+  background: var(--ye-toolbar-bg) !important;
+  border-bottom: 1px solid var(--ye-border) !important;
 }
 
 .yaniv-editor.theme-default[data-theme="dark"] {
-  --tiptap-bg-secondary: #141414;
+  --ye-bg-secondary: #141414;
 }
 
 .yaniv-editor.theme-default.document-layout[data-theme="dark"] {
-  background: var(--tiptap-bg-secondary);
+  background: var(--ye-bg-secondary);
 }
 
 .yaniv-editor.theme-default[data-theme="dark"] .continuous-pages {
-  border-color: var(--tiptap-border);
+  border-color: var(--ye-border);
   box-shadow: none;
 }
