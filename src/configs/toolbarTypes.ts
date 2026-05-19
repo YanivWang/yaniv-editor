@@ -34,11 +34,12 @@ export interface MenuItemConfig {
   danger?: boolean;
   active?: boolean;
   children?: MenuItemConfig[];
-}
-
-export interface MenuGroupConfig {
-  title: string;
-  items: MenuItemConfig[];
+  /** 子菜单展示：`nested` 默认嵌套；`split-hover` 主区域点击 + 右侧 hover 语言列表 */
+  submenuMode?: "nested" | "split-hover";
+  /** split-hover 模式下当前选中的子项 key */
+  selectedChildKey?: string;
+  /** split-hover 右侧箭头 tooltip */
+  splitArrowTitle?: string;
 }
 
 export type TextColor = (typeof TEXT_COLORS)[number];

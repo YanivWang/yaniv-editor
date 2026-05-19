@@ -6,81 +6,68 @@
   >
     <!-- 工具栏（预览模式下隐藏） -->
     <ToolbarNav
-      v-if="editorInstance && !isPreviewMode"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && shouldShowHeaderNav"
+      :editor="editor"
       :config="toolbarConfig"
-      :enabled="shouldShowHeaderNav"
       class="document-toolbar"
     >
     </ToolbarNav>
 
     <!-- 功能模块：链接悬浮框（预览模式下禁用） -->
     <LinkBubbleMenu
-      v-if="editorInstance && !isPreviewMode && featureFlags.linkBubbleMenu"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && uiFlags.linkBubbleMenu"
+      :editor="editor"
       :readonly="readonly"
-      :enabled="featureFlags.linkBubbleMenu"
     />
 
     <!-- 功能模块：表格工具栏（预览模式下禁用） -->
     <TableToolbar
-      v-if="editorInstance && !isPreviewMode"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && uiFlags.tableToolbar"
+      :editor="editor"
       :readonly="readonly"
       :show-mode="props.tableMenuShowMode ?? 2"
-      :enabled="featureFlags.tableToolbar"
     />
 
     <!-- 功能模块：图片工具栏（预览模式下禁用） -->
     <ImageToolbar
-      v-if="editorInstance && !isPreviewMode && featureFlags.image"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && uiFlags.image"
+      :editor="editor"
       :readonly="readonly"
-      :enabled="featureFlags.image"
     />
 
     <!-- 功能模块：视频工具栏（预览模式下禁用） -->
     <VideoToolbar
-      v-if="editorInstance && !isPreviewMode && featureFlags.image"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && uiFlags.image"
+      :editor="editor"
       :readonly="readonly"
-      :enabled="featureFlags.image"
     />
 
     <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
     <FloatingMenu
-      v-if="editorInstance && !isPreviewMode && featureFlags.floatingMenu"
-      :editor="editorInstance"
+      v-if="editor && !isPreviewMode && uiFlags.floatingMenu"
+      :editor="editor"
       :readonly="readonly"
-      :enabled="featureFlags.floatingMenu"
     />
 
     <!-- 功能模块：Notion 风格块选择菜单（/ 转换当前块，+ 在下方插入新块） -->
     <BlockPickerMenu
-      v-if="editorInstance && !isPreviewMode && showBlockPickerMenu"
+      v-if="editor && !isPreviewMode && showBlockPickerMenu"
       ref="blockPickerMenuRef"
-      :editor="editorInstance"
+      :editor="editor"
     />
 
     <!-- Word 文档区域容器 -->
     <div class="document-body">
-      <OutlinePanel
-        v-if="editorInstance && !isPreviewMode && showOutlinePanel"
-        :editor="editorInstance"
-      />
+      <OutlinePanel v-if="editor && !isPreviewMode && showOutlinePanel" :editor="editor" />
       <div ref="containerRef" class="document-container">
         <CodeBlockLanguageBadge
-          v-if="editorInstance && !isPreviewMode && toolbarConfig.codeBlock"
-          :editor="editorInstance"
+          v-if="editor && !isPreviewMode && toolbarConfig.codeBlock"
+          :editor="editor"
           :container="containerRef"
         />
         <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
           <div class="continuous-pages">
-            <EditorContent
-              v-if="editorInstance"
-              :editor="editorInstance"
-              class="document-content"
-            />
+            <EditorContent v-if="editor" :editor="editor" class="document-content" />
             <div v-else class="editor-status">{{ editorError || "正在初始化编辑器..." }}</div>
           </div>
         </div>
@@ -89,10 +76,10 @@
 
     <!-- 底部导航（预览模式下隐藏） -->
     <FooterNav
-      v-if="editorInstance && !isPreviewMode && shouldShowFooterNav"
+      v-if="editor && !isPreviewMode && shouldShowFooterNav"
       v-model:zoom-level="zoomLevel"
       :total-pages="totalPages"
-      :editor="editorInstance"
+      :editor="editor"
       :show-char-count="true"
       :show-shortcut-hints="showStatusShortcutHints"
       :zoom-bar-placement="props.zoomBarPlacement"
@@ -123,10 +110,8 @@ import type { SlashCommandState } from "@/components/tools/slash-command";
 import { TableToolbar } from "@/components/tools/table-toolbar";
 import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { buildEditorExtensions } from "@/extensions/coreExtensions";
-import { isFeatureEnabled } from "@/extensions/resolveExtensionGates";
 import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
-import { validateYanivEditorProps } from "@/utils/validateEditorProps";
 
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
@@ -141,6 +126,7 @@ import "@/styles/base.css";
 import "@/styles/document-layout.css";
 import "@/styles/task-list.css";
 import "@/styles/toolbar.css";
+import "@/styles/toolbar-dropdown.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
 import "@/styles/block-picker.css";
@@ -190,25 +176,14 @@ const {
   resolvedExtensionGates,
   toolbarConfig,
   showStatusShortcutHints,
+  uiFlags,
+  showBlockPickerMenu,
 } = useEditorFeatures(props);
-
-const featureFlags = computed(() => ({
-  linkBubbleMenu: isFeatureEnabled(props.features, "linkBubbleMenu"),
-  tableToolbar: isFeatureEnabled(props.features, "tableToolbar"),
-  image: isFeatureEnabled(props.features, "image"),
-  floatingMenu: isFeatureEnabled(props.features, "floatingMenu"),
-}));
-
-const showBlockPickerMenu = computed(
-  () => resolvedExtensionGates.value.slashCommand || resolvedExtensionGates.value.dragHandle,
-);
 
 const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
   useEditorPagination(containerRef);
 const isFirstInit = ref(true);
 const isInitializing = ref(false);
-
-const editorInstance = computed(() => editor.value as Editor);
 
 const { visible: outlinePanelVisible } = provideOutlinePanel();
 
@@ -334,7 +309,6 @@ const destroyEditor = async () => {
 };
 
 onMounted(async () => {
-  validateYanivEditorProps(props);
   await initEditor();
 });
 

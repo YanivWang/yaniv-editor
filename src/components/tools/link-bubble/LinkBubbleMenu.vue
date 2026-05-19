@@ -80,11 +80,9 @@ const props = withDefaults(
   defineProps<{
     editor: Editor | null | undefined;
     readonly?: boolean;
-    enabled?: boolean;
   }>(),
   {
     readonly: false,
-    enabled: false, // 默认启用
   },
 );
 
@@ -119,12 +117,6 @@ function updateCurrentLinkUrl() {
  * @description 只在选中链接文本时显示（部分或全部），选中非链接文本时不显示
  */
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  // 如果功能未启用，不显示
-  if (!props.enabled) {
-    return false;
-  }
-
-  // 只读模式下不显示
   if (props.readonly) {
     return false;
   }

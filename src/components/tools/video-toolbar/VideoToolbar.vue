@@ -57,11 +57,9 @@ const props = withDefaults(
   defineProps<{
     editor: Editor | null | undefined;
     readonly?: boolean;
-    enabled?: boolean;
   }>(),
   {
     readonly: false,
-    enabled: true,
   },
 );
 
@@ -103,7 +101,7 @@ function getCurrentVideoInfo() {
 }
 
 const shouldShow = (bubbleProps: { editor: any }) => {
-  if (!props.enabled || props.readonly || !bubbleProps.editor) {
+  if (props.readonly || !bubbleProps.editor) {
     return false;
   }
 

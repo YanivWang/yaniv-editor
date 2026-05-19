@@ -1,5 +1,5 @@
 <template>
-  <div v-if="enabled" class="footer-nav-container">
+  <div class="footer-nav-container">
     <ZoomBar
       v-model:zoom-level="localZoomLevel"
       :total-pages="totalPages"
@@ -28,7 +28,6 @@
  *   :totalPages="totalPages"
  *   :editor="editor"
  * />
- * <FooterNav :enabled="false" /> // 关闭底部导航
  * ```
  */
 import { ref, watch } from "vue";
@@ -58,8 +57,6 @@ interface Props {
   step?: number;
   /** 缩放条位置 */
   zoomBarPlacement?: "bottom" | "belowToolbar";
-  /** 是否启用底部导航，默认为 true */
-  enabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -69,7 +66,6 @@ const props = withDefaults(defineProps<Props>(), {
   showCharCount: true,
   showShortcutHints: false,
   zoomBarPlacement: "bottom",
-  enabled: true,
 });
 
 // ===== Emits =====

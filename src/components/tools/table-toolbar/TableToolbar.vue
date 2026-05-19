@@ -1,6 +1,6 @@
 <template>
   <bubble-menu
-    v-if="editor && enabled"
+    v-if="editor"
     :editor="editor"
     :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
     :should-show="shouldShow"
@@ -117,12 +117,10 @@ const props = withDefaults(
     editor: Editor | null | undefined;
     readonly?: boolean;
     showMode?: 1 | 2;
-    enabled?: boolean;
   }>(),
   {
     readonly: false,
     showMode: 2,
-    enabled: false,
   },
 );
 
@@ -211,9 +209,6 @@ const cellTools = [
 ];
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  // 如果未启用，则不显示
-  if (!props.enabled) return false;
-
   if (props.readonly) return false;
 
   if (isBlockDragging(bubbleProps.editor)) return false;

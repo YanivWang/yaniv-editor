@@ -42,9 +42,9 @@ async function uploadImage(file: File): Promise<string> {
 
 ### 图片能力
 
-- 拖拽调整大小（`ResizableImage`，`enableImageResize` 默认 true）
+- 拖拽调整大小（`ResizableImage`，`enableResize` 默认 true）
 - 粘贴图片（`PasteImage` 扩展）
-- 图片工具栏（对齐、替换等，需 `features.image` + Demo 级 tableToolbar/imageToolbar 配置）
+- 图片工具栏（对齐、替换等，需 `features.image`）
 - 支持 Base64（`allowBase64: true`）
 
 ### 关闭图片

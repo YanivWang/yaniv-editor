@@ -9,9 +9,5 @@ export * from "./AiHighlightMark";
 // Export AI Suggestion Manager (used by summarize, translation, etc.)
 export * from "./aiSuggestionManager";
 
-// Export shared components
-export { default as CustomAiPopover } from "./CustomAiPopover.vue";
-export { default as AiSuggestionPopover } from "./AiSuggestionPopover.vue";
-
 // Import styles
 import "./ai-highlight.css";

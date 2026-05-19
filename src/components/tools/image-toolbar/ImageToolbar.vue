@@ -80,11 +80,9 @@ const props = withDefaults(
   defineProps<{
     editor: Editor | null | undefined;
     readonly?: boolean;
-    enabled?: boolean;
   }>(),
   {
     readonly: false,
-    enabled: true,
   },
 );
 
@@ -184,12 +182,6 @@ function getImageAlign() {
  * 检查是否应该显示工具栏
  */
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  // 如果功能未启用，不显示
-  if (!props.enabled) {
-    return false;
-  }
-
-  // 检查编辑器是否存在
   if (!bubbleProps.editor) {
     return false;
   }

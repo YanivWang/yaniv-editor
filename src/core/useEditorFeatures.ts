@@ -33,11 +33,24 @@ export function useEditorFeatures(props: YanivEditorProps) {
     isFeatureEnabled(features.value, "statusShortcutHints"),
   );
 
+  const uiFlags = computed(() => ({
+    linkBubbleMenu: isFeatureEnabled(features.value, "linkBubbleMenu"),
+    tableToolbar: isFeatureEnabled(features.value, "tableToolbar"),
+    image: isFeatureEnabled(features.value, "image"),
+    floatingMenu: isFeatureEnabled(features.value, "floatingMenu"),
+  }));
+
+  const showBlockPickerMenu = computed(
+    () => resolvedExtensionGates.value.slashCommand || resolvedExtensionGates.value.dragHandle,
+  );
+
   return {
     shouldShowHeaderNav,
     shouldShowFooterNav,
     resolvedExtensionGates,
     toolbarConfig,
     showStatusShortcutHints,
+    uiFlags,
+    showBlockPickerMenu,
   };
 }

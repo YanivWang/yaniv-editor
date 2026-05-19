@@ -68,7 +68,7 @@
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 
 import { ColorPicker } from "@/components/editor/color";
 import { HeadingButtons } from "@/components/editor/heading";
@@ -76,10 +76,9 @@ import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";
 import { TextFormatButtons } from "@/components/editor/text-format";
 import { isBlockDragging } from "@/components/tools/drag-handle";
+import { useEditorColorState } from "@/composables/useEditorColorState";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
-import { normalizeColor } from "@/utils/color";
-import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -92,59 +91,21 @@ const props = withDefaults(
   defineProps<{
     editor: Editor | null | undefined;
     readonly?: boolean;
-    enabled?: boolean;
   }>(),
   {
     readonly: false,
-    enabled: true,
   },
 );
 const editor = computed(() => props.editor ?? null);
 
-// ===== 响应式状态 =====
-// 当前颜色值
-const currentTextColor = ref<string>("#000000");
-const currentBgColor = ref<string>("#ffffff");
-
-// ===== 工具函数 =====
-const runCommand = createCommandRunner(editor);
-
-// 监听编辑器状态，更新当前颜色
-watch(
-  () => editor.value?.getAttributes("textStyle"),
-  (attrs) => {
-    if (attrs?.color) {
-      currentTextColor.value = normalizeColor(attrs.color);
-    } else {
-      currentTextColor.value = "#000000";
-    }
-  },
-  { deep: true, immediate: true },
-);
-
-watch(
-  () => editor.value?.getAttributes("highlight"),
-  (attrs) => {
-    if (attrs?.color) {
-      currentBgColor.value = normalizeColor(attrs.color);
-    } else {
-      currentBgColor.value = "#ffffff";
-    }
-  },
-  { deep: true, immediate: true },
-);
+const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
+  useEditorColorState(editor);
 
 /**
  * 控制浮动菜单显示时机
  * @description 仅在有文本选中时显示，只读模式下不显示
  */
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  // 如果功能未启用，不显示
-  if (!props.enabled) {
-    return false;
-  }
-
-  // 只读模式下不显示
   if (props.readonly) return false;
 
   if (isBlockDragging(bubbleProps.editor)) return false;
@@ -188,22 +149,6 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
 
   return true;
 };
-
-/**
- * 设置文字颜色
- */
-const setTextColor = (color: string) => {
-  currentTextColor.value = color;
-  runCommand((chain) => chain.setColor(color))();
-};
-
-/**
- * 设置背景高亮
- */
-const setHighlight = (color: string) => {
-  currentBgColor.value = color;
-  runCommand((chain) => chain.setHighlight({ color }))();
-};
 </script>
 
 <style scoped>
@@ -241,85 +186,4 @@ const setHighlight = (color: string) => {
   gap: 2px;
   align-items: center;
 }
-
-.bubble-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: #333;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
-  transition: all 0.2s;
-
-  [data-theme="dark"] & {
-    color: #f0f0f0;
-  }
-}
-
-.bubble-btn:hover {
-  background: #f5f5f5;
-
-  [data-theme="dark"] & {
-    background: #303030;
-  }
-}
-
-.bubble-btn.active {
-  color: #1890ff;
-  background: #e6f4ff;
-
-  [data-theme="dark"] & {
-    color: #4fc3f7;
-    background: #1a4d6e;
-  }
-}
-
-.heading-btn {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.color-panel {
-  display: grid;
-  grid-template-columns: repeat(8, 24px);
-  gap: 8px;
-  padding: 12px;
-  background: #fff;
-  border-radius: 4px;
-
-  [data-theme="dark"] & {
-    background: #1f1f1f;
-  }
-}
-
-.color-item {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: transform 0.2s;
-
-  [data-theme="dark"] & {
-    border-color: #434343;
-  }
-}
-
-.color-item:hover {
-  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
-  transform: scale(1.2);
-
-  [data-theme="dark"] & {
-    box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
-  }
-}
-
-/* Bubble Menu 容器样式 */
 </style>

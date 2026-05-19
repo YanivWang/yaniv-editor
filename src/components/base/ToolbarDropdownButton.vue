@@ -1,5 +1,10 @@
 <template>
-  <a-dropdown v-model:open="dropdownOpen" :placement="placement" :trigger="['click']">
+  <a-dropdown
+    v-model:open="dropdownOpen"
+    :placement="placement"
+    :trigger="['click']"
+    @open-change="handleOpenChange"
+  >
     <a-tooltip :title="title" placement="top" :open="dropdownOpen ? false : undefined">
       <a-button type="text" :class="['ye-dropdown-btn', { 'is-active': active }]">
         <span class="ye-dropdown-btn__content">
@@ -14,6 +19,63 @@
       <a-menu style="max-height: 360px; overflow-y: auto" @click="onMenuClick">
         <template v-for="item in items" :key="item.key">
           <a-menu-divider v-if="item.type === 'divider'" />
+
+          <a-menu-item v-else-if="isSplitHoverItem(item)" :key="item.key + ':split-hover'">
+            <slot
+              name="split-item"
+              :item="item"
+              :on-primary-click="() => onSplitPrimary(item)"
+              :on-child-select="onSplitChildSelect"
+            >
+              <div
+                class="ye-dropdown-split"
+                @mouseenter="onSplitRowEnter(item)"
+                @mouseleave="onSplitRowLeave(item)"
+              >
+                <span class="ye-dropdown-split__main" @click.stop="onSplitPrimary(item)">
+                  <component :is="item.icon" v-if="item.icon" class="ye-dropdown-menu-item__icon" />
+                  <span class="ye-dropdown-menu-item__label">{{ item.label }}</span>
+                </span>
+                <a-dropdown
+                  :trigger="hasSplitSelection(item) ? ['hover'] : []"
+                  placement="rightTop"
+                  :open="isSplitOverlayOpen(item)"
+                  @open-change="(open: boolean) => onSplitOverlayOpenChange(item, open)"
+                >
+                  <span
+                    class="ye-dropdown-split__arrow"
+                    :title="item.splitArrowTitle || splitHoverArrowTitle"
+                  >
+                    <RightOutlined />
+                  </span>
+                  <template #overlay>
+                    <div
+                      class="ye-dropdown-split-overlay"
+                      @mouseenter="cancelSplitClose"
+                      @mouseleave="scheduleSplitClose(item)"
+                    >
+                      <a-menu
+                        class="ye-dropdown-overlay"
+                        :selected-keys="item.selectedChildKey ? [item.selectedChildKey] : []"
+                        @click="onSplitChildSelect"
+                      >
+                        <a-menu-item
+                          v-for="child in item.children"
+                          :key="child.key"
+                          :disabled="child.disabled"
+                          :danger="child.danger"
+                        >
+                          <span class="ye-dropdown-menu-item">
+                            <span class="ye-dropdown-menu-item__label">{{ child.label }}</span>
+                          </span>
+                        </a-menu-item>
+                      </a-menu>
+                    </div>
+                  </template>
+                </a-dropdown>
+              </div>
+            </slot>
+          </a-menu-item>
 
           <a-sub-menu
             v-else-if="item.children && item.children.length"
@@ -57,15 +119,18 @@
 </template>
 
 <script setup lang="ts">
-import { DownOutlined } from "@ant-design/icons-vue";
+import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { Tooltip as ATooltip } from "ant-design-vue";
 import { ref } from "vue";
 
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import { findMenuItemByKey } from "@/utils/menuItem";
 
 import type { Component } from "vue";
 
 const dropdownOpen = ref(false);
+const splitOverlayKey = ref<string | null>(null);
+let splitCloseTimeout: number | null = null;
 
 interface Props {
   icon?: Component;
@@ -74,6 +139,8 @@ interface Props {
   active?: boolean;
   items: MenuItemConfig[];
   placement?: "top" | "bottom" | "bottomLeft" | "bottomRight" | "topLeft" | "topRight";
+  /** split-hover 项右侧箭头的默认 tooltip */
+  splitHoverArrowTitle?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -81,159 +148,95 @@ const props = withDefaults(defineProps<Props>(), {
   placement: "bottom",
 });
 
-const emit = defineEmits<{ select: [key: string] }>();
+const emit = defineEmits<{
+  select: [key: string];
+  splitPrimary: [itemKey: string];
+}>();
 
-function findItemByKey(items: MenuItemConfig[], key: string): MenuItemConfig | undefined {
-  for (const item of items) {
-    if (item.key === key) return item;
-    if (item.children?.length) {
-      const found = findItemByKey(item.children, key);
-      if (found) return found;
-    }
+function isSplitHoverItem(item: MenuItemConfig): boolean {
+  return item.submenuMode === "split-hover" && !!item.children?.length;
+}
+
+function hasSplitSelection(item: MenuItemConfig): boolean {
+  return !!item.selectedChildKey;
+}
+
+function isSplitOverlayOpen(item: MenuItemConfig): boolean {
+  return splitOverlayKey.value === item.key;
+}
+
+function cancelSplitClose() {
+  if (splitCloseTimeout) {
+    clearTimeout(splitCloseTimeout);
+    splitCloseTimeout = null;
   }
-  return undefined;
+}
+
+function scheduleSplitClose(item: MenuItemConfig) {
+  if (hasSplitSelection(item)) return;
+  cancelSplitClose();
+  splitCloseTimeout = window.setTimeout(() => {
+    if (splitOverlayKey.value === item.key) {
+      splitOverlayKey.value = null;
+    }
+  }, 150);
+}
+
+function onSplitRowEnter(item: MenuItemConfig) {
+  if (hasSplitSelection(item)) return;
+  cancelSplitClose();
+  splitOverlayKey.value = item.key;
+}
+
+function onSplitRowLeave(item: MenuItemConfig) {
+  scheduleSplitClose(item);
+}
+
+function onSplitOverlayOpenChange(item: MenuItemConfig, open: boolean) {
+  if (hasSplitSelection(item)) {
+    splitOverlayKey.value = open ? item.key : null;
+  }
+}
+
+function onSplitPrimary(item: MenuItemConfig) {
+  if (!hasSplitSelection(item)) {
+    splitOverlayKey.value = item.key;
+    emit("splitPrimary", item.key);
+    return;
+  }
+
+  dropdownOpen.value = false;
+  splitOverlayKey.value = null;
+  item.action?.();
+  emit("splitPrimary", item.key);
+}
+
+function onSplitChildSelect(info: { key: string }) {
+  const item = findMenuItemByKey(props.items, info.key);
+  if (!item) return;
+
+  dropdownOpen.value = false;
+  splitOverlayKey.value = null;
+  item.action?.();
+  emit("select", info.key);
+}
+
+function handleOpenChange(open: boolean) {
+  if (!open) {
+    splitOverlayKey.value = null;
+    cancelSplitClose();
+  }
 }
 
 function onMenuClick(info: { key: string }) {
-  const item = findItemByKey(props.items, info.key);
+  if (info.key.endsWith(":split-hover")) return;
+
+  const item = findMenuItemByKey(props.items, info.key);
   if (!item) return;
+
   dropdownOpen.value = false;
+  splitOverlayKey.value = null;
   item.action?.();
   emit("select", info.key);
 }
 </script>
-
-<style>
-/* 使用全局样式以支持深色模式 */
-@media (width <= 768px) {
-  .ye-dropdown-btn {
-    height: 28px;
-    padding: 0 6px;
-  }
-  .ye-dropdown-btn__icon {
-    font-size: 14px;
-  }
-  .ye-dropdown-btn__label {
-    font-size: 12px;
-  }
-}
-
-.ye-dropdown-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 32px;
-  padding: 0 6px;
-  line-height: 1;
-  color: var(--ye-toolbar-btn-text);
-  border-radius: var(--ye-radius-sm);
-  transition: all var(--ye-transition-normal);
-}
-
-.ye-dropdown-btn:hover {
-  color: var(--ye-toolbar-btn-text);
-  background: var(--ye-toolbar-btn-hover);
-}
-
-.ye-dropdown-btn.is-active {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
-}
-
-.ye-dropdown-btn .ant-btn-icon {
-  display: none;
-}
-
-.ye-dropdown-btn__content {
-  display: inline-flex !important;
-  flex-flow: row nowrap !important;
-  gap: 2px;
-  align-items: center !important;
-  justify-content: center;
-  height: 100%;
-  white-space: nowrap;
-}
-
-.ye-dropdown-btn__icon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.ye-dropdown-btn__icon .anticon {
-  font-size: 18px;
-}
-
-.ye-dropdown-btn__label {
-  flex-shrink: 0;
-  font-size: 14px;
-  line-height: 1;
-}
-
-.ye-dropdown-btn__arrow {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  margin-left: 0;
-  font-size: 10px;
-  line-height: 1;
-  opacity: 0.65;
-  transition:
-    opacity 0.2s,
-    transform 0.2s;
-}
-
-.ye-dropdown-btn:hover .ye-dropdown-btn__arrow {
-  opacity: 1;
-}
-
-.ye-dropdown-overlay {
-  max-height: 260px !important;
-  overflow-y: auto !important;
-}
-
-@media (width <= 768px) {
-  .ye-dropdown-overlay {
-    max-height: 150px !important;
-  }
-}
-
-.ye-dropdown-menu-item {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  min-width: 120px;
-  font-size: 14px;
-}
-
-.ye-dropdown-menu-item__icon {
-  font-size: 16px;
-  color: rgb(0 0 0 / 65%);
-}
-
-[data-theme="dark"] .ye-dropdown-menu-item__icon {
-  color: rgb(255 255 255 / 65%);
-}
-
-.ye-dropdown-menu-item__label {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ye-dropdown-overlay .ant-dropdown-menu-item {
-  padding: 8px 10px;
-}
-
-.ye-dropdown-overlay .ant-dropdown-menu-item-selected {
-  color: var(--ye-primary) !important;
-  background: var(--ye-primary-light) !important;
-}
-</style>

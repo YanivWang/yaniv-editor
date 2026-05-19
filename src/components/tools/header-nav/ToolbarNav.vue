@@ -1,5 +1,5 @@
 <template>
-  <div v-if="enabled" class="document-toolbar-container">
+  <div class="document-toolbar-container">
     <div class="document-toolbar">
       <!-- 左侧：基础工具 -->
       <div class="toolbar-left">
@@ -149,11 +149,10 @@
  * @example
  * ```vue
  * <ToolbarNav :editor="editor" :config="{ textFormat: true, colorPicker: true }" />
- * <ToolbarNav :editor="editor" :enabled="false" /> // 关闭工具栏
  * ```
  */
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 
 import { ToolbarGroup } from "@/components/base";
 import { AlignDropdown } from "@/components/editor/align";
@@ -177,10 +176,9 @@ import { TextFormatButtons } from "@/components/editor/text-format";
 import { UndoRedoButton } from "@/components/editor/undo-redo";
 import { VideoUpload } from "@/components/editor/video";
 import { WordButton } from "@/components/editor/word";
+import { useEditorColorState } from "@/composables/useEditorColorState";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
-import { normalizeColor } from "@/utils/color";
-import { createCommandRunner } from "@/utils/editorCommands";
 
 import { FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 
@@ -193,13 +191,9 @@ interface Props {
   editor: Editor | null | undefined;
   /** 工具栏配置，控制显示哪些工具 */
   config?: ToolbarToolsConfig;
-  /** 是否启用工具栏，默认为 true */
-  enabled?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  enabled: true,
-});
+const props = defineProps<Props>();
 
 const editor = computed(() => props.editor ?? null);
 
@@ -230,48 +224,8 @@ const showSection = computed(() => {
   };
 });
 
-// ===== 响应式状态 =====
-const currentTextColor = ref<string>("#000000");
-const currentBgColor = ref<string>("#ffffff");
-
-// ===== 辅助函数 =====
-const runCommand = createCommandRunner(editor);
-
-// ===== 颜色应用函数 =====
-const setTextColor = (color: string) => {
-  currentTextColor.value = color;
-  runCommand((chain) => chain.setColor(color))();
-};
-
-const setHighlight = (color: string) => {
-  currentBgColor.value = color;
-  runCommand((chain) => chain.setHighlight({ color }))();
-};
-
-// 监听编辑器状态，更新当前颜色
-watch(
-  () => editor.value?.getAttributes("textStyle"),
-  (attrs) => {
-    if (attrs?.color) {
-      currentTextColor.value = normalizeColor(attrs.color);
-    } else {
-      currentTextColor.value = "#000000";
-    }
-  },
-  { deep: true, immediate: true },
-);
-
-watch(
-  () => editor.value?.getAttributes("highlight"),
-  (attrs) => {
-    if (attrs?.color) {
-      currentBgColor.value = normalizeColor(attrs.color);
-    } else {
-      currentBgColor.value = "#ffffff";
-    }
-  },
-  { deep: true, immediate: true },
-);
+const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
+  useEditorColorState(editor);
 </script>
 
 <style lang="scss" scoped>

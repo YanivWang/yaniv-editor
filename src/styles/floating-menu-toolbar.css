@@ -3,7 +3,6 @@
  * @description 浮动菜单（依赖 variables.css）
  */
 
-/* 浮动菜单容器 */
 .floating-menu {
   z-index: 999;
   display: flex;
@@ -13,33 +12,6 @@
   box-shadow: var(--ye-bubble-shadow);
 }
 
-/* 浮动菜单按钮 */
-.floating-btn {
-  color: var(--ye-text);
-}
-
-[data-theme="dark"] .floating-btn {
-  color: var(--ye-text);
-}
-
-[data-theme="dark"] .floating-btn:hover {
-  color: var(--ye-text);
-  background: var(--ye-bg-hover);
-}
-
-[data-theme="dark"] .floating-btn.active {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
-}
-
-/* 标题按钮 */
-.floating-menu .heading-btn {
-  font-family: var(--ye-font-family);
-  font-size: 14px;
-  font-weight: bold;
-}
-
-/* 通用菜单样式 */
 .menu-content {
   display: flex;
   gap: 4px;
@@ -58,41 +30,10 @@
   border-right: none;
 }
 
-.menu-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--ye-btn-size);
-  height: var(--ye-btn-size);
-  color: var(--ye-text-secondary);
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: var(--ye-radius-sm);
-  transition: all var(--ye-transition-normal);
-}
-
-.menu-btn:hover {
-  color: var(--ye-text);
-  background: var(--ye-bg-hover);
-}
-
-.menu-btn.active {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
-}
-
-.menu-btn .anticon {
-  font-size: var(--ye-btn-icon-size);
-}
-
-/* 浮动菜单动画 */
 .ProseMirror-floatingmenu {
   animation: ye-slide-in 0.2s ease-in-out;
 }
 
-/* Tippy 样式重置 */
 .tippy-box[data-theme~="light"] {
   background-color: transparent;
   border: none;
@@ -103,44 +44,18 @@
   padding: 0;
 }
 
-/* 响应式 */
 @media (width <= 768px) {
   .floating-menu,
   .ProseMirror-floatingmenu {
     display: none !important;
   }
-
-  .menu-btn {
-    width: var(--ye-btn-size-sm);
-    height: var(--ye-btn-size-sm);
-  }
-
-  .menu-btn .anticon {
-    font-size: 14px;
-  }
 }
 
-/* 深色模式 */
 [data-theme="dark"] .floating-menu {
   background: var(--ye-bubble-bg);
   box-shadow: var(--ye-bubble-shadow);
 }
 
-[data-theme="dark"] .floating-group,
 [data-theme="dark"] .menu-group {
   border-right-color: var(--ye-border);
-}
-
-[data-theme="dark"] .menu-btn {
-  color: var(--ye-text-secondary);
-}
-
-[data-theme="dark"] .menu-btn:hover {
-  color: var(--ye-text);
-  background: var(--ye-bg-hover);
-}
-
-[data-theme="dark"] .menu-btn.active {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
 }

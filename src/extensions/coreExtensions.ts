@@ -135,7 +135,7 @@ export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[
       ResizableImage.configure({
         inline: true,
         allowBase64: true,
-        enableResize: gates.image,
+        enableResize: true,
       }),
     );
   }
