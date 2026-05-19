@@ -1,9 +1,9 @@
 /**
- * 扩展功能门控 — 与 TiptapProEditor 的 features / versionConfig 对齐
+ * 扩展功能门控 — 与 TiptapProEditor 的 version / features 对齐
  * @description 单一解析入口，避免「UI 关了但扩展仍注册」的不一致
  */
 
-import type { FeatureConfig, VersionConfig } from "@/core/editorTypes";
+import type { EditorVersion, FeatureConfig } from "@/core/editorTypes";
 
 /** 解析后的门控（全部显式布尔，供 getExtensionsByVersion 使用） */
 export interface ResolvedExtensionGates {
@@ -21,34 +21,31 @@ export interface ResolvedExtensionGates {
 }
 
 export interface ResolveExtensionGatesInput {
-  /** 与 TiptapProEditor.version / getExtensionsByVersion 第一参数一致 */
-  version: string | number;
+  /** 与 TiptapProEditor.version / getExtensionsByVersion 一致 */
+  version: EditorVersion;
   features?: FeatureConfig;
-  versionConfig?: VersionConfig;
 }
 
-function isBasicTier(version: string | number): boolean {
-  return version === "basic" || version === 1;
+function isBasicTier(version: EditorVersion): boolean {
+  return version === "basic";
 }
 
 /**
  * 解析扩展层应注册的能力
  *
- * 规则（保持向后兼容：未传 features 字段时尽量与旧行为一致）：
- * - table / image / math：显式 `false` 则不注册对应扩展；默认 true
- * - ai：`features.ai` 或 `versionConfig.features.ai` 任一为 false 则不注册 AI 扩展；默认 true
- * - formatPainter / outline / searchReplace：显式 true/false 优先；未指定时 advanced/premium 为 true，basic 为 false
+ * 规则：
+ * - table / image / math：显式 `false` 则不注册；默认 true
+ * - ai：`features.ai === false` 则不注册；默认 true
+ * - formatPainter / outline / searchReplace：显式 true/false 优先；未指定时 advanced 为 true，basic 为 false
  * - officePaste：默认 true；显式 false 关闭
  */
 export function resolveExtensionGates(input: ResolveExtensionGatesInput): ResolvedExtensionGates {
-  const { version, features: f, versionConfig: vc } = input;
-  const vf = vc?.features;
+  const { version, features: f } = input;
 
   const table = f?.table !== false;
   const image = f?.image !== false;
   const math = f?.math !== false;
-
-  const ai = f?.ai !== false && vf?.ai !== false;
+  const ai = f?.ai !== false;
 
   let formatPainter: boolean;
   if (f?.formatPainter === true) {

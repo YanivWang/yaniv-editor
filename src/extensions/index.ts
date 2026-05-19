@@ -3,8 +3,8 @@
  * @description 编辑器扩展的统一导出入口
  */
 
-export { getExtensionsByVersion, getBasicExtensions } from "./coreExtensions";
-export type { EditorVersion } from "./coreExtensions";
+export { getExtensionsByVersion } from "./coreExtensions";
+export type { EditorVersion } from "@/core/editorTypes";
 export { resolveExtensionGates } from "./resolveExtensionGates";
 export type { ResolvedExtensionGates, ResolveExtensionGatesInput } from "./resolveExtensionGates";
 export { OfficePaste } from "./office-paste";

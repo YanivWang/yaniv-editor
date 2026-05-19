@@ -28,6 +28,8 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ## 功能相关
 
+完整缺口清单见 [功能缺口与半成品](/features/incomplete-features)。
+
 ### AI 按钮不可用？
 
 检查：

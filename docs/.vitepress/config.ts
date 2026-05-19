@@ -36,6 +36,7 @@ export default defineConfig({
           text: "功能",
           items: [
             { text: "功能总览", link: "/features/overview" },
+            { text: "功能缺口与半成品", link: "/features/incomplete-features" },
             { text: "文本与排版", link: "/features/text-formatting" },
             { text: "媒体", link: "/features/media" },
             { text: "表格", link: "/features/table" },

@@ -53,18 +53,15 @@ const { preset, mode } = getTheme();
 
 ## Notion 风格配置
 
-Notion 风格建议配合 `PRESET_CONFIGS.notion` 的功能开关：
+Notion 风格建议配合 `editorPresets.notion`（隐藏顶栏，启用浮动菜单）：
 
-```ts
-import { PRESET_CONFIGS } from "yaniv-editor";
-
-// 固定栏仅保留撤销/重做，格式化依赖 floatingMenu
-const notionFeatures = PRESET_CONFIGS.notion.features;
+```vue
+<TiptapProEditor v-bind="editorPresets.notion" />
 ```
 
-同时：
-
 ```ts
+import { editorPresets } from "yaniv-editor";
+
 setTheme("notion", "light");
 ```
 

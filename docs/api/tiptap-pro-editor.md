@@ -12,18 +12,17 @@ import "yaniv-editor/style.css";
 
 ## Props
 
-| Prop                | 类型                                 | 默认值             | 说明                                          |
-| ------------------- | ------------------------------------ | ------------------ | --------------------------------------------- |
-| `version`           | `'basic' \| 'advanced' \| 'premium'` | `'basic'`          | 工具栏档位与扩展门控基准                      |
-| `versionConfig`     | `VersionConfig`                      | —                  | 版本对象配置（与 version 二选一）             |
-| `initialContent`    | `string \| object`                   | `'<p>开始编辑...'` | 初始内容，支持 HTML 或 ProseMirror JSON       |
-| `features`          | `FeatureConfig`                      | —                  | 功能门控，见 [功能配置](/api/features-config) |
-| `locale`            | `string`                             | `'zh-CN'`          | 界面语言                                      |
-| `readonly`          | `boolean`                            | `false`            | 只读模式                                      |
-| `previewMode`       | `boolean`                            | `false`            | 预览模式（无工具栏、不可编辑）                |
-| `documentId`        | `string`                             | —                  | 预留字段，当前不触发加载/保存                 |
-| `tableMenuShowMode` | `1 \| 2`                             | `2`                | 表格工具栏显示时机                            |
-| `zoomBarPlacement`  | `'bottom' \| 'belowToolbar'`         | `'bottom'`         | 缩放条位置                                    |
+| Prop                | 类型                         | 默认值             | 说明                                          |
+| ------------------- | ---------------------------- | ------------------ | --------------------------------------------- |
+| `version`           | `'basic' \| 'advanced'`      | `'advanced'`       | 工具栏档位与扩展门控基准                      |
+| `initialContent`    | `string \| object`           | `'<p>开始编辑...'` | 初始内容，支持 HTML 或 ProseMirror JSON       |
+| `features`          | `FeatureConfig`              | —                  | 功能门控，见 [功能配置](/api/features-config) |
+| `locale`            | `string`                     | `'zh-CN'`          | 界面语言                                      |
+| `readonly`          | `boolean`                    | `false`            | 只读模式                                      |
+| `previewMode`       | `boolean`                    | `false`            | 预览模式（无工具栏、不可编辑）                |
+| `documentId`        | `string`                     | —                  | 预留字段，当前不触发加载/保存                 |
+| `tableMenuShowMode` | `1 \| 2`                     | `2`                | 表格工具栏显示时机                            |
+| `zoomBarPlacement`  | `'bottom' \| 'belowToolbar'` | `'bottom'`         | 缩放条位置                                    |
 
 ### FeatureConfig 速查
 
@@ -121,7 +120,8 @@ async function save() {
 import type {
   EditorVersion,
   FeatureConfig,
-  VersionConfig,
+  EditorPresetProps,
+  EditorPresetName,
   TiptapProEditorProps,
   TiptapProEditorExpose,
   EditorInstance,

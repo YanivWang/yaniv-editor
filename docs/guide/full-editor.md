@@ -65,7 +65,6 @@ onMounted(() => {
 | ---------- | ------------------------- | ------------------------------ |
 | `basic`    | `BASIC_TOOLBAR_CONFIG`    | 无格式刷、大纲、查找替换       |
 | `advanced` | `ADVANCED_TOOLBAR_CONFIG` | 格式刷、大纲、查找替换默认开启 |
-| `premium`  | 同 advanced               | 同 advanced                    |
 
 `advanced` 工具栏包含：撤销/重做、格式刷、查找替换、字体、文本格式、颜色、标题、列表、对齐、链接、表格、图片、视频、上下标、Word、模板、图库、AI。
 

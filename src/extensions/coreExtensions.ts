@@ -32,6 +32,7 @@ import {
   TranslationExtension,
   AiHighlightMark,
 } from "@/ai";
+import { DEFAULT_EDITOR_VERSION, type EditorVersion } from "@/core/editorTypes";
 
 import { codeBlockLowlightExtension } from "./codeBlockLowlight";
 import { FontSize } from "./fontSize";
@@ -47,11 +48,6 @@ import { SearchReplace } from "./search-replace";
 import { Video } from "./video";
 
 import type { AnyExtension } from "@tiptap/core";
-
-/**
- * 编辑器版本类型
- */
-export type EditorVersion = "basic" | "advanced" | "premium" | "all" | 1 | 2 | 3 | 4;
 
 /**
  * 扩展配置选项
@@ -80,7 +76,7 @@ export interface ExtensionsOptions {
  * @returns 扩展配置数组
  */
 export function getExtensionsByVersion(
-  _version: EditorVersion = "basic",
+  _version: EditorVersion = DEFAULT_EDITOR_VERSION,
   optionsOrEnableImageResize: boolean | ExtensionsOptions = true,
 ): AnyExtension[] {
   // 兼容旧 API：如果传入 boolean，转换为配置对象
@@ -276,13 +272,4 @@ export function getExtensionsByVersion(
   }
 
   return extensions;
-}
-
-/**
- * 获取基础版扩展配置
- * @description 为了保持向后兼容，此函数内部调用 getExtensionsByVersion('basic')
- * @deprecated 建议直接使用 getExtensionsByVersion('basic') 或 getExtensionsByVersion(2)
- */
-export function getBasicExtensions() {
-  return getExtensionsByVersion("basic");
 }

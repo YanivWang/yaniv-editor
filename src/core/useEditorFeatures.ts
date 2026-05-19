@@ -8,19 +8,15 @@ import {
   type ToolbarToolsConfig,
 } from "@/tools/header-nav";
 
-import type { TiptapProEditorProps } from "./editorTypes";
+import { DEFAULT_EDITOR_VERSION, type TiptapProEditorProps } from "./editorTypes";
 
 type FeatureName = "headerNav" | "footerNav";
 
 export function useEditorFeatures(props: TiptapProEditorProps) {
+  const resolvedVersion = computed(() => props.version ?? DEFAULT_EDITOR_VERSION);
+
   const getFeatureConfig = (featureName: FeatureName): boolean => {
-    if (props.features?.[featureName] !== undefined) {
-      return props.features[featureName];
-    }
-    if (props.versionConfig?.features?.[featureName] !== undefined) {
-      return props.versionConfig.features[featureName];
-    }
-    return false;
+    return props.features?.[featureName] === true;
   };
 
   const shouldShowHeaderNav = computed(() => getFeatureConfig("headerNav"));
@@ -28,15 +24,14 @@ export function useEditorFeatures(props: TiptapProEditorProps) {
 
   const resolvedExtensionGates = computed(() =>
     resolveExtensionGates({
-      version: props.version ?? "basic",
+      version: resolvedVersion.value,
       features: props.features,
-      versionConfig: props.versionConfig,
     }),
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
     const base: ToolbarToolsConfig =
-      props.version === "advanced" || props.version === "premium"
+      resolvedVersion.value === "advanced"
         ? {
             ...ADVANCED_TOOLBAR_CONFIG,
             codeBlock: true,

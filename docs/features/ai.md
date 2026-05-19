@@ -5,7 +5,7 @@ yaniv-editor 内置 AI 写作辅助 UI，支持续写、润色、摘要、翻译
 ## 前置条件
 
 1. `features.ai !== false`（默认 true）
-2. `version="advanced"` 或 `premium`（工具栏包含 AI 按钮）
+2. `version="advanced"`（工具栏包含 AI 按钮）
 3. 配置 AI API（环境变量或 UI 设置）
 
 ## 配置方式
@@ -58,17 +58,6 @@ AI 结果以建议形式展示，用户确认后写入文档（`AiHighlightMark`
 
 ```vue
 <TiptapProEditor :features="{ ai: false }" />
-```
-
-或通过 `versionConfig`：
-
-```vue
-<TiptapProEditor
-  :version-config="{
-    version: 'advanced',
-    features: { ai: false },
-  }"
-/>
 ```
 
 ## 架构

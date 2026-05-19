@@ -82,28 +82,31 @@
 | Google Docs 式协作  | ❌                  |
 | Markdown 优先工作流 | ❌                  |
 
-## 预设配置 PRESET_CONFIGS
+## 预设 editorPresets
 
-| 名称       | 用途                |
-| ---------- | ------------------- |
-| `minimal`  | 最小工具集          |
-| `basic`    | 基础编辑            |
-| `advanced` | 高级功能（无 AI）   |
-| `full`     | 完整功能含 AI       |
-| `notion`   | Notion 风格功能组合 |
+| 名称         | 用途                              |
+| ------------ | --------------------------------- |
+| `production` | 生产推荐（完整工具栏 + 常用模块） |
+| `full`       | 同 `production`                   |
+| `basic`      | 基础档位 + 顶栏                   |
+| `minimal`    | 基础档位，无顶栏                  |
+| `notion`     | Notion 风格（浮动菜单，无顶栏）   |
 
-```ts
-import { PRESET_CONFIGS, mergeConfig } from "yaniv-editor";
+```vue
+<script setup>
+import { editorPresets } from "yaniv-editor";
+</script>
 
-const config = mergeConfig("full");
+<template>
+  <TiptapProEditor v-bind="editorPresets.production" />
+</template>
 ```
 
-::: info
-`PRESET_CONFIGS` 中的 `FeatureFlags` 主要用于 examples 与文档演示；集成 `TiptapProEditor` 时请优先使用 [FeatureConfig](/api/features-config)（`editorTypes.ts`）。
-:::
+详见 [功能配置 — editorPresets](/api/features-config#editorpresets-推荐)。
 
 ## 详细文档
 
+- [功能缺口与半成品](/features/incomplete-features)
 - [文本与排版](/features/text-formatting)
 - [媒体](/features/media)
 - [表格](/features/table)

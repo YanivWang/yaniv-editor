@@ -1,6 +1,6 @@
 /**
- * TiptapPro Tenant Editor Types
- * @description 编辑器类型定义（支持版本配置）
+ * TiptapPro Editor Types
+ * @description 档位（version）+ 功能开关（features）
  */
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
@@ -8,7 +8,10 @@ import type { Editor } from "@tiptap/vue-3";
 /**
  * 版本类型
  */
-export type EditorVersion = "basic" | "advanced" | "premium";
+export type EditorVersion = "basic" | "advanced";
+
+/** 未传 version 时的默认档位 */
+export const DEFAULT_EDITOR_VERSION = "advanced" as const satisfies EditorVersion;
 
 /**
  * 编辑器功能配置
@@ -18,9 +21,9 @@ export interface FeatureConfig {
   table?: boolean;
   /** 是否注册数学公式扩展（默认 true；false 时移除公式能力） */
   math?: boolean;
-  /** 是否注册 AI 相关扩展（默认 true；也可由 versionConfig.features.ai 关闭） */
+  /** 是否注册 AI 相关扩展（默认 true；显式 false 关闭） */
   ai?: boolean;
-  /** 是否注册格式刷扩展（默认随版本：basic 为 false，advanced/premium 为 true；可显式覆盖） */
+  /** 是否注册格式刷扩展（默认随版本：basic 为 false，advanced 为 true；可显式覆盖） */
   formatPainter?: boolean;
   /** 标题锚点 UniqueID + 目录（TableOfContents）扩展；进阶版默认开，协作中会由扩展层跳过 */
   outline?: boolean;
@@ -51,36 +54,11 @@ export interface FeatureConfig {
 }
 
 /**
- * 版本配置接口
- */
-export interface VersionConfig {
-  /** 版本类型（基础版/进阶版/高级版） */
-  version?: EditorVersion;
-  /** 功能开关配置 */
-  features?: {
-    /** 基础版功能 */
-    basic?: boolean;
-    /** 进阶版功能 */
-    advanced?: boolean;
-    /** AI功能 */
-    ai?: boolean;
-    /** 头部导航 */
-    headerNav?: boolean;
-    /** 底部导航 */
-    footerNav?: boolean;
-    /** 预览模式 */
-    previewMode?: boolean;
-  };
-}
-
-/**
  * 编辑器 Props
  */
 export interface TiptapProEditorProps {
-  /** 版本配置 */
+  /** 档位：工具栏与部分扩展的默认集合（basic / advanced） */
   version?: EditorVersion;
-  /** 版本配置对象（与 version 二选一） */
-  versionConfig?: VersionConfig;
   /** 缩放条位置：底部固定或工具栏下方 */
   zoomBarPlacement?: "bottom" | "belowToolbar";
   /** 是否为只读模式 */
@@ -93,7 +71,7 @@ export interface TiptapProEditorProps {
   initialContent?: string | object;
   /** 表格悬浮框显示模式：1=聚焦显示；2=单元格选中显示 */
   tableMenuShowMode?: 1 | 2;
-  /** 功能配置（兼容旧版） */
+  /** 功能开关：在 version 默认之上覆盖扩展注册与部分 UI */
   features?: FeatureConfig;
   /** 语言设置 */
   locale?: string;

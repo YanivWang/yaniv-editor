@@ -34,7 +34,7 @@ src/index.ts
 import { TextFormatButtons } from "@/editor/text-format";
 import { ToolbarNav, ADVANCED_TOOLBAR_CONFIG } from "@/tools/header-nav";
 import { ToolbarButton } from "@/base";
-import { PRESET_CONFIGS } from "@/configs";
+import { editorPresets } from "@/configs/editorPresets";
 ```
 
 对外使用时优先从包入口导入：

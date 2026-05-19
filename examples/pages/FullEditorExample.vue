@@ -70,8 +70,7 @@
               :key="themePreset"
               :initial-content="sampleContent"
               :locale="locale"
-              :features="currentFeatures"
-              :version="'advanced'"
+              v-bind="editorPreset"
               @update="handleUpdate"
             />
           </div>
@@ -91,13 +90,13 @@ import {
   DeviceSwitcher,
   type Orientation,
 } from "../../src/components/tools/device-switcher";
-import { PRESET_CONFIGS } from "../../src/configs/editorConfig";
+import { editorPresets } from "../../src/configs/editorPresets";
 import TiptapProEditor from "../../src/core/TiptapProEditor.vue";
 import { createI18n, type LocaleCode } from "../../src/locales";
 import { setDeviceView, setOrientation, setTheme, type DeviceView } from "../../src/themes";
 import EditorAutoDemo from "../components/EditorAutoDemo.vue";
 
-import type { FeatureFlags, ThemePreset } from "../../src/configs/editorConfig";
+import type { ThemePreset } from "../../src/configs/editorConfig";
 import type { Editor } from "@tiptap/vue-3";
 
 import "../../src/themes/presets/word.css";
@@ -122,13 +121,9 @@ const antdTheme = computed(() => ({
   algorithm: theme.value === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
 }));
 
-const currentFeatures = computed<FeatureFlags>(() => {
-  if (themePreset.value === "notion") {
-    return PRESET_CONFIGS.notion.features;
-  }
-
-  return PRESET_CONFIGS.full.features;
-});
+const editorPreset = computed(() =>
+  themePreset.value === "notion" ? editorPresets.notion : editorPresets.full,
+);
 
 watch(locale, (newLocale) => {
   createI18n({ locale: newLocale });

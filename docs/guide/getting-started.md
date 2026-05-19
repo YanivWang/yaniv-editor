@@ -112,28 +112,32 @@ const { content } = await res.json();
 
 ## 版本选择
 
-| version    | 说明                                 |
-| ---------- | ------------------------------------ |
-| `basic`    | 基础工具栏，无格式刷/查找替换/大纲   |
-| `advanced` | 推荐默认值，完整工具栏与进阶扩展     |
-| `premium`  | 与 advanced 同级扩展门控，预留商业版 |
+| version    | 说明                               |
+| ---------- | ---------------------------------- |
+| `basic`    | 基础工具栏，无格式刷/查找替换/大纲 |
+| `advanced` | **默认**，完整工具栏与进阶扩展     |
 
 工具栏按钮范围由 `version` 决定；扩展是否注册由 `features` 与 `resolveExtensionGates` 共同决定。详见 [功能配置](/api/features-config)。
 
 ## 预设配置
 
-可使用 `PRESET_CONFIGS` 快速生成 Demo 级配置（主要用于 examples，部分字段与 `FeatureConfig` 类型不完全重叠）：
+使用与 props 同构的 `editorPresets`，可直接 `v-bind`：
 
-```ts
-import { PRESET_CONFIGS, mergeConfig } from "yaniv-editor";
+```vue
+<script setup>
+import { editorPresets, mergeEditorPreset } from "yaniv-editor";
 
-const config = mergeConfig("full", {
-  locale: "zh-CN",
-  initialContent: "<p>Hello</p>",
+const editorProps = mergeEditorPreset("production", {
+  features: { ai: false },
 });
+</script>
+
+<template>
+  <TiptapProEditor locale="zh-CN" initial-content="<p>Hello</p>" v-bind="editorProps" />
+</template>
 ```
 
-集成 `TiptapProEditor` 时，建议直接使用 `features`（`FeatureConfig` 类型）而非 `FeatureFlags`。
+详见 [功能配置](/api/features-config)。
 
 ## 下一步
 

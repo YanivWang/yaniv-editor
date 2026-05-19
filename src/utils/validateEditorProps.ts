@@ -6,10 +6,8 @@ export function validateTiptapProEditorProps(props: TiptapProEditorProps): void 
 
   const zone = `[yaniv-editor]`;
 
-  if (props.version && !["basic", "advanced", "premium"].includes(props.version)) {
-    warn(
-      `${zone} Unrecognized props.version="${props.version}". Expected basic | advanced | premium.`,
-    );
+  if (props.version && !["basic", "advanced"].includes(props.version)) {
+    warn(`${zone} Unrecognized props.version="${props.version}". Expected basic | advanced.`);
   }
 
   const placement = props.zoomBarPlacement;
