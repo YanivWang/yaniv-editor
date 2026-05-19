@@ -48,7 +48,13 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { t } from "@/locales";
 import { slashCommandKey, type SlashCommandState } from "@/tools/slash-command";
 
-import { applyBlockInsert, applyBlockTransform } from "./blockMenuActions";
+import {
+  applyBlockInsert,
+  applyBlockTransform,
+  insertBlockMediaAt,
+  isMediaBlockId,
+  pickMediaFile,
+} from "./blockMenuActions";
 import { getBlockMenuGroups } from "./blockMenuRegistry";
 
 import type {
@@ -116,6 +122,43 @@ function setInsertMenuOpen(open: boolean): void {
 function selectItem(item: BlockMenuItemDef) {
   const editor = props.editor;
   if (!editor || !mode.value) return;
+
+  if (isMediaBlockId(item.id)) {
+    const accept = item.id === "image" ? "image/*" : "video/*";
+    const currentMode = mode.value;
+    const context = insertContext.value;
+
+    if (currentMode === "slash") {
+      const pluginState = slashCommandKey.getState(editor.state) as SlashCommandState | undefined;
+      const slashRange = pluginState?.range ? { ...pluginState.range } : null;
+      const insertPos = slashRange?.from ?? editor.state.selection.from;
+
+      // 先删除 "/" 触发文本再打开文件选择器，避免失焦后斜杠命令重新激活并残留「无匹配结果」
+      if (slashRange) {
+        editor.chain().focus().deleteRange(slashRange).run();
+      }
+
+      hide();
+
+      void pickMediaFile(accept).then((src) => {
+        if (!src) return;
+        insertBlockMediaAt(editor, insertPos, item.id, src);
+      });
+
+      return;
+    }
+
+    hide();
+
+    void pickMediaFile(accept).then((src) => {
+      if (!src) return;
+      if (context) {
+        insertBlockMediaAt(editor, context.insertPos, item.id, src);
+      }
+    });
+
+    return;
+  }
 
   if (mode.value === "slash") {
     const pluginState = slashCommandKey.getState(editor.state) as SlashCommandState | undefined;

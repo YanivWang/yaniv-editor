@@ -1,8 +1,6 @@
 import { Fragment, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/model";
 import { TextSelection } from "@tiptap/pm/state";
 
-import { t } from "@/locales";
-
 import type { BlockInsertContext, BlockMenuItemId } from "./types";
 import type { Editor } from "@tiptap/core";
 
@@ -79,6 +77,50 @@ function focusInsertPos(editor: Editor, insertPos: number): void {
   view.focus();
 }
 
+const MEDIA_BLOCK_IDS = new Set<BlockMenuItemId>(["image", "video"]);
+
+export function isMediaBlockId(blockId: BlockMenuItemId): boolean {
+  return MEDIA_BLOCK_IDS.has(blockId);
+}
+
+/** 打开系统文件选择器，返回 Data URL */
+export function pickMediaFile(accept: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = accept;
+    input.style.cssText = "position:fixed;left:-9999px;opacity:0";
+
+    const cleanup = () => input.remove();
+
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      cleanup();
+      if (!file) {
+        resolve(null);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+
+    document.body.appendChild(input);
+    input.click();
+  });
+}
+
+/** 在指定文档位置插入图片/视频块（+ 号菜单） */
+export function insertBlockMediaAt(
+  editor: Editor,
+  insertPos: number,
+  blockId: "image" | "video",
+  src: string,
+): void {
+  editor.chain().insertContentAt(insertPos, { type: blockId, attrs: { src } }).focus().run();
+}
+
 export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): void {
   const chain = editor.chain().focus();
 
@@ -113,16 +155,6 @@ export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): v
     case "table":
       chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
       return;
-    case "image": {
-      const url = window.prompt(t("slashCommand.imageUrlPrompt") || "Enter image URL");
-      if (url) chain.setImage({ src: url }).run();
-      return;
-    }
-    case "video": {
-      const url = window.prompt(t("slashCommand.videoUrlPrompt") || "Enter video URL");
-      if (url) chain.setVideo({ src: url }).run();
-      return;
-    }
     case "math":
       chain.insertBlockMath().run();
       return;
@@ -147,20 +179,6 @@ export function applyBlockInsert(
       focusInsertPos(editor, insertPos);
       editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
       return;
-    case "image": {
-      const url = window.prompt(t("slashCommand.imageUrlPrompt") || "Enter image URL");
-      if (!url) return;
-      focusInsertPos(editor, insertPos);
-      editor.chain().focus().setImage({ src: url }).run();
-      return;
-    }
-    case "video": {
-      const url = window.prompt(t("slashCommand.videoUrlPrompt") || "Enter video URL");
-      if (!url) return;
-      focusInsertPos(editor, insertPos);
-      editor.chain().focus().setVideo({ src: url }).run();
-      return;
-    }
     case "math":
       focusInsertPos(editor, insertPos);
       editor.chain().focus().insertBlockMath().run();
