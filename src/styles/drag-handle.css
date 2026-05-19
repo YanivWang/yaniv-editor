@@ -1,0 +1,67 @@
+/**
+ * Drag handle styles
+ * @description Left-side six-dot handle for block sorting.
+ */
+
+.ProseMirror {
+  position: relative;
+}
+
+.word-content-multi {
+  position: relative;
+}
+
+.drag-handle {
+  position: absolute;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(2, 3px);
+  gap: 3px 4px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  pointer-events: auto;
+  cursor: grab;
+  background: transparent;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
+}
+
+.drag-handle.is-visible {
+  opacity: 1;
+}
+
+.drag-handle:hover {
+  background: rgb(0 0 0 / 8%);
+}
+
+.drag-handle:active,
+.drag-handle.is-dragging {
+  cursor: grabbing;
+  background: rgb(59 130 246 / 15%);
+}
+
+.drag-handle__dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  background: #6b7280;
+  border-radius: 999px;
+}
+
+.drag-handle.is-dragging .drag-handle__dot {
+  background: #3b82f6;
+}
+
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle__dot {
+  background: #a3a3a3;
+}

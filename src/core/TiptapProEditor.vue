@@ -96,6 +96,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch 
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
+import { DragHandleExtension } from "@/tools/drag-handle";
 import { FloatingMenu } from "@/tools/floating-menu";
 import { FooterNav } from "@/tools/footer-nav";
 import { ToolbarNav } from "@/tools/header-nav";
@@ -122,6 +123,7 @@ import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
 import "@/styles/image-resize.css";
 import "@/styles/slash-command.css";
+import "@/styles/drag-handle.css";
 
 const props = withDefaults(defineProps<TiptapProEditorProps>(), {
   zoomBarPlacement: "bottom",
@@ -226,6 +228,11 @@ const initEditor = async () => {
           }),
       },
     });
+
+    // 添加块拖拽手柄扩展（只负责拖动排序，不提供点击菜单）
+    if (!props.readonly && !isPreviewMode.value && props.features?.dragHandle !== false) {
+      extensions.push(DragHandleExtension);
+    }
 
     // 添加斜杠命令扩展
     if (props.features?.slashCommand) {

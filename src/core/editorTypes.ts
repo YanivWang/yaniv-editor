@@ -34,6 +34,8 @@ export interface FeatureConfig {
   mention?: boolean;
   /** 是否启用斜杠命令菜单（输入 / 弹出块类型选择） */
   slashCommand?: boolean;
+  /** 是否启用左侧六点拖拽手柄（只拖动排序，不带菜单；默认开启） */
+  dragHandle?: boolean;
   /** 是否启用悬浮框功能 */
   floatingMenu?: boolean;
   /** 是否启用图片工具栏功能 */

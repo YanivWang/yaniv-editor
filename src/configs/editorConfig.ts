@@ -34,6 +34,7 @@ export interface FeatureFlags {
   headerNav?: boolean;
   footerNav?: boolean;
   floatingMenu?: boolean;
+  dragHandle?: boolean;
   linkBubbleMenu?: boolean;
   tableToolbar?: boolean;
   imageToolbar?: boolean;
