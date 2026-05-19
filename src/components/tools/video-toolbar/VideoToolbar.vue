@@ -8,19 +8,6 @@
   >
     <div class="video-menu-content">
       <div class="video-menu-group">
-        <button
-          v-for="alignOption in alignOptions"
-          :key="alignOption.value"
-          class="video-menu-btn"
-          :class="{ active: currentAlign === alignOption.value }"
-          :title="alignOption.title"
-          @click="setAlign(alignOption.value)"
-        >
-          <component :is="alignOption.icon" />
-        </button>
-      </div>
-
-      <div class="video-menu-group">
         <button class="video-menu-btn" title="预览" @click="previewVideo">
           <EyeOutlined />
         </button>
@@ -55,15 +42,9 @@
 <script setup lang="ts">
 /**
  * VideoToolbar - 视频工具栏组件
- * @description 提供视频对齐、预览、删除等功能的气泡菜单
+ * @description 提供视频预览、删除等功能的气泡菜单
  */
-import {
-  AlignLeftOutlined,
-  AlignCenterOutlined,
-  AlignRightOutlined,
-  EyeOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons-vue";
+import { EyeOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
@@ -88,13 +69,6 @@ const editor = computed(() => props.editor ?? null);
 const previewVisible = ref(false);
 const previewVideoRef = ref<HTMLVideoElement | null>(null);
 const currentVideoSrc = ref("");
-const currentAlign = ref<"left" | "center" | "right" | null>(null);
-
-const alignOptions = [
-  { value: "left" as const, icon: AlignLeftOutlined, title: "左对齐" },
-  { value: "center" as const, icon: AlignCenterOutlined, title: "居中" },
-  { value: "right" as const, icon: AlignRightOutlined, title: "右对齐" },
-];
 
 function getCurrentVideoInfo() {
   const e = editor.value;
@@ -145,21 +119,9 @@ const shouldShow = (bubbleProps: { editor: any }) => {
   }
 
   currentVideoSrc.value = node.attrs.src || "";
-  currentAlign.value = node.attrs.align || null;
 
   return true;
 };
-
-function setAlign(align: "left" | "center" | "right") {
-  const e = editor.value;
-  if (!e) return;
-
-  const { node, pos } = getCurrentVideoInfo();
-  if (!node || pos === null) return;
-
-  e.chain().focus().setNodeSelection(pos).updateAttributes("video", { align }).run();
-  currentAlign.value = align;
-}
 
 function previewVideo() {
   const { node } = getCurrentVideoInfo();
@@ -267,16 +229,6 @@ onBeforeUnmount(() => {
 
   :where(.dark, .dark *) & {
     background: #303030;
-  }
-}
-
-.video-menu-btn.active {
-  color: #1677ff;
-  background: #e6f4ff;
-
-  :where(.dark, .dark *) & {
-    color: #4fc3f7;
-    background: #15395b;
   }
 }
 
