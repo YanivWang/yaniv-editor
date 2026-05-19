@@ -68,6 +68,8 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
+import { isBlockDragging } from "@/tools/drag-handle";
+
 import type { Editor } from "@tiptap/vue-3";
 
 const props = withDefaults(
@@ -130,6 +132,8 @@ const shouldShow = (bubbleProps: { editor: any }) => {
   if (!props.enabled || props.readonly || !bubbleProps.editor) {
     return false;
   }
+
+  if (isBlockDragging(bubbleProps.editor)) return false;
 
   if (!bubbleProps.editor.isActive("video")) {
     return false;

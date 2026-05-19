@@ -87,6 +87,7 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed } from "vue";
 
 import { t } from "@/locales";
+import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
@@ -195,6 +196,8 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   if (!props.enabled) return false;
 
   if (props.readonly) return false;
+
+  if (isBlockDragging(bubbleProps.editor)) return false;
 
   if (props.showMode === 1) {
     if (!bubbleProps.editor.isActive("table")) return false;

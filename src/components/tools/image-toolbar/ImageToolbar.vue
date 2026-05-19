@@ -70,6 +70,7 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref } from "vue";
 
+import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -192,6 +193,8 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   if (!bubbleProps.editor) {
     return false;
   }
+
+  if (isBlockDragging(bubbleProps.editor)) return false;
 
   if (props.readonly || !bubbleProps.editor.isActive("image")) {
     return false;

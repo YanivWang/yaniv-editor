@@ -71,6 +71,7 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, nextTick, ref, watch } from "vue";
 
 import { t } from "@/locales";
+import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -132,6 +133,8 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   if (!e) {
     return false;
   }
+
+  if (isBlockDragging(e)) return false;
 
   const { from, to } = bubbleProps;
   const { state } = bubbleProps;

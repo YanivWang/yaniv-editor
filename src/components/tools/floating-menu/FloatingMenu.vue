@@ -66,6 +66,7 @@
  * @description 选中文本时显示的浮动格式化工具栏（类似 Medium、Notion）
  */
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref, watch } from "vue";
 
@@ -76,6 +77,7 @@ import { LinkButton } from "@/editor/link";
 import { ListTools } from "@/editor/list";
 import { TextFormatButtons } from "@/editor/text-format";
 import { t } from "@/locales";
+import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -156,6 +158,10 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
 
   // 只读模式下不显示
   if (props.readonly) return false;
+
+  if (isBlockDragging(bubbleProps.editor)) return false;
+
+  if (bubbleProps.state.selection instanceof NodeSelection) return false;
 
   const { from, to } = bubbleProps;
   const isEmptySelection = from === to;

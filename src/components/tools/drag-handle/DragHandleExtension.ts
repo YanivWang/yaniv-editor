@@ -9,6 +9,14 @@ import { NodeSelection, Plugin, PluginKey } from "@tiptap/pm/state";
 
 import type { EditorView } from "@tiptap/pm/view";
 
+declare module "@tiptap/core" {
+  interface Storage {
+    dragHandle: {
+      isDragging: boolean;
+    };
+  }
+}
+
 export const dragHandleKey = new PluginKey("dragHandle");
 
 const DRAGGABLE_NODE_TYPES = new Set([
@@ -159,7 +167,15 @@ function serializeDragData(view: EditorView, selection: NodeSelection): string {
 export const DragHandleExtension = Extension.create({
   name: "dragHandle",
 
+  addStorage() {
+    return {
+      isDragging: false,
+    };
+  },
+
   addProseMirrorPlugins() {
+    const extension = this;
+
     return [
       new Plugin({
         key: dragHandleKey,
@@ -169,6 +185,11 @@ export const DragHandleExtension = Extension.create({
           const handleRoot = view.dom.parentElement ?? view.dom;
           let currentTarget: DragTarget | null = null;
           let isDragging = false;
+
+          const setDraggingState = (dragging: boolean) => {
+            isDragging = dragging;
+            extension.storage.isDragging = dragging;
+          };
 
           const hideHandle = () => {
             if (isDragging) return;
@@ -220,20 +241,20 @@ export const DragHandleExtension = Extension.create({
             }
 
             const selection = NodeSelection.create(view.state.doc, currentTarget.pos);
+
+            setDraggingState(true);
+            view.dragging = {
+              slice: selection.content(),
+              move: true,
+            };
+            handle.classList.add("is-dragging");
+
             view.dispatch(view.state.tr.setSelection(selection));
 
             event.dataTransfer.clearData();
             event.dataTransfer.setData("text/html", serializeDragData(view, selection));
             event.dataTransfer.setData("text/plain", currentTarget.node.textContent);
             event.dataTransfer.effectAllowed = "move";
-
-            view.dragging = {
-              slice: selection.content(),
-              move: true,
-            };
-
-            isDragging = true;
-            handle.classList.add("is-dragging");
 
             const targetRect = currentTarget.dom.getBoundingClientRect();
             event.dataTransfer.setDragImage(
@@ -244,7 +265,7 @@ export const DragHandleExtension = Extension.create({
           });
 
           handle.addEventListener("dragend", () => {
-            isDragging = false;
+            setDraggingState(false);
             handle.classList.remove("is-dragging");
             hideHandle();
           });
