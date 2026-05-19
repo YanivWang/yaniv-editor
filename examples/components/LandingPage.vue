@@ -154,15 +154,6 @@
 
         <!-- Feature 5 -->
         <div class="feature-card">
-          <div class="feature-card__icon">🤝</div>
-          <h3 class="feature-card__title">Real-time Collaboration</h3>
-          <p class="feature-card__description">
-            Multi-user editing powered by Yjs. See collaborators' cursors in real-time.
-          </p>
-        </div>
-
-        <!-- Feature 6 -->
-        <div class="feature-card">
           <div class="feature-card__icon">🌍</div>
           <h3 class="feature-card__title">i18n Ready</h3>
           <p class="feature-card__description">

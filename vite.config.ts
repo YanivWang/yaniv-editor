@@ -72,11 +72,7 @@ export default defineConfig({
         /^@tiptap\/.*/,
         "ant-design-vue",
         "@ant-design/icons-vue",
-        /^#\/.*/, // Internal APIs (collaboration, etc.)
-        "yjs",
-        "y-prosemirror",
-        "y-websocket",
-        /^y-.*/,
+        /^#\/.*/, // Internal APIs
         "lowlight",
         /^prosemirror-.*/,
       ],

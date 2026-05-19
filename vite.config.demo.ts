@@ -53,9 +53,6 @@ export default defineConfig({
           if (id.includes("/@tiptap/") || id.includes("/prosemirror-")) {
             return "vendor-editor";
           }
-          if (id.includes("/yjs/") || id.includes("/y-websocket/") || id.includes("/lib0/")) {
-            return "vendor-collaboration";
-          }
           if (id.includes("/katex/") || id.includes("/lowlight/")) {
             return "vendor-content";
           }

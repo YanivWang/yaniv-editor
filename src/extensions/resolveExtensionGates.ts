@@ -12,7 +12,7 @@ export interface ResolvedExtensionGates {
   math: boolean;
   ai: boolean;
   formatPainter: boolean;
-  /** 标题 UniqueID + 目录扩展（协作开启时由 coreExtensions 忽略，避免与 Yjs 冲突） */
+  /** 标题 UniqueID + 目录扩展 */
   outline: boolean;
   /** 查找替换 */
   searchReplace: boolean;

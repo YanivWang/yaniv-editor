@@ -9,14 +9,10 @@ import {
 } from "@/tools/header-nav";
 
 import type { TiptapProEditorProps } from "./editorTypes";
-import type { Ref } from "vue";
 
-type FeatureName = "headerNav" | "footerNav" | "collaboration";
+type FeatureName = "headerNav" | "footerNav";
 
-export function useEditorFeatures(
-  props: TiptapProEditorProps,
-  disableCollaborativeHistory: Ref<boolean>,
-) {
+export function useEditorFeatures(props: TiptapProEditorProps) {
   const getFeatureConfig = (featureName: FeatureName): boolean => {
     if (props.features?.[featureName] !== undefined) {
       return props.features[featureName];
@@ -39,8 +35,6 @@ export function useEditorFeatures(
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
-    const disableUndoRedo = disableCollaborativeHistory.value;
-
     const base: ToolbarToolsConfig =
       props.version === "advanced" || props.version === "premium"
         ? {
@@ -52,15 +46,12 @@ export function useEditorFeatures(
             lineHeight: true,
             clearFormat: true,
             undoRedo: true,
-            undoRedoDisabled: disableUndoRedo,
             subscriptSuperscript: true,
             formatPainter: true,
-            formatPainterDisabled: disableUndoRedo,
           }
         : {
             ...BASIC_TOOLBAR_CONFIG,
             undoRedo: true,
-            undoRedoDisabled: disableUndoRedo,
           };
 
     return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);

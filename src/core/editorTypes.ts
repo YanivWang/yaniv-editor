@@ -44,8 +44,6 @@ export interface FeatureConfig {
   image?: boolean;
   /** 是否启用链接悬浮框功能 */
   linkBubbleMenu?: boolean;
-  /** 是否启用协作编辑功能 */
-  collaboration?: boolean;
   /** 是否启用头部导航 */
   headerNav?: boolean;
   /** 是否启用底部导航 */
@@ -68,8 +66,6 @@ export interface VersionConfig {
     advanced?: boolean;
     /** AI功能 */
     ai?: boolean;
-    /** 协作编辑 */
-    collaboration?: boolean;
     /** 头部导航 */
     headerNav?: boolean;
     /** 底部导航 */
@@ -103,15 +99,6 @@ export interface TiptapProEditorProps {
   features?: FeatureConfig;
   /** 语言设置 */
   locale?: string;
-}
-
-/**
- * 协作用户信息
- */
-export interface CollaboratorInfo {
-  id: string | number;
-  name: string;
-  color: string;
 }
 
 /**

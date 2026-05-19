@@ -60,10 +60,6 @@ export type EditorVersion = "basic" | "advanced" | "premium" | "all" | 1 | 2 | 3
 export interface ExtensionsOptions {
   /** 是否启用图片增强功能（拖拽大小调整），默认 true */
   enableImageResize?: boolean;
-  /** 是否禁用历史记录扩展（协作模式下需要禁用），默认 false */
-  disableHistory?: boolean;
-  /** 是否在协作房间内（为 true 时跳过 UniqueID / TOC） */
-  collaborating?: boolean;
   /** OfficePaste 回调与流水线开关（宿主可弹窗提示、逐项关闭 transform） */
   officePaste?: Partial<
     Pick<
@@ -94,12 +90,7 @@ export function getExtensionsByVersion(
       ? { enableImageResize: optionsOrEnableImageResize }
       : optionsOrEnableImageResize;
 
-  const {
-    enableImageResize = true,
-    disableHistory = false,
-    collaborating = false,
-    officePaste,
-  } = options;
+  const { enableImageResize = true, officePaste } = options;
 
   const gates: ResolvedExtensionGates =
     options.features ??
@@ -110,7 +101,6 @@ export function getExtensionsByVersion(
   const extensions: AnyExtension[] = [];
 
   // 基础扩展（所有版本都包含）
-  // 协作模式下禁用 history，因为 @tiptap/extension-collaboration 自带历史管理
   const starterKitConfig: Record<string, unknown> = {
     // 禁用一些高级功能，在基础版中通过其他扩展提供
     heading: {
@@ -120,11 +110,6 @@ export function getExtensionsByVersion(
     link: false,
     underline: false,
   };
-
-  // 协作模式下禁用 history
-  if (disableHistory) {
-    starterKitConfig.history = false;
-  }
 
   extensions.push(StarterKit.configure(starterKitConfig));
 
@@ -227,8 +212,8 @@ export function getExtensionsByVersion(
     );
   }
 
-  // 大纲与标题锚点（协作时跳过，减轻与 Yjs 的 ID 写入冲突）
-  if (gates.outline && !collaborating) {
+  // 大纲与标题锚点
+  if (gates.outline) {
     extensions.push(
       UniqueID.configure({
         types: ["heading"],
@@ -266,7 +251,7 @@ export function getExtensionsByVersion(
   if (gates.searchReplace) {
     extensions.push(
       SearchReplace.configure({
-        scrollIntoViewOnNavigate: !collaborating,
+        scrollIntoViewOnNavigate: true,
       }),
     );
   }

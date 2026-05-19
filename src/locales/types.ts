@@ -72,8 +72,6 @@ export interface TiptapLocale {
     // 撤销重做
     undo: string;
     redo: string;
-    undoDisabledInCollab: string;
-    redoDisabledInCollab: string;
 
     // 更多
     more: string;
@@ -221,8 +219,6 @@ export interface TiptapLocale {
     // 基础操作
     undo: string;
     redo: string;
-    undoDisabledInCollab: string;
-    redoDisabledInCollab: string;
     clearFormat: string;
     formatPainter: string;
 
@@ -285,7 +281,7 @@ export interface TiptapLocale {
     sampleSuccessSingle: string;
     sampleSuccessContinuous: string;
     formatPainterExited: string;
-    collaborationNoFormatPainter: string;
+    formatPainterDisabled: string;
 
     // 查找替换
     findReplace: string;

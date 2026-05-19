@@ -255,16 +255,6 @@ const demoScript: DemoStep[] = [
   { action: "format", format: "list" },
   { action: "pause", duration: 100 },
 
-  { action: "addLine", line: { html: "", class: "line-bullet", tag: "div" } },
-  {
-    action: "type",
-    text: "Real-time collaboration with <strong>cursor sync</strong>",
-    lineIndex: 5,
-    duration: 28,
-  },
-  { action: "format", format: "" },
-  { action: "pause", duration: 300 },
-
   // Blockquote
   { action: "format", format: "quote" },
   { action: "addLine", line: { html: "", class: "line-blockquote", tag: "blockquote" } },

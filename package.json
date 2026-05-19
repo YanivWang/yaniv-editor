@@ -69,8 +69,6 @@
     "@tiptap/extension-bubble-menu": "^3.7.2",
     "@tiptap/extension-character-count": "^3.0.0",
     "@tiptap/extension-code-block-lowlight": "^3.7.1",
-    "@tiptap/extension-collaboration": "^3.13.0",
-    "@tiptap/extension-collaboration-cursor": "^2.26.2",
     "@tiptap/extension-color": "^3.0.0",
     "@tiptap/extension-font-family": "^3.7.2",
     "@tiptap/extension-highlight": "^3.0.0",
@@ -130,9 +128,7 @@
     "vue": "^3.5.13",
     "vue-eslint-parser": "^10.4.0",
     "vue-tsc": "2.0.26",
-    "vue-types": "^3.0.2",
-    "y-websocket": "^3.0.0",
-    "yjs": "^13.6.27"
+    "vue-types": "^3.0.2"
   },
   "keywords": [
     "tiptap",
@@ -154,8 +150,6 @@
     "ai",
     "ai-editor",
     "ai-writing",
-    "collaboration",
-    "real-time-collaboration",
     "markdown",
     "prosemirror",
     "contenteditable",

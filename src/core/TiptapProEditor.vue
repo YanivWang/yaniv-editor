@@ -8,16 +8,6 @@
       :enabled="shouldShowHeaderNav"
       class="word-toolbar"
     >
-      <!-- 协作编辑状态显示（在工具栏右侧） -->
-      <template v-if="shouldShowCollaboration" #right>
-        <CollaborationToggle
-          v-model="collaborationEnabled"
-          :collaborators-count="collaboration.collaboratorsCount.value"
-          :collaborators-list="[...collaboration.collaboratorsList.value]"
-          show-label
-          @change="handleCollaborationChange"
-        />
-      </template>
     </ToolbarNav>
 
     <!-- 功能模块：链接悬浮框（预览模式下禁用） -->
@@ -111,11 +101,9 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
-import { useUserStore } from "@/adapters";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
-import { CollaborationToggle, useCollaboration, normalizeContent } from "@/tools/collaboration";
 import {
   DragHandleMenu,
   DragHandleWithMenuExtension,
@@ -147,7 +135,6 @@ import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
 import "@/styles/drag-handle-with-menu.css";
 import "@/styles/image-resize.css";
-import "@/styles/collaboration.css";
 import "@/styles/slash-command.css";
 
 const props = withDefaults(defineProps<TiptapProEditorProps>(), {
@@ -163,8 +150,6 @@ const isPreviewMode = computed(() => props.previewMode);
 
 const emit = defineEmits<{
   update: [content: any];
-  collaboratorsChange: [count: number];
-  collaboratorsListChange: [users: Array<{ id: string | number; name: string; color: string }>];
 }>();
 
 // ===== 基础状态 =====
@@ -190,121 +175,13 @@ const isInitializing = ref(false);
 
 const editorInstance = computed(() => editor.value as Editor);
 
-// ===== 用户信息获取 =====
-const userStore = useUserStore();
-
-/**
- * 获取用户信息
- */
-const getUserInfo = (): { id: string | number; name: string } => {
-  try {
-    const userInfo = userStore.userInfo;
-    if (userInfo) {
-      const id =
-        userInfo.userId || (userInfo as any).id || (userInfo as any).user_id || "anonymous";
-      const name =
-        userInfo.realName ||
-        userInfo.userName ||
-        (userInfo as any).name ||
-        (userInfo as any).real_name ||
-        (userInfo as any).username ||
-        "匿名用户";
-      return { id, name };
-    }
-  } catch {}
-  return { id: "anonymous", name: "匿名用户" };
-};
-
-// ===== 协作编辑（使用 Composable） =====
-const collaboration = useCollaboration({
-  getUserInfo,
-  onCollaboratorsChange: (count) => emit("collaboratorsChange", count),
-  onCollaboratorsListChange: (users) => emit("collaboratorsListChange", users),
-});
-
-// 协作功能开关状态（用于 UI 绑定）
-const collaborationEnabled = ref(false);
-
-/**
- * 同步协作人数到 editor.storage（供扩展读取）
- * - `FormatPainter` 扩展会读取 `editor.storage.__collaborationUsersCount` 来判断是否需要在多人时禁用
- */
-watch(
-  () => [editor.value, collaboration.collaboratorsCount.value] as const,
-  ([e, count]) => {
-    if (!e) return;
-    try {
-      (e as any).storage.__collaborationUsersCount = count;
-    } catch {}
-  },
-  { immediate: true },
-);
-
-const disableCollaborativeHistory = computed(
-  () => isCollaborationAvailable.value && collaboration.collaboratorsCount.value > 1,
-);
-
 const {
-  getFeatureConfig,
   shouldShowHeaderNav,
   shouldShowFooterNav,
   resolvedExtensionGates,
   toolbarConfig,
   showStatusShortcutHints,
-} = useEditorFeatures(props, disableCollaborativeHistory);
-
-// 协作功能需要环境变量配置 VITE_COLLABORATION_WS_URL
-const collaborationWsUrl = computed(() => import.meta.env?.VITE_COLLABORATION_WS_URL || "");
-
-// 组件是否启用协作（features.collaboration）
-const isCollaborationFeatureEnabled = computed(() => getFeatureConfig("collaboration"));
-
-// 检查并提示：如果组件开启了协作但没有配置 WS URL
-const shouldShowCollaboration = computed(() => {
-  if (isCollaborationFeatureEnabled.value && !collaborationWsUrl.value) {
-    console.warn(
-      "[yaniv-editor] Collaboration feature enabled but VITE_COLLABORATION_WS_URL is not configured in .env",
-    );
-    return false;
-  }
-  return isCollaborationFeatureEnabled.value && !!collaborationWsUrl.value;
-});
-
-/**
- * 检查协作功能是否可用
- */
-const isCollaborationAvailable = computed(() => {
-  return collaborationEnabled.value && shouldShowCollaboration.value && !!props.documentId;
-});
-
-// ===== 协作功能开关处理 =====
-const handleCollaborationChange = async (enabled: boolean) => {
-  if (collaborationEnabled.value !== enabled) {
-    collaborationEnabled.value = enabled;
-  }
-};
-
-// 监听 shouldShowCollaboration 变化，同步到 collaborationEnabled
-watch(
-  () => shouldShowCollaboration.value,
-  (newValue) => {
-    if (collaborationEnabled.value !== newValue) {
-      collaborationEnabled.value = newValue;
-    }
-  },
-  { immediate: true },
-);
-
-// 监听 collaborationEnabled 变化，重新初始化编辑器
-watch(
-  () => collaborationEnabled.value,
-  async (newValue, oldValue) => {
-    if (oldValue === undefined) return;
-    if (newValue !== oldValue && editor.value && !isInitializing.value) {
-      await initEditor();
-    }
-  },
-);
+} = useEditorFeatures(props);
 
 // ===== 国际化 =====
 useEditorI18n(props);
@@ -318,46 +195,27 @@ const getEditorContent = () => {
   }
 };
 
+const EMPTY_DOC = { type: "doc", content: [{ type: "paragraph" }] };
+
+const normalizeInitialContent = (content: any): any => {
+  if (!content) return EMPTY_DOC;
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) return { type: "doc", content };
+  if (typeof content === "object") {
+    if (content.type === "doc") return content;
+    if (Array.isArray(content.content)) return { type: "doc", content: content.content };
+    return { type: "doc", content: [content] };
+  }
+  return EMPTY_DOC;
+};
+
 const getInitialContent = (): any => {
-  // 非首次初始化且未开启协作，保留当前内容
-  if (!isFirstInit.value && editor.value && !isCollaborationAvailable.value) {
+  // 非首次初始化时保留当前内容
+  if (!isFirstInit.value && editor.value) {
     const currentContent = getEditorContent();
     if (currentContent) return currentContent;
   }
-  // 使用 collaboration 模块的 normalizeContent
-  return normalizeContent(props.initialContent, { silent: true });
-};
-
-// ===== 协作功能初始化（使用 useCollaboration） =====
-const initCollaborationFeature = async (initialContent: any, extensions: any[]) => {
-  if (!isCollaborationAvailable.value) {
-    collaboration.disable();
-    return;
-  }
-
-  try {
-    // 如果已有协作实例，先销毁
-    if (collaboration.instance.value) {
-      collaboration.disable();
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-
-    // 使用 useCollaboration 的 initWithExtensions 方法
-    // 这样会自动处理状态更新（collaboratorsCount, collaboratorsList）
-    const collabExtensions = await collaboration.initWithExtensions({
-      documentId: props.documentId!,
-      readonly: props.readonly,
-      initialContent,
-      getUserInfo,
-    });
-
-    if (collabExtensions.length === 0) {
-      return;
-    }
-
-    // 添加协作扩展
-    extensions.push(...collabExtensions);
-  } catch {}
+  return normalizeInitialContent(props.initialContent);
 };
 
 // ===== 编辑器初始化 =====
@@ -374,13 +232,10 @@ const initEditor = async () => {
     }
 
     // 获取扩展配置
-    // 协作模式下需要禁用 History 扩展，因为 @tiptap/extension-collaboration 自带历史管理
     const enableImageResize = props.versionConfig?.features?.advanced !== false;
     const extensions = getExtensionsByVersion(props.version, {
       enableImageResize,
-      disableHistory: isCollaborationAvailable.value,
       features: resolvedExtensionGates.value,
-      collaborating: isCollaborationAvailable.value,
       officePaste: {
         onPasteFromOfficeWithImages: () =>
           Modal.info({
@@ -410,9 +265,6 @@ const initEditor = async () => {
       );
     }
 
-    // 初始化协作功能
-    await initCollaborationFeature(initialContentToUse, extensions);
-
     // 销毁旧编辑器
     if (editor.value) {
       editor.value.destroy();
@@ -421,14 +273,11 @@ const initEditor = async () => {
 
     await nextTick();
 
-    // 协作模式下不设置初始内容
-    const shouldSetContentOnInit = !isCollaborationAvailable.value;
-
     // 创建编辑器（预览模式下也设为不可编辑）
     editor.value = new Editor({
       editable: !props.readonly && !isPreviewMode.value,
       extensions,
-      content: shouldSetContentOnInit ? initialContentToUse : undefined,
+      content: initialContentToUse,
       editorProps: {
         attributes: { class: "word-editor-content" },
       },
@@ -439,11 +288,6 @@ const initEditor = async () => {
     });
 
     await nextTick();
-
-    // 更新协作实例中的 editor 引用
-    if (collaboration.instance.value && editor.value) {
-      collaboration.setEditor(editor.value);
-    }
 
     initPageCssVariables();
 
@@ -458,7 +302,6 @@ const initEditor = async () => {
 
 // ===== 清理 =====
 const destroyEditor = async () => {
-  collaboration.disable();
   if (editor.value) {
     editor.value.destroy();
     editor.value = null;
@@ -497,11 +340,6 @@ watchAndReinit(
 watchAndReinit(
   () => props.features?.slashCommand,
   (newVal, oldVal) => (newVal ?? false) !== (oldVal ?? false),
-);
-
-watchAndReinit(
-  () => props.documentId,
-  (newId, oldId) => shouldShowCollaboration.value && newId !== oldId,
 );
 
 // 功能门控变化时重建编辑器，保持扩展与 UI 一致

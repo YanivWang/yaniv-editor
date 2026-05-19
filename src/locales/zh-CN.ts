@@ -67,8 +67,6 @@ export const zhCN: TiptapLocale = {
     // 撤销重做
     undo: "撤销",
     redo: "重做",
-    undoDisabledInCollab: "协作模式下不可用",
-    redoDisabledInCollab: "协作模式下不可用",
 
     // 更多
     more: "更多",
@@ -208,8 +206,6 @@ export const zhCN: TiptapLocale = {
     // 基础操作
     undo: "撤销",
     redo: "重做",
-    undoDisabledInCollab: "协作模式下不可用",
-    redoDisabledInCollab: "协作模式下不可用",
     clearFormat: "清除格式",
     formatPainter: "格式刷",
 
@@ -272,7 +268,7 @@ export const zhCN: TiptapLocale = {
     sampleSuccessSingle: "格式采样成功，点击目标文本应用格式",
     sampleSuccessContinuous: "格式采样成功，可连续点击多个目标文本应用格式",
     formatPainterExited: "已退出格式刷模式",
-    collaborationNoFormatPainter: "协作模式下不支持格式刷功能",
+    formatPainterDisabled: "当前不可使用格式刷功能",
 
     // 查找替换
     findReplace: "查找与替换",

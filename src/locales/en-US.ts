@@ -67,8 +67,6 @@ export const enUS: TiptapLocale = {
     // Undo/Redo
     undo: "Undo",
     redo: "Redo",
-    undoDisabledInCollab: "Disabled in collaboration mode",
-    redoDisabledInCollab: "Disabled in collaboration mode",
 
     // More
     more: "More",
@@ -208,8 +206,6 @@ export const enUS: TiptapLocale = {
     // Basic operations
     undo: "Undo",
     redo: "Redo",
-    undoDisabledInCollab: "Disabled in collaboration mode",
-    redoDisabledInCollab: "Disabled in collaboration mode",
     clearFormat: "Clear Format",
     formatPainter: "Format Painter",
 
@@ -273,7 +269,7 @@ export const enUS: TiptapLocale = {
     sampleSuccessContinuous:
       "Format sampled successfully, you can click multiple target texts to apply format",
     formatPainterExited: "Format painter mode exited",
-    collaborationNoFormatPainter: "Format painter is not supported in collaboration mode",
+    formatPainterDisabled: "Format painter is currently disabled",
 
     // Find & replace
     findReplace: "Find & Replace",

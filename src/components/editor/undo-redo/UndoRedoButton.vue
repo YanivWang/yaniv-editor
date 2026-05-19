@@ -2,13 +2,13 @@
   <ToolbarGroup>
     <ToolbarButton
       :icon="UndoOutlined"
-      :title="disabled ? t('editor.undoDisabledInCollab') : t('editor.undo')"
+      :title="t('editor.undo')"
       :disabled="disabled || !canUndo"
       @click="undo"
     />
     <ToolbarButton
       :icon="RedoOutlined"
-      :title="disabled ? t('editor.redoDisabledInCollab') : t('editor.redo')"
+      :title="t('editor.redo')"
       :disabled="disabled || !canRedo"
       @click="redo"
     />
@@ -32,7 +32,7 @@ import type { Editor } from "@tiptap/vue-3";
 // ===== Props =====
 interface Props {
   editor: Editor | null | undefined;
-  /** 是否禁用按钮（协作模式下需要禁用） */
+  /** 是否禁用按钮 */
   disabled?: boolean;
 }
 

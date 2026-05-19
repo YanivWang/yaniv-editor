@@ -162,29 +162,6 @@ function updateCursorStyle(editor: Editor, add: boolean): void {
   }
 }
 
-/**
- * 是否处于“多人协作”状态
- * @description
- * - 仅检测到 collaboration 扩展并不代表一定是多人（也可能只是自己在线）
- * - 协作人数由业务层写入 `editor.storage.__collaborationUsersCount`
- * - 仅当人数 > 1 时才认为是多人协作（需要禁用格式刷）
- */
-function isCollaborationMultiUser(editor: Editor): boolean {
-  try {
-    const hasCollaboration = editor.extensionManager.extensions.some(
-      (ext) => ext.name === "collaboration",
-    );
-    if (!hasCollaboration) return false;
-
-    // 业务层注入：TiptapProEditor.vue 会同步此值
-    const anyEditor = editor as any;
-    const count = Number(anyEditor?.storage?.__collaborationUsersCount ?? 0);
-    return count > 1;
-  } catch (error) {
-    return false;
-  }
-}
-
 export const FormatPainter = Extension.create<Record<string, never>, FormatPainterStorage>({
   name: "formatPainter",
 
@@ -208,11 +185,6 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
       startFormatPainting:
         (mode?: 1 | 2) =>
         ({ editor }) => {
-          // 多人协作时禁用格式刷
-          if (isCollaborationMultiUser(editor)) {
-            return false;
-          }
-
           // 检查是否有选中内容
           try {
             const sel = editor.state.selection;
@@ -249,11 +221,6 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
       startContinuousFormatPainting:
         () =>
         ({ editor }) => {
-          // 多人协作时禁用格式刷
-          if (isCollaborationMultiUser(editor)) {
-            return false;
-          }
-
           // 检查是否有选中内容
           try {
             const sel = editor.state.selection;
@@ -289,17 +256,6 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
       applyFormat:
         () =>
         ({ editor }) => {
-          // 多人协作时禁用格式刷
-          if (isCollaborationMultiUser(editor)) {
-            // 如果格式刷已激活，则取消激活状态
-            if (this.storage.isActive) {
-              this.storage.isActive = false;
-              this.storage.isContinuous = false;
-              updateCursorStyle(editor, false);
-            }
-            return false;
-          }
-
           // 检查格式刷是否已激活
           if (!this.storage.isActive) {
             return false;

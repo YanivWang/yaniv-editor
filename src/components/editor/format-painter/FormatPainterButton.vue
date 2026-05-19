@@ -28,7 +28,7 @@ import type { Editor } from "@tiptap/vue-3";
 // ===== Props =====
 interface Props {
   editor: Editor | null | undefined;
-  /** 外部传入的禁用状态（优先级高于内部协作检测） */
+  /** 外部传入的禁用状态 */
   disabled?: boolean;
 }
 
@@ -47,24 +47,9 @@ interface EditorWithStorage {
 // ===== 禁用状态检查 =====
 /**
  * 计算是否禁用格式刷
- * @description 优先使用外部传入的 disabled 属性，否则检查协作扩展是否存在
  */
 const isDisabled = computed(() => {
-  // 如果外部明确传入了 disabled 属性，使用外部值
-  if (props.disabled !== undefined) {
-    return props.disabled;
-  }
-  // 否则检查协作扩展是否存在（兼容旧逻辑）
-  const e = editor.value;
-  if (!e) return false;
-  try {
-    const collaborationExt = e.extensionManager.extensions.find(
-      (ext) => ext.name === "collaboration",
-    );
-    return !!collaborationExt;
-  } catch (error) {
-    return false;
-  }
+  return Boolean(props.disabled);
 });
 
 // ===== 格式刷状态管理 =====
@@ -139,7 +124,7 @@ function toggleFormatPainter() {
 
   // 检查是否禁用，如果禁用则提示
   if (isDisabled.value) {
-    message.warning(t("editor.collaborationNoFormatPainter"));
+    message.warning(t("editor.formatPainterDisabled"));
     return;
   }
 
@@ -182,7 +167,7 @@ function toggleFormatPainterContinuous() {
 
   // 检查是否禁用，如果禁用则提示
   if (isDisabled.value) {
-    message.warning(t("editor.collaborationNoFormatPainter"));
+    message.warning(t("editor.formatPainterDisabled"));
     return;
   }
 
