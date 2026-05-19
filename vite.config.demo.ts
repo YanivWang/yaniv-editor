@@ -65,8 +65,6 @@ export default defineConfig({
       },
     },
   },
-  // Copy static assets
-  publicDir: "public",
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __VERSION__: JSON.stringify("0.1.0"),
