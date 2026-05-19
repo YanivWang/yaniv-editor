@@ -1,10 +1,10 @@
 /**
- * SlashCommand 样式
- * @description 斜杠命令菜单（依赖 base.css）
+ * BlockPicker 样式
+ * @description Notion 风格块选择菜单（依赖 base.css）
  */
 
 /* ========== 菜单容器 ========== */
-.slash-command-menu {
+.block-picker-menu {
   position: fixed;
   z-index: 1002;
   min-width: 260px;
@@ -20,11 +20,11 @@
   box-shadow:
     0 4px 16px rgb(0 0 0 / 12%),
     0 0 1px rgb(0 0 0 / 8%);
-  animation: slash-fade-in 0.12s ease-out;
+  animation: block-picker-fade-in 0.12s ease-out;
   -webkit-overflow-scrolling: touch;
 }
 
-@keyframes slash-fade-in {
+@keyframes block-picker-fade-in {
   from {
     opacity: 0;
     transform: translateY(-4px);
@@ -35,7 +35,7 @@
   }
 }
 
-.slash-command-backdrop {
+.block-picker-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1001;
@@ -43,25 +43,25 @@
 }
 
 /* 滚动条样式 */
-.slash-command-menu::-webkit-scrollbar {
+.block-picker-menu::-webkit-scrollbar {
   width: 6px;
 }
 
-.slash-command-menu::-webkit-scrollbar-track {
+.block-picker-menu::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.slash-command-menu::-webkit-scrollbar-thumb {
+.block-picker-menu::-webkit-scrollbar-thumb {
   background: #d9d9d9;
   border-radius: 6px;
 }
 
-.slash-command-menu::-webkit-scrollbar-thumb:hover {
+.block-picker-menu::-webkit-scrollbar-thumb:hover {
   background: #bfbfbf;
 }
 
 /* ========== 分组标题 ========== */
-.slash-command-group-title {
+.block-picker-group-title {
   padding: 8px 14px 4px;
   font-size: 11px;
   font-weight: 600;
@@ -72,7 +72,7 @@
 }
 
 /* ========== 菜单项 ========== */
-.slash-command-item {
+.block-picker-item {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -87,12 +87,12 @@
   transition: background-color 0.1s ease;
 }
 
-.slash-command-item:hover,
-.slash-command-item.active {
+.block-picker-item:hover,
+.block-picker-item.active {
   background: var(--tp-color-bg-gray, #f5f5f5);
 }
 
-.slash-command-item-icon {
+.block-picker-item-icon {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -105,13 +105,13 @@
   border-radius: 6px;
 }
 
-.slash-command-item.active .slash-command-item-icon,
-.slash-command-item:hover .slash-command-item-icon {
+.block-picker-item.active .block-picker-item-icon,
+.block-picker-item:hover .block-picker-item-icon {
   color: var(--tp-color-primary, #1677ff);
   background: var(--tp-color-primary-bg, #e6f4ff);
 }
 
-.slash-command-item-content {
+.block-picker-item-content {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -119,14 +119,14 @@
   min-width: 0;
 }
 
-.slash-command-item-title {
+.block-picker-item-title {
   font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
   color: var(--tp-color-text, #262626);
 }
 
-.slash-command-item-desc {
+.block-picker-item-desc {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 12px;
@@ -136,7 +136,7 @@
 }
 
 /* ========== 无结果 ========== */
-.slash-command-empty {
+.block-picker-empty {
   padding: 16px 14px;
   font-size: 13px;
   color: var(--tp-color-text-muted, #8c8c8c);
@@ -144,72 +144,72 @@
 }
 
 /* ========== 深色模式 ========== */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-menu {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-menu {
   background: var(--tp-menu-bg, #1f1f1f);
   box-shadow:
     0 4px 16px rgb(0 0 0 / 40%),
     0 0 1px rgb(255 255 255 / 10%);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item {
   color: #e8e8e8;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item:hover,
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item.active {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item:hover,
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item.active {
   background: #2a2a2a;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item-icon {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-icon {
   color: #a8a8a8;
   background: #2a2a2a;
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .slash-command-item.active
-  .slash-command-item-icon,
+  .block-picker-item.active
+  .block-picker-item-icon,
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .slash-command-item:hover
-  .slash-command-item-icon {
+  .block-picker-item:hover
+  .block-picker-item-icon {
   color: var(--tp-color-primary, #4fc3f7);
   background: var(--tp-color-primary-bg, #15395b);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item-title {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-title {
   color: #e8e8e8;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-item-desc {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-desc {
   color: #808080;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .slash-command-group-title {
+:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-group-title {
   color: #808080;
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .slash-command-menu::-webkit-scrollbar-thumb {
+  .block-picker-menu::-webkit-scrollbar-thumb {
   background: #434343;
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .slash-command-menu::-webkit-scrollbar-thumb:hover {
+  .block-picker-menu::-webkit-scrollbar-thumb:hover {
   background: #595959;
 }
 
 /* ========== 响应式 ========== */
 @media (width <= 768px) {
-  .slash-command-menu {
+  .block-picker-menu {
     min-width: 220px;
     max-width: 280px;
   }
 
-  .slash-command-item {
+  .block-picker-item {
     padding: 6px 12px;
     font-size: 13px;
   }
 
-  .slash-command-item-icon {
+  .block-picker-item-icon {
     width: 32px;
     height: 32px;
     font-size: 16px;
@@ -218,8 +218,8 @@
 
 /* ========== 打印隐藏 ========== */
 @media print {
-  .slash-command-menu,
-  .slash-command-backdrop {
+  .block-picker-menu,
+  .block-picker-backdrop {
     display: none !important;
   }
 }

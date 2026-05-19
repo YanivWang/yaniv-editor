@@ -123,7 +123,8 @@ export const zhCN: TiptapLocale = {
   placeholder: {
     default: "请输入内容...",
     heading: "标题",
-    paragraph: "正文",
+    paragraph: "输入文本或输入 '/' 唤起命令",
+    codeBlock: "输入代码",
   },
 
   messages: {

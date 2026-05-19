@@ -123,7 +123,8 @@ export const enUS: TiptapLocale = {
   placeholder: {
     default: "Type something...",
     heading: "Heading",
-    paragraph: "Paragraph",
+    paragraph: "Enter text or type '/' for commands",
+    codeBlock: "Enter code",
   },
 
   messages: {

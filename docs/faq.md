@@ -59,7 +59,7 @@ GET /api/documents/:id → :initial-content="data.content"
 :features="{ slashCommand: true, headerNav: true }"
 ```
 
-`slashCommand` 会注册扩展并在模板中渲染 `SlashCommandMenu`。
+`slashCommand` 会注册斜杠扩展；块选择 UI 为 `BlockPickerMenu`（`@/tools/block-menu`），样式类名为 `block-picker-*`（`src/styles/block-picker.css`），与拖拽柄 `+` 号共用。
 
 ### 协作编辑支持吗？
 

@@ -123,7 +123,8 @@ export const zhTW: TiptapLocale = {
   placeholder: {
     default: "請輸入內容...",
     heading: "標題",
-    paragraph: "正文",
+    paragraph: "輸入文字或輸入 '/' 喚起命令",
+    codeBlock: "輸入程式碼",
   },
 
   messages: {

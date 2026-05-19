@@ -364,10 +364,10 @@ function findToolbarControl(id: string): HTMLElement | null {
   return findToolbarButton(id);
 }
 
-function findSlashCommandItem(itemId: string): HTMLElement | null {
+function findBlockPickerItem(itemId: string): HTMLElement | null {
   const labels = SLASH_COMMAND_LABELS[itemId] ?? [];
-  for (const btn of document.querySelectorAll(".slash-command-item")) {
-    const title = btn.querySelector(".slash-command-item-title")?.textContent?.trim() ?? "";
+  for (const btn of document.querySelectorAll(".block-picker-item")) {
+    const title = btn.querySelector(".block-picker-item-title")?.textContent?.trim() ?? "";
     if (labels.some((label) => title.includes(label))) {
       return btn as HTMLElement;
     }
@@ -496,9 +496,9 @@ async function tapControl(
   await pause(100, signal);
 }
 
-async function selectSlashCommand(editor: DemoEditor, itemId: string, signal: AbortSignal) {
+async function selectBlockPickerItem(editor: DemoEditor, itemId: string, signal: AbortSignal) {
   await pause(350, signal);
-  const el = findSlashCommandItem(itemId);
+  const el = findBlockPickerItem(itemId);
   if (el) {
     await tapElement(el, signal, { click: true });
   } else if (itemId === "codeBlock") {
@@ -1525,7 +1525,7 @@ const editor = new Editor({
 
     await moveToEditor(editor, signal);
     await typeText(editor, "/", speed, signal);
-    await selectSlashCommand(editor, "blockquote", signal);
+    await selectBlockPickerItem(editor, "blockquote", signal);
     await moveToEditor(editor, signal);
     await typeText(
       editor,
@@ -1561,7 +1561,7 @@ const editor = new Editor({
 
     await moveToEditor(editor, signal);
     await typeText(editor, "/", speed, signal);
-    await selectSlashCommand(editor, "codeBlock", signal);
+    await selectBlockPickerItem(editor, "codeBlock", signal);
     await moveToEditor(editor, signal);
     await typeText(editor, "const demo = 'typed after /code';", fast, signal);
     await pause(300, signal);

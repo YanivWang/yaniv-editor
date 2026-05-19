@@ -33,6 +33,7 @@ import {
   AiHighlightMark,
 } from "@/ai";
 import { DEFAULT_EDITOR_VERSION, type EditorVersion } from "@/core/editorTypes";
+import { t } from "@/locales";
 
 import { codeBlockLowlightExtension } from "./codeBlockLowlight";
 import { FontSize } from "./fontSize";
@@ -48,6 +49,7 @@ import { SearchReplace } from "./search-replace";
 import { Video } from "./video";
 
 import type { AnyExtension } from "@tiptap/core";
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 /**
  * 扩展配置选项
@@ -119,10 +121,19 @@ export function getExtensionsByVersion(
   extensions.push(StarterKit.configure(starterKitConfig));
   extensions.push(codeBlockLowlightExtension);
 
-  // 占位符扩展
+  // 占位符扩展（每个空块显示提示，需配合 src/styles/placeholder.css）
   extensions.push(
     Placeholder.configure({
-      placeholder: "开始编辑你的文档...",
+      showOnlyCurrent: false,
+      placeholder: ({ node }: { node: ProseMirrorNode }) => {
+        if (node.type.name === "heading") {
+          return t("placeholder.heading");
+        }
+        if (node.type.name === "codeBlock") {
+          return t("placeholder.codeBlock");
+        }
+        return t("placeholder.paragraph");
+      },
     }),
   );
 

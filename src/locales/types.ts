@@ -135,6 +135,7 @@ export interface TiptapLocale {
     default: string;
     heading: string;
     paragraph: string;
+    codeBlock: string;
   };
 
   // 错误和提示

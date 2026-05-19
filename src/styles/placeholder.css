@@ -1,0 +1,44 @@
+/**
+ * Placeholder styles for empty blocks
+ * @description Works with @tiptap/extension-placeholder (is-empty + data-placeholder)
+ */
+
+.ProseMirror p.is-empty::before,
+.ProseMirror h1.is-empty::before,
+.ProseMirror h2.is-empty::before,
+.ProseMirror h3.is-empty::before,
+.ProseMirror h4.is-empty::before,
+.ProseMirror h5.is-empty::before,
+.ProseMirror h6.is-empty::before,
+.ProseMirror pre.is-empty::before {
+  float: left;
+  height: 0;
+  pointer-events: none;
+  content: attr(data-placeholder);
+}
+
+.ProseMirror p.is-empty::before,
+.ProseMirror h1.is-empty::before,
+.ProseMirror h2.is-empty::before,
+.ProseMirror h3.is-empty::before,
+.ProseMirror h4.is-empty::before,
+.ProseMirror h5.is-empty::before,
+.ProseMirror h6.is-empty::before {
+  color: var(--tiptap-text-muted, #9b9a97);
+}
+
+.ProseMirror pre.is-empty::before {
+  color: var(--tiptap-text-muted, #9b9a97);
+}
+
+.theme-notion .ProseMirror p.is-empty::before,
+.theme-notion .ProseMirror h1.is-empty::before,
+.theme-notion .ProseMirror h2.is-empty::before,
+.theme-notion .ProseMirror h3.is-empty::before,
+.theme-notion .ProseMirror h4.is-empty::before,
+.theme-notion .ProseMirror h5.is-empty::before,
+.theme-notion .ProseMirror h6.is-empty::before,
+.theme-notion .ProseMirror pre.is-empty::before {
+  font-style: italic;
+  color: var(--tiptap-text-muted, #9b9a97);
+}

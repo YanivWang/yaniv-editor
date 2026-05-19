@@ -32,19 +32,24 @@
 
 .drag-handle {
   display: grid;
-  grid-template-columns: repeat(2, 2px);
-  gap: 3px 5px;
-  cursor: grab;
+  grid-template-columns: repeat(2, 3px);
+  gap: 3px 4px;
+  place-content: center;
+  cursor: pointer;
 }
 
 .drag-handle-plus {
-  display: flex;
+  display: inline-flex;
   padding: 0;
-  font-size: 31px;
-  font-weight: 300;
-  line-height: 1;
   color: #cfcfcf;
   cursor: pointer;
+}
+
+.drag-handle-plus__icon {
+  display: block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
 }
 
 .drag-handle.is-visible,
@@ -65,14 +70,14 @@
 
 .drag-handle__dot {
   display: block;
-  width: 2px;
-  height: 2px;
-  background: #cfcfcf;
+  width: 3px;
+  height: 3px;
+  background: #c4c4c4;
   border-radius: 999px;
 }
 
 .drag-handle.is-dragging .drag-handle__dot {
-  background: #cfcfcf;
+  background: #c4c4c4;
 }
 
 .drag-handle-menu {
@@ -246,11 +251,11 @@
 }
 
 .theme-notion .drag-handle__dot {
-  background: #cfcfcf;
+  background: #c4c4c4;
 }
 
 .theme-notion .drag-handle.is-dragging .drag-handle__dot {
-  background: #cfcfcf;
+  background: #c4c4c4;
 }
 
 .drag-handle-menu.theme-notion-menu {
@@ -278,7 +283,7 @@
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle__dot {
-  background: #cfcfcf;
+  background: #c4c4c4;
 }
 
 .theme-notion[data-theme="dark"] .drag-handle-plus:hover,
@@ -289,7 +294,7 @@
 }
 
 .theme-notion[data-theme="dark"] .drag-handle__dot {
-  background: #cfcfcf;
+  background: #c4c4c4;
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle-menu,
@@ -336,7 +341,7 @@
 .prosemirror-dropcursor-block {
   box-sizing: border-box;
   height: 6px !important;
-  padding-left: 5px;
+  padding-left: 0;
   background-color: transparent !important;
   clip-path: none;
 }

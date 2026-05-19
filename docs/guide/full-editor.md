@@ -12,7 +12,7 @@ YanivEditor
 ├── ImageToolbar        # 图片工具栏
 ├── VideoToolbar        # 视频工具栏
 ├── FloatingMenu        # 选区浮动菜单
-├── SlashCommandMenu    # 斜杠命令（需 features.slashCommand）
+├── BlockPickerMenu     # Notion 块菜单（/ 转换、+ 插入；features.slashCommand 或 dragHandle）
 ├── EditorContent       # 文档编辑区（Word 分页布局）
 └── FooterNav           # 底部缩放 / 字数统计
 ```
@@ -70,20 +70,20 @@ onMounted(() => {
 
 ## 常用 features 开关
 
-| 字段             | 作用                   | 默认值                |
-| ---------------- | ---------------------- | --------------------- |
-| `headerNav`      | 显示顶部工具栏         | `false`（需显式开启） |
-| `footerNav`      | 显示底部缩放/字数栏    | `false`               |
-| `floatingMenu`   | 选区浮动格式化菜单     | `false`               |
-| `slashCommand`   | `/` 斜杠块命令         | `false`               |
-| `linkBubbleMenu` | 链接编辑气泡           | `false`               |
-| `tableToolbar`   | 表格上下文工具栏       | `false`               |
-| `image`          | 注册图片/视频扩展      | `true`                |
-| `table`          | 注册表格扩展           | `true`                |
-| `ai`             | 注册 AI 扩展           | `true`                |
-| `dragHandle`     | 块左侧添加、菜单与拖拽 | `true`                |
-| `searchReplace`  | 查找替换扩展           | advanced 默认 `true`  |
-| `officePaste`    | Office/WPS 粘贴增强    | `true`                |
+| 字段             | 作用                                                    | 默认值                |
+| ---------------- | ------------------------------------------------------- | --------------------- |
+| `headerNav`      | 显示顶部工具栏                                          | `false`（需显式开启） |
+| `footerNav`      | 显示底部缩放/字数栏                                     | `false`               |
+| `floatingMenu`   | 选区浮动格式化菜单                                      | `false`               |
+| `slashCommand`   | `/` 唤起 `BlockPickerMenu`（块类型选择）                | `false`               |
+| `linkBubbleMenu` | 链接编辑气泡                                            | `false`               |
+| `tableToolbar`   | 表格上下文工具栏                                        | `false`               |
+| `image`          | 注册图片/视频扩展                                       | `true`                |
+| `table`          | 注册表格扩展                                            | `true`                |
+| `ai`             | 注册 AI 扩展                                            | `true`                |
+| `dragHandle`     | 块左侧 `+` / 六点柄与拖拽（`+` 共用 `BlockPickerMenu`） | `true`                |
+| `searchReplace`  | 查找替换扩展                                            | advanced 默认 `true`  |
+| `officePaste`    | Office/WPS 粘贴增强                                     | `true`                |
 
 完整列表见 [功能配置](/api/features-config)。
 

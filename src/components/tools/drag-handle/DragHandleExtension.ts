@@ -14,10 +14,23 @@ import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/stat
 
 import type { EditorView } from "@tiptap/pm/view";
 
+export interface DragInsertMenuContext {
+  targetPos: number;
+  targetNodeSize: number;
+  insertPos: number;
+  anchorRect: DOMRect;
+}
+
+export interface DragHandleOptions {
+  onOpenInsertMenu?: (context: DragInsertMenuContext) => void;
+  onCloseInsertMenu?: () => void;
+}
+
 declare module "@tiptap/core" {
   interface Storage {
     dragHandle: {
       isDragging: boolean;
+      insertMenuOpen: boolean;
     };
   }
 }
@@ -38,55 +51,6 @@ const DRAGGABLE_NODE_TYPES = new Set([
 
 const MEDIA_NODE_TYPES = new Set(["image", "video"]);
 const LIST_NODE_TYPES = new Set(["orderedList", "bulletList"]);
-const TEXT_BLOCK_TYPES = new Set(["paragraph", "heading", "codeBlock"]);
-
-function isTextBlockEmpty(node: ProseMirrorNode): boolean {
-  let hasContent = false;
-
-  node.descendants((child) => {
-    if (child.isText && (child.text?.trim().length ?? 0) > 0) {
-      hasContent = true;
-      return false;
-    }
-    if (child.isAtom && child.type.name !== "hardBreak") {
-      hasContent = true;
-      return false;
-    }
-  });
-
-  return !hasContent;
-}
-
-function hasBlockContent(node: ProseMirrorNode): boolean {
-  const type = node.type.name;
-
-  if (MEDIA_NODE_TYPES.has(type) || type === "table") {
-    return true;
-  }
-
-  if (TEXT_BLOCK_TYPES.has(type)) {
-    return !isTextBlockEmpty(node);
-  }
-
-  if (type === "blockquote" || LIST_NODE_TYPES.has(type)) {
-    let hasContent = false;
-
-    node.descendants((child) => {
-      if (TEXT_BLOCK_TYPES.has(child.type.name) && !isTextBlockEmpty(child)) {
-        hasContent = true;
-        return false;
-      }
-      if (MEDIA_NODE_TYPES.has(child.type.name)) {
-        hasContent = true;
-        return false;
-      }
-    });
-
-    return hasContent;
-  }
-
-  return node.textContent.trim().length > 0;
-}
 
 interface DragTarget {
   node: ProseMirrorNode;
@@ -94,7 +58,7 @@ interface DragTarget {
   dom: HTMLElement;
 }
 
-type BlockMenuKind = "insert" | "actions";
+type BlockMenuKind = "actions";
 
 interface BlockMenuItem {
   id: string;
@@ -259,7 +223,8 @@ function createPlusButtonElement(): HTMLButtonElement {
   plusButton.className = "drag-handle-plus";
   plusButton.contentEditable = "false";
   plusButton.setAttribute("aria-label", "添加块");
-  plusButton.textContent = "+";
+  plusButton.innerHTML =
+    '<svg class="drag-handle-plus__icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>';
   return plusButton;
 }
 
@@ -415,73 +380,6 @@ function duplicateTargetNode(view: EditorView, target: DragTarget): void {
   insertNodeAfter(view, target, target.node.copy(target.node.content));
 }
 
-function setCursorAfterTarget(view: EditorView, target: DragTarget): void {
-  const pos = target.pos + target.node.nodeSize;
-  const tr = view.state.tr.setSelection(TextSelection.near(view.state.doc.resolve(pos), 1));
-  view.dispatch(tr);
-  view.focus();
-}
-
-function createInsertItems(
-  view: EditorView,
-  target: DragTarget,
-  insertTable: () => void,
-): BlockMenuItem[] {
-  const { schema } = view.state;
-
-  return [
-    {
-      id: "paragraph",
-      label: "正文",
-      description: "插入普通文本块",
-      run: () => insertNodeAfter(view, target, createParagraph(schema)),
-    },
-    {
-      id: "heading1",
-      label: "标题 1",
-      description: "插入大标题",
-      run: () => insertNodeAfter(view, target, createHeading(schema, 1)),
-    },
-    {
-      id: "heading2",
-      label: "标题 2",
-      description: "插入中标题",
-      run: () => insertNodeAfter(view, target, createHeading(schema, 2)),
-    },
-    {
-      id: "bulletList",
-      label: "无序列表",
-      description: "插入列表块",
-      run: () => insertNodeAfter(view, target, createList(schema, "bulletList")),
-    },
-    {
-      id: "taskList",
-      label: "任务列表",
-      description: "插入待办块",
-      run: () => insertNodeAfter(view, target, createList(schema, "taskList")),
-    },
-    {
-      id: "blockquote",
-      label: "引用",
-      description: "插入引用块",
-      run: () => insertNodeAfter(view, target, createBlockquote(schema)),
-    },
-    {
-      id: "codeBlock",
-      label: "代码块",
-      description: "插入代码块",
-      run: () => insertNodeAfter(view, target, createCodeBlock(schema)),
-    },
-    {
-      id: "table",
-      label: "表格",
-      description: "插入 3x3 表格",
-      dividerBefore: true,
-      run: insertTable,
-    },
-  ];
-}
-
 function createTransformItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
   const { schema } = view.state;
   const text = target.node.textContent;
@@ -635,17 +533,11 @@ function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: (
   }
 }
 
-function positionBlockMenu(
-  menu: HTMLElement,
-  target: DragTarget,
-  kind: BlockMenuKind,
-  anchor?: HTMLElement,
-): void {
+function positionBlockMenu(menu: HTMLElement, target: DragTarget, anchor?: HTMLElement): void {
   const anchorRect = anchor?.getBoundingClientRect() ?? target.dom.getBoundingClientRect();
   const targetRect = target.dom.getBoundingClientRect();
-  const xOffset = kind === "insert" ? 8 : 10;
 
-  menu.style.left = `${Math.max(8, anchorRect.right + xOffset)}px`;
+  menu.style.left = `${Math.max(8, anchorRect.right + 10)}px`;
   menu.style.top = `${Math.max(8, targetRect.top)}px`;
 
   requestAnimationFrame(() => {
@@ -667,17 +559,25 @@ function positionBlockMenu(
   });
 }
 
-export const DragHandleExtension = Extension.create({
+export const DragHandleExtension = Extension.create<DragHandleOptions>({
   name: "dragHandle",
+
+  addOptions() {
+    return {
+      onOpenInsertMenu: undefined,
+      onCloseInsertMenu: undefined,
+    };
+  },
 
   addStorage() {
     return {
       isDragging: false,
+      insertMenuOpen: false,
     };
   },
 
   addProseMirrorPlugins() {
-    const editor = this.editor;
+    const extensionOptions = this.options;
     const storage = this.storage;
 
     return [
@@ -700,12 +600,18 @@ export const DragHandleExtension = Extension.create({
 
           const closeMenu = () => {
             activeMenuKind = null;
-            menu.classList.remove("is-visible", "is-insert-menu", "is-actions-menu");
+            menu.classList.remove("is-visible", "is-actions-menu");
             menu.replaceChildren();
           };
 
+          const closeInsertMenu = () => {
+            if (!storage.insertMenuOpen) return;
+            storage.insertMenuOpen = false;
+            extensionOptions.onCloseInsertMenu?.();
+          };
+
           const hideHandle = () => {
-            if (isDragging || activeMenuKind) return;
+            if (isDragging || activeMenuKind || storage.insertMenuOpen) return;
             currentTarget = null;
             plusButton.classList.remove("is-visible");
             handle.classList.remove("is-visible");
@@ -722,13 +628,8 @@ export const DragHandleExtension = Extension.create({
             plusButton.classList.add("is-visible");
             handle.classList.add("is-visible");
 
-            if (activeMenuKind) {
-              positionBlockMenu(
-                menu,
-                target,
-                activeMenuKind,
-                activeMenuKind === "insert" ? plusButton : handle,
-              );
+            if (activeMenuKind === "actions") {
+              positionBlockMenu(menu, target, handle);
             }
           };
 
@@ -737,16 +638,17 @@ export const DragHandleExtension = Extension.create({
 
             const target = findTargetFromCoords(view, event);
             if (
-              activeMenuKind &&
+              (activeMenuKind || storage.insertMenuOpen) &&
               (!target ||
                 !currentTarget ||
                 target.pos !== currentTarget.pos ||
                 target.dom !== currentTarget.dom)
             ) {
               closeMenu();
+              closeInsertMenu();
             }
 
-            if (!target || !hasBlockContent(target.node)) {
+            if (!target) {
               hideHandle();
               return;
             }
@@ -769,42 +671,48 @@ export const DragHandleExtension = Extension.create({
             hideHandle();
           };
 
-          const openMenu = (kind: BlockMenuKind) => {
+          const openActionsMenu = () => {
             if (!currentTarget) return;
 
             const target = currentTarget;
-            activeMenuKind = kind;
+            activeMenuKind = "actions";
             menu.classList.toggle("theme-notion-menu", Boolean(view.dom.closest(".theme-notion")));
             menu.classList.toggle(
               "is-dark",
               Boolean(view.dom.closest('[data-theme="dark"], .dark')),
             );
-            menu.classList.toggle("is-insert-menu", kind === "insert");
-            menu.classList.toggle("is-actions-menu", kind === "actions");
+            menu.classList.add("is-actions-menu");
 
-            const insertTable = () => {
-              setCursorAfterTarget(view, target);
-              editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-            };
-
-            renderBlockMenu(
-              menu,
-              kind === "insert"
-                ? createInsertItems(view, target, insertTable)
-                : createActionItems(view, target),
-              closeMenu,
-            );
-            positionBlockMenu(menu, target, kind, kind === "insert" ? plusButton : handle);
+            renderBlockMenu(menu, createActionItems(view, target), closeMenu);
+            positionBlockMenu(menu, target, handle);
             menu.classList.add("is-visible");
           };
 
-          const toggleMenu = (kind: BlockMenuKind) => {
-            if (activeMenuKind === kind) {
+          const toggleActionsMenu = () => {
+            if (activeMenuKind === "actions") {
               closeMenu();
               return;
             }
 
-            openMenu(kind);
+            openActionsMenu();
+          };
+
+          const openInsertMenu = () => {
+            if (!currentTarget || !extensionOptions.onOpenInsertMenu) return;
+
+            const target = currentTarget;
+            if (storage.insertMenuOpen) {
+              closeInsertMenu();
+              return;
+            }
+
+            storage.insertMenuOpen = true;
+            extensionOptions.onOpenInsertMenu({
+              targetPos: target.pos,
+              targetNodeSize: target.node.nodeSize,
+              insertPos: target.pos + target.node.nodeSize,
+              anchorRect: plusButton.getBoundingClientRect(),
+            });
           };
 
           plusButton.addEventListener("mousedown", (event) => {
@@ -815,7 +723,7 @@ export const DragHandleExtension = Extension.create({
           plusButton.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
-            toggleMenu("insert");
+            openInsertMenu();
           });
 
           handle.addEventListener("mousedown", (event) => {
@@ -826,13 +734,13 @@ export const DragHandleExtension = Extension.create({
           handle.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
-            toggleMenu("actions");
+            toggleActionsMenu();
           });
 
           handle.addEventListener("keydown", (event) => {
             if (event.key !== "Enter" && event.key !== " ") return;
             event.preventDefault();
-            openMenu("actions");
+            openActionsMenu();
           });
 
           handle.addEventListener("dragstart", (event: DragEvent) => {
@@ -877,19 +785,28 @@ export const DragHandleExtension = Extension.create({
 
           const handleDocumentPointerDown = (event: MouseEvent) => {
             const target = event.target;
-            if (
-              target instanceof Node &&
-              (menu.contains(target) || handle.contains(target) || plusButton.contains(target))
-            ) {
-              return;
+            if (target instanceof Node) {
+              if (menu.contains(target) || handle.contains(target) || plusButton.contains(target)) {
+                return;
+              }
+
+              if (
+                target instanceof Element &&
+                target.closest(".block-picker-menu, .block-picker-backdrop")
+              ) {
+                return;
+              }
             }
+
             closeMenu();
+            closeInsertMenu();
             hideHandle();
           };
 
           const handleDocumentKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
               closeMenu();
+              closeInsertMenu();
               hideHandle();
             }
           };
@@ -908,12 +825,7 @@ export const DragHandleExtension = Extension.create({
 
               const node = updatedView.state.doc.nodeAt(currentTarget.pos);
               const dom = getDomElement(updatedView, currentTarget.pos);
-              if (
-                !node ||
-                !dom ||
-                node.type.name !== currentTarget.node.type.name ||
-                !hasBlockContent(node)
-              ) {
+              if (!node || !dom || node.type.name !== currentTarget.node.type.name) {
                 hideHandle();
                 return;
               }

@@ -51,10 +51,10 @@
       :enabled="props.features?.floatingMenu ?? false"
     />
 
-    <!-- 功能模块：斜杠命令菜单（预览模式下禁用） -->
-    <SlashCommandMenu
-      v-if="editorInstance && !isPreviewMode && (props.features?.slashCommand ?? false)"
-      ref="slashCommandMenuRef"
+    <!-- 功能模块：Notion 风格块选择菜单（/ 转换当前块，+ 在下方插入新块） -->
+    <BlockPickerMenu
+      v-if="editorInstance && !isPreviewMode && showBlockPickerMenu"
+      ref="blockPickerMenuRef"
       :editor="editorInstance"
     />
 
@@ -109,13 +109,14 @@ import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
+import { BlockPickerMenu } from "@/tools/block-menu";
 import { DragHandleExtension } from "@/tools/drag-handle";
 import { FloatingMenu } from "@/tools/floating-menu";
 import { FooterNav } from "@/tools/footer-nav";
 import { ToolbarNav } from "@/tools/header-nav";
 import { ImageToolbar } from "@/tools/image-toolbar";
 import { LinkBubbleMenu } from "@/tools/link-bubble";
-import { SlashCommandMenu, SlashCommandExtension } from "@/tools/slash-command";
+import { SlashCommandExtension } from "@/tools/slash-command";
 import type { SlashCommandState } from "@/tools/slash-command";
 import { TableToolbar } from "@/tools/table-toolbar";
 import { VideoToolbar } from "@/tools/video-toolbar";
@@ -134,8 +135,9 @@ import "@/styles/toolbar.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
 import "@/styles/image-resize.css";
-import "@/styles/slash-command.css";
+import "@/styles/block-picker.css";
 import "@/styles/drag-handle.css";
+import "@/styles/placeholder.css";
 import "@/styles/code-block.css";
 import "@/styles/outline.css";
 
@@ -159,13 +161,18 @@ const editor = shallowRef<Editor | null>(null);
 const editorError = ref<string | null>(null);
 const containerRef = ref<HTMLElement | null>(null);
 
-type SlashCommandMenuInstance = {
+type BlockPickerMenuInstance = {
   activate: (state: SlashCommandState) => void;
+  openInsert: (context: import("@/tools/block-menu").BlockInsertContext) => void;
   hide: () => void;
   updateQuery: (query: string) => void;
 };
 
-const slashCommandMenuRef = ref<SlashCommandMenuInstance | null>(null);
+const blockPickerMenuRef = ref<BlockPickerMenuInstance | null>(null);
+
+const showBlockPickerMenu = computed(
+  () => Boolean(props.features?.slashCommand) || props.features?.dragHandle !== false,
+);
 const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
   useEditorPagination(containerRef);
 const isFirstInit = ref(true);
@@ -257,16 +264,21 @@ const initEditor = async () => {
 
     // 添加块控制扩展（左侧 + 添加、六点菜单与拖拽排序）
     if (!props.readonly && !isPreviewMode.value && props.features?.dragHandle !== false) {
-      extensions.push(DragHandleExtension);
+      extensions.push(
+        DragHandleExtension.configure({
+          onOpenInsertMenu: (context) => blockPickerMenuRef.value?.openInsert(context),
+          onCloseInsertMenu: () => blockPickerMenuRef.value?.hide(),
+        }),
+      );
     }
 
     // 添加斜杠命令扩展
     if (props.features?.slashCommand) {
       extensions.push(
         SlashCommandExtension.configure({
-          onActivate: (state: SlashCommandState) => slashCommandMenuRef.value?.activate(state),
-          onDeactivate: () => slashCommandMenuRef.value?.hide(),
-          onQueryChange: (query: string) => slashCommandMenuRef.value?.updateQuery(query),
+          onActivate: (state: SlashCommandState) => blockPickerMenuRef.value?.activate(state),
+          onDeactivate: () => blockPickerMenuRef.value?.hide(),
+          onQueryChange: (query: string) => blockPickerMenuRef.value?.updateQuery(query),
         }),
       );
     }
