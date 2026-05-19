@@ -8,7 +8,7 @@ export type ThemeMode = "light" | "dark" | "auto";
 /** Theme preset */
 export type ThemePreset = "default" | "notion" | "typora" | "word" | "github" | "custom";
 
-/** AI configuration（宿主应用侧，非 TiptapProEditor props） */
+/** AI configuration（宿主应用侧，非 YanivEditor props） */
 export interface AiConfig {
   provider: "openai" | "aliyun" | "ollama" | "deepseek";
   apiKey: string;

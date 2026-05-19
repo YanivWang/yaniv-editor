@@ -1,9 +1,9 @@
-/* TiptapPro Word 模式样式 */
+/* Yaniv Editor Word 模式样式 */
 
-/* 基于原 tiptap 样式，适配 tiptap-pro-editor 类名 */
+/* 基于原 tiptap 样式，适配 yaniv-editor 类名 */
 
 /* ===== Word 文档模式编辑器容器 ===== */
-.tiptap-pro-editor.word-mode {
+.yaniv-editor.word-mode {
   /* 布局与尺寸 */
   display: flex;
   flex-direction: column;
@@ -44,8 +44,8 @@
 }
 
 /* 深色模式下的编辑器容器 */
-.dark .tiptap-pro-editor.word-mode,
-[data-theme="dark"] .tiptap-pro-editor.word-mode {
+.dark .yaniv-editor.word-mode,
+[data-theme="dark"] .yaniv-editor.word-mode {
   --color-text: #f0f0f0;
   --color-bg: #1f1f1f;
   --color-bg-gray: #262626;
@@ -397,18 +397,18 @@
 }
 
 /* ===== 预览模式样式 ===== */
-.tiptap-pro-editor.word-mode.is-preview-mode {
+.yaniv-editor.word-mode.is-preview-mode {
   /* 预览模式下禁止选中文本 */
   user-select: none;
 }
 
-.tiptap-pro-editor.word-mode.is-preview-mode .word-document-container {
+.yaniv-editor.word-mode.is-preview-mode .word-document-container {
   /* 容器保持可滚动 */
   overflow: auto;
   cursor: default;
 }
 
-.tiptap-pro-editor.word-mode.is-preview-mode .ProseMirror {
+.yaniv-editor.word-mode.is-preview-mode .ProseMirror {
   /* 内容区域禁止点击交互，但不影响容器滚动 */
   pointer-events: none;
 
@@ -416,7 +416,7 @@
   caret-color: transparent;
 }
 
-.tiptap-pro-editor.word-mode.is-preview-mode .ProseMirror * {
+.yaniv-editor.word-mode.is-preview-mode .ProseMirror * {
   cursor: default !important;
 
   /* 预览模式下禁止选中 */
@@ -424,19 +424,19 @@
 }
 
 /* 预览模式下链接保持视觉样式但不可点击 */
-.tiptap-pro-editor.word-mode.is-preview-mode .ProseMirror a {
+.yaniv-editor.word-mode.is-preview-mode .ProseMirror a {
   pointer-events: none;
   cursor: default;
 }
 
 /* 预览模式下图片不显示调整手柄 */
-.tiptap-pro-editor.word-mode.is-preview-mode .ProseMirror img {
+.yaniv-editor.word-mode.is-preview-mode .ProseMirror img {
   resize: none;
 }
 
 /* 预览模式下隐藏所有可调整大小的手柄 */
-.tiptap-pro-editor.word-mode.is-preview-mode .resize-handle,
-.tiptap-pro-editor.word-mode.is-preview-mode .image-resizer {
+.yaniv-editor.word-mode.is-preview-mode .resize-handle,
+.yaniv-editor.word-mode.is-preview-mode .image-resizer {
   display: none !important;
 }
 

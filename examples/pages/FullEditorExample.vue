@@ -35,7 +35,7 @@
       <main class="demo-main">
         <DeviceFrame :device="deviceView" :orientation="deviceOrientation">
           <div class="demo-card">
-            <TiptapProEditor
+            <YanivEditor
               ref="editorRef"
               :key="themePreset"
               :initial-content="sampleContent"
@@ -56,7 +56,7 @@ import { computed, onMounted, ref, watch } from "vue";
 
 import { DeviceFrame, type Orientation } from "../../src/components/tools/device-switcher";
 import { editorPresets } from "../../src/configs/editorPresets";
-import TiptapProEditor from "../../src/core/TiptapProEditor.vue";
+import YanivEditor from "../../src/core/YanivEditor.vue";
 import { t, useI18n, type LocaleCode } from "../../src/locales";
 import { setDeviceView, setOrientation, setTheme, type DeviceView } from "../../src/themes";
 import DemoAppHeader from "../components/DemoAppHeader.vue";
@@ -121,7 +121,7 @@ const handleOrientationChange = (orientation: Orientation) => {
 };
 
 const sampleContent = `
-<h1>Welcome to yaniv-editor!</h1>
+<h1>Welcome to Yaniv Editor!</h1>
 <p>This is a <strong>beautiful</strong> and <em>customizable</em> rich-text editor built with:</p>
 <ul>
   <li><strong>Tiptap 3</strong> - The headless editor framework</li>
@@ -137,14 +137,14 @@ const sampleContent = `
 <p>When configured, the AI button provides continue writing, polish, summarize, and translate.</p>
 `;
 
-type TiptapProEditorInstance = {
+type YanivEditorInstance = {
   getEditor: () => Editor | null;
   getJSON: () => unknown;
   getHTML: () => string;
   getText: () => string;
 };
 
-const editorRef = ref<TiptapProEditorInstance | null>(null);
+const editorRef = ref<YanivEditorInstance | null>(null);
 const getEditorInstance = () => editorRef.value?.getEditor() ?? null;
 
 const editorContent = ref<unknown>(null);

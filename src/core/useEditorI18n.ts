@@ -2,7 +2,7 @@ import { computed, watch } from "vue";
 
 import { createI18n, useI18n as useTiptapI18n, type LocaleCode } from "@/locales";
 
-import type { TiptapProEditorProps } from "./editorTypes";
+import type { YanivEditorProps } from "./editorTypes";
 
 function mapLocaleToTiptapLocale(locale: string): LocaleCode {
   const localeMap: Record<string, LocaleCode> = {
@@ -20,7 +20,7 @@ function mapLocaleToTiptapLocale(locale: string): LocaleCode {
   return "zh-CN";
 }
 
-export function useEditorI18n(props: TiptapProEditorProps) {
+export function useEditorI18n(props: YanivEditorProps) {
   const currentLocale = computed(() => props.locale || "zh-CN");
 
   const initTiptapI18n = () => {

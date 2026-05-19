@@ -1,9 +1,9 @@
 /**
- * 编辑器集成预设 — 与 TiptapProEditor 的 version / features 同构，可直接 v-bind
+ * 编辑器集成预设 — 与 YanivEditor 的 version / features 同构，可直接 v-bind
  */
-import type { EditorVersion, FeatureConfig, TiptapProEditorProps } from "@/core/editorTypes";
+import type { EditorVersion, FeatureConfig, YanivEditorProps } from "@/core/editorTypes";
 
-export type EditorPresetProps = Pick<TiptapProEditorProps, "version" | "features">;
+export type EditorPresetProps = Pick<YanivEditorProps, "version" | "features">;
 
 export type EditorPresetName = keyof typeof editorPresets;
 

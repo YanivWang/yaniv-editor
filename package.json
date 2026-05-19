@@ -1,8 +1,11 @@
 {
-  "name": "yaniv-editor",
+  "name": "@yanivjs/yaniv-editor",
   "version": "0.1.0",
-  "description": "yaniv-editor — Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
+  "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@10.17.0",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

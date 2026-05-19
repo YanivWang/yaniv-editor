@@ -1,5 +1,5 @@
 /**
- * AI Features for TiptapPro Tenant
+ * AI Features for Yaniv Editor
  * @description Collection of AI-powered text processing features
  */
 

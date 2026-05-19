@@ -1,5 +1,5 @@
 /**
- * 扩展功能门控 — 与 TiptapProEditor 的 version / features 对齐
+ * 扩展功能门控 — 与 YanivEditor 的 version / features 对齐
  * @description 单一解析入口，避免「UI 关了但扩展仍注册」的不一致
  */
 
@@ -21,7 +21,7 @@ export interface ResolvedExtensionGates {
 }
 
 export interface ResolveExtensionGatesInput {
-  /** 与 TiptapProEditor.version / getExtensionsByVersion 一致 */
+  /** 与 YanivEditor.version / getExtensionsByVersion 一致 */
   version: EditorVersion;
   features?: FeatureConfig;
 }

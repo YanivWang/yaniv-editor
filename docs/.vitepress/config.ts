@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "yaniv-editor",
+  title: "Yaniv Editor",
   description: "Vue 3 + Tiptap 3 富文本编辑器 UI 套件",
   lang: "zh-CN",
   cleanUrls: true,
@@ -11,7 +11,7 @@ export default defineConfig({
     nav: [
       { text: "指南", link: "/guide/getting-started" },
       { text: "功能", link: "/features/overview" },
-      { text: "API", link: "/api/tiptap-pro-editor" },
+      { text: "API", link: "/api/yaniv-editor" },
       { text: "FAQ", link: "/faq" },
       {
         text: "示例",
@@ -49,7 +49,7 @@ export default defineConfig({
         {
           text: "API",
           items: [
-            { text: "TiptapProEditor", link: "/api/tiptap-pro-editor" },
+            { text: "YanivEditor", link: "/api/yaniv-editor" },
             { text: "功能配置", link: "/api/features-config" },
             { text: "Composables", link: "/api/composables" },
           ],
@@ -59,7 +59,7 @@ export default defineConfig({
     socialLinks: [{ icon: "github", link: "https://github.com/benngaihk/yaniv-editor" }],
     footer: {
       message: "MIT Licensed",
-      copyright: "Copyright © yaniv-editor contributors",
+      copyright: "Copyright © Yaniv Editor contributors",
     },
     search: {
       provider: "local",

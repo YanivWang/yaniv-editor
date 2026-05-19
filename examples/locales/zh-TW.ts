@@ -2,7 +2,7 @@ import type { DemoMessages } from "./types";
 
 export const demoZhTW: DemoMessages = {
   demo: {
-    appTitle: "yaniv-editor 範例",
+    appTitle: "Yaniv Editor 範例",
     subtitle: {
       fullEditor: "完整編輯器範例，支援主題與裝置預覽",
       inlinePlugins: "行內編輯器與可熱插拔功能外掛",
@@ -84,7 +84,7 @@ export const demoZhTW: DemoMessages = {
         free: "免費",
       },
       features: {
-        title: "為什麼選擇 yaniv-editor？",
+        title: "為什麼選擇 Yaniv Editor？",
         themes: {
           title: "5 款精美主題",
           description: "從 Notion 風格到 Word 風格，每款主題均完美支援深色模式。",

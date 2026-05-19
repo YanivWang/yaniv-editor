@@ -1,13 +1,13 @@
-# TiptapProEditor
+# YanivEditor
 
 主编辑器组件，封装工具栏、扩展注册、分页布局与辅助 UI。
 
 ## 导入
 
 ```ts
-import { TiptapProEditor } from "yaniv-editor";
-import type { TiptapProEditorProps, TiptapProEditorExpose } from "yaniv-editor";
-import "yaniv-editor/style.css";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
+import type { YanivEditorProps, YanivEditorExpose } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
 ```
 
 ## Props
@@ -41,7 +41,7 @@ import "yaniv-editor/style.css";
 ## Expose（ref 方法）
 
 ```ts
-interface TiptapProEditorExpose {
+interface YanivEditorExpose {
   getEditor(): Editor | null;
   getJSON(): JSONContent | null;
   getHTML(): string;
@@ -54,9 +54,9 @@ interface TiptapProEditorExpose {
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import { TiptapProEditor } from "yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 
-const editorRef = ref<InstanceType<typeof TiptapProEditor> | null>(null);
+const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 
 function exportContent() {
   const json = editorRef.value?.getJSON();
@@ -68,7 +68,7 @@ function exportContent() {
 </script>
 
 <template>
-  <TiptapProEditor ref="editorRef" version="advanced" @update="onUpdate" />
+  <YanivEditor ref="editorRef" version="advanced" @update="onUpdate" />
 </template>
 ```
 
@@ -77,11 +77,11 @@ function exportContent() {
 ```vue
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { TiptapProEditor, setTheme } from "yaniv-editor";
-import "yaniv-editor/style.css";
-import "yaniv-editor/src/themes/presets/word.css";
+import { YanivEditor, setTheme } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/word.css";
 
-const editorRef = ref<InstanceType<typeof TiptapProEditor> | null>(null);
+const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 
 onMounted(() => setTheme("word", "light"));
 
@@ -95,7 +95,7 @@ async function save() {
 </script>
 
 <template>
-  <TiptapProEditor
+  <YanivEditor
     ref="editorRef"
     version="advanced"
     locale="zh-CN"
@@ -122,10 +122,10 @@ import type {
   FeatureConfig,
   EditorPresetProps,
   EditorPresetName,
-  TiptapProEditorProps,
-  TiptapProEditorExpose,
+  YanivEditorProps,
+  YanivEditorExpose,
   EditorInstance,
-} from "yaniv-editor";
+} from "@yanivjs/yaniv-editor";
 ```
 
 ## 相关

@@ -309,9 +309,9 @@ const frameStyle = computed(() => {
   border-radius: 0;
 }
 
-.device-frame__pc :deep(.tiptap-pro-editor),
-.device-frame__ipad-screen :deep(.tiptap-pro-editor),
-.device-frame__iphone-screen :deep(.tiptap-pro-editor) {
+.device-frame__pc :deep(.yaniv-editor),
+.device-frame__ipad-screen :deep(.yaniv-editor),
+.device-frame__iphone-screen :deep(.yaniv-editor) {
   display: flex;
   flex-direction: column;
   height: 100%;

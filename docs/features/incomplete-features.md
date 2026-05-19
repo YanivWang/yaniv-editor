@@ -1,6 +1,6 @@
 # 功能缺口与半成品说明
 
-本文档说明 yaniv-editor **当前尚未完成**或**仅部分实现**的核心能力，便于集成前评估范围、避免误以为已内置完整产品能力。
+本文档说明 Yaniv Editor **当前尚未完成**或**仅部分实现**的核心能力，便于集成前评估范围、避免误以为已内置完整产品能力。
 
 ::: tip 与「功能总览」的区别
 [功能总览](/features/overview) 列出**已实现**的能力矩阵；本文档聚焦**缺口、预留与 Demo 级实现**。
@@ -17,7 +17,7 @@
 | 评论 / 批注         | 无                                                | —                         |
 | 版本历史 / 自动保存 | i18n 有 `versionHistory.*` 文案，**无组件与 API** | `src/locales/*.ts`        |
 | Markdown 双向编辑   | Typora 主题为视觉风格，非 MD 源码模式             | `docs/faq.md`             |
-| 内容持久化          | 由业务层实现；`documentId` 不会触发加载/保存      | `TiptapProEditor` props   |
+| 内容持久化          | 由业务层实现；`documentId` 不会触发加载/保存      | `YanivEditor` props       |
 
 ### documentId
 

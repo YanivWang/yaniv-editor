@@ -1,10 +1,10 @@
 /**
- * yaniv-editor
+ * Yaniv Editor (@yanivjs/yaniv-editor)
  * Beautiful Tiptap 3 + Vue 3 rich-text editor theme
  */
 
 // Core Editor
-export { default as TiptapProEditor } from "./core/TiptapProEditor.vue";
+export { default as YanivEditor } from "./core/YanivEditor.vue";
 export type * from "./core/editorTypes";
 export { DEFAULT_EDITOR_VERSION } from "./core/editorTypes";
 export * from "./configs/editorConfig";
@@ -39,4 +39,4 @@ export type {
 export * from "./composables";
 
 // Styles - users import separately:
-// import 'yaniv-editor/style.css'
+// import '@yanivjs/yaniv-editor/style.css'

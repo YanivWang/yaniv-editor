@@ -1,5 +1,5 @@
 /**
- * Conventional Commits；scope 与 yaniv-editor 目录对齐。
+ * Conventional Commits；scope 与仓库目录 yaniv-editor 对齐。
  */
 module.exports = {
   extends: ["@commitlint/config-conventional"],

@@ -1,6 +1,6 @@
 # 功能总览
 
-本文档列出 yaniv-editor 当前已实现的能力、版本差异，以及需要业务层自行接入的部分。
+本文档列出 Yaniv Editor 当前已实现的能力、版本差异，以及需要业务层自行接入的部分。
 
 ## 能力矩阵
 
@@ -94,11 +94,11 @@
 
 ```vue
 <script setup>
-import { editorPresets } from "yaniv-editor";
+import { editorPresets } from "@yanivjs/yaniv-editor";
 </script>
 
 <template>
-  <TiptapProEditor v-bind="editorPresets.production" />
+  <YanivEditor v-bind="editorPresets.production" />
 </template>
 ```
 

@@ -2,15 +2,15 @@
  * Code Block - 语法高亮与深色代码块样式
  */
 
-.tiptap-pro-editor .word-document-container {
+.yaniv-editor .word-document-container {
   position: relative;
 }
 
 /* 代码块容器：始终深色，覆盖各主题 preset 中的浅色 pre */
-.tiptap-pro-editor .ProseMirror pre,
-.theme-notion .tiptap-pro-editor .ProseMirror pre,
-.theme-github .tiptap-pro-editor .ProseMirror pre,
-.theme-typora .tiptap-pro-editor .ProseMirror pre {
+.yaniv-editor .ProseMirror pre,
+.theme-notion .yaniv-editor .ProseMirror pre,
+.theme-github .yaniv-editor .ProseMirror pre,
+.theme-typora .yaniv-editor .ProseMirror pre {
   position: relative;
   min-height: 4.5em;
   padding: 40px 24px 24px !important;
@@ -26,9 +26,9 @@
   border-radius: 8px;
 }
 
-.tiptap-pro-editor .ProseMirror pre code,
-.theme-notion .tiptap-pro-editor .ProseMirror pre code,
-.theme-github .tiptap-pro-editor .ProseMirror pre code {
+.yaniv-editor .ProseMirror pre code,
+.theme-notion .yaniv-editor .ProseMirror pre code,
+.theme-github .yaniv-editor .ProseMirror pre code {
   display: block;
   padding: 0 !important;
   font-family: inherit;
@@ -40,7 +40,7 @@
 }
 
 /* GitHub Dark 语法 token（仅作用于代码块内，避免全量引入 highlight.js 主题） */
-.tiptap-pro-editor
+.yaniv-editor
   .ProseMirror
   pre
   :is(
@@ -54,11 +54,11 @@
   color: #ff7b72;
 }
 
-.tiptap-pro-editor .ProseMirror pre :is(.hljs-title, .hljs-title.class_, .hljs-title.function_) {
+.yaniv-editor .ProseMirror pre :is(.hljs-title, .hljs-title.class_, .hljs-title.function_) {
   color: #d2a8ff;
 }
 
-.tiptap-pro-editor
+.yaniv-editor
   .ProseMirror
   pre
   :is(
@@ -76,31 +76,31 @@
   color: #79c0ff;
 }
 
-.tiptap-pro-editor .ProseMirror pre :is(.hljs-regexp, .hljs-string, .hljs-meta .hljs-string) {
+.yaniv-editor .ProseMirror pre :is(.hljs-regexp, .hljs-string, .hljs-meta .hljs-string) {
   color: #a5d6ff;
 }
 
-.tiptap-pro-editor .ProseMirror pre :is(.hljs-built_in, .hljs-symbol) {
+.yaniv-editor .ProseMirror pre :is(.hljs-built_in, .hljs-symbol) {
   color: #ffa657;
 }
 
-.tiptap-pro-editor .ProseMirror pre :is(.hljs-comment, .hljs-code, .hljs-formula) {
+.yaniv-editor .ProseMirror pre :is(.hljs-comment, .hljs-code, .hljs-formula) {
   color: #8b949e;
 }
 
-.tiptap-pro-editor
+.yaniv-editor
   .ProseMirror
   pre
   :is(.hljs-name, .hljs-quote, .hljs-selector-tag, .hljs-selector-pseudo) {
   color: #7ee787;
 }
 
-.tiptap-pro-editor .ProseMirror pre .hljs-section {
+.yaniv-editor .ProseMirror pre .hljs-section {
   font-weight: bold;
   color: #1f6feb;
 }
 
-.tiptap-pro-editor .ProseMirror pre .hljs-bullet {
+.yaniv-editor .ProseMirror pre .hljs-bullet {
   color: #f2cc60;
 }
 

@@ -21,7 +21,7 @@
 
         <!-- Title -->
         <h1 class="hero__title">
-          <span class="gradient-text">yaniv-editor</span>
+          <span class="gradient-text">Yaniv Editor</span>
         </h1>
 
         <!-- Subtitle -->
@@ -222,7 +222,7 @@
         <h2 class="cta__title">{{ t("demo.landing.cta.title") }}</h2>
         <p class="cta__subtitle">{{ t("demo.landing.cta.subtitle") }}</p>
         <div class="cta__code">
-          <code>npm install benngaihk/yaniv-editor</code>
+          <code>pnpm add @yanivjs/yaniv-editor</code>
           <button
             class="cta__copy"
             :title="t('demo.landing.cta.copyTitle')"
@@ -315,7 +315,7 @@ const themes = computed(() =>
 );
 
 const copyInstallCommand = () => {
-  navigator.clipboard.writeText("npm install benngaihk/yaniv-editor");
+  navigator.clipboard.writeText("pnpm add @yanivjs/yaniv-editor");
   // Could add a toast notification here
 };
 </script>

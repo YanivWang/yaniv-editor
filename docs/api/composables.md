@@ -7,7 +7,7 @@
 绑定查找替换快捷键（默认 `Mod-f`）。
 
 ```ts
-import { useFindReplaceHotkey } from "yaniv-editor";
+import { useFindReplaceHotkey } from "@yanivjs/yaniv-editor";
 
 useFindReplaceHotkey({
   enabled: true,
@@ -33,7 +33,7 @@ interface UseFindReplaceHotkeyOptions {
 将当前选区滚动到可视区域。
 
 ```ts
-import { scrollEditorSelectionIntoView } from "yaniv-editor";
+import { scrollEditorSelectionIntoView } from "@yanivjs/yaniv-editor";
 
 scrollEditorSelectionIntoView(editor, { block: "nearest" });
 ```
@@ -45,7 +45,7 @@ scrollEditorSelectionIntoView(editor, { block: "nearest" });
 AI 用户配置管理（localStorage）。
 
 ```ts
-import { useAiConfig } from "yaniv-editor";
+import { useAiConfig } from "@yanivjs/yaniv-editor";
 
 const { config, saveConfig, clearConfig, testConnection, isConfigured } = useAiConfig();
 ```
@@ -55,7 +55,7 @@ const { config, saveConfig, clearConfig, testConnection, isConfigured } = useAiC
 ## createI18n / useI18n
 
 ```ts
-import { createI18n, useI18n, t } from "yaniv-editor";
+import { createI18n, useI18n, t } from "@yanivjs/yaniv-editor";
 
 createI18n({ locale: "zh-CN", fallbackLocale: "en-US" });
 
@@ -65,7 +65,7 @@ i18n.setLocale("en-US");
 const label = t("editor.bold");
 ```
 
-`TiptapProEditor` 会根据 `locale` prop 自动初始化 i18n。
+`YanivEditor` 会根据 `locale` prop 自动初始化 i18n。
 
 ## 主题 API
 
@@ -77,7 +77,7 @@ import {
   registerTheme,
   setDeviceView,
   setOrientation,
-} from "yaniv-editor";
+} from "@yanivjs/yaniv-editor";
 ```
 
 详见 [主题与样式](/guide/theming)。

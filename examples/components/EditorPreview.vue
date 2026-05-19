@@ -195,7 +195,7 @@ const demoScript: DemoStep[] = [
   // Title
   { action: "format", format: "h1" },
   { action: "addLine", line: { html: "", class: "line-h1", tag: "h1" } },
-  { action: "type", text: "yaniv-editor", lineIndex: 0, duration: 70 },
+  { action: "type", text: "Yaniv Editor", lineIndex: 0, duration: 70 },
   { action: "pause", duration: 300 },
   { action: "format", format: "" },
 
@@ -256,7 +256,7 @@ const demoScript: DemoStep[] = [
   { action: "addLine", line: { html: "", class: "line-code", tag: "pre" } },
   {
     action: "type",
-    text: '<span class="code-kw">import</span> { TiptapProEditor } <span class="code-kw">from</span> <span class="code-str">\'yaniv-editor\'</span>',
+    text: '<span class="code-kw">import</span> { YanivEditor } <span class="code-kw">from</span> <span class="code-str">\'@yanivjs/yaniv-editor\'</span>',
     lineIndex: 7,
     duration: 25,
   },

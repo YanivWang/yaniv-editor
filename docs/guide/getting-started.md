@@ -1,13 +1,13 @@
 # 快速开始
 
-本指南帮助你在 Vue 3 项目中集成 `yaniv-editor`，并在 10 分钟内跑通基础编辑与内容保存。
+本指南帮助你在 Vue 3 项目中集成 **Yaniv Editor**（npm：`@yanivjs/yaniv-editor`），并在 10 分钟内跑通基础编辑与内容保存。
 
 ## 安装
 
 ```bash
-pnpm add yaniv-editor
+pnpm add @yanivjs/yaniv-editor
 # 或
-npm install yaniv-editor
+npm install @yanivjs/yaniv-editor
 ```
 
 ### Peer Dependencies
@@ -30,10 +30,10 @@ npm install yaniv-editor
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import { TiptapProEditor } from "yaniv-editor";
-import "yaniv-editor/style.css";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
 
-const editorRef = ref<InstanceType<typeof TiptapProEditor> | null>(null);
+const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 const doc = ref<unknown>(null);
 
 function onUpdate(content: unknown) {
@@ -49,11 +49,11 @@ function save() {
 </script>
 
 <template>
-  <TiptapProEditor
+  <YanivEditor
     ref="editorRef"
     version="advanced"
     locale="zh-CN"
-    :initial-content="'<p>Hello yaniv-editor</p>'"
+    :initial-content="'<p>Hello Yaniv!</p>'"
     :features="{
       headerNav: true,
       footerNav: true,
@@ -65,13 +65,13 @@ function save() {
 ```
 
 ::: warning 注意
-`TiptapProEditor` **不支持** `v-model`。请通过 `@update` 监听内容变化，或使用 `ref` 调用 `getJSON()` / `getHTML()` / `getText()` 读取内容。
+`YanivEditor` **不支持** `v-model`。请通过 `@update` 监听内容变化，或使用 `ref` 调用 `getJSON()` / `getHTML()` / `getText()` 读取内容。
 :::
 
 ## 推荐配置（生产环境）
 
 ```vue
-<TiptapProEditor
+<YanivEditor
   ref="editorRef"
   version="advanced"
   locale="zh-CN"
@@ -125,7 +125,7 @@ const { content } = await res.json();
 
 ```vue
 <script setup>
-import { editorPresets, mergeEditorPreset } from "yaniv-editor";
+import { editorPresets, mergeEditorPreset } from "@yanivjs/yaniv-editor";
 
 const editorProps = mergeEditorPreset("production", {
   features: { ai: false },
@@ -133,7 +133,7 @@ const editorProps = mergeEditorPreset("production", {
 </script>
 
 <template>
-  <TiptapProEditor locale="zh-CN" initial-content="<p>Hello</p>" v-bind="editorProps" />
+  <YanivEditor locale="zh-CN" initial-content="<p>Hello</p>" v-bind="editorProps" />
 </template>
 ```
 

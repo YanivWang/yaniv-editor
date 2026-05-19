@@ -1,6 +1,6 @@
 # AI 辅助
 
-yaniv-editor 内置 AI 写作辅助 UI，支持续写、润色、摘要、翻译与自定义指令。
+Yaniv Editor 内置 AI 写作辅助 UI，支持续写、润色、摘要、翻译与自定义指令。
 
 ## 前置条件
 
@@ -37,7 +37,7 @@ VITE_AI_API_KEY=sk-...
 工具栏 AI 按钮 → 设置面板，配置 Provider、API Key、模型等。配置存储在浏览器 localStorage。
 
 ```ts
-import { useAiConfig } from "yaniv-editor";
+import { useAiConfig } from "@yanivjs/yaniv-editor";
 
 const { config, saveConfig, testConnection } = useAiConfig();
 ```
@@ -57,7 +57,7 @@ AI 结果以建议形式展示，用户确认后写入文档（`AiHighlightMark`
 ## 关闭 AI
 
 ```vue
-<TiptapProEditor :features="{ ai: false }" />
+<YanivEditor :features="{ ai: false }" />
 ```
 
 ## 架构
@@ -78,7 +78,7 @@ AiMenuButton (工具栏)
 ## 相关导出
 
 ```ts
-import { AiMenuButton, useAiConfig, createAiAdapter, AI_PROVIDERS } from "yaniv-editor";
+import { AiMenuButton, useAiConfig, createAiAdapter, AI_PROVIDERS } from "@yanivjs/yaniv-editor";
 ```
 
 ## 下一步

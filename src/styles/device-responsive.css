@@ -6,12 +6,12 @@
 /* ===== Device View Container Styles ===== */
 
 /* PC 视图 - 全宽 */
-[data-device="pc"] .tiptap-pro-editor {
+[data-device="pc"] .yaniv-editor {
   max-width: 100%;
 }
 
 /* Pad 视图 - 平板宽度 */
-[data-device="pad"] .tiptap-pro-editor {
+[data-device="pad"] .yaniv-editor {
   max-width: 768px;
   margin-right: auto;
   margin-left: auto;
@@ -26,7 +26,7 @@
 }
 
 /* Mobile 视图 - 手机宽度 */
-[data-device="mobile"] .tiptap-pro-editor {
+[data-device="mobile"] .yaniv-editor {
   max-width: 375px;
   margin-right: auto;
   margin-left: auto;
@@ -110,7 +110,7 @@
 
 /* ===== 过渡动画 ===== */
 
-.tiptap-pro-editor {
+.yaniv-editor {
   transition: max-width 0.3s ease;
 }
 

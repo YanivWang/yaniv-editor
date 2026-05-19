@@ -7,7 +7,7 @@ advanced 工具栏提供 Word 文档互转能力（`WordButton`）。
 - `mammoth` — Word (.docx) → HTML
 - `docx` + `file-saver` — HTML/编辑器内容 → .docx
 
-已作为 `yaniv-editor` 的 dependencies 打包，使用者无需单独安装。
+已作为 Yaniv Editor（`@yanivjs/yaniv-editor`）的 dependencies 打包，使用者无需单独安装。
 
 ## 功能
 
@@ -23,7 +23,7 @@ advanced 工具栏提供 Word 文档互转能力（`WordButton`）。
 也可单独使用底层 API：
 
 ```ts
-import { importWordFile, convertWordToHtml, exportToWord } from "yaniv-editor";
+import { importWordFile, convertWordToHtml, exportToWord } from "@yanivjs/yaniv-editor";
 
 // 导入
 const html = await convertWordToHtml(file);

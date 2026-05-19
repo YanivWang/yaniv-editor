@@ -28,7 +28,7 @@ export function provideOutlinePanel(): OutlinePanelContext {
 export function useOutlinePanel(): OutlinePanelContext {
   const context = inject(OUTLINE_PANEL_KEY);
   if (!context) {
-    throw new Error("[useOutlinePanel] must be used within TiptapProEditor");
+    throw new Error("[useOutlinePanel] must be used within YanivEditor");
   }
   return context;
 }

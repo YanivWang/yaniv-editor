@@ -1,6 +1,6 @@
 # 功能配置
 
-集成 `TiptapProEditor` 只需两个 prop：
+集成 `YanivEditor` 只需两个 prop：
 
 | Prop       | 作用                                       |
 | ---------- | ------------------------------------------ |
@@ -38,7 +38,7 @@
 ### 手写配置
 
 ```vue
-<TiptapProEditor
+<YanivEditor
   version="advanced"
   :features="{
     headerNav: true,
@@ -61,7 +61,7 @@
 预设与 props **同构**，可直接 `v-bind`：
 
 ```ts
-import { editorPresets, mergeEditorPreset } from "yaniv-editor";
+import { editorPresets, mergeEditorPreset } from "@yanivjs/yaniv-editor";
 
 editorPresets.production; // 生产推荐
 editorPresets.notion; // Notion 风格（无顶栏 + 浮动菜单）
@@ -69,7 +69,7 @@ mergeEditorPreset("production", { features: { ai: false } });
 ```
 
 ```vue
-<TiptapProEditor v-bind="editorPresets.production" />
+<YanivEditor v-bind="editorPresets.production" />
 ```
 
 | 名称         | 说明                              |
@@ -85,7 +85,7 @@ mergeEditorPreset("production", { features: { ai: false } });
 高级接入：统一解析扩展层门控。
 
 ```ts
-import { resolveExtensionGates } from "yaniv-editor";
+import { resolveExtensionGates } from "@yanivjs/yaniv-editor";
 
 const gates = resolveExtensionGates({
   version: "advanced",
@@ -108,9 +108,9 @@ const gates = resolveExtensionGates({
 
 ## 变更 features 的行为
 
-修改影响扩展注册的门控字段时，`TiptapProEditor` 会**重建编辑器实例**以保持扩展与 UI 一致。
+修改影响扩展注册的门控字段时，`YanivEditor` 会**重建编辑器实例**以保持扩展与 UI 一致。
 
 ## 相关
 
-- [TiptapProEditor](/api/tiptap-pro-editor)
+- [YanivEditor](/api/yaniv-editor)
 - [功能总览](/features/overview)

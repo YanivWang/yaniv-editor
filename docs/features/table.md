@@ -14,7 +14,7 @@
 选中表格或单元格时显示上下文工具栏 `TableToolbar`。
 
 ```vue
-<TiptapProEditor
+<YanivEditor
   :features="{
     table: true,
     tableToolbar: true,
@@ -51,7 +51,7 @@ getExtensionsByVersion("advanced", {
 ## 关闭表格
 
 ```vue
-<TiptapProEditor :features="{ table: false, tableToolbar: false }" />
+<YanivEditor :features="{ table: false, tableToolbar: false }" />
 ```
 
 扩展与工具栏按钮将同步隐藏（通过 `applyExtensionGatesToToolbarConfig`）。

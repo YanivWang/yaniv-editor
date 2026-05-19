@@ -10,7 +10,7 @@
 - `src/components/editor`：需要 `Editor` 实例才能工作的编辑器功能控件。
 - `src/components/tools`：编辑器外围编排组件，例如头部工具栏、底部导航、浮动菜单、图片工具栏、表格工具栏。
 - `src/features/ai`：AI 适配器、AI 扩展、AI 菜单组件与配置。
-- `src/core`：主编辑器编排入口，目前只保留 `TiptapProEditor` 相关核心文件。
+- `src/core`：主编辑器编排入口，目前只保留 `YanivEditor` 相关核心文件。
 - `src/configs`：公共配置、常量、功能预设、能力映射和工具栏/菜单类型。
 - `src/extensions`：Tiptap 扩展注册与自定义扩展。
 
@@ -18,7 +18,7 @@
 
 ```text
 src/index.ts
-  -> src/core/TiptapProEditor.vue
+  -> src/core/YanivEditor.vue
     -> src/components/tools/header-nav/ToolbarNav.vue
       -> src/components/editor/*
       -> src/components/base/*
@@ -40,7 +40,7 @@ import { editorPresets } from "@/configs/editorPresets";
 对外使用时优先从包入口导入：
 
 ```ts
-import { TiptapProEditor } from "yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 ```
 
 ## 约定

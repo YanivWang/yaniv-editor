@@ -33,7 +33,7 @@
 }
 
 /* ===== Notion 风格 - 全宽无纸张边框布局 ===== */
-.theme-notion .tiptap-pro-editor.word-mode {
+.theme-notion .yaniv-editor.word-mode {
   background: #ffffff;
 }
 
@@ -249,7 +249,7 @@
   --tiptap-link: rgb(82, 156, 202);
 }
 
-.theme-notion[data-theme="dark"] .tiptap-pro-editor.word-mode,
+.theme-notion[data-theme="dark"] .yaniv-editor.word-mode,
 .theme-notion[data-theme="dark"] .word-document-container,
 .theme-notion[data-theme="dark"] .continuous-pages {
   background: #191919;

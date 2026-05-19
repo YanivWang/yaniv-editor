@@ -8,11 +8,11 @@ import {
   type ToolbarToolsConfig,
 } from "@/tools/header-nav";
 
-import { DEFAULT_EDITOR_VERSION, type TiptapProEditorProps } from "./editorTypes";
+import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 
 type FeatureName = "headerNav" | "footerNav";
 
-export function useEditorFeatures(props: TiptapProEditorProps) {
+export function useEditorFeatures(props: YanivEditorProps) {
   const resolvedVersion = computed(() => props.version ?? DEFAULT_EDITOR_VERSION);
 
   const getFeatureConfig = (featureName: FeatureName): boolean => {

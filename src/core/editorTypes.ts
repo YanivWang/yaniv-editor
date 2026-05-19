@@ -1,5 +1,5 @@
 /**
- * TiptapPro Editor Types
+ * Yaniv Editor Types
  * @description 档位（version）+ 功能开关（features）
  */
 import type { JSONContent } from "@tiptap/core";
@@ -56,7 +56,7 @@ export interface FeatureConfig {
 /**
  * 编辑器 Props
  */
-export interface TiptapProEditorProps {
+export interface YanivEditorProps {
   /** 档位：工具栏与部分扩展的默认集合（basic / advanced） */
   version?: EditorVersion;
   /** 缩放条位置：底部固定或工具栏下方 */
@@ -91,7 +91,7 @@ export interface EditorInstance {
 /**
  * 编辑器暴露的方法
  */
-export interface TiptapProEditorExpose {
+export interface YanivEditorExpose {
   getEditor: () => Editor | null;
   getJSON: () => JSONContent | null;
   getHTML: () => string;

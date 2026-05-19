@@ -1,10 +1,10 @@
-import type { TiptapProEditorProps } from "@/core/editorTypes";
+import type { YanivEditorProps } from "@/core/editorTypes";
 
 /** 宿主集成时的轻量校验（不抛出，避免打断业务渲染） */
-export function validateTiptapProEditorProps(props: TiptapProEditorProps): void {
+export function validateYanivEditorProps(props: YanivEditorProps): void {
   const warn = typeof console?.warn === "function" ? console.warn.bind(console) : () => {};
 
-  const zone = `[yaniv-editor]`;
+  const zone = `[Yaniv Editor]`;
 
   if (props.version && !["basic", "advanced"].includes(props.version)) {
     warn(`${zone} Unrecognized props.version="${props.version}". Expected basic | advanced.`);

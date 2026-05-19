@@ -1,6 +1,6 @@
 # 媒体
 
-yaniv-editor 支持图片与视频的插入、缩放及上下文工具栏。
+Yaniv Editor 支持图片与视频的插入、缩放及上下文工具栏。
 
 ## 图片
 
@@ -50,7 +50,7 @@ async function uploadImage(file: File): Promise<string> {
 ### 关闭图片
 
 ```vue
-<TiptapProEditor :features="{ image: false }" />
+<YanivEditor :features="{ image: false }" />
 ```
 
 ## 视频
@@ -72,7 +72,7 @@ async function uploadImage(file: File): Promise<string> {
 ## 相关配置
 
 ```vue
-<TiptapProEditor
+<YanivEditor
   :features="{
     image: true,
     tableToolbar: true,

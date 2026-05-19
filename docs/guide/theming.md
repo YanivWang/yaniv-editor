@@ -1,28 +1,28 @@
 # 主题与样式
 
-yaniv-editor 通过 **CSS 变量 + 主题预设类名** 实现视觉定制，支持明暗色切换。
+Yaniv Editor 通过 **CSS 变量 + 主题预设类名** 实现视觉定制，支持明暗色切换。
 
 ## 引入样式
 
 最低要求：
 
 ```ts
-import "yaniv-editor/style.css";
+import "@yanivjs/yaniv-editor/style.css";
 ```
 
 使用特定视觉预设时，额外引入对应 CSS：
 
 ```ts
-import "yaniv-editor/src/themes/presets/word.css";
-import "yaniv-editor/src/themes/presets/notion.css";
-import "yaniv-editor/src/themes/presets/github.css";
-import "yaniv-editor/src/themes/presets/typora.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/word.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/notion.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/github.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/typora.css";
 ```
 
 ## 切换主题
 
 ```ts
-import { setTheme, toggleThemeMode, getTheme } from "yaniv-editor";
+import { setTheme, toggleThemeMode, getTheme } from "@yanivjs/yaniv-editor";
 
 // preset: default | notion | github | typora | word | custom
 // mode: light | dark | auto
@@ -56,11 +56,11 @@ const { preset, mode } = getTheme();
 Notion 风格建议配合 `editorPresets.notion`（隐藏顶栏，启用浮动菜单）：
 
 ```vue
-<TiptapProEditor v-bind="editorPresets.notion" />
+<YanivEditor v-bind="editorPresets.notion" />
 ```
 
 ```ts
-import { editorPresets } from "yaniv-editor";
+import { editorPresets } from "@yanivjs/yaniv-editor";
 
 setTheme("notion", "light");
 ```
@@ -70,7 +70,7 @@ setTheme("notion", "light");
 ## 自定义主题
 
 ```ts
-import { registerTheme, setTheme } from "yaniv-editor";
+import { registerTheme, setTheme } from "@yanivjs/yaniv-editor";
 
 registerTheme("custom", {
   "--editor-primary": "#6366f1",
@@ -88,7 +88,7 @@ setTheme("custom", "light");
 主题模块还提供设备视图 API（主要用于 Demo 设备框）：
 
 ```ts
-import { setDeviceView, setOrientation } from "yaniv-editor";
+import { setDeviceView, setOrientation } from "@yanivjs/yaniv-editor";
 
 setDeviceView("mobile"); // pc | pad | mobile
 setOrientation("portrait"); // portrait | landscape
@@ -101,7 +101,7 @@ setOrientation("portrait"); // portrait | landscape
 编辑器 UI 文案通过 `locale` prop 控制：
 
 ```vue
-<TiptapProEditor locale="zh-CN" />
+<YanivEditor locale="zh-CN" />
 ```
 
 支持：`zh-CN`、`zh-TW`、`en-US`。
@@ -109,7 +109,7 @@ setOrientation("portrait"); // portrait | landscape
 也可在应用层初始化：
 
 ```ts
-import { createI18n } from "yaniv-editor";
+import { createI18n } from "@yanivjs/yaniv-editor";
 
 createI18n({ locale: "zh-CN", fallbackLocale: "en-US" });
 ```

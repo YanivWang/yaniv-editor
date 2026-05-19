@@ -1,11 +1,11 @@
 # Full Editor
 
-Full Editor 指通过 **`TiptapProEditor`** 一站式接入的完整富文本编辑体验，对应 examples 中的 `/full-editor` 演示页。
+Full Editor 指通过 **`YanivEditor`** 一站式接入的完整富文本编辑体验，对应 examples 中的 `/full-editor` 演示页。
 
 ## 架构概览
 
 ```text
-TiptapProEditor
+YanivEditor
 ├── ToolbarNav          # 顶部工具栏
 ├── LinkBubbleMenu      # 链接气泡菜单
 ├── TableToolbar        # 表格上下文工具栏
@@ -24,11 +24,11 @@ TiptapProEditor
 ```vue
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { TiptapProEditor, setTheme } from "yaniv-editor";
-import "yaniv-editor/style.css";
+import { YanivEditor, setTheme } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
 
 // 主题 CSS（按需引入）
-import "yaniv-editor/src/themes/presets/word.css";
+import "@yanivjs/yaniv-editor/src/themes/presets/word.css";
 
 onMounted(() => {
   setTheme("word", "light");
@@ -36,7 +36,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <TiptapProEditor
+  <YanivEditor
     version="advanced"
     locale="zh-CN"
     :initial-content="sampleHtml"
@@ -56,7 +56,7 @@ onMounted(() => {
 ```
 
 ::: tip 主题说明
-主题通过 `setTheme(preset, mode)` + 引入对应 CSS 文件生效，**不是** `TiptapProEditor` 的 prop。详见 [主题与样式](/guide/theming)。
+主题通过 `setTheme(preset, mode)` + 引入对应 CSS 文件生效，**不是** `YanivEditor` 的 prop。详见 [主题与样式](/guide/theming)。
 :::
 
 ## 版本与工具栏
@@ -91,10 +91,10 @@ onMounted(() => {
 
 ```vue
 <!-- 只读：可渲染不可编辑 -->
-<TiptapProEditor readonly :initial-content="html" />
+<YanivEditor readonly :initial-content="html" />
 
 <!-- 预览：隐藏工具栏，不可交互 -->
-<TiptapProEditor preview-mode :initial-content="html" />
+<YanivEditor preview-mode :initial-content="html" />
 ```
 
 ## 暴露的方法
@@ -102,7 +102,7 @@ onMounted(() => {
 通过 `ref` 访问：
 
 ```ts
-const editorRef = ref<InstanceType<typeof TiptapProEditor> | null>(null);
+const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 
 editorRef.value?.getEditor(); // 原始 Tiptap Editor 实例
 editorRef.value?.getJSON(); // ProseMirror JSON
@@ -118,7 +118,7 @@ examples 中的 Full Editor 演示页额外包含：
 - 多主题切换 UI
 - 自动演示脚本
 
-这些属于 Demo 壳层，**不是** `TiptapProEditor` 内置能力。生产集成只需引入组件与样式即可。
+这些属于 Demo 壳层，**不是** `YanivEditor` 内置能力。生产集成只需引入组件与样式即可。
 
 ## 下一步
 

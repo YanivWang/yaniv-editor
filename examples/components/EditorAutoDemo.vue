@@ -438,7 +438,7 @@ async function runDemoScript(editor: Editor, signal: AbortSignal) {
   // ===== 1. 标题 + 居中对齐 =====
   await tapOn("heading", signal, () => editor.commands.setHeading({ level: 1 }));
   await moveToEditor(editor, signal);
-  await typeText(editor, "yaniv-editor - Feature Showcase", speed, signal);
+  await typeText(editor, "Yaniv Editor - Feature Showcase", speed, signal);
   await pause(300, signal);
 
   await tapOn("align", signal, () => editor.commands.setTextAlign("center"));

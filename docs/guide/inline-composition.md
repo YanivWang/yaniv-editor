@@ -1,6 +1,6 @@
 # Inline 按需拼装
 
-当 Full Editor 过重时，可以不使用 `TiptapProEditor`，而是**直接用 Tiptap `Editor` + 零散工具栏组件**组装轻量编辑器。examples 中的 `/inline-plugins` 演示了这一模式。
+当 Full Editor 过重时，可以不使用 `YanivEditor`，而是**直接用 Tiptap `Editor` + 零散工具栏组件**组装轻量编辑器。examples 中的 `/inline-plugins` 演示了这一模式。
 
 ## 适用场景
 
@@ -104,7 +104,7 @@ Demo 内置四套预设，可作为产品配置参考：
 
 |                  | Full Editor        | Inline 拼装            |
 | ---------------- | ------------------ | ---------------------- |
-| 组件             | `TiptapProEditor`  | 自建 `Editor` + 工具栏 |
+| 组件             | `YanivEditor`      | 自建 `Editor` + 工具栏 |
 | 体积             | 较大               | 可按需裁剪             |
 | 分页/缩放        | ✅                 | ❌                     |
 | AI / Word / 模板 | ✅                 | 需自行组合             |
@@ -113,4 +113,4 @@ Demo 内置四套预设，可作为产品配置参考：
 ## 下一步
 
 - [媒体与图片上传](/features/media)
-- [TiptapProEditor API](/api/tiptap-pro-editor)
+- [YanivEditor API](/api/yaniv-editor)

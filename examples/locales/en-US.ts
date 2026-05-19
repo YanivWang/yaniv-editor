@@ -2,7 +2,7 @@ import type { DemoMessages } from "./types";
 
 export const demoEnUS: DemoMessages = {
   demo: {
-    appTitle: "yaniv-editor Examples",
+    appTitle: "Yaniv Editor Examples",
     subtitle: {
       fullEditor: "Full editor example with themes and device preview",
       inlinePlugins: "Inline editor with hot-swappable feature plugins",
@@ -84,7 +84,7 @@ export const demoEnUS: DemoMessages = {
         free: "Free",
       },
       features: {
-        title: "Why Choose yaniv-editor?",
+        title: "Why Choose Yaniv Editor?",
         themes: {
           title: "5 Beautiful Themes",
           description: "From Notion-like to Word-style. Each theme has perfect dark mode support.",

@@ -1,5 +1,5 @@
 <template>
-  <div class="tiptap-pro-editor word-mode" :class="{ 'is-preview-mode': isPreviewMode }">
+  <div class="yaniv-editor word-mode" :class="{ 'is-preview-mode': isPreviewMode }">
     <!-- 工具栏（预览模式下隐藏） -->
     <ToolbarNav
       v-if="editorInstance && !isPreviewMode"
@@ -97,7 +97,7 @@
 
 <script setup lang="ts">
 /**
- * TiptapProEditor - 基础版富文本编辑器
+ * YanivEditor - 基础版富文本编辑器
  * @description 支持基础版功能的 Tiptap 编辑器
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
@@ -119,9 +119,9 @@ import { SlashCommandMenu, SlashCommandExtension } from "@/tools/slash-command";
 import type { SlashCommandState } from "@/tools/slash-command";
 import { TableToolbar } from "@/tools/table-toolbar";
 import { VideoToolbar } from "@/tools/video-toolbar";
-import { validateTiptapProEditorProps } from "@/utils/validateEditorProps";
+import { validateYanivEditorProps } from "@/utils/validateEditorProps";
 
-import { DEFAULT_EDITOR_VERSION, type TiptapProEditorProps } from "./editorTypes";
+import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
@@ -139,7 +139,7 @@ import "@/styles/drag-handle.css";
 import "@/styles/code-block.css";
 import "@/styles/outline.css";
 
-const props = withDefaults(defineProps<TiptapProEditorProps>(), {
+const props = withDefaults(defineProps<YanivEditorProps>(), {
   zoomBarPlacement: "bottom",
   readonly: false,
   previewMode: false,
@@ -299,7 +299,7 @@ const initEditor = async () => {
 
     calculatePages();
   } catch (error) {
-    console.error("[TiptapProEditor] Editor initialization failed:", error);
+    console.error("[YanivEditor] Editor initialization failed:", error);
     editorError.value = "编辑器初始化失败";
   } finally {
     isInitializing.value = false;
@@ -316,7 +316,7 @@ const destroyEditor = async () => {
 
 // ===== 生命周期 =====
 onMounted(async () => {
-  validateTiptapProEditorProps(props);
+  validateYanivEditorProps(props);
   await initEditor();
 });
 

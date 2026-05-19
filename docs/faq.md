@@ -4,7 +4,7 @@
 
 ### 为什么不支持 v-model？
 
-`TiptapProEditor` 基于 Tiptap 命令式 API 设计，内容通过 `@update` 事件或 `getJSON()` / `getHTML()` 读取。这样便于与后端 JSON 存储、差异对比等方案集成。
+`YanivEditor` 基于 Tiptap 命令式 API 设计，内容通过 `@update` 事件或 `getJSON()` / `getHTML()` 读取。这样便于与后端 JSON 存储、差异对比等方案集成。
 
 ### 如何保存和加载文档？
 
@@ -90,8 +90,8 @@ GET /api/documents/:id → :initial-content="data.content"
 主题不是组件 prop。使用：
 
 ```ts
-import { setTheme } from "yaniv-editor";
-import "yaniv-editor/src/themes/presets/notion.css";
+import { setTheme } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/src/themes/presets/notion.css";
 
 setTheme("notion", "light");
 ```
@@ -110,11 +110,11 @@ toggleThemeMode();
 
 ### 应该用哪种？
 
-| 需求                 | 选择                            |
-| -------------------- | ------------------------------- |
-| 完整文档、CMS 正文   | Full Editor (`TiptapProEditor`) |
-| 评论、聊天、轻量表单 | Inline 按需拼装                 |
-| 运行时动态工具栏     | Inline Demo 模式                |
+| 需求                 | 选择                        |
+| -------------------- | --------------------------- |
+| 完整文档、CMS 正文   | Full Editor (`YanivEditor`) |
+| 评论、聊天、轻量表单 | Inline 按需拼装             |
+| 运行时动态工具栏     | Inline Demo 模式            |
 
 详见 [Full Editor](/guide/full-editor) 与 [Inline 拼装](/guide/inline-composition)。
 
