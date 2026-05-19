@@ -59,20 +59,26 @@
     />
 
     <!-- Word 文档区域容器 -->
-    <div ref="containerRef" class="word-document-container">
-      <CodeBlockLanguageBadge
-        v-if="editorInstance && !isPreviewMode && toolbarConfig.codeBlock"
+    <div class="word-editor-body">
+      <OutlinePanel
+        v-if="editorInstance && !isPreviewMode && showOutlinePanel"
         :editor="editorInstance"
-        :container="containerRef"
       />
-      <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
-        <div class="continuous-pages">
-          <EditorContent
-            v-if="editorInstance"
-            :editor="editorInstance"
-            class="word-content-multi"
-          />
-          <div v-else class="editor-fallback">{{ editorError || "正在初始化编辑器..." }}</div>
+      <div ref="containerRef" class="word-document-container">
+        <CodeBlockLanguageBadge
+          v-if="editorInstance && !isPreviewMode && toolbarConfig.codeBlock"
+          :editor="editorInstance"
+          :container="containerRef"
+        />
+        <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
+          <div class="continuous-pages">
+            <EditorContent
+              v-if="editorInstance"
+              :editor="editorInstance"
+              class="word-content-multi"
+            />
+            <div v-else class="editor-fallback">{{ editorError || "正在初始化编辑器..." }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -99,6 +105,7 @@ import { Modal } from "ant-design-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
+import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
@@ -119,7 +126,6 @@ import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
 
-
 // 样式（variables.css 需最先加载以定义 CSS 变量，base.css 需在其他样式之前加载）
 import "@/styles/variables.css";
 import "@/styles/base.css";
@@ -131,6 +137,7 @@ import "@/styles/image-resize.css";
 import "@/styles/slash-command.css";
 import "@/styles/drag-handle.css";
 import "@/styles/code-block.css";
+import "@/styles/outline.css";
 
 const props = withDefaults(defineProps<TiptapProEditorProps>(), {
   zoomBarPlacement: "bottom",
@@ -173,6 +180,15 @@ const {
   toolbarConfig,
   showStatusShortcutHints,
 } = useEditorFeatures(props);
+
+const { visible: outlinePanelVisible } = provideOutlinePanel();
+
+const showOutlinePanel = computed(
+  () =>
+    resolvedExtensionGates.value.outline &&
+    outlinePanelVisible.value &&
+    toolbarConfig.value.outline !== false,
+);
 
 // ===== 国际化 =====
 useEditorI18n(props);
@@ -227,6 +243,9 @@ const initEditor = async () => {
     const extensions = getExtensionsByVersion(props.version, {
       enableImageResize,
       features: resolvedExtensionGates.value,
+      outline: {
+        scrollParent: () => containerRef.value ?? window,
+      },
       officePaste: {
         onPasteFromOfficeWithImages: () =>
           Modal.info({

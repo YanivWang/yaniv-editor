@@ -31,6 +31,9 @@ export { ClearFormatButton as FormatClearButton } from "./format-clear";
 // Format Painter
 export { FormatPainterButton } from "./format-painter";
 
+// Outline
+export { OutlinePanel, OutlineToggleButton, provideOutlinePanel, useOutlinePanel } from "./outline";
+
 // Subscript/Superscript
 export { SubscriptSuperscriptButton as SubSupGroup } from "./subscript-superscript";
 

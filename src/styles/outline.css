@@ -1,0 +1,13 @@
+/* 编辑器主体：大纲侧栏 + 文档滚动区 */
+.word-editor-body {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.word-editor-body > .word-document-container {
+  flex: 1;
+  min-width: 0;
+}

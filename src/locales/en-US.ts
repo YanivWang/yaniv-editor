@@ -282,6 +282,13 @@ export const enUS: TiptapLocale = {
     replaceOnce: "Replace",
     replaceAll: "Replace all",
     caseSensitiveShort: "Match case",
+
+    // Outline
+    outlineToggle: "Document outline",
+    outlineTitle: "Outline",
+    outlineEmpty: "No headings yet. Add H1–H6 to build an outline.",
+    outlineClose: "Close outline",
+
     toolbarSectionDocument: "Document",
     toolbarSectionTypography: "Font",
     toolbarSectionParagraph: "Paragraph",

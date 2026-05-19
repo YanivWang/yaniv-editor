@@ -50,6 +50,7 @@ export function applyExtensionGatesToToolbarConfig(
     formatPainter: !!(base.formatPainter && gates.formatPainter),
     ai: !!(base.ai && gates.ai),
     findReplace: base.findReplace !== false && gates.searchReplace,
+    outline: base.outline !== false && gates.outline,
   };
 }
 

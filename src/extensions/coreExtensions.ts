@@ -67,6 +67,10 @@ export interface ExtensionsOptions {
    * 不传则默认由版本解析（参见 resolveExtensionGates）
    */
   features?: ResolvedExtensionGates;
+  /** 大纲扩展：滚动容器（用于高亮当前章节） */
+  outline?: {
+    scrollParent?: () => HTMLElement | Window;
+  };
 }
 
 /**
@@ -85,7 +89,7 @@ export function getExtensionsByVersion(
       ? { enableImageResize: optionsOrEnableImageResize }
       : optionsOrEnableImageResize;
 
-  const { enableImageResize = true, officePaste } = options;
+  const { enableImageResize = true, officePaste, outline: outlineOptions } = options;
 
   const gates: ResolvedExtensionGates =
     options.features ??
@@ -215,6 +219,7 @@ export function getExtensionsByVersion(
       }),
       TableOfContents.configure({
         anchorTypes: ["heading"],
+        ...(outlineOptions?.scrollParent ? { scrollParent: outlineOptions.scrollParent } : {}),
       }),
     );
   }

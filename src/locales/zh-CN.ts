@@ -281,6 +281,13 @@ export const zhCN: TiptapLocale = {
     replaceOnce: "替换",
     replaceAll: "全部替换",
     caseSensitiveShort: "区分大小写",
+
+    // 大纲
+    outlineToggle: "文档大纲",
+    outlineTitle: "大纲",
+    outlineEmpty: "暂无标题，插入 H1–H6 标题后将自动生成大纲。",
+    outlineClose: "关闭大纲",
+
     toolbarSectionDocument: "文档与编辑",
     toolbarSectionTypography: "字体",
     toolbarSectionParagraph: "段落",

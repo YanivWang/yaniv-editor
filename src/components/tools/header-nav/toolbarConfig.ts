@@ -51,6 +51,8 @@ export interface ToolbarToolsConfig {
   ai?: boolean;
   /** 是否显示查找与替换 */
   findReplace?: boolean;
+  /** 是否显示大纲侧栏开关 */
+  outline?: boolean;
 }
 
 /**
@@ -121,4 +123,5 @@ export const ADVANCED_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   gallery: true,
   ai: true,
   findReplace: true,
+  outline: true,
 };

@@ -294,6 +294,13 @@ export interface TiptapLocale {
     replaceOnce: string;
     replaceAll: string;
     caseSensitiveShort: string;
+
+    // 大纲
+    outlineToggle: string;
+    outlineTitle: string;
+    outlineEmpty: string;
+    outlineClose: string;
+
     // 工具栏分区（信息架构 / 可访问性）
     toolbarSectionDocument: string;
     toolbarSectionTypography: string;

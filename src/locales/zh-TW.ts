@@ -281,6 +281,13 @@ export const zhTW: TiptapLocale = {
     replaceOnce: "取代",
     replaceAll: "全部取代",
     caseSensitiveShort: "區分大小寫",
+
+    // 大綱
+    outlineToggle: "文件大綱",
+    outlineTitle: "大綱",
+    outlineEmpty: "尚無標題，插入 H1–H6 標題後將自動產生大綱。",
+    outlineClose: "關閉大綱",
+
     toolbarSectionDocument: "文件與編輯",
     toolbarSectionTypography: "字型",
     toolbarSectionParagraph: "段落",

@@ -22,6 +22,10 @@
             <FindReplaceButton :editor="editor" :hotkeys-enabled="!!config.findReplace" />
           </div>
 
+          <div v-if="config.outline" class="tool-group">
+            <OutlineToggleButton />
+          </div>
+
           <div v-if="config.clearFormat" class="tool-group">
             <ClearFormatButton :editor="editor" />
           </div>
@@ -164,6 +168,7 @@ import { HeadingDropdown } from "@/editor/heading";
 import { ImageUpload } from "@/editor/image";
 import { LinkButton } from "@/editor/link";
 import { ListTools } from "@/editor/list";
+import { OutlineToggleButton } from "@/editor/outline";
 import { SubscriptSuperscriptButton } from "@/editor/subscript-superscript";
 import { TableButton } from "@/editor/table";
 import { TemplateButton } from "@/editor/template";
@@ -209,7 +214,7 @@ const showSection = computed(() => {
   const c = config.value;
   const ed = editor.value;
   return {
-    document: !!(c.undoRedo || c.formatPainter || c.findReplace || c.clearFormat),
+    document: !!(c.undoRedo || c.formatPainter || c.findReplace || c.outline || c.clearFormat),
     typography: !!(c.font || c.textFormat || c.codeBlock || c.colorPicker),
     paragraph: !!(c.heading || c.list || c.align),
     insert: !!(
