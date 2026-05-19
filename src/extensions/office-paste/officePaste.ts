@@ -32,7 +32,7 @@ export const OfficePaste = Extension.create<OfficePasteOptions>({
   addOptions() {
     return {
       onPasteFromOfficeWithImages: undefined,
-      imagePlaceholderHtml: "<span data-tp-office-paste-image>[图片将由文档 HTML 带入]</span>",
+      imagePlaceholderHtml: "<span data-office-paste-image>[图片将由文档 HTML 带入]</span>",
       htmlTransforms: undefined as OfficePasteOptions["htmlTransforms"],
       excelTablePaste: true,
     };

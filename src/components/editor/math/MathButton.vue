@@ -6,7 +6,7 @@
 import { FunctionOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import ToolbarDropdownButton from "@/base/ToolbarDropdownButton.vue";
+import ToolbarDropdownButton from "@/components/base/ToolbarDropdownButton.vue";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";
 

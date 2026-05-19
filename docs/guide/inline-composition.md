@@ -17,7 +17,7 @@ new Editor({ extensions: [...] })
   + 按需渲染 Toolbar 组件（UndoRedoGroup、HeadingDropdown、TextFormatGroup ...）
 ```
 
-工具栏组件从 `@/editor` 路径导入（库内部别名；对外集成可参考 examples 或按需 re-export）。
+工具栏组件从 `@/components/editor` 路径导入（对外集成可参考 examples 或按需 re-export）。
 
 ## 示例结构
 
@@ -28,7 +28,7 @@ import Underline from "@tiptap/extension-underline";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 
-import { UndoRedoGroup, HeadingDropdown, TextFormatButtons, LinkButton } from "@/editor";
+import { UndoRedoGroup, HeadingDropdown, TextFormatButtons, LinkButton } from "@/components/editor";
 
 const editor = ref<Editor | null>(null);
 

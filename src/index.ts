@@ -22,9 +22,6 @@ export * from "./themes";
 // Locales
 export * from "./locales";
 
-// Adapters
-export * from "./adapters";
-
 // AI Module
 export * from "./features/ai";
 

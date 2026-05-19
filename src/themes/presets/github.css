@@ -4,6 +4,11 @@
  */
 
 .yaniv-editor.theme-github {
+  --tiptap-doc-page-width: 980px;
+  --tiptap-doc-page-min-height: 480px;
+  --tiptap-doc-padding-top: 40px;
+  --tiptap-doc-padding-bottom: 40px;
+  --tiptap-doc-padding-inline: 48px;
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #f6f8fa;
   --tiptap-bg-hover: #f3f4f6;
@@ -39,9 +44,8 @@
 
 /* GitHub 风格 - 全宽无阴影 */
 .yaniv-editor.theme-github .continuous-pages {
-  max-width: 980px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
+  border: 1px solid var(--tiptap-border);
+  border-radius: var(--tiptap-radius-md);
   box-shadow: none;
 }
 

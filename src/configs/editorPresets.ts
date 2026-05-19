@@ -30,12 +30,6 @@ export const editorPresets = {
     features: productionFeatures,
   },
 
-  /** 完整能力（同 production，别名） */
-  full: {
-    version: "advanced",
-    features: productionFeatures,
-  },
-
   /** 基础档位 + 顶栏 */
   basic: {
     version: "basic",

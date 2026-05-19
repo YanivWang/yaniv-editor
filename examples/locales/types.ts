@@ -10,12 +10,6 @@ export interface DemoMessages {
       inlinePlugins: string;
     };
     navAriaLabel: string;
-    theme: {
-      dark: string;
-      light: string;
-      switchToDark: string;
-      switchToLight: string;
-    };
     themePreset: {
       default: string;
       word: string;

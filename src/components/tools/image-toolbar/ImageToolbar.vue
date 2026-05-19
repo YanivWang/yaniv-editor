@@ -70,7 +70,7 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref } from "vue";
 
-import { isBlockDragging } from "@/tools/drag-handle";
+import { isBlockDragging } from "@/components/tools/drag-handle";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";

@@ -81,7 +81,7 @@
               :editor="editorInstance"
               class="document-content"
             />
-            <div v-else class="editor-fallback">{{ editorError || "正在初始化编辑器..." }}</div>
+            <div v-else class="editor-status">{{ editorError || "正在初始化编辑器..." }}</div>
           </div>
         </div>
       </div>
@@ -110,21 +110,20 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef,
 
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
+import { BlockPickerMenu } from "@/components/tools/block-menu";
+import { DragHandleExtension } from "@/components/tools/drag-handle";
+import { FloatingMenu } from "@/components/tools/floating-menu";
+import { FooterNav } from "@/components/tools/footer-nav";
+import { ToolbarNav } from "@/components/tools/header-nav";
+import { ImageToolbar } from "@/components/tools/image-toolbar";
+import { LinkBubbleMenu } from "@/components/tools/link-bubble";
+import { SlashCommandExtension } from "@/components/tools/slash-command";
+import type { SlashCommandState } from "@/components/tools/slash-command";
+import { TableToolbar } from "@/components/tools/table-toolbar";
+import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
-// @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
-import { BlockPickerMenu } from "@/tools/block-menu";
-import { DragHandleExtension } from "@/tools/drag-handle";
-import { FloatingMenu } from "@/tools/floating-menu";
-import { FooterNav } from "@/tools/footer-nav";
-import { ToolbarNav } from "@/tools/header-nav";
-import { ImageToolbar } from "@/tools/image-toolbar";
-import { LinkBubbleMenu } from "@/tools/link-bubble";
-import { SlashCommandExtension } from "@/tools/slash-command";
-import type { SlashCommandState } from "@/tools/slash-command";
-import { TableToolbar } from "@/tools/table-toolbar";
-import { VideoToolbar } from "@/tools/video-toolbar";
 import { validateYanivEditorProps } from "@/utils/validateEditorProps";
 
 
@@ -141,7 +140,6 @@ import "@/styles/task-list.css";
 import "@/styles/toolbar.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
-import "@/styles/image-resize.css";
 import "@/styles/block-picker.css";
 import "@/styles/drag-handle.css";
 import "@/styles/placeholder.css";
@@ -179,7 +177,7 @@ useEditorTheme({
 
 type BlockPickerMenuInstance = {
   activate: (state: SlashCommandState) => void;
-  openInsert: (context: import("@/tools/block-menu").BlockInsertContext) => void;
+  openInsert: (context: import("@/components/tools/block-menu").BlockInsertContext) => void;
   hide: () => void;
   updateQuery: (query: string) => void;
 };

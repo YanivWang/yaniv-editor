@@ -337,49 +337,20 @@ export interface EditorStateInfo {
   isEmptySelection: boolean;
 }
 
-// ===== 从 editorConstants 迁移的类型定义 =====
-// 这些类型基于 editorConstants.ts 中的常量数组推导而来
-// 常量定义保留在 editorConstants.ts 中，类型定义统一在此管理
-// 注意：这些类型需要从 editorConstants.ts 导入常量来推导精确类型
+import {
+  BACKGROUND_COLORS,
+  CODE_LANGUAGES,
+  FONT_FAMILIES,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  TABLE_BORDER_STYLES,
+  TEXT_COLORS,
+} from "./editorConstants";
 
-/**
- * 文本颜色类型
- * @note 实际类型从 TEXT_COLORS 常量推导，见 editorConstants.ts
- */
-export type TextColor = string;
-
-/**
- * 背景颜色类型
- * @note 实际类型从 BACKGROUND_COLORS 常量推导，见 editorConstants.ts
- */
-export type BackgroundColor = string;
-
-/**
- * 字体系列类型
- * @note 实际类型从 FONT_FAMILIES 常量推导，见 editorConstants.ts
- */
-export type FontFamily = string;
-
-/**
- * 字号类型
- * @note 实际类型从 FONT_SIZES 常量推导，见 editorConstants.ts
- */
-export type FontSize = string;
-
-/**
- * 行间距类型
- * @note 实际类型从 LINE_HEIGHTS 常量推导，见 editorConstants.ts
- */
-export type LineHeight = string;
-
-/**
- * 代码语言类型
- * @note 实际类型从 CODE_LANGUAGES 常量推导，见 `@/configs/editorConstants`
- */
-export type CodeLanguage = string;
-
-/**
- * 表格边框样式类型
- * @note 实际类型从 TABLE_BORDER_STYLES 常量推导，见 editorConstants.ts
- */
-export type TableBorderStyle = string;
+export type TextColor = (typeof TEXT_COLORS)[number];
+export type BackgroundColor = (typeof BACKGROUND_COLORS)[number];
+export type FontFamily = (typeof FONT_FAMILIES)[number]["value"];
+export type FontSizeOption = (typeof FONT_SIZES)[number]["value"];
+export type LineHeightOption = (typeof LINE_HEIGHTS)[number]["value"];
+export type CodeLanguage = (typeof CODE_LANGUAGES)[number];
+export type TableBorderStyle = (typeof TABLE_BORDER_STYLES)[number]["value"];

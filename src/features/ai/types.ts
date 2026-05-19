@@ -3,8 +3,9 @@
  * Common types for AI adapters
  */
 
-/** Supported AI providers */
-export type AiProvider = "openai" | "aliyun" | "ollama" | "deepseek" | "anthropic" | "custom";
+import type { AiProvider } from "./config/types";
+
+export type { AiProvider } from "./config/types";
 
 /** AI configuration from env */
 export interface AiConfig {
@@ -29,6 +30,8 @@ export interface AiStreamCallbacks {
   onToken?: (token: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
+  /** 传入后可用 AbortController.abort() 取消流式请求 */
+  signal?: AbortSignal;
 }
 
 /** Non-streaming response */

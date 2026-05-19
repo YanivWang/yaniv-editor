@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
-import { aiApiService } from "@/api/ai";
+import { aiClient } from "@/features/ai/client";
 import { t } from "@/locales";
 
 import { aiSuggestionManager } from "../shared/aiSuggestionManager";
@@ -82,14 +82,14 @@ function performTranslation(
     onStart: () => {
       accumulatedContent = "";
     },
-    onMessage: (message: { content: string }) => {
-      if (message && message.content) {
-        accumulatedContent += message.content;
+    onToken: (token: string) => {
+      if (token) {
+        accumulatedContent += token;
         // Update the suggestion in popover
         aiSuggestionManager.updateSuggestion(accumulatedContent);
       }
     },
-    onStop: () => {
+    onComplete: () => {
       try {
         // Stop streaming indicator
         aiSuggestionManager.stopStreaming();
@@ -111,5 +111,5 @@ function performTranslation(
     },
   };
 
-  aiApiService.translate(selectedText, targetLang, sysPrompt, callback);
+  aiClient.translate(selectedText, targetLang, sysPrompt, callback);
 }

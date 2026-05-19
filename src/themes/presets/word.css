@@ -4,6 +4,14 @@
  */
 
 .yaniv-editor.theme-word {
+  /* A4 纸张（与 pageConstants / useEditorPagination 一致，运行时仍可覆盖） */
+  --tiptap-doc-page-width: 794px;
+  --tiptap-doc-page-min-height: 939px;
+  --tiptap-doc-padding-top: 96px;
+  --tiptap-doc-padding-bottom: 96px;
+  --tiptap-doc-padding-inline: 92px;
+  --tiptap-doc-page-padding: 0;
+  --tiptap-doc-container-padding-y: 20px;
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #f2f2f2;
   --tiptap-bg-hover: #e6e6e6;
@@ -41,9 +49,8 @@
 
 /* Word 风格 - A4 纸张 */
 .yaniv-editor.theme-word .continuous-pages {
-  max-width: 816px;
   border-radius: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--tiptap-shadow-md);
 }
 
 /* Word 风格 - 专业标题 */

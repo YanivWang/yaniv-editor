@@ -5,6 +5,13 @@
 
 /* ===== Notion 主题变量 ===== */
 .yaniv-editor.theme-notion {
+  --tiptap-doc-page-width: 900px;
+  --tiptap-doc-page-padding: 0 96px;
+  --tiptap-doc-padding-top: 32px;
+  --tiptap-doc-padding-bottom: 100px;
+  --tiptap-doc-padding-inline: 0;
+  --tiptap-doc-page-min-height: calc(100vh - 100px);
+  --tiptap-doc-container-padding-y: 0;
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #ffffff;
   --tiptap-bg-hover: rgba(55, 53, 47, 0.08);
@@ -38,16 +45,12 @@
 }
 
 .yaniv-editor.theme-notion .document-container {
-  padding: 0;
-  background: #ffffff;
+  background: var(--tiptap-bg);
 }
 
 /* 隐藏纸张阴影和边框 */
 .yaniv-editor.theme-notion .continuous-pages {
-  max-width: 900px;
-  padding: 0 96px;
-  margin: 0 auto;
-  background: #ffffff;
+  background: var(--tiptap-bg);
   border-radius: 0;
   box-shadow: none;
 }
@@ -67,8 +70,8 @@
 }
 
 /* 工具栏按钮 */
-.yaniv-editor.theme-notion .tt-toolbar-button,
-.yaniv-editor.theme-notion .tt-dropdown-btn {
+.yaniv-editor.theme-notion .ye-toolbar-button,
+.yaniv-editor.theme-notion .ye-dropdown-btn {
   min-width: 28px;
   height: 28px;
   padding: 0 6px;
@@ -78,36 +81,22 @@
   border-radius: 4px;
 }
 
-.yaniv-editor.theme-notion .tt-toolbar-button:hover,
-.yaniv-editor.theme-notion .tt-dropdown-btn:hover {
+.yaniv-editor.theme-notion .ye-toolbar-button:hover,
+.yaniv-editor.theme-notion .ye-dropdown-btn:hover {
   color: #37352f;
   background: rgba(55, 53, 47, 0.08);
 }
 
-.yaniv-editor.theme-notion .tt-toolbar-button.is-active,
-.yaniv-editor.theme-notion .tt-dropdown-btn.is-active {
+.yaniv-editor.theme-notion .ye-toolbar-button.is-active,
+.yaniv-editor.theme-notion .ye-dropdown-btn.is-active {
   color: rgb(35, 131, 226);
   background: rgba(35, 131, 226, 0.12);
 }
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
 .yaniv-editor.theme-notion .document-content .ProseMirror {
-  min-height: calc(100vh - 100px);
-  padding: 32px 0 100px;
-  font-family:
-    ui-sans-serif,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI Variable Display",
-    "Segoe UI",
-    Helvetica,
-    "Apple Color Emoji",
-    Arial,
-    sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #37352f;
-  background: #ffffff;
+  color: var(--tiptap-text);
+  background: var(--tiptap-bg);
 }
 
 /* ===== Notion 风格 - 大标题 ===== */
@@ -280,13 +269,13 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .tt-toolbar-button,
-.yaniv-editor.theme-notion[data-theme="dark"] .tt-dropdown-btn {
+.yaniv-editor.theme-notion[data-theme="dark"] .ye-toolbar-button,
+.yaniv-editor.theme-notion[data-theme="dark"] .ye-dropdown-btn {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .tt-toolbar-button:hover,
-.yaniv-editor.theme-notion[data-theme="dark"] .tt-dropdown-btn:hover {
+.yaniv-editor.theme-notion[data-theme="dark"] .ye-toolbar-button:hover,
+.yaniv-editor.theme-notion[data-theme="dark"] .ye-dropdown-btn:hover {
   color: rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.055);
 }

@@ -2,8 +2,8 @@
   <a-tooltip :title="title" placement="top">
     <button
       :class="[
-        'tt-toolbar-button',
-        `tt-toolbar-button--${size}`,
+        'ye-toolbar-button',
+        `ye-toolbar-button--${size}`,
         { 'is-active': active, 'is-danger': danger },
       ]"
       :disabled="disabled"
@@ -12,7 +12,7 @@
       @click="onClick"
       @dblclick="onDblClick"
     >
-      <span class="tt-toolbar-button__content">
+      <span class="ye-toolbar-button__content">
         <slot name="icon">
           <component :is="icon" v-if="icon" />
         </slot>
@@ -58,83 +58,62 @@ function onDblClick() {
 
 <style>
 /* 使用全局样式以支持深色模式（因为需要匹配父级的 data-theme 属性） */
-.tt-toolbar-button {
+.ye-toolbar-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   padding: 0 6px;
   line-height: 1;
-  color: var(--menu-btn-color, #262626);
+  color: var(--tiptap-toolbar-btn-text);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 4px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--tiptap-radius-sm);
+  transition: all var(--tiptap-transition-normal);
 }
 
-.tt-toolbar-button:disabled {
-  color: #bfbfbf;
+.ye-toolbar-button:disabled {
+  color: var(--tiptap-toolbar-btn-disabled);
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-[data-theme="dark"] .tt-toolbar-button {
-  color: var(--menu-btn-color, #f0f0f0);
-}
-
-[data-theme="dark"] .tt-toolbar-button:disabled {
-  color: #666;
-}
-
-.tt-toolbar-button--small {
+.ye-toolbar-button--small {
   height: 28px;
 }
 
-.tt-toolbar-button--medium {
+.ye-toolbar-button--medium {
   height: 32px;
 }
 
-.tt-toolbar-button--large {
+.ye-toolbar-button--large {
   height: 36px;
 }
 
-.tt-toolbar-button:hover:not(:disabled) {
-  background: var(--menu-btn-hover-bg, #f5f5f5);
+.ye-toolbar-button:hover:not(:disabled) {
+  background: var(--tiptap-toolbar-btn-hover);
 }
 
-[data-theme="dark"] .tt-toolbar-button:hover:not(:disabled) {
-  background: var(--menu-btn-hover-bg, #303030);
+.ye-toolbar-button:active:not(:disabled) {
+  background: var(--tiptap-toolbar-btn-active);
 }
 
-.tt-toolbar-button:active:not(:disabled) {
-  background: #e8e8e8;
+.ye-toolbar-button.is-active {
+  color: var(--tiptap-primary);
+  background: var(--tiptap-primary-light);
 }
 
-[data-theme="dark"] .tt-toolbar-button:active:not(:disabled) {
-  background: #262626;
+.ye-toolbar-button.is-danger {
+  color: var(--tiptap-danger);
 }
 
-.tt-toolbar-button.is-active {
-  color: var(--menu-primary, #1890ff);
-  background: #e6f4ff;
-}
-
-[data-theme="dark"] .tt-toolbar-button.is-active {
-  color: #4fc3f7;
-  background: #1a4d6e;
-}
-
-.tt-toolbar-button.is-danger {
-  color: var(--danger-color, #ff4d4f);
-}
-
-.tt-toolbar-button.is-danger:hover:not(:disabled) {
+.ye-toolbar-button.is-danger:hover:not(:disabled) {
   color: #fff;
-  background: var(--danger-color, #ff4d4f);
+  background: var(--tiptap-danger);
 }
 
-.tt-toolbar-button__content {
+.ye-toolbar-button__content {
   display: inline-flex;
   gap: 4px;
   align-items: center;
@@ -142,7 +121,7 @@ function onDblClick() {
   height: 100%;
 }
 
-.tt-toolbar-button__content .anticon {
+.ye-toolbar-button__content .anticon {
   display: flex;
   align-items: center;
   justify-content: center;

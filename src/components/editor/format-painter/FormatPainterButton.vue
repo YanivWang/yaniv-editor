@@ -19,7 +19,7 @@ import { FormatPainterOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { computed, ref, watch, onBeforeUnmount } from "vue";
 
-import { ToolbarButton } from "@/base";
+import { ToolbarButton } from "@/components/base";
 import type { FormatPainterStorage } from "@/extensions/formatPainter";
 import { t } from "@/locales";
 

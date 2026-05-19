@@ -63,10 +63,11 @@ AI 结果以建议形式展示，用户确认后写入文档（`AiHighlightMark`
 ## 架构
 
 ```text
-AiMenuButton (工具栏)
-  → PolishExtension / ContinueWritingExtension / ...
-    → aiApiService (src/api/ai.ts)
-      → createAiAdapter (OpenAI 兼容流式 API)
+AiToolbarMenu (工具栏)
+  → useAi({ adapter }) ──┐
+                         ├── aiClient (src/features/ai/client.ts)
+PolishExtension / …      │      → createAiAdapter (OpenAI 兼容流式 API)
+  → aiClient ────────────┘
 ```
 
 ## 安全提示

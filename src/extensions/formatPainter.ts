@@ -51,7 +51,7 @@ export interface FormatPainterStorage {
 }
 
 /** 本地存储的键名 */
-const STORAGE_KEY = "tiptap-format-painter-formats";
+const STORAGE_KEY = "yaniv_format_painter_formats";
 
 export type FormatPainterFormats = FormatPainterStorage["formats"];
 

@@ -45,8 +45,8 @@
  */
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
+import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
 import { t } from "@/locales";
-import { slashCommandKey, type SlashCommandState } from "@/tools/slash-command";
 
 import {
   applyBlockInsert,

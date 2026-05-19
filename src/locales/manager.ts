@@ -9,8 +9,9 @@ import { enUS } from "./en-US";
 import { zhCN } from "./zh-CN";
 import { zhTW } from "./zh-TW";
 
-export type LocaleCode = "zh-CN" | "zh-TW" | "en-US";
+import type { LocaleCode } from "./types";
 
+export type { LocaleCode } from "./types";
 export type LocaleMessages = typeof zhCN;
 
 const builtInLocales: Record<LocaleCode, LocaleMessages> = {

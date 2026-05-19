@@ -4,7 +4,7 @@
  */
 import { ref } from "vue";
 
-const STORAGE_KEY = "tiptap_translate_target_lang";
+const STORAGE_KEY = "yaniv_translate_target_lang";
 
 // 全局共享的翻译目标语言（初始为空，需用户先选择）
 const saved = typeof window !== "undefined" ? window.localStorage?.getItem(STORAGE_KEY) : null;

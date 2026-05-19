@@ -50,7 +50,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 | 项                                | 说明                                                                                                |
 | --------------------------------- | --------------------------------------------------------------------------------------------------- |
-| 未配置 API Key                    | 走 `simulateAiStream` 本地模拟流式输出，非真实模型（`src/api/ai.ts`）                               |
+| 未配置 API Key                    | 走 `simulateAiStream` 本地模拟流式输出，非真实模型（`src/features/ai/client.ts`）                   |
 | Anthropic 提供商                  | 设置面板可选，工厂复用 OpenAI 兼容适配器；原生 Claude API 格式不同，通常需代理端点                  |
 | API Key 存储                      | localStorage + 简单混淆，非加密；生产建议后端代理                                                   |
 | 翻译语言（ToolbarDropdownButton） | 下拉含翻译子菜单，但 `setTranslateLang` 为 stub，未接入 `translateStore`；`AiMenuButton` 路径已接好 |

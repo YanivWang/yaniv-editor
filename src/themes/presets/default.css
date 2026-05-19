@@ -6,6 +6,12 @@
 
 .yaniv-editor.theme-default {
   --tiptap-bg-secondary: #f5f5f5;
+  --tiptap-doc-page-width: 960px;
+  --tiptap-doc-page-min-height: 480px;
+  --tiptap-doc-padding-top: 40px;
+  --tiptap-doc-padding-bottom: 40px;
+  --tiptap-doc-padding-inline: 56px;
+  --tiptap-doc-container-padding-y: 24px;
 }
 
 /* 浅灰画布，区别于 Word 的深灰纸张背景 */
@@ -13,26 +19,11 @@
   background: var(--tiptap-bg-secondary);
 }
 
-.yaniv-editor.theme-default .document-container {
-  padding: 24px 16px;
-}
-
 /* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
 .yaniv-editor.theme-default .continuous-pages {
-  max-width: 960px;
-  margin: 0 auto;
-  background: var(--tiptap-bg);
   border: 1px solid var(--tiptap-border);
   border-radius: var(--tiptap-radius-md);
   box-shadow: var(--tiptap-shadow-sm);
-}
-
-.yaniv-editor.theme-default .document-content .ProseMirror {
-  min-height: 480px;
-  padding: 40px 56px;
-  font-family: var(--tiptap-font-family);
-  font-size: var(--tiptap-font-size);
-  line-height: var(--tiptap-line-height);
 }
 
 .yaniv-editor.theme-default .document-content .ProseMirror h1 {

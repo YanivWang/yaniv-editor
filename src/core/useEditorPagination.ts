@@ -31,10 +31,16 @@ export function useEditorPagination(containerRef: Ref<HTMLElement | null>) {
 
   const initPageCssVariables = () => {
     if (!containerRef.value) return;
-    containerRef.value.style.setProperty("--a4-width-px", `${A4_WIDTH_PX}px`);
-    containerRef.value.style.setProperty("--padding-top-px", `${PAGE_PADDING_TOP_PX}px`);
-    containerRef.value.style.setProperty("--padding-bottom-px", `${PAGE_PADDING_BOTTOM_PX}px`);
-    containerRef.value.style.setProperty("--page-content-height-px", `${PAGE_CONTENT_HEIGHT_PX}px`);
+    containerRef.value.style.setProperty("--tiptap-doc-page-width", `${A4_WIDTH_PX}px`);
+    containerRef.value.style.setProperty("--tiptap-doc-padding-top", `${PAGE_PADDING_TOP_PX}px`);
+    containerRef.value.style.setProperty(
+      "--tiptap-doc-padding-bottom",
+      `${PAGE_PADDING_BOTTOM_PX}px`,
+    );
+    containerRef.value.style.setProperty(
+      "--tiptap-doc-page-min-height",
+      `${PAGE_CONTENT_HEIGHT_PX}px`,
+    );
   };
 
   return {

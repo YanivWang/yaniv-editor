@@ -76,10 +76,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-import { useAi } from "@/ai";
-import type { AiAdapter } from "@/ai";
-import { useAiConfig } from "@/ai/config/useAiConfig";
-import BaseTooltip from "@/base/BaseTooltip.vue";
+import BaseTooltip from "@/components/base/BaseTooltip.vue";
+import { useAi } from "@/features/ai";
+import type { AiAdapter } from "@/features/ai";
+import { useAiConfig } from "@/features/ai/config/useAiConfig";
 import { t } from "@/locales";
 
 import AiSettingsModal from "./AiSettingsModal.vue";
@@ -306,12 +306,12 @@ onUnmounted(() => {
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: var(--tiptap-z-bubble, 200);
+  z-index: var(--tiptap-z-bubble);
   min-width: 200px;
   padding: 8px;
   margin-top: 8px;
-  background: var(--tiptap-bg, #fff);
-  border: 1px solid var(--tiptap-border, #e5e5e5);
+  background: var(--tiptap-bg);
+  border: 1px solid var(--tiptap-border);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
@@ -323,7 +323,7 @@ onUnmounted(() => {
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
-  color: var(--tiptap-text, #1a1a1a);
+  color: var(--tiptap-text);
   text-align: left;
   cursor: pointer;
   background: transparent;
@@ -343,7 +343,7 @@ onUnmounted(() => {
 .ai-menu-divider {
   height: 1px;
   margin: 8px 0;
-  background: var(--tiptap-border, #e5e5e5);
+  background: var(--tiptap-border);
 }
 
 .ai-menu-custom {
@@ -357,10 +357,10 @@ onUnmounted(() => {
   height: 36px;
   padding: 0 12px;
   font-size: 13px;
-  color: var(--tiptap-text, #1a1a1a);
+  color: var(--tiptap-text);
   outline: none;
-  background: var(--tiptap-bg-secondary, #f5f5f5);
-  border: 1px solid var(--tiptap-border, #e5e5e5);
+  background: var(--tiptap-bg-secondary);
+  border: 1px solid var(--tiptap-border);
   border-radius: 8px;
   transition: border-color 0.2s ease;
 }
@@ -370,7 +370,7 @@ onUnmounted(() => {
 }
 
 .ai-menu-input::placeholder {
-  color: var(--tiptap-text-muted, #999);
+  color: var(--tiptap-text-muted);
 }
 
 .ai-menu-send {
@@ -418,7 +418,7 @@ onUnmounted(() => {
   padding: 8px 12px;
   margin-bottom: 8px;
   font-size: 12px;
-  color: var(--tiptap-text-muted, #666);
+  color: var(--tiptap-text-muted);
   background: rgba(102, 126, 234, 0.08);
   border-radius: 8px;
 }

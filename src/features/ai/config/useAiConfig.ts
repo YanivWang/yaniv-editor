@@ -217,27 +217,11 @@ export function useAiConfig() {
     state.value.testError = null;
   }
 
-  /**
-   * 获取用于 API 请求的配置
-   */
-  function getRequestConfig(): {
-    endpoint: string;
-    apiKey: string;
-    model: string;
-    timeout: number;
-  } | null {
-    const cfg = state.value.config;
-    if (!cfg || !cfg.enabled) return null;
-
-    const providerInfo = getProviderInfo(cfg.provider);
-    if (!providerInfo) return null;
-
-    return {
-      endpoint: cfg.endpoint || providerInfo.defaultEndpoint,
-      apiKey: cfg.apiKey,
-      model: cfg.model || providerInfo.defaultModel,
-      timeout: cfg.timeout || DEFAULT_CONFIG.timeout,
-    };
+  function getRequestConfig() {
+    const resolved = getAiRequestConfig();
+    if (!resolved) return null;
+    const { endpoint, apiKey, model, timeout } = resolved;
+    return { endpoint, apiKey, model, timeout };
   }
 
   return {

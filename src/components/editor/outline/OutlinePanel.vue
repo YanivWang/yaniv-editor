@@ -1,10 +1,10 @@
 <template>
-  <aside class="tp-outline-panel" :aria-label="t('editor.outlineTitle')">
-    <header class="tp-outline-panel__header">
-      <span class="tp-outline-panel__title">{{ t("editor.outlineTitle") }}</span>
+  <aside class="outline-panel" :aria-label="t('editor.outlineTitle')">
+    <header class="outline-panel__header">
+      <span class="outline-panel__title">{{ t("editor.outlineTitle") }}</span>
       <button
         type="button"
-        class="tp-outline-panel__close"
+        class="outline-panel__close"
         :title="t('editor.outlineClose')"
         :aria-label="t('editor.outlineClose')"
         @click="close"
@@ -13,22 +13,22 @@
       </button>
     </header>
 
-    <div v-if="items.length === 0" class="tp-outline-panel__empty">
+    <div v-if="items.length === 0" class="outline-panel__empty">
       {{ t("editor.outlineEmpty") }}
     </div>
 
-    <nav v-else class="tp-outline-panel__list">
+    <nav v-else class="outline-panel__list">
       <button
         v-for="item in items"
         :key="item.id"
         type="button"
-        class="tp-outline-panel__item"
+        class="outline-panel__item"
         :class="{ 'is-active': item.isActive }"
         :style="{ paddingLeft: `${12 + (item.level - 1) * 14}px` }"
         @click="scrollToHeading(item)"
       >
-        <span v-if="item.itemIndex" class="tp-outline-panel__index">{{ item.itemIndex }}.</span>
-        <span class="tp-outline-panel__text">{{ item.textContent }}</span>
+        <span v-if="item.itemIndex" class="outline-panel__index">{{ item.itemIndex }}.</span>
+        <span class="outline-panel__text">{{ item.textContent }}</span>
       </button>
     </nav>
   </aside>
@@ -118,7 +118,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.tp-outline-panel {
+.outline-panel {
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
@@ -126,52 +126,52 @@ onBeforeUnmount(() => {
   min-width: 220px;
   max-width: 220px;
   height: 100%;
-  background: var(--menu-bg, #fff);
-  border-right: 1px solid var(--menu-border-color, #e8e8e8);
+  background: var(--tiptap-bg);
+  border-right: 1px solid var(--tiptap-border);
 }
 
-.tp-outline-panel__header {
+.outline-panel__header {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--menu-border-color, #e8e8e8);
+  border-bottom: 1px solid var(--tiptap-border);
 }
 
-.tp-outline-panel__title {
+.outline-panel__title {
   font-size: 13px;
   font-weight: 600;
-  color: var(--menu-btn-color, #262626);
+  color: var(--tiptap-text);
 }
 
-.tp-outline-panel__close {
+.outline-panel__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
   padding: 0;
-  color: var(--menu-btn-color, #595959);
+  color: var(--tiptap-text-secondary);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 4px;
-  transition: background 0.2s;
+  border-radius: var(--tiptap-radius-sm);
+  transition: background var(--tiptap-transition-normal);
 
   &:hover {
-    background: var(--menu-btn-hover-bg, #f5f5f5);
+    background: var(--tiptap-bg-hover);
   }
 }
 
-.tp-outline-panel__empty {
+.outline-panel__empty {
   padding: 16px 12px;
   font-size: 12px;
   line-height: 1.5;
-  color: #8c8c8c;
+  color: var(--tiptap-text-muted);
 }
 
-.tp-outline-panel__list {
+.outline-panel__list {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
   overflow-y: auto;
 }
 
-.tp-outline-panel__item {
+.outline-panel__item {
   display: flex;
   gap: 4px;
   align-items: flex-start;
@@ -189,33 +189,33 @@ onBeforeUnmount(() => {
   padding: 6px 12px 6px 0;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--menu-btn-color, #595959);
+  color: var(--tiptap-text-secondary);
   text-align: left;
   cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 0;
   transition:
-    color 0.2s,
-    background 0.2s;
+    color var(--tiptap-transition-normal),
+    background var(--tiptap-transition-normal);
 
   &:hover {
-    color: var(--menu-primary, #1890ff);
-    background: var(--menu-btn-hover-bg, #f5f5f5);
+    color: var(--tiptap-primary);
+    background: var(--tiptap-bg-hover);
   }
 
   &.is-active {
-    color: var(--menu-primary, #1890ff);
-    background: rgb(24 144 255 / 8%);
+    color: var(--tiptap-primary);
+    background: var(--tiptap-primary-light);
   }
 }
 
-.tp-outline-panel__index {
+.outline-panel__index {
   flex-shrink: 0;
   opacity: 0.65;
 }
 
-.tp-outline-panel__text {
+.outline-panel__text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

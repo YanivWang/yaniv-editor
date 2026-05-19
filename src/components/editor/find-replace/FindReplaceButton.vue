@@ -9,7 +9,7 @@
     @cancel="onClose"
     @after-open-change="onAfterOpenChange"
   >
-    <div class="tp-find-replace">
+    <div class="find-replace-form">
       <Space direction="vertical" style="width: 100%">
         <Input
           v-model:value="term"
@@ -24,7 +24,7 @@
         />
         <Checkbox v-model:checked="caseSens">{{ t("editor.caseSensitiveShort") }}</Checkbox>
       </Space>
-      <div class="tp-find-replace-actions">
+      <div class="find-replace-form__actions">
         <Button type="primary" size="small" @click="handleFindPrev">{{
           t("editor.findPrev")
         }}</Button>
@@ -46,7 +46,7 @@ import { SearchOutlined } from "@ant-design/icons-vue";
 import { Modal, Input, Button, Checkbox, Space } from "ant-design-vue";
 import { computed, ref, watch } from "vue";
 
-import { ToolbarButton } from "@/base";
+import { ToolbarButton } from "@/components/base";
 import { useFindReplaceHotkey } from "@/composables/useFindReplaceHotkey";
 import { t } from "@/locales";
 
@@ -148,7 +148,7 @@ function handleReplaceAll() {
 </script>
 
 <style scoped lang="scss">
-.tp-find-replace-actions {
+.find-replace-form__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

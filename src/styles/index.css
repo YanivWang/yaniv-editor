@@ -20,7 +20,7 @@
 
 /* Menus */
 @import "./bubble-menu.css";
-@import "./floating-menu.css";
+@import "./floating-menu-toolbar.css";
 
 /* Features */
 @import "./table.css";

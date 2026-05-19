@@ -35,9 +35,9 @@ src/index.ts
 库内开发可使用路径别名：
 
 ```ts
-import { TextFormatButtons } from "@/editor/text-format";
-import { ToolbarNav, ADVANCED_TOOLBAR_CONFIG } from "@/tools/header-nav";
-import { ToolbarButton } from "@/base";
+import { TextFormatButtons } from "@/components/editor/text-format";
+import { ToolbarNav, ADVANCED_TOOLBAR_CONFIG } from "@/components/tools/header-nav";
+import { ToolbarButton } from "@/components/base";
 import { editorPresets } from "@/configs/editorPresets";
 ```
 

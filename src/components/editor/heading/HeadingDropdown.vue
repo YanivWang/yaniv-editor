@@ -17,7 +17,7 @@
 import { FontSizeOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import { ToolbarGroup, ToolbarDropdownButton } from "@/base";
+import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import { HEADING_OPTIONS } from "@/configs/editorConstants";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";

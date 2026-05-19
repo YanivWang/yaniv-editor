@@ -41,7 +41,7 @@
 import { SnippetsOutlined, FileTextOutlined } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
-import { ToolbarGroup, ToolbarButton } from "@/base";
+import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -103,7 +103,7 @@ function insertTemplate(tpl: TemplateItem) {
 
 .template-card:hover {
   background: #f0f5ff;
-  border-color: var(--menu-primary, #1890ff);
+  border-color: var(--tiptap-primary);
 }
 
 [data-theme="dark"] .template-card {
@@ -123,7 +123,7 @@ function insertTemplate(tpl: TemplateItem) {
   width: 36px;
   height: 36px;
   font-size: 20px;
-  color: var(--menu-primary, #1890ff);
+  color: var(--tiptap-primary);
   background: #e6f4ff;
   border-radius: 8px;
 }

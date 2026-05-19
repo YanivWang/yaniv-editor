@@ -14,34 +14,34 @@
     v-model:open="showPicker"
     trigger="click"
     placement="bottomLeft"
-    overlay-class-name="tt-color-picker-popover"
+    overlay-class-name="ye-color-picker-popover"
   >
     <!-- Popover 内容：颜色选择面板 -->
     <template #content>
-      <div class="tt-color-picker-content">
+      <div class="ye-color-picker-content">
         <!-- 头部区域：颜色预览、标题、清空按钮 -->
-        <div class="tt-color-picker-header">
+        <div class="ye-color-picker-header">
           <!-- 当前颜色预览方块（可点击打开高级颜色选择器） -->
           <button
-            class="tt-color-picker-preview-btn"
+            class="ye-color-picker-preview-btn"
             type="button"
             :title="t('editor.showAdvanced')"
             @click.stop="showAdvancedPicker = true"
           >
-            <div class="tt-color-picker-preview">
+            <div class="ye-color-picker-preview">
               <div
-                class="tt-color-picker-preview-color"
+                class="ye-color-picker-preview-color"
                 :style="{ backgroundColor: normalizedColor }"
               />
             </div>
           </button>
           <!-- 分隔线 -->
-          <div class="tt-color-picker-separator" />
+          <div class="ye-color-picker-separator" />
           <!-- 标题 -->
-          <div class="tt-color-picker-title">{{ t("editor.colors") }}</div>
+          <div class="ye-color-picker-title">{{ t("editor.colors") }}</div>
           <!-- 预览文字：根据类型显示文字颜色或背景颜色效果 -->
           <div
-            class="tt-color-picker-preview-text"
+            class="ye-color-picker-preview-text"
             :class="{ 'is-background': type === 'background' }"
             :style="previewTextStyle"
           >
@@ -49,24 +49,24 @@
           </div>
           <!-- 清空颜色按钮 -->
           <button
-            class="tt-color-clear-btn"
+            class="ye-color-clear-btn"
             type="button"
             :title="t('editor.clearColor')"
             @click.stop="clearColor"
           >
-            <StopOutlined class="tt-color-clear-icon" />
+            <StopOutlined class="ye-color-clear-icon" />
           </button>
         </div>
 
         <!-- 默认颜色网格 -->
-        <div class="tt-color-picker-section">
-          <div class="tt-color-picker-section-title">{{ t("editor.defaultColors") }}</div>
-          <div class="tt-color-picker-grid" :style="gridStyle">
+        <div class="ye-color-picker-section">
+          <div class="ye-color-picker-section-title">{{ t("editor.defaultColors") }}</div>
+          <div class="ye-color-picker-grid" :style="gridStyle">
             <button
               v-for="color in DEFAULT_COLORS"
               :key="color"
               :class="[
-                'tt-color-picker__item',
+                'ye-color-picker__item',
                 { 'is-selected': normalizedColor === normalizeColor(color) },
               ]"
               :style="{
@@ -82,14 +82,14 @@
         </div>
 
         <!-- 标准色 -->
-        <div class="tt-color-picker-section">
-          <div class="tt-color-picker-section-title">{{ t("editor.standardColors") }}</div>
-          <div class="tt-color-picker-grid" :style="standardGridStyle">
+        <div class="ye-color-picker-section">
+          <div class="ye-color-picker-section-title">{{ t("editor.standardColors") }}</div>
+          <div class="ye-color-picker-grid" :style="standardGridStyle">
             <button
               v-for="color in STANDARD_COLORS"
               :key="color"
               :class="[
-                'tt-color-picker__item',
+                'ye-color-picker__item',
                 { 'is-selected': normalizedColor === normalizeColor(color) },
               ]"
               :style="{
@@ -105,11 +105,11 @@
         </div>
 
         <!-- 高级颜色选择器 -->
-        <div v-if="showAdvancedPicker" class="tt-color-picker-advanced">
-          <div class="tt-color-picker-advanced-header">
-            <span class="tt-color-picker-advanced-title">{{ t("editor.showAdvanced") }}</span>
+        <div v-if="showAdvancedPicker" class="ye-color-picker-advanced">
+          <div class="ye-color-picker-advanced-header">
+            <span class="ye-color-picker-advanced-title">{{ t("editor.showAdvanced") }}</span>
             <button
-              class="tt-color-picker-advanced-close"
+              class="ye-color-picker-advanced-close"
               type="button"
               :title="t('editor.hideAdvanced')"
               @click.stop="showAdvancedPicker = false"
@@ -117,17 +117,17 @@
               ×
             </button>
           </div>
-          <div class="tt-color-picker-advanced-content">
+          <div class="ye-color-picker-advanced-content">
             <input
               v-model="advancedColor"
               type="color"
-              class="tt-color-picker-color-input"
+              class="ye-color-picker-color-input"
               @change="handleAdvancedColorChange"
             />
             <input
               v-model="advancedColor"
               type="text"
-              class="tt-color-picker-color-text"
+              class="ye-color-picker-color-text"
               placeholder="#000000"
               @input="handleAdvancedColorInput"
             />
@@ -137,10 +137,10 @@
     </template>
     <!-- Popover 触发器：颜色选择按钮 -->
     <Tooltip :title="buttonTitle" placement="top" :open="showPicker ? false : undefined">
-      <div class="tt-color-current-btn" :class="{ 'has-icon': icon }">
+      <div class="ye-color-current-btn" :class="{ 'has-icon': icon }">
         <!-- 如果提供了图标，显示图标；否则显示颜色预览 -->
-        <component :is="icon" v-if="icon" class="tt-color-icon" />
-        <div v-else class="tt-color-current-preview" />
+        <component :is="icon" v-if="icon" class="ye-color-icon" />
+        <div v-else class="ye-color-current-preview" />
       </div>
     </Tooltip>
   </Popover>
@@ -483,7 +483,7 @@ watch(normalizedColor, (newColor) => {
 $dark-selector: "[data-theme=" dark "] &";
 
 /* ===== 颜色选择按钮 ===== */
-.tt-color-current-btn {
+.ye-color-current-btn {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -518,14 +518,14 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 颜色预览区域（无图标时显示） */
-.tt-color-current-preview {
+.ye-color-current-preview {
   width: 100%;
   height: 100%;
   border-radius: 2px;
 }
 
 /* 图标样式 */
-.tt-color-icon {
+.ye-color-icon {
   font-size: 18px;
   line-height: 1;
   color: #262626;
@@ -537,7 +537,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* ===== Popover 内容区域 ===== */
-.tt-color-picker-content {
+.ye-color-picker-content {
   min-width: 280px; /* 适配 10 列布局（10 × 20px + 9 × 6px + padding） */
   max-width: 320px;
   padding: 10px 12px;
@@ -550,7 +550,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 头部区域：颜色预览、标题、清空按钮 */
-.tt-color-picker-header {
+.ye-color-picker-header {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -558,7 +558,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 当前颜色预览方块容器 */
-.tt-color-picker-preview {
+.ye-color-picker-preview {
   flex-shrink: 0;
   width: 40px;
   min-width: 40px;
@@ -573,13 +573,13 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 当前颜色预览方块 */
-.tt-color-picker-preview-color {
+.ye-color-picker-preview-color {
   width: 100%;
   height: 100%;
 }
 
 /* 分隔线 */
-.tt-color-picker-separator {
+.ye-color-picker-separator {
   width: 1px;
   height: 20px;
   background: rgba(0, 0, 0, 0.08);
@@ -590,7 +590,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 标题文字 */
-.tt-color-picker-title {
+.ye-color-picker-title {
   flex: 1;
   font-size: 14px;
   font-weight: 500;
@@ -602,7 +602,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 预览文字（显示文字颜色或背景颜色效果） */
-.tt-color-picker-preview-text {
+.ye-color-picker-preview-text {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -631,7 +631,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 清空颜色按钮 */
-.tt-color-clear-btn {
+.ye-color-clear-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -652,7 +652,7 @@ $dark-selector: "[data-theme=" dark "] &";
       background: rgba(255, 255, 255, 0.1);
     }
 
-    .tt-color-clear-icon {
+    .ye-color-clear-icon {
       color: #1677ff;
 
       #{$dark-selector} {
@@ -670,7 +670,7 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-.tt-color-clear-icon {
+.ye-color-clear-icon {
   font-size: 18px;
   line-height: 1;
   color: #8c8c8c;
@@ -682,7 +682,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* ===== 颜色区域 ===== */
-.tt-color-picker-section {
+.ye-color-picker-section {
   margin-bottom: 12px;
 
   &:last-child {
@@ -691,7 +691,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 区域标题 */
-.tt-color-picker-section-title {
+.ye-color-picker-section-title {
   margin-bottom: 6px;
   font-size: 12px;
   font-weight: 500;
@@ -704,7 +704,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* ===== 颜色网格 ===== */
-.tt-color-picker-grid {
+.ye-color-picker-grid {
   display: grid;
   gap: 6px; /* 统一颜色块间距为 6px */
   justify-content: start;
@@ -713,7 +713,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 颜色块样式 */
-.tt-color-picker__item {
+.ye-color-picker__item {
   position: relative;
   padding: 0;
   cursor: pointer;
@@ -753,7 +753,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 预览方块按钮（可点击） */
-.tt-color-picker-preview-btn {
+.ye-color-picker-preview-btn {
   padding: 0;
   cursor: pointer;
   background: transparent;
@@ -779,7 +779,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 高级颜色选择器 */
-.tt-color-picker-advanced {
+.ye-color-picker-advanced {
   padding-top: 12px;
   margin-top: 12px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
@@ -789,14 +789,14 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-.tt-color-picker-advanced-header {
+.ye-color-picker-advanced-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
 
-.tt-color-picker-advanced-title {
+.ye-color-picker-advanced-title {
   font-size: 12px;
   font-weight: 500;
   color: #8c8c8c;
@@ -806,7 +806,7 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-.tt-color-picker-advanced-close {
+.ye-color-picker-advanced-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -837,13 +837,13 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-.tt-color-picker-advanced-content {
+.ye-color-picker-advanced-content {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.tt-color-picker-color-input {
+.ye-color-picker-color-input {
   width: 60px;
   height: 32px;
   padding: 0;
@@ -876,7 +876,7 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-.tt-color-picker-color-text {
+.ye-color-picker-color-text {
   flex: 1;
   height: 32px;
   padding: 4px 11px;
@@ -922,7 +922,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* 覆盖 Ant Design Popover 的默认内边距 */
-:deep(.tt-color-picker-popover) {
+:deep(.ye-color-picker-popover) {
   .ant-popover-inner {
     padding: 0; /* 移除 Popover 默认内边距，使用组件内部 padding */
   }

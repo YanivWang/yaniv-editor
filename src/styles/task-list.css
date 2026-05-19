@@ -33,7 +33,7 @@
   width: 1em;
   height: 1em;
   margin: 0;
-  accent-color: var(--tiptap-primary, #1890ff);
+  accent-color: var(--tiptap-primary);
   cursor: pointer;
 }
 
@@ -49,7 +49,7 @@
 
 .yaniv-editor .ProseMirror ul[data-type="taskList"] > li[data-checked="true"] > div,
 .yaniv-editor .ProseMirror ul[data-type="taskList"] > li[data-checked="true"] > p {
-  color: var(--tiptap-text-muted, #9b9a97);
+  color: var(--tiptap-text-muted);
   text-decoration: line-through;
 }
 

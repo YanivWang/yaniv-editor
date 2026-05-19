@@ -2,7 +2,7 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 import { createApp, h, ref } from "vue";
 
-import { aiApiService } from "@/api/ai";
+import { aiClient } from "@/features/ai/client";
 import { t } from "@/locales";
 import {
   buildParagraphNodesFromText,
@@ -136,9 +136,9 @@ function performPolish(
     onStart: () => {
       accumulatedContent = "";
     },
-    onMessage: (message: { content: string }) => {
-      if (message && message.content) {
-        accumulatedContent += message.content;
+    onToken: (token: string) => {
+      if (token) {
+        accumulatedContent += token;
         // Update the suggestion in popover
         suggestedTextRef.value = accumulatedContent;
 
@@ -162,7 +162,7 @@ function performPolish(
         }
       }
     },
-    onStop: () => {
+    onComplete: () => {
       try {
         // Stop streaming indicator
         isStreamingRef.value = false;
@@ -201,7 +201,7 @@ function performPolish(
   };
 
   // Call AI API
-  aiApiService.polish(selectedText, sysPrompt, callback);
+  aiClient.polish(selectedText, sysPrompt, callback);
 }
 
 /**

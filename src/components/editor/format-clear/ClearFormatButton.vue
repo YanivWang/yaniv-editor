@@ -12,7 +12,7 @@
 import { ClearOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import { ToolbarGroup, ToolbarButton } from "@/base";
+import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 

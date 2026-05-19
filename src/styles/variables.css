@@ -12,6 +12,10 @@
   --tiptap-primary-hover: #2563eb;
   --tiptap-primary-light: rgba(59, 130, 246, 0.1);
 
+  /* ===== Semantic ===== */
+  --tiptap-danger: #ef4444;
+  --tiptap-danger-bg: #fef2f2;
+
   /* ===== Editor Core ===== */
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #f9fafb;
@@ -38,20 +42,17 @@
   --tiptap-toolbar-btn-active: #e5e5e5;
   --tiptap-toolbar-btn-disabled: #cccccc;
   --tiptap-toolbar-btn-text: var(--tiptap-text);
-  --tiptap-toolbar-button-bg: transparent;
-  --tiptap-toolbar-button-hover: #f3f4f6;
-  --tiptap-toolbar-button-active: #e5e7eb;
   --tiptap-toolbar-divider: #e5e7eb;
 
-  /* ===== Toolbar Button (shared) ===== */
-  --menu-btn-color: var(--tiptap-text);
-  --menu-btn-hover-bg: var(--tiptap-toolbar-btn-hover);
-  --menu-primary: var(--tiptap-primary);
-
-  /* ===== Bubble Menu ===== */
+  /* ===== Bubble / Floating Menu ===== */
   --tiptap-bubble-bg: #ffffff;
   --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   --tiptap-bubble-border: var(--tiptap-border);
+
+  /* ===== Toolbar Button Size ===== */
+  --tiptap-btn-size: 32px;
+  --tiptap-btn-size-sm: 28px;
+  --tiptap-btn-icon-size: 16px;
 
   /* ===== Code ===== */
   --tiptap-code-bg: #f5f5f5;
@@ -108,6 +109,16 @@
   --tiptap-z-dropdown: 100;
   --tiptap-z-bubble: 200;
   --tiptap-z-modal: 300;
+
+  /* ===== Document Layout（默认 A4 / Word；各 theme preset 可覆盖） ===== */
+  --tiptap-doc-page-width: 794px;
+  --tiptap-doc-page-min-height: 939px;
+  --tiptap-doc-padding-top: 96px;
+  --tiptap-doc-padding-bottom: 96px;
+  --tiptap-doc-padding-inline: 92px;
+  --tiptap-doc-page-padding: 0;
+  --tiptap-doc-page-cut-height: 16px;
+  --tiptap-doc-container-padding-y: 20px;
 }
 
 /* ===== Dark Mode（唯一约定：data-theme="dark"） ===== */
@@ -115,6 +126,8 @@
   --tiptap-primary: #60a5fa;
   --tiptap-primary-hover: #93c5fd;
   --tiptap-primary-light: rgba(96, 165, 250, 0.15);
+  --tiptap-danger: #f87171;
+  --tiptap-danger-bg: #3f1d1d;
   --tiptap-bg: #1a1a1a;
   --tiptap-bg-secondary: #111827;
   --tiptap-bg-hover: #374151;
@@ -129,12 +142,7 @@
   --tiptap-toolbar-btn-hover: #333333;
   --tiptap-toolbar-btn-active: #404040;
   --tiptap-toolbar-btn-text: var(--tiptap-text);
-  --tiptap-toolbar-button-hover: #374151;
-  --tiptap-toolbar-button-active: #4b5563;
   --tiptap-toolbar-divider: #374151;
-  --menu-btn-color: #f0f0f0;
-  --menu-btn-hover-bg: #303030;
-  --menu-primary: #4fc3f7;
   --tiptap-bubble-bg: #262626;
   --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   --tiptap-code-bg: #2a2a2a;

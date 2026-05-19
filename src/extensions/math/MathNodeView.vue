@@ -165,7 +165,7 @@ watch(
 }
 
 .math-node-wrapper.is-selected .math-display {
-  outline: 2px solid var(--tp-color-primary, #1890ff);
+  outline: 2px solid var(--tiptap-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -190,12 +190,12 @@ watch(
 
 .math-empty {
   font-style: italic;
-  color: var(--tp-color-text-muted, #999);
+  color: var(--tiptap-text-muted);
 }
 
 .math-placeholder {
   font-style: italic;
-  color: var(--tp-color-text-muted, #999);
+  color: var(--tiptap-text-muted);
 }
 
 .math-error {
@@ -210,8 +210,8 @@ watch(
   gap: 8px;
   min-width: 300px;
   padding: 12px;
-  background: var(--tp-color-bg, #fff);
-  border: 1px solid var(--tp-color-border, #e5e5e5);
+  background: var(--tiptap-bg);
+  border: 1px solid var(--tiptap-border);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -230,23 +230,23 @@ watch(
   font-family: "Fira Code", Monaco, monospace;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--tp-color-text, #1a1a1a);
+  color: var(--tiptap-text);
   resize: vertical;
   outline: none;
-  background: var(--tp-color-bg-secondary, #f5f5f5);
-  border: 1px solid var(--tp-color-border, #e5e5e5);
+  background: var(--tiptap-bg-secondary);
+  border: 1px solid var(--tiptap-border);
   border-radius: 4px;
 }
 
 .math-editor__input:focus {
-  border-color: var(--tp-color-primary, #1890ff);
+  border-color: var(--tiptap-primary);
 }
 
 .math-editor__preview {
   min-height: 40px;
   padding: 8px;
   text-align: center;
-  background: var(--tp-color-bg-secondary, #f5f5f5);
+  background: var(--tiptap-bg-secondary);
   border-radius: 4px;
 }
 
@@ -266,17 +266,17 @@ watch(
 }
 
 .math-btn--cancel {
-  color: var(--tp-color-text, #1a1a1a);
-  background: var(--tp-color-bg-secondary, #f5f5f5);
+  color: var(--tiptap-text);
+  background: var(--tiptap-bg-secondary);
 }
 
 .math-btn--cancel:hover {
-  background: var(--tp-color-border, #e5e5e5);
+  background: var(--tiptap-border);
 }
 
 .math-btn--save {
   color: #fff;
-  background: var(--tp-color-primary, #1890ff);
+  background: var(--tiptap-primary);
 }
 
 .math-btn--save:hover {

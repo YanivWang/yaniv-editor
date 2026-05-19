@@ -60,7 +60,7 @@
 import { AppstoreOutlined, FileImageOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
-import { ToolbarGroup, ToolbarButton } from "@/base";
+import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -241,7 +241,7 @@ function insertSelected() {
 }
 
 .gallery-item.is-selected {
-  border-color: var(--menu-primary, #1890ff);
+  border-color: var(--tiptap-primary);
 }
 
 .gallery-item__img {
@@ -256,7 +256,7 @@ function insertSelected() {
   right: 6px;
   font-size: 20px;
   line-height: 1;
-  color: var(--menu-primary, #1890ff);
+  color: var(--tiptap-primary);
   background: #fff;
   border-radius: 50%;
 }

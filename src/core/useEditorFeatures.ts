@@ -1,12 +1,12 @@
 import { computed } from "vue";
 
-import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
-import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
 import {
   BASIC_TOOLBAR_CONFIG,
   ADVANCED_TOOLBAR_CONFIG,
   type ToolbarToolsConfig,
-} from "@/tools/header-nav";
+} from "@/components/tools/header-nav";
+import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
+import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
 
 import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 

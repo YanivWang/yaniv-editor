@@ -1,5 +1,5 @@
 <template>
-  <div :class="['tt-toolbar-divider', `tt-toolbar-divider--${direction}`]" :style="dividerStyle" />
+  <div :class="['ye-toolbar-divider', `ye-toolbar-divider--${direction}`]" :style="dividerStyle" />
 </template>
 
 <script setup lang="ts">
@@ -34,15 +34,15 @@ const dividerStyle = computed(() => {
 </script>
 
 <style scoped>
-.tt-toolbar-divider {
+.ye-toolbar-divider {
   flex-shrink: 0;
 }
 
-.tt-toolbar-divider--vertical {
+.ye-toolbar-divider--vertical {
   align-self: stretch;
 }
 
-.tt-toolbar-divider--horizontal {
+.ye-toolbar-divider--horizontal {
   width: 100%;
 }
 </style>

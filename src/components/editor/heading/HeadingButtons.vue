@@ -21,7 +21,7 @@
  */
 import { computed } from "vue";
 
-import { ToolbarButton, ToolbarGroup } from "@/base";
+import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import type { HeadingLevel } from "@/configs/toolbarTypes";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";

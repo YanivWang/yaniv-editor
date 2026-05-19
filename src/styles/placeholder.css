@@ -25,7 +25,7 @@
 .ProseMirror h5.is-empty::before,
 .ProseMirror h6.is-empty::before,
 .ProseMirror pre.is-empty::before {
-  color: var(--tiptap-placeholder-color, #ccc);
+  color: var(--tiptap-placeholder-color);
 }
 
 .yaniv-editor.theme-notion .ProseMirror p.is-empty::before,

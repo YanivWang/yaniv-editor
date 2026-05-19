@@ -16,9 +16,9 @@
   font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
   font-size: 13px !important;
   line-height: 1.5;
-  color: var(--tiptap-codeblock-text, #d4d4d4) !important;
+  color: var(--tiptap-codeblock-text) !important;
   tab-size: 2;
-  background: var(--tiptap-codeblock-bg, #1e1e1e) !important;
+  background: var(--tiptap-codeblock-bg) !important;
   border: none !important;
   border-radius: 8px;
 }

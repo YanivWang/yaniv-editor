@@ -43,7 +43,7 @@ import {
 } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
-import { ToolbarGroup, ToolbarDropdownButton } from "@/base";
+import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";

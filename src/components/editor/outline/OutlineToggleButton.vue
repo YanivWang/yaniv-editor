@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { ApartmentOutlined } from "@ant-design/icons-vue";
 
-import { ToolbarButton } from "@/base";
+import { ToolbarButton } from "@/components/base";
 import { t } from "@/locales";
 
 import { useOutlinePanel } from "./useOutlinePanel";

@@ -17,7 +17,7 @@
 import { CodeOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import { ToolbarGroup, ToolbarDropdownButton } from "@/base";
+import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import { CODE_LANGUAGES, DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";

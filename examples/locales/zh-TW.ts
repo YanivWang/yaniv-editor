@@ -12,12 +12,6 @@ export const demoZhTW: DemoMessages = {
       inlinePlugins: "行內 + 外掛",
     },
     navAriaLabel: "範例導覽",
-    theme: {
-      dark: "深色",
-      light: "淺色",
-      switchToDark: "切換到深色模式",
-      switchToLight: "切換到淺色模式",
-    },
     themePreset: {
       default: "預設風格",
       word: "Word 風格",

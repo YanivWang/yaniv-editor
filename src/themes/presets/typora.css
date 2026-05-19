@@ -4,6 +4,11 @@
  */
 
 .yaniv-editor.theme-typora {
+  --tiptap-doc-page-width: 860px;
+  --tiptap-doc-page-min-height: 480px;
+  --tiptap-doc-padding-top: 48px;
+  --tiptap-doc-padding-bottom: 48px;
+  --tiptap-doc-padding-inline: 64px;
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #fafafa;
   --tiptap-bg-hover: #f5f5f5;
@@ -43,7 +48,6 @@
 
 /* Typora 风格 - 无边框纸张 */
 .yaniv-editor.theme-typora .continuous-pages {
-  max-width: 860px;
   border-radius: 0;
   box-shadow: none;
 }

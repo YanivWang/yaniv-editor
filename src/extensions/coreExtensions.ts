@@ -23,6 +23,7 @@ import { Underline } from "@tiptap/extension-underline";
 import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 
+import { DEFAULT_EDITOR_VERSION, type EditorVersion } from "@/core/editorTypes";
 import {
   CustomAiExtension,
   ContinueWritingExtension,
@@ -30,8 +31,7 @@ import {
   SummarizeExtension,
   TranslationExtension,
   AiHighlightMark,
-} from "@/ai";
-import { DEFAULT_EDITOR_VERSION, type EditorVersion } from "@/core/editorTypes";
+} from "@/features/ai";
 import { t } from "@/locales";
 
 import { codeBlockLowlightExtension } from "./codeBlockLowlight";
@@ -78,19 +78,11 @@ export interface ExtensionsOptions {
 /**
  * 根据版本获取扩展配置
  * @param _version 编辑器版本（扩展差异主要通过 options.features 门控）
- * @param optionsOrEnableImageResize 配置选项或是否启用图片增强功能（兼容旧 API）
- * @returns 扩展配置数组
  */
 export function getExtensionsByVersion(
   _version: EditorVersion = DEFAULT_EDITOR_VERSION,
-  optionsOrEnableImageResize: boolean | ExtensionsOptions = true,
+  options: ExtensionsOptions = {},
 ): AnyExtension[] {
-  // 兼容旧 API：如果传入 boolean，转换为配置对象
-  const options: ExtensionsOptions =
-    typeof optionsOrEnableImageResize === "boolean"
-      ? { enableImageResize: optionsOrEnableImageResize }
-      : optionsOrEnableImageResize;
-
   const { enableImageResize = true, officePaste, outline: outlineOptions } = options;
 
   const gates: ResolvedExtensionGates =

@@ -27,10 +27,6 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      "@/editor": resolve(__dirname, "src/components/editor"),
-      "@/base": resolve(__dirname, "src/components/base"),
-      "@/tools": resolve(__dirname, "src/components/tools"),
-      "@/ai": resolve(__dirname, "src/features/ai"),
       "@": resolve(__dirname, "src"),
     },
   },

@@ -1,14 +1,14 @@
 /**
  * YanivEditor 内部主题：按需加载 preset CSS，在根节点应用类名与 data-theme
  */
-import { computed, onBeforeUnmount, provide, watch, type ComputedRef, type Ref } from "vue";
+import { provide, watch, type ComputedRef, type Ref } from "vue";
 
 import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 
-import { applyThemeToElement, resolveThemeMode, watchSystemTheme } from "./applyTheme";
+import { applyThemeToElement } from "./applyTheme";
 import { loadThemePreset } from "./loadPreset";
-
-import type { ResolvedThemeMode , editorThemeInjectionKey, type EditorThemeContext } from "./themeContext";
+import { editorThemeInjectionKey, type EditorThemeContext , ResolvedThemeMode } from "./themeContext";
+import { useResolvedThemeMode } from "./useResolvedThemeMode";
 
 export interface UseEditorThemeOptions {
   rootRef: Ref<HTMLElement | null | undefined>;
@@ -24,9 +24,15 @@ export interface UseEditorThemeReturn {
 export function useEditorTheme(options: UseEditorThemeOptions): UseEditorThemeReturn {
   const { rootRef, preset, mode } = options;
 
-  const resolvedMode = computed(() => resolveThemeMode(mode.value));
+  const resolvedMode = useResolvedThemeMode(mode);
 
-  let stopSystemWatch: (() => void) | undefined;
+  const themeContext: EditorThemeContext = {
+    preset,
+    mode,
+    resolvedMode,
+  };
+
+  provide(editorThemeInjectionKey, themeContext);
 
   const syncDom = async () => {
     await loadThemePreset(preset.value);
@@ -34,39 +40,7 @@ export function useEditorTheme(options: UseEditorThemeOptions): UseEditorThemeRe
     if (el) applyThemeToElement(el, preset.value, mode.value);
   };
 
-  const themeContext: EditorThemeContext = {
-    preset,
-    mode,
-    resolvedMode,
-    setPreset: (p) => {
-      preset.value = p;
-    },
-    setMode: (m) => {
-      mode.value = m;
-    },
-  };
-
-  provide(editorThemeInjectionKey, themeContext);
-
-  watch([preset, mode], syncDom, { immediate: true });
-
-  watch(
-    () => mode.value,
-    (next) => {
-      stopSystemWatch?.();
-      stopSystemWatch = undefined;
-      if (next !== "auto") return;
-      stopSystemWatch = watchSystemTheme(() => {
-        const el = rootRef.value;
-        if (el) applyThemeToElement(el, preset.value, "auto");
-      });
-    },
-    { immediate: true },
-  );
-
-  onBeforeUnmount(() => {
-    stopSystemWatch?.();
-  });
+  watch([preset, mode, resolvedMode], syncDom, { immediate: true });
 
   return { resolvedMode, themeContext };
 }

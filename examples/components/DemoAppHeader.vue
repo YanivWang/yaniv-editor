@@ -18,10 +18,6 @@
         </RouterLink>
       </nav>
 
-      <button class="demo-theme-toggle" :title="themeToggleTitle" @click="emit('toggleTheme')">
-        {{ theme === "light" ? t("demo.theme.dark") : t("demo.theme.light") }}
-      </button>
-
       <a-dropdown v-if="showThemeMode" :trigger="['click']" placement="bottomLeft">
         <button type="button" class="demo-header-select">
           <span>{{ currentThemeModeLabel }}</span>
@@ -80,7 +76,6 @@ import type { MenuInfo } from "ant-design-vue/es/menu/src/interface";
 const props = withDefaults(
   defineProps<{
     subtitleKey: string;
-    theme: "light" | "dark";
     showLocaleSelect?: boolean;
     showThemePreset?: boolean;
     showThemeMode?: boolean;
@@ -99,15 +94,10 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  toggleTheme: [];
   "update:locale": [value: LocaleCode];
   "update:themePreset": [value: ThemePreset];
   "update:themeMode": [value: ThemeMode];
 }>();
-
-const themeToggleTitle = computed(() =>
-  props.theme === "light" ? t("demo.theme.switchToDark") : t("demo.theme.switchToLight"),
-);
 
 const themePresetOptions = computed(() => [
   { value: "default" as const, label: t("demo.themePreset.default") },

@@ -12,12 +12,6 @@ export const demoEnUS: DemoMessages = {
       inlinePlugins: "Inline + Plugins",
     },
     navAriaLabel: "Examples",
-    theme: {
-      dark: "Dark",
-      light: "Light",
-      switchToDark: "Switch to Dark",
-      switchToLight: "Switch to Light",
-    },
     themePreset: {
       default: "Default Style",
       word: "Word Style",

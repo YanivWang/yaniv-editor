@@ -2,7 +2,7 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 import { createApp, h, ref } from "vue";
 
-import { aiApiService } from "@/api/ai";
+import { aiClient } from "@/features/ai/client";
 import { t } from "@/locales";
 import {
   buildParagraphNodesFromText,
@@ -171,9 +171,9 @@ function performContinueWriting(
     onStart: () => {
       accumulatedContent = "";
     },
-    onMessage: (message: { content: string }) => {
-      if (message && message.content) {
-        accumulatedContent += message.content;
+    onToken: (token: string) => {
+      if (token) {
+        accumulatedContent += token;
         // Update the suggestion in popover
         suggestedTextRef.value = accumulatedContent;
 
@@ -197,7 +197,7 @@ function performContinueWriting(
         }
       }
     },
-    onStop: () => {
+    onComplete: () => {
       try {
         // Stop streaming indicator
         isStreamingRef.value = false;
@@ -236,7 +236,7 @@ function performContinueWriting(
   };
 
   // Call AI API
-  aiApiService.continueWriting(selectedText, sysPrompt, callback);
+  aiClient.continueWriting(selectedText, sysPrompt, callback);
 }
 
 /**

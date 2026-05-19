@@ -136,7 +136,7 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
 
   addOptions() {
     return {
-      searchResultClass: "tp-search-result",
+      searchResultClass: "search-result",
       disableRegex: true,
       scrollIntoViewOnNavigate: true,
     };

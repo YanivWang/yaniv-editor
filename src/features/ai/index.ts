@@ -41,6 +41,10 @@ export { default as AiMenuButton } from "./AiMenuButton.vue";
 // Export AI components
 export { AiToolbarMenu, AiSettingsModal } from "./components";
 
+// Export AI client（Extension + UI 统一调用链）
+export { aiClient, createAiClient, normalizeAiError } from "./client";
+export type { CreateAiClientOptions } from "./client";
+
 // Export useAi composable
 export { useAi } from "./useAi";
 export type { UseAiOptions, UseAiReturn } from "./useAi";

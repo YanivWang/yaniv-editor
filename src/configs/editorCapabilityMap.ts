@@ -3,8 +3,8 @@
  * @description Shared config mapping for capability id → extension gate → toolbar config key.
  */
 
+import type { ToolbarToolsConfig } from "@/components/tools/header-nav/toolbarConfig";
 import type { ResolvedExtensionGates } from "@/extensions/resolveExtensionGates";
-import type { ToolbarToolsConfig } from "@/tools/header-nav/toolbarConfig";
 
 /** 与扩展/UI 对齐的能力标识（便于文档与后续 dict 驱动） */
 export type EditorCapabilityId =

@@ -32,7 +32,7 @@ import { LinkOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
-import { ToolbarButton, ToolbarGroup } from "@/base";
+import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";

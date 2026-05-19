@@ -105,8 +105,8 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { Tooltip as ATooltip } from "ant-design-vue";
 import { computed } from "vue";
 
+import { isBlockDragging } from "@/components/tools/drag-handle";
 import { t } from "@/locales";
-import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 

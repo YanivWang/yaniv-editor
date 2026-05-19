@@ -1,13 +1,14 @@
 /**
  * useAi Composable
- * Vue composable for AI features in editor
+ * Vue composable for AI features in editor（基于 AiClient）
  */
 
 import { ref, readonly } from "vue";
 
+import { createAiClient } from "./client";
 import { AI_PROMPTS } from "./prompts";
 
-import type { AiAdapter, AiMessage, AiStreamCallbacks } from "./types";
+import type { AiAdapter, AiStreamCallbacks } from "./types";
 
 export interface UseAiOptions {
   adapter: AiAdapter;
@@ -42,8 +43,17 @@ export interface UseAiReturn {
   abort: () => void;
 }
 
+function translateSystemPrompt(targetLang: string): string {
+  const langName =
+    AI_PROMPTS.translate.targetLanguages[
+      targetLang as keyof typeof AI_PROMPTS.translate.targetLanguages
+    ] || targetLang;
+  return `${AI_PROMPTS.translate.system}\n目标语言: ${langName}`;
+}
+
 export function useAi(options: UseAiOptions): UseAiReturn {
   const { adapter, onError } = options;
+  const client = createAiClient({ adapter });
 
   const isLoading = ref(false);
   const result = ref("");
@@ -56,7 +66,6 @@ export function useAi(options: UseAiOptions): UseAiReturn {
     onError?.(e);
   };
 
-  // Non-streaming methods
   const runChat = async (systemPrompt: string, userContent: string): Promise<string> => {
     abortController = new AbortController();
     isLoading.value = true;
@@ -64,14 +73,9 @@ export function useAi(options: UseAiOptions): UseAiReturn {
     result.value = "";
 
     try {
-      const messages: AiMessage[] = [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userContent },
-      ];
-
-      const response = await adapter.chat(messages);
-      result.value = response.content;
-      return response.content;
+      const content = await client.chat(systemPrompt, userContent);
+      result.value = content;
+      return content;
     } catch (e) {
       handleError(e as Error);
       throw e;
@@ -80,7 +84,6 @@ export function useAi(options: UseAiOptions): UseAiReturn {
     }
   };
 
-  // Streaming methods
   const runChatStream = async (
     systemPrompt: string,
     userContent: string,
@@ -89,11 +92,6 @@ export function useAi(options: UseAiOptions): UseAiReturn {
     isLoading.value = true;
     error.value = null;
     result.value = "";
-
-    const messages: AiMessage[] = [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userContent },
-    ];
 
     const streamCallbacks: AiStreamCallbacks = {
       onStart: () => {
@@ -114,7 +112,11 @@ export function useAi(options: UseAiOptions): UseAiReturn {
       },
     };
 
-    await adapter.chatStream(messages, streamCallbacks);
+    try {
+      await client.chatStream(systemPrompt, userContent, streamCallbacks);
+    } finally {
+      isLoading.value = false;
+    }
   };
 
   return {
@@ -122,31 +124,18 @@ export function useAi(options: UseAiOptions): UseAiReturn {
     result: readonly(result),
     error: readonly(error),
 
-    // Non-streaming
     continueWriting: (text) => runChat(AI_PROMPTS.continueWriting.system, text),
     polish: (text) => runChat(AI_PROMPTS.polish.system, text),
     summarize: (text) => runChat(AI_PROMPTS.summarize.system, text),
-    translate: (text, targetLang) => {
-      const langName =
-        AI_PROMPTS.translate.targetLanguages[
-          targetLang as keyof typeof AI_PROMPTS.translate.targetLanguages
-        ] || targetLang;
-      return runChat(`${AI_PROMPTS.translate.system}\n目标语言: ${langName}`, text);
-    },
+    translate: (text, targetLang) => runChat(translateSystemPrompt(targetLang), text),
     customAi: (text, instruction) =>
       runChat(`${AI_PROMPTS.customAi.system}\n用户指令: ${instruction}`, text),
 
-    // Streaming
     continueWritingStream: (text, cb) => runChatStream(AI_PROMPTS.continueWriting.system, text, cb),
     polishStream: (text, cb) => runChatStream(AI_PROMPTS.polish.system, text, cb),
     summarizeStream: (text, cb) => runChatStream(AI_PROMPTS.summarize.system, text, cb),
-    translateStream: (text, targetLang, cb) => {
-      const langName =
-        AI_PROMPTS.translate.targetLanguages[
-          targetLang as keyof typeof AI_PROMPTS.translate.targetLanguages
-        ] || targetLang;
-      return runChatStream(`${AI_PROMPTS.translate.system}\n目标语言: ${langName}`, text, cb);
-    },
+    translateStream: (text, targetLang, cb) =>
+      runChatStream(translateSystemPrompt(targetLang), text, cb),
     customAiStream: (text, instruction, cb) =>
       runChatStream(`${AI_PROMPTS.customAi.system}\n用户指令: ${instruction}`, text, cb),
 

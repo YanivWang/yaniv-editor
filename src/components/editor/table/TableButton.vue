@@ -111,7 +111,7 @@ import {
 import { Popover } from "ant-design-vue";
 import { computed, ref } from "vue";
 
-import { ToolbarGroup, ToolbarButton } from "@/base";
+import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";

@@ -41,7 +41,7 @@ const dividerDirection = computed(() => {
   return props.direction === "horizontal" ? "vertical" : "horizontal";
 });
 
-const computedDividerColor = computed(() => props.dividerColor ?? "var(--tiptap-border, #e8e8e8)");
+const computedDividerColor = computed(() => props.dividerColor ?? "var(--tiptap-border)");
 </script>
 
 <style scoped>

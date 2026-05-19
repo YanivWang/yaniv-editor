@@ -10,9 +10,9 @@
   z-index: 1001 !important;
   display: flex;
   padding: 6px 8px;
-  background: var(--tp-menu-bg, #fff);
-  border-radius: var(--tp-menu-radius, 8px);
-  box-shadow: var(--tp-menu-shadow, 0 4px 12px rgb(0 0 0 / 15%));
+  background: var(--tiptap-bubble-bg);
+  border-radius: var(--tiptap-radius-md);
+  box-shadow: var(--tiptap-bubble-shadow);
 }
 
 /* 工具栏内容 */
@@ -40,11 +40,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--tp-btn-size, 32px);
-  height: var(--tp-btn-size, 32px);
+  width: var(--tiptap-btn-size);
+  height: var(--tiptap-btn-size);
   padding: 0;
-  font-size: var(--tp-btn-icon-size, 16px);
-  color: var(--tp-color-text, #333);
+  font-size: var(--tiptap-btn-icon-size);
+  color: var(--tiptap-text);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -53,8 +53,8 @@
 }
 
 .table-menu-btn:hover:not(:disabled) {
-  color: var(--tp-color-primary, #1890ff);
-  background: var(--tp-color-bg-hover, #f5f5f5);
+  color: var(--tiptap-primary);
+  background: var(--tiptap-bg-hover);
   transform: translateY(-1px);
 }
 
@@ -68,7 +68,7 @@
 }
 
 .table-menu-btn:disabled {
-  color: var(--tp-color-text-muted, #d0d0d0);
+  color: var(--tiptap-text-muted);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -79,17 +79,17 @@
 
 /* 危险操作按钮 */
 .table-menu-btn--danger {
-  color: var(--tp-color-danger, #ff4d4f);
+  color: var(--tiptap-danger);
 }
 
 .table-menu-btn--danger:hover:not(:disabled) {
-  color: var(--tp-color-danger, #ff4d4f);
-  background: var(--tp-color-danger-bg, #fff1f0);
+  color: var(--tiptap-danger);
+  background: var(--tiptap-danger-bg);
 }
 
 /* 图标样式 */
 .table-menu-btn .anticon {
-  font-size: var(--tp-btn-icon-size, 16px);
+  font-size: var(--tiptap-btn-icon-size);
 }
 
 /* 表格边框样式类 */
@@ -145,8 +145,8 @@
 
   .table-menu-btn {
     flex-shrink: 0;
-    width: var(--tp-btn-size-sm, 28px);
-    height: var(--tp-btn-size-sm, 28px);
+    width: var(--tiptap-btn-size-sm);
+    height: var(--tiptap-btn-size-sm);
   }
 
   .table-menu-btn :deep(.anticon) {

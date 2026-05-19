@@ -2,7 +2,7 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 import { createApp, h, ref } from "vue";
 
-import { aiApiService } from "@/api/ai";
+import { aiClient } from "@/features/ai/client";
 import { t } from "@/locales";
 import {
   buildParagraphNodesFromText,
@@ -327,9 +327,9 @@ function performCustomAi(
     onStart: () => {
       accumulatedContent = "";
     },
-    onMessage: (message: { content: string }) => {
-      if (message && message.content) {
-        accumulatedContent += message.content;
+    onToken: (token: string) => {
+      if (token) {
+        accumulatedContent += token;
         // Update the suggestion in popover
         suggestedTextRef.value = accumulatedContent;
 
@@ -353,7 +353,7 @@ function performCustomAi(
         }
       }
     },
-    onStop: () => {
+    onComplete: () => {
       try {
         // Stop streaming indicator
         isStreamingRef.value = false;
@@ -392,7 +392,7 @@ function performCustomAi(
   };
 
   // Call AI API
-  aiApiService.customCommand(
+  aiClient.customCommand(
     selectedText,
     prompt,
     "你係一個專業嘅文本處理助手。直接返回處理結果,唔好加任何解釋。",

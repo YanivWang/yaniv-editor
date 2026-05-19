@@ -70,14 +70,14 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref, watch } from "vue";
 
-import { AiMenuButton } from "@/ai";
-import { ColorPicker } from "@/editor/color";
-import { HeadingButtons } from "@/editor/heading";
-import { LinkButton } from "@/editor/link";
-import { ListTools } from "@/editor/list";
-import { TextFormatButtons } from "@/editor/text-format";
+import { ColorPicker } from "@/components/editor/color";
+import { HeadingButtons } from "@/components/editor/heading";
+import { LinkButton } from "@/components/editor/link";
+import { ListTools } from "@/components/editor/list";
+import { TextFormatButtons } from "@/components/editor/text-format";
+import { isBlockDragging } from "@/components/tools/drag-handle";
+import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
-import { isBlockDragging } from "@/tools/drag-handle";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";

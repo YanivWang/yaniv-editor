@@ -1,6 +1,6 @@
 <template>
-  <div v-if="enabled" class="editor-toolbar-container">
-    <div class="editor-toolbar">
+  <div v-if="enabled" class="document-toolbar-container">
+    <div class="document-toolbar">
       <!-- 左侧：基础工具 -->
       <div class="toolbar-left">
         <!-- 文档与编辑 -->
@@ -155,29 +155,29 @@
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
 import { computed, ref, watch } from "vue";
 
-import { AiMenuButton } from "@/ai";
-import { ToolbarGroup } from "@/base";
-import { AlignDropdown } from "@/editor/align";
-import { CodeBlockDropdown } from "@/editor/code-block";
-import { ColorPicker } from "@/editor/color";
-import FindReplaceButton from "@/editor/find-replace/FindReplaceButton.vue";
-import { FontFamilySelect, FontSizeSelect } from "@/editor/font";
-import { ClearFormatButton } from "@/editor/format-clear";
-import { FormatPainterButton } from "@/editor/format-painter";
-import { GalleryButton } from "@/editor/gallery";
-import { HeadingDropdown } from "@/editor/heading";
-import { ImageUpload } from "@/editor/image";
-import { LinkButton } from "@/editor/link";
-import { ListTools } from "@/editor/list";
-import { MathButton } from "@/editor/math";
-import { OutlineToggleButton } from "@/editor/outline";
-import { SubscriptSuperscriptButton } from "@/editor/subscript-superscript";
-import { TableButton } from "@/editor/table";
-import { TemplateButton } from "@/editor/template";
-import { TextFormatButtons } from "@/editor/text-format";
-import { UndoRedoButton } from "@/editor/undo-redo";
-import { VideoUpload } from "@/editor/video";
-import { WordButton } from "@/editor/word";
+import { ToolbarGroup } from "@/components/base";
+import { AlignDropdown } from "@/components/editor/align";
+import { CodeBlockDropdown } from "@/components/editor/code-block";
+import { ColorPicker } from "@/components/editor/color";
+import FindReplaceButton from "@/components/editor/find-replace/FindReplaceButton.vue";
+import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
+import { ClearFormatButton } from "@/components/editor/format-clear";
+import { FormatPainterButton } from "@/components/editor/format-painter";
+import { GalleryButton } from "@/components/editor/gallery";
+import { HeadingDropdown } from "@/components/editor/heading";
+import { ImageUpload } from "@/components/editor/image";
+import { LinkButton } from "@/components/editor/link";
+import { ListTools } from "@/components/editor/list";
+import { MathButton } from "@/components/editor/math";
+import { OutlineToggleButton } from "@/components/editor/outline";
+import { SubscriptSuperscriptButton } from "@/components/editor/subscript-superscript";
+import { TableButton } from "@/components/editor/table";
+import { TemplateButton } from "@/components/editor/template";
+import { TextFormatButtons } from "@/components/editor/text-format";
+import { UndoRedoButton } from "@/components/editor/undo-redo";
+import { VideoUpload } from "@/components/editor/video";
+import { WordButton } from "@/components/editor/word";
+import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -297,7 +297,7 @@ watch(
 $dark-selector: "[data-theme=" dark "] &";
 
 /* ===== 工具栏容器 ===== */
-.editor-toolbar-container {
+.document-toolbar-container {
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -312,7 +312,7 @@ $dark-selector: "[data-theme=" dark "] &";
 }
 
 /* ===== 工具栏主体 ===== */
-.editor-toolbar {
+.document-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;

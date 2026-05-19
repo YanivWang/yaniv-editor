@@ -7,14 +7,12 @@
     >
       <DemoAppHeader
         subtitle-key="demo.subtitle.fullEditor"
-        :theme="resolvedShellTheme"
         :theme-mode="themeMode"
         :locale="locale"
         :theme-preset="themePreset"
         show-locale-select
         show-theme-preset
         show-theme-mode
-        @toggle-theme="toggleTheme"
         @update:locale="locale = $event"
         @update:theme-preset="themePreset = $event"
         @update:theme-mode="themeMode = $event"
@@ -23,7 +21,6 @@
       <main class="demo-main">
         <div class="demo-card">
           <YanivEditor
-            :key="editorPresetKey"
             :initial-content="sampleContent"
             :locale="locale"
             :theme-preset="themePreset"
@@ -56,11 +53,7 @@ const { setLocale } = useI18n();
 
 /** 皮肤（CSS）与功能配置（features）分离：Notion 仅切换 editorPresets.notion */
 const editorPreset = computed(() =>
-  themePreset.value === "notion" ? editorPresets.notion : editorPresets.full,
-);
-
-const editorPresetKey = computed(() =>
-  themePreset.value === "notion" ? "notion-features" : "full-features",
+  themePreset.value === "notion" ? editorPresets.notion : editorPresets.production,
 );
 
 /** 外壳与编辑器共用：解析 light/dark，auto 时跟随系统 */
@@ -85,11 +78,6 @@ onMounted(() => {
     "--tiptap-border": "#c4b5fd",
   });
 });
-
-/** 快捷切换：从 auto 切出为显式 light/dark */
-const toggleTheme = () => {
-  themeMode.value = resolvedShellTheme.value === "light" ? "dark" : "light";
-};
 
 const sampleContent = `
 <h1>欢迎使用 Yaniv Editor</h1>

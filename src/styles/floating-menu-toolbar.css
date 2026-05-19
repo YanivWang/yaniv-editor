@@ -1,6 +1,6 @@
 /**
  * FloatingMenu 样式
- * @description 浮动菜单（依赖 base.css）
+ * @description 浮动菜单（依赖 variables.css）
  */
 
 /* 浮动菜单容器 */
@@ -8,33 +8,33 @@
   z-index: 999;
   display: flex;
   padding: 4px;
-  background: var(--tp-menu-bg, #fff);
-  border-radius: var(--tp-menu-radius, 8px);
-  box-shadow: var(--tp-menu-shadow, 0 4px 12px rgb(0 0 0 / 15%));
+  background: var(--tiptap-bubble-bg);
+  border-radius: var(--tiptap-radius-md);
+  box-shadow: var(--tiptap-bubble-shadow);
 }
 
 /* 浮动菜单按钮 */
 .floating-btn {
-  color: var(--tp-color-text, #333);
+  color: var(--tiptap-text);
 }
 
 [data-theme="dark"] .floating-btn {
-  color: var(--tp-color-text, #f0f0f0);
+  color: var(--tiptap-text);
 }
 
 [data-theme="dark"] .floating-btn:hover {
-  color: #fff;
-  background: var(--tp-color-bg-hover, #303030);
+  color: var(--tiptap-text);
+  background: var(--tiptap-bg-hover);
 }
 
 [data-theme="dark"] .floating-btn.active {
-  color: var(--tp-color-primary, #4fc3f7);
-  background: var(--tp-color-primary-bg, #1a4d6e);
+  color: var(--tiptap-primary);
+  background: var(--tiptap-primary-light);
 }
 
 /* 标题按钮 */
 .floating-menu .heading-btn {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--tiptap-font-family);
   font-size: 14px;
   font-weight: bold;
 }
@@ -51,7 +51,7 @@
   gap: 2px;
   align-items: center;
   padding: 0 4px;
-  border-right: 1px solid var(--tp-color-border, #e0e0e0);
+  border-right: 1px solid var(--tiptap-border);
 }
 
 .menu-group:last-child {
@@ -63,33 +63,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  color: var(--tp-color-text-secondary, #666);
+  width: var(--tiptap-btn-size);
+  height: var(--tiptap-btn-size);
+  color: var(--tiptap-text-secondary);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 4px;
-  transition: all var(--tp-transition-normal, 0.2s ease);
+  border-radius: var(--tiptap-radius-sm);
+  transition: all var(--tiptap-transition-normal);
 }
 
 .menu-btn:hover {
-  color: var(--tp-color-text, #333);
-  background: var(--tp-color-bg-hover, #f0f0f0);
+  color: var(--tiptap-text);
+  background: var(--tiptap-bg-hover);
 }
 
 .menu-btn.active {
-  color: var(--tp-color-primary, #1890ff);
-  background: var(--tp-color-primary-bg, #e6f7ff);
+  color: var(--tiptap-primary);
+  background: var(--tiptap-primary-light);
 }
 
 .menu-btn .anticon {
-  font-size: 16px;
+  font-size: var(--tiptap-btn-icon-size);
 }
 
 /* 浮动菜单动画 */
 .ProseMirror-floatingmenu {
-  animation: tp-slide-in 0.2s ease-in-out;
+  animation: tiptap-slide-in 0.2s ease-in-out;
 }
 
 /* Tippy 样式重置 */
@@ -111,8 +111,8 @@
   }
 
   .menu-btn {
-    width: 28px;
-    height: 28px;
+    width: var(--tiptap-btn-size-sm);
+    height: var(--tiptap-btn-size-sm);
   }
 
   .menu-btn .anticon {
@@ -122,25 +122,25 @@
 
 /* 深色模式 */
 [data-theme="dark"] .floating-menu {
-  background: var(--tp-menu-bg, #1f1f1f);
-  box-shadow: var(--tp-menu-shadow, 0 4px 12px rgb(0 0 0 / 40%));
+  background: var(--tiptap-bubble-bg);
+  box-shadow: var(--tiptap-bubble-shadow);
 }
 
 [data-theme="dark"] .floating-group,
 [data-theme="dark"] .menu-group {
-  border-right-color: var(--tp-color-border, #434343);
+  border-right-color: var(--tiptap-border);
 }
 
 [data-theme="dark"] .menu-btn {
-  color: var(--tp-color-text-secondary, #d0d0d0);
+  color: var(--tiptap-text-secondary);
 }
 
 [data-theme="dark"] .menu-btn:hover {
-  color: var(--tp-color-text, #f0f0f0);
-  background: var(--tp-color-bg-hover, #303030);
+  color: var(--tiptap-text);
+  background: var(--tiptap-bg-hover);
 }
 
 [data-theme="dark"] .menu-btn.active {
-  color: var(--tp-color-primary, #4fc3f7);
-  background: var(--tp-color-primary-bg, #1a4d6e);
+  color: var(--tiptap-primary);
+  background: var(--tiptap-primary-light);
 }
