@@ -6,8 +6,6 @@ import { removeAiHighlight } from "./AiHighlightMark";
 import { aiSuggestionManager } from "./aiSuggestionManager";
 import { buildDocumentContextPrompt } from "./documentContext";
 
-export { buildDocumentContextPrompt } from "./documentContext";
-
 import type { AiStreamCallbacks } from "../types";
 import type { Editor } from "@tiptap/core";
 

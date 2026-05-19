@@ -67,10 +67,10 @@ export const editorPresets = {
 
 /** 合并预设与自定义覆盖 */
 export function mergeEditorPreset(
-  preset: EditorPresetName | EditorPresetProps,
+  preset: EditorPresetName,
   overrides?: Partial<EditorPresetProps>,
 ): EditorPresetProps {
-  const base = typeof preset === "string" ? editorPresets[preset] : preset;
+  const base = editorPresets[preset];
   return {
     features: {
       ...base.features,

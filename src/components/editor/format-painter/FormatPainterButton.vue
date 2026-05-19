@@ -20,6 +20,7 @@ import { message } from "ant-design-vue";
 import { computed, ref, watch, onBeforeUnmount } from "vue";
 
 import { ToolbarButton } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import type { FormatPainterStorage } from "@/extensions/formatPainter";
 import { t } from "@/locales";
 
@@ -27,7 +28,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 外部传入的禁用状态 */
   disabled?: boolean;
 }
@@ -35,7 +36,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   disabled: undefined,
 });
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 禁用状态检查 =====
 /**

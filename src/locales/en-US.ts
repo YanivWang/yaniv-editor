@@ -90,12 +90,6 @@ export const enUS: TiptapLocale = {
     fixTables: "Fix Tables",
   },
 
-  bubbleMenu: {
-    turnInto: "Turn Into",
-    textStyle: "Text Style",
-    color: "Color",
-  },
-
   dragMenu: {
     delete: "Delete",
     duplicate: "Duplicate",
@@ -361,8 +355,6 @@ export const enUS: TiptapLocale = {
     aiPrompt: "AI Prompt",
     aiPromptPlaceholder: "Enter AI instruction, e.g.: Optimize this text, Translate to English...",
     customAiCommand: "Custom AI Command",
-    customAiPromptPlaceholder:
-      "Enter your AI instruction, e.g.: Please optimize this text, Please translate to English, Please summarize key points, etc.",
     execute: "Execute",
     cancel: "Cancel",
     reject: "Reject",

@@ -24,6 +24,7 @@ import {
 import { computed } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import "@/types/tiptapExtensions";
 import { createCommandRunner } from "@/utils/editorCommands";
@@ -33,7 +34,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 是否显示任务列表按钮，默认 false */
   showTaskList?: boolean;
 }
@@ -42,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
   showTaskList: false,
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);

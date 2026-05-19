@@ -30,9 +30,10 @@
  */
 import { LinkOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
@@ -41,11 +42,11 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 响应式状态 =====
 const linkModalOpen = ref(false);

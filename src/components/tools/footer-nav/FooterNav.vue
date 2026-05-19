@@ -3,7 +3,6 @@
     <ZoomBar
       v-model:zoom-level="localZoomLevel"
       :total-pages="totalPages"
-      :editor="editor"
       :show-char-count="showCharCount"
       :show-shortcut-hints="showShortcutHints"
       :min="min"

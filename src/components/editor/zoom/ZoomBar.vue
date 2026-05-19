@@ -26,6 +26,7 @@
 import { Button as AButton } from "ant-design-vue";
 import { computed, ref, watch } from "vue";
 
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -54,6 +55,8 @@ const props = withDefaults(
     showShortcutHints: false,
   },
 );
+
+const editor = useYanivEditor(() => props.editor);
 
 const emit = defineEmits<{
   (e: "update:zoomLevel", value: number): void;
@@ -112,14 +115,14 @@ const wordCount = ref(0);
  * 更新字数统计
  */
 const updateCounts = () => {
-  if (!props.editor) {
+  if (!editor.value) {
     characterCount.value = 0;
     wordCount.value = 0;
     return;
   }
 
   try {
-    const storage = props.editor.storage.characterCount;
+    const storage = editor.value.storage.characterCount;
     if (storage) {
       characterCount.value = storage.characters?.() ?? 0;
       wordCount.value = storage.words?.() ?? 0;
@@ -136,29 +139,26 @@ const updateCounts = () => {
 
 // 监听编辑器内容变化
 watch(
-  () => props.editor,
-  (editor) => {
-    if (editor) {
+  editor,
+  (ed) => {
+    if (ed) {
       // 初始化时更新一次
       updateCounts();
 
       // 监听编辑器更新事件
-      editor.on("update", updateCounts);
-      editor.on("selectionUpdate", updateCounts);
+      ed.on("update", updateCounts);
+      ed.on("selectionUpdate", updateCounts);
     }
   },
   { immediate: true },
 );
 
 // 监听编辑器销毁
-watch(
-  () => props.editor,
-  (editor, oldEditor) => {
-    if (oldEditor && !editor) {
-      // 编辑器被销毁时清理监听
-      oldEditor.off("update", updateCounts);
-      oldEditor.off("selectionUpdate", updateCounts);
-    }
-  },
-);
+watch(editor, (ed, oldEditor) => {
+  if (oldEditor && !ed) {
+    // 编辑器被销毁时清理监听
+    oldEditor.off("update", updateCounts);
+    oldEditor.off("selectionUpdate", updateCounts);
+  }
+});
 </script>

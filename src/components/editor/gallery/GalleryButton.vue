@@ -58,9 +58,10 @@
  * @description 扫描当前文档中已有的图片，展示为图库，支持选中后重新插入
  */
 import { AppstoreOutlined, FileImageOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -75,7 +76,7 @@ interface GalleryImage {
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 外部图片源（可选），如果提供则展示外部图片而非文档内图片 */
   images?: GalleryImage[];
 }
@@ -84,7 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
   images: undefined,
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 const runCommand = createCommandRunner(editor);
 
 // ===== 状态 =====

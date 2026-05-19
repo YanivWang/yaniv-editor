@@ -68,17 +68,15 @@ import {
 } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
-import { isBlockDragging } from "@/components/tools/drag-handle";
+import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useYanivEditor } from "@/core/editorContext";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
-
-import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined;
     readonly?: boolean;
   }>(),
   {
@@ -86,7 +84,7 @@ const props = withDefaults(
   },
 );
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor();
 const runCommand = createCommandRunner(editor);
 
 // ===== 状态 =====
@@ -182,17 +180,8 @@ function getImageAlign() {
  * 检查是否应该显示工具栏
  */
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (!bubbleProps.editor) {
-    return false;
-  }
+  if (!shouldShowImageBubbleMenu(bubbleProps, props.readonly)) return false;
 
-  if (isBlockDragging(bubbleProps.editor)) return false;
-
-  if (props.readonly || !bubbleProps.editor.isActive("image")) {
-    return false;
-  }
-
-  // 更新当前图片信息
   const { node } = getCurrentImageInfo();
   if (node?.type.name === "image") {
     currentImageSrc.value = node.attrs.src || "";

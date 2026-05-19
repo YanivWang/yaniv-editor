@@ -42,6 +42,7 @@ import { SnippetsOutlined, FileTextOutlined } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -52,7 +53,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 自定义模板列表（可选，会追加到内置模板后面） */
   customTemplates?: TemplateItem[];
 }
@@ -61,7 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
   customTemplates: () => [],
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 const runCommand = createCommandRunner(editor);
 
 // ===== 状态 =====

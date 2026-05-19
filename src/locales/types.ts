@@ -96,13 +96,6 @@ export interface TiptapLocale {
     fixTables: string;
   };
 
-  // 气泡菜单
-  bubbleMenu: {
-    turnInto: string;
-    textStyle: string;
-    color: string;
-  };
-
   // 拖拽菜单
   dragMenu: {
     delete: string;
@@ -373,7 +366,6 @@ export interface TiptapLocale {
     aiPrompt: string;
     aiPromptPlaceholder: string;
     customAiCommand: string;
-    customAiPromptPlaceholder: string;
     execute: string;
     cancel: string;
     reject: string;

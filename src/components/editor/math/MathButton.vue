@@ -8,29 +8,31 @@ import { computed } from "vue";
 
 import ToolbarDropdownButton from "@/components/base/ToolbarDropdownButton.vue";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import type { Editor } from "@tiptap/vue-3";
 
 interface Props {
-  editor: Editor | null;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
+const editor = useYanivEditor(() => props.editor);
 
 const menuItems = computed<MenuItemConfig[]>(() => [
   {
     key: "inline-math",
     label: t("editor.mathInline"),
     action: () => {
-      props.editor?.chain().focus().insertInlineMath().run();
+      editor.value?.chain().focus().insertInlineMath().run();
     },
   },
   {
     key: "block-math",
     label: t("editor.mathBlock"),
     action: () => {
-      props.editor?.chain().focus().insertBlockMath().run();
+      editor.value?.chain().focus().insertBlockMath().run();
     },
   },
 ]);

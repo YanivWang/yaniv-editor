@@ -61,6 +61,7 @@ import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import { exportToWord } from "./wordExport";
@@ -70,11 +71,11 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 状态 =====
 const importModalOpen = ref(false);

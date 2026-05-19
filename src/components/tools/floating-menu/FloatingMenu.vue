@@ -4,21 +4,18 @@
     :editor="editor"
     :tippy-options="{ duration: 100, placement: 'top' }"
     :should-show="shouldShow"
-    class="bubble-menu floating-menu"
+    class="floating-menu"
   >
-    <div class="bubble-menu-content menu-content">
-      <!-- 标题快捷按钮 -->
-      <div class="bubble-group menu-group">
-        <HeadingButtons :editor="editor" />
+    <div class="menu-content">
+      <div class="menu-group">
+        <HeadingControl variant="buttons" />
       </div>
 
-      <!-- 文本格式 -->
-      <div class="bubble-group menu-group">
-        <TextFormatButtons :editor="editor" />
+      <div class="menu-group">
+        <TextFormatButtons />
       </div>
 
-      <!-- 颜色工具 -->
-      <div class="bubble-group menu-group">
+      <div class="menu-group">
         <ColorPicker
           :icon="FontColorsOutlined"
           type="text"
@@ -35,18 +32,15 @@
         />
       </div>
 
-      <!-- 链接 -->
-      <div class="bubble-group menu-group">
-        <LinkButton :editor="editor" />
+      <div class="menu-group">
+        <LinkButton />
       </div>
 
-      <!-- 列表工具 -->
-      <div class="bubble-group menu-group">
-        <ListTools :editor="editor" :show-task-list="true" />
+      <div class="menu-group">
+        <ListTools :show-task-list="true" />
       </div>
 
-      <!-- AI 工具（与主工具栏一致的下拉按钮，支持翻译子菜单） -->
-      <div class="bubble-group menu-group">
+      <div class="menu-group">
         <AiMenuButton
           v-if="editor"
           :editor="editor"
@@ -63,127 +57,35 @@
 <script setup lang="ts">
 /**
  * FloatingMenu - 选中文本时的浮动工具栏
- * @description 选中文本时显示的浮动格式化工具栏（类似 Medium、Notion）
  */
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
-import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed } from "vue";
 
 import { ColorPicker } from "@/components/editor/color";
-import { HeadingButtons } from "@/components/editor/heading";
+import { HeadingControl } from "@/components/editor/heading";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";
 import { TextFormatButtons } from "@/components/editor/text-format";
-import { isBlockDragging } from "@/components/tools/drag-handle";
+import { shouldShowFloatingTextToolbar } from "@/composables/bubbleMenuShouldShow";
 import { useEditorColorState } from "@/composables/useEditorColorState";
+import { useYanivEditor } from "@/core/editorContext";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 
-import type { Editor } from "@tiptap/vue-3";
-
-// 工具函数和配置导入
-
-// Ant Design 组件和图标
-
-// ===== Props =====
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined;
     readonly?: boolean;
   }>(),
   {
     readonly: false,
   },
 );
-const editor = computed(() => props.editor ?? null);
+
+const editor = useYanivEditor();
 
 const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
   useEditorColorState(editor);
 
-/**
- * 控制浮动菜单显示时机
- * @description 仅在有文本选中时显示，只读模式下不显示
- */
-const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (props.readonly) return false;
-
-  if (isBlockDragging(bubbleProps.editor)) return false;
-
-  if (bubbleProps.state.selection instanceof NodeSelection) return false;
-
-  const { from, to } = bubbleProps;
-  const isEmptySelection = from === to;
-
-  // 不显示的情况：无选区、在代码块中、在表格中（表格有自己的上下文菜单）
-  if (isEmptySelection) return false;
-  if (bubbleProps.editor.isActive("codeBlock")) return false;
-  if (bubbleProps.editor.isActive("table")) return false;
-
-  // 如果选中的是媒体节点，不显示悬浮菜单（媒体有自己的工具栏）
-  if (bubbleProps.editor.isActive("image")) return false;
-  if (bubbleProps.editor.isActive("video")) return false;
-
-  // 检查选中的节点是否是媒体
-  const { state } = bubbleProps;
-  const { selection } = state;
-  if (selection.node && ["image", "video"].includes(selection.node.type.name)) {
-    return false;
-  }
-
-  // 检查光标前后的节点是否是媒体
-  const $anchor = selection.$anchor;
-  const nodeAfter = $anchor.nodeAfter;
-  const nodeBefore = $anchor.nodeBefore;
-  if (
-    (nodeAfter && ["image", "video"].includes(nodeAfter.type.name)) ||
-    (nodeBefore && ["image", "video"].includes(nodeBefore.type.name))
-  ) {
-    return false;
-  }
-
-  // 如果选中的是链接，不显示文字悬浮框（链接有自己的悬浮框）
-  if (bubbleProps.editor.isActive("link")) {
-    return false;
-  }
-
-  return true;
-};
+const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
+  shouldShowFloatingTextToolbar(bubbleProps, props.readonly);
 </script>
-
-<style scoped>
-@media (width <= 768px) {
-  .bubble-menu-content {
-    gap: 2px;
-  }
-}
-
-.bubble-menu {
-  z-index: 1010;
-  display: flex;
-  padding: 4px;
-  background: #fff;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
-
-  [data-theme="dark"] & {
-    background: #1f1f1f;
-    border-color: #434343;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
-  }
-}
-
-.bubble-menu-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
-.bubble-group {
-  display: flex;
-  gap: 2px;
-  align-items: center;
-}
-</style>

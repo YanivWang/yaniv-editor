@@ -195,24 +195,6 @@ export const KEYBOARD_SHORTCUTS = {
 } as const;
 
 /**
- * UI 配置
- */
-export const UI_CONFIG = {
-  /** 工具栏按钮尺寸 */
-  toolbarButtonSize: 28,
-  /** 工具栏高度 */
-  toolbarHeight: 56,
-  /** 工具栏间距 */
-  toolbarGap: 6,
-  /** 颜色面板列数 */
-  colorPanelColumns: 8,
-  /** 颜色面板色块大小 */
-  colorItemSize: 24,
-  /** 浮动菜单偏移 */
-  bubbleMenuOffset: 8,
-} as const;
-
-/**
  * @note 此文件仅保留常量配置。
  * 工具栏与菜单类型请从 `@/configs/toolbarTypes` 导入。
  */

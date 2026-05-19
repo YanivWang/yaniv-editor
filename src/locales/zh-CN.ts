@@ -90,12 +90,6 @@ export const zhCN: TiptapLocale = {
     fixTables: "修复表格",
   },
 
-  bubbleMenu: {
-    turnInto: "转换为",
-    textStyle: "文本样式",
-    color: "颜色",
-  },
-
   dragMenu: {
     delete: "删除",
     duplicate: "复制",
@@ -360,8 +354,6 @@ export const zhCN: TiptapLocale = {
     aiPrompt: "AI 指令",
     aiPromptPlaceholder: "请输入 AI 指令，例如：优化这段文字、翻译成英文...",
     customAiCommand: "自定义 AI 指令",
-    customAiPromptPlaceholder:
-      "请输入你的 AI 指令，例如：请帮我优化这段文字、请翻译成英文、请总结要点等",
     execute: "执行",
     cancel: "取消",
     reject: "拒绝",

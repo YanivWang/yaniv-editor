@@ -24,6 +24,7 @@ import { computed } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { AlignValue, MenuItemConfig } from "@/configs/toolbarTypes";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
@@ -32,11 +33,11 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);

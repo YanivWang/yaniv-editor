@@ -7,62 +7,44 @@
     <!-- 工具栏（预览模式下隐藏） -->
     <ToolbarNav
       v-if="editor && !isPreviewMode && shouldShowHeaderNav"
-      :editor="editor"
       :config="toolbarConfig"
       class="document-toolbar"
-    >
-    </ToolbarNav>
+    />
 
     <!-- 功能模块：链接悬浮框（预览模式下禁用） -->
     <LinkBubbleMenu
       v-if="editor && !isPreviewMode && uiFlags.linkBubbleMenu"
-      :editor="editor"
       :readonly="readonly"
     />
 
     <!-- 功能模块：表格工具栏（预览模式下禁用） -->
     <TableToolbar
       v-if="editor && !isPreviewMode && uiFlags.tableToolbar"
-      :editor="editor"
       :readonly="readonly"
       :show-mode="props.tableMenuShowMode ?? 2"
     />
 
     <!-- 功能模块：图片工具栏（预览模式下禁用） -->
-    <ImageToolbar
-      v-if="editor && !isPreviewMode && uiFlags.image"
-      :editor="editor"
-      :readonly="readonly"
-    />
+    <ImageToolbar v-if="editor && !isPreviewMode && uiFlags.image" :readonly="readonly" />
 
     <!-- 功能模块：视频工具栏（预览模式下禁用） -->
-    <VideoToolbar
-      v-if="editor && !isPreviewMode && uiFlags.image"
-      :editor="editor"
-      :readonly="readonly"
-    />
+    <VideoToolbar v-if="editor && !isPreviewMode && uiFlags.image" :readonly="readonly" />
 
     <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
-    <FloatingMenu
-      v-if="editor && !isPreviewMode && uiFlags.floatingMenu"
-      :editor="editor"
-      :readonly="readonly"
-    />
+    <FloatingMenu v-if="editor && !isPreviewMode && uiFlags.floatingMenu" :readonly="readonly" />
 
     <!-- 功能模块：Notion 风格块选择菜单（/ 转换当前块，+ 在下方插入新块） -->
     <BlockPickerMenu
       v-if="editor && !isPreviewMode && showBlockPickerMenu"
       ref="blockPickerMenuRef"
-      :editor="editor"
     />
 
     <!-- Word 文档区域容器 -->
     <div class="document-body">
-      <OutlinePanel v-if="editor && !isPreviewMode && showOutlinePanel" :editor="editor" />
+      <OutlinePanel v-if="editor && !isPreviewMode && showOutlinePanel" />
       <div ref="containerRef" class="document-container">
         <CodeBlockLanguageBadge
           v-if="editor && !isPreviewMode && toolbarConfig.codeBlock"
-          :editor="editor"
           :container="containerRef"
         />
         <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
@@ -79,7 +61,6 @@
       v-if="editor && !isPreviewMode && shouldShowFooterNav"
       v-model:zoom-level="zoomLevel"
       :total-pages="totalPages"
-      :editor="editor"
       :show-char-count="true"
       :show-shortcut-hints="showStatusShortcutHints"
       :zoom-bar-placement="props.zoomBarPlacement"
@@ -113,6 +94,7 @@ import { buildEditorExtensions } from "@/extensions/coreExtensions";
 import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
 
+import { provideYanivEditor } from "./editorContext";
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
@@ -151,6 +133,7 @@ const emit = defineEmits<{
 }>();
 
 const editor = shallowRef<Editor | null>(null);
+provideYanivEditor(editor);
 const editorError = ref<string | null>(null);
 const rootRef = ref<HTMLElement | null>(null);
 const containerRef = ref<HTMLElement | null>(null);

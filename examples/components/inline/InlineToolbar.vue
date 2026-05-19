@@ -6,7 +6,7 @@
           <UndoRedoButton :editor="editor" />
         </div>
         <div v-else-if="plugin.id === 'heading'" class="inline-toolbar__group">
-          <HeadingDropdown :editor="editor" />
+          <HeadingControl variant="dropdown" :editor="editor" />
         </div>
         <div v-else-if="plugin.id === 'textFormat'" class="inline-toolbar__group">
           <TextFormatButtons :editor="editor" />
@@ -38,13 +38,12 @@
 </template>
 
 <script setup lang="ts">
-
 import {
   AlignDropdown,
   ClearFormatButton,
   CodeBlockDropdown,
   FontSizeSelect,
-  HeadingDropdown,
+  HeadingControl,
   LinkButton,
   ListTools,
   TextFormatButtons,

@@ -3,8 +3,9 @@
  * @description 编辑器状态检查工具函数
  */
 
+import { toValue, type MaybeRefOrGetter } from "vue";
+
 import type { Editor } from "@tiptap/core";
-import type { Ref } from "vue";
 
 /** Attribute value type for editor state checks */
 type AttributeValue = string | number | boolean | null | undefined;
@@ -46,7 +47,9 @@ export interface StateCheckers {
  * }
  * ```
  */
-export function createStateCheckers(editor: Ref<Editor | null | undefined>): StateCheckers {
+export function createStateCheckers(
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
+): StateCheckers {
   return {
     /**
      * 检查节点/标记是否激活
@@ -55,7 +58,7 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否激活
      */
     isActive: (name: string, attributes?: Record<string, AttributeValue>) => {
-      const e = editor.value;
+      const e = toValue(editor);
       if (!e) return false;
       return attributes ? e.isActive(name, attributes) : e.isActive(name);
     },
@@ -66,7 +69,7 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否激活
      */
     isHeadingActive: (level: number) => {
-      const e = editor.value;
+      const e = toValue(editor);
       if (!e) return false;
       return e.isActive("heading", { level });
     },
@@ -77,7 +80,7 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否激活
      */
     isActiveAlign: (value: "left" | "center" | "right" | "justify") => {
-      const e = editor.value;
+      const e = toValue(editor);
       if (!e) return false;
       return e.isActive({ textAlign: value });
     },
@@ -88,7 +91,7 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
      * @returns 是否可执行
      */
     canExecute: (command: string) => {
-      const e = editor.value;
+      const e = toValue(editor);
       if (!e) return false;
       // Tiptap commands are dynamically added, use type assertion through unknown
       const canObj = e.can() as unknown as Record<
@@ -117,11 +120,11 @@ export function createStateCheckers(editor: Ref<Editor | null | undefined>): Sta
  * ```
  */
 export function isActive(
-  editor: Ref<Editor | null | undefined>,
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
   name: string,
   attributes?: Record<string, AttributeValue>,
 ): boolean {
-  const e = editor.value;
+  const e = toValue(editor);
   if (!e) return false;
   return attributes ? e.isActive(name, attributes) : e.isActive(name);
 }
@@ -132,8 +135,11 @@ export function isActive(
  * @param level - 标题级别 (1-6)
  * @returns 是否激活
  */
-export function isHeadingActive(editor: Ref<Editor | null | undefined>, level: number): boolean {
-  const e = editor.value;
+export function isHeadingActive(
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
+  level: number,
+): boolean {
+  const e = toValue(editor);
   if (!e) return false;
   return e.isActive("heading", { level });
 }
@@ -145,10 +151,10 @@ export function isHeadingActive(editor: Ref<Editor | null | undefined>, level: n
  * @returns 是否激活
  */
 export function isActiveAlign(
-  editor: Ref<Editor | null | undefined>,
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
   value: "left" | "center" | "right" | "justify",
 ): boolean {
-  const e = editor.value;
+  const e = toValue(editor);
   if (!e) return false;
   return e.isActive({ textAlign: value });
 }
@@ -159,8 +165,11 @@ export function isActiveAlign(
  * @param command - 命令名称
  * @returns 是否可执行
  */
-export function canExecute(editor: Ref<Editor | null | undefined>, command: string): boolean {
-  const e = editor.value;
+export function canExecute(
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
+  command: string,
+): boolean {
+  const e = toValue(editor);
   if (!e) return false;
   const canObj = e.can() as unknown as Record<
     string,
@@ -176,8 +185,10 @@ export function canExecute(editor: Ref<Editor | null | undefined>, command: stri
  * @param editor - 编辑器实例引用
  * @returns 段落样式标识 ('paragraph' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6')
  */
-export function getCurrentParagraphStyle(editor: Ref<Editor | null | undefined>): string {
-  const e = editor.value;
+export function getCurrentParagraphStyle(
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
+): string {
+  const e = toValue(editor);
   if (!e) return "paragraph";
 
   for (let i = 1; i <= 6; i++) {
@@ -196,9 +207,9 @@ export function getCurrentParagraphStyle(editor: Ref<Editor | null | undefined>)
  * @returns 对齐方式 ('left' | 'center' | 'right' | 'justify')
  */
 export function getCurrentTextAlign(
-  editor: Ref<Editor | null | undefined>,
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
 ): "left" | "center" | "right" | "justify" {
-  const e = editor.value;
+  const e = toValue(editor);
   if (!e) return "left";
 
   const alignments: Array<"left" | "center" | "right" | "justify"> = [

@@ -30,16 +30,17 @@
  * @description 支持本地上传视频
  */
 import { InboxOutlined, VideoCameraOutlined } from "@ant-design/icons-vue";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
 
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 视频上传函数（可选） */
   uploadVideo?: (file: File) => Promise<string>;
 }
@@ -48,7 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
   uploadVideo: undefined,
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 const runCommand = createCommandRunner(editor);
 
 const videoUploadOpen = ref(false);

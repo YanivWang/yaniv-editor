@@ -1,5 +1,5 @@
 /**
  * Heading Components - 标题组件统一导出
  */
-export { default as HeadingDropdown } from "./HeadingDropdown.vue";
-export { default as HeadingButtons } from "./HeadingButtons.vue";
+export { default as HeadingControl } from "./HeadingControl.vue";
+export { useHeadingActions } from "./useHeadingActions";

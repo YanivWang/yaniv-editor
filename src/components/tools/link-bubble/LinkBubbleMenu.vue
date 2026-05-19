@@ -68,17 +68,15 @@
  */
 import { EditOutlined, LinkOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed, nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 
-import { isBlockDragging } from "@/components/tools/drag-handle";
+import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
-import type { Editor } from "@tiptap/vue-3";
-
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined;
     readonly?: boolean;
   }>(),
   {
@@ -86,7 +84,7 @@ const props = withDefaults(
   },
 );
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor();
 const runCommand = createCommandRunner(editor);
 
 // 响应式状态
@@ -116,113 +114,10 @@ function updateCurrentLinkUrl() {
  * 检查是否应该显示链接悬浮框
  * @description 只在选中链接文本时显示（部分或全部），选中非链接文本时不显示
  */
-const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (props.readonly) {
-    return false;
-  }
-
-  const e = bubbleProps.editor;
-  if (!e) {
-    return false;
-  }
-
-  if (isBlockDragging(e)) return false;
-
-  const { from, to } = bubbleProps;
-  const { state } = bubbleProps;
-
-  // 关键：只有当选择范围不为空时才显示（即必须选中文本）
-  // 如果 from === to，说明只是光标位置，没有选中文本，不显示
-  if (from === to) {
-    return false;
-  }
-
-  // 检查选中的文本是否包含链接标记
-  // 必须确保选中的文本本身是链接，而不是选择范围内有其他链接
-  try {
-    const start = Math.min(from, to);
-    const end = Math.max(from, to);
-
-    // 使用 resolve 获取选择范围的标记
-    const $from = state.doc.resolve(start);
-    const $to = state.doc.resolve(end);
-
-    // 检查起始位置的标记（选中的文本开始位置）
-    const marksAtStart = $from.marks();
-    let linkMarkAtStart = null;
-    for (const mark of marksAtStart) {
-      if (mark.type && mark.type.name === "link" && mark.attrs?.href) {
-        linkMarkAtStart = mark;
-        break;
-      }
-    }
-
-    // 检查结束位置的标记（选中的文本结束位置）
-    const marksAtEnd = $to.marks();
-    let linkMarkAtEnd = null;
-    for (const mark of marksAtEnd) {
-      if (mark.type && mark.type.name === "link" && mark.attrs?.href) {
-        linkMarkAtEnd = mark;
-        break;
-      }
-    }
-
-    // 只有当起始和结束位置都有链接标记，且是同一个链接时，才显示悬浮框
-    // 这确保选中的文本本身是链接，而不是选择范围内有其他链接
-    if (linkMarkAtStart && linkMarkAtEnd) {
-      // 检查是否是同一个链接（通过比较 href）
-      if (linkMarkAtStart.attrs?.href === linkMarkAtEnd.attrs?.href) {
-        currentLinkUrl.value = linkMarkAtStart.attrs.href;
-        return true;
-      }
-    }
-
-    // 如果起始或结束位置只有一个有链接标记，也检查选择范围内的所有文本节点
-    // 确保选中的文本节点本身都包含链接标记
-    let allNodesHaveLink = false;
-    let linkHref = "";
-    let hasNonLinkText = false;
-
-    state.doc.nodesBetween(start, end, (node: any) => {
-      // 只检查文本节点，忽略其他类型的节点
-      if (node.isText) {
-        if (node.marks && node.marks.length > 0) {
-          const linkMark = node.marks.find(
-            (mark: any) => mark.type && mark.type.name === "link" && mark.attrs?.href,
-          );
-          if (linkMark) {
-            if (!linkHref) {
-              linkHref = linkMark.attrs.href;
-            } else if (linkHref !== linkMark.attrs.href) {
-              // 如果选中的文本包含不同的链接，不显示
-              hasNonLinkText = true;
-              return false;
-            }
-            allNodesHaveLink = true;
-          } else {
-            // 如果文本节点没有链接标记，说明选中的不是链接文本
-            hasNonLinkText = true;
-            return false;
-          }
-        } else {
-          // 如果文本节点没有任何标记，说明选中的不是链接文本
-          hasNonLinkText = true;
-          return false;
-        }
-      }
-    });
-
-    // 只有当所有选中的文本节点都包含链接标记，且没有非链接文本时，才显示
-    if (allNodesHaveLink && !hasNonLinkText && linkHref) {
-      currentLinkUrl.value = linkHref;
-      return true;
-    }
-  } catch (error) {
-    // 忽略错误
-  }
-
-  return false;
-};
+const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
+  shouldShowLinkBubbleMenu(bubbleProps, props.readonly, (href) => {
+    currentLinkUrl.value = href;
+  });
 
 // 监听编辑器选择变化，更新链接URL
 watch(

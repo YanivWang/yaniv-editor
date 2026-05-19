@@ -11,15 +11,15 @@
           :aria-label="t('editor.toolbarSectionDocument')"
         >
           <div v-if="config.undoRedo" class="tool-group">
-            <UndoRedoButton :editor="editor" />
+            <UndoRedoButton />
           </div>
 
           <div v-if="config.formatPainter" class="tool-group">
-            <FormatPainterButton :editor="editor" />
+            <FormatPainterButton />
           </div>
 
           <div v-if="config.searchReplace" class="tool-group">
-            <FindReplaceButton :editor="editor" :hotkeys-enabled="!!config.searchReplace" />
+            <FindReplaceButton :hotkeys-enabled="!!config.searchReplace" />
           </div>
 
           <div v-if="config.outline" class="tool-group">
@@ -27,7 +27,7 @@
           </div>
 
           <div v-if="config.clearFormat" class="tool-group">
-            <ClearFormatButton :editor="editor" />
+            <ClearFormatButton />
           </div>
         </div>
 
@@ -39,13 +39,13 @@
           :aria-label="t('editor.toolbarSectionTypography')"
         >
           <div v-if="config.font" class="tool-group">
-            <FontFamilySelect :editor="editor" />
-            <FontSizeSelect :editor="editor" />
+            <FontFamilySelect />
+            <FontSizeSelect />
           </div>
 
           <div v-if="config.textFormat || config.codeBlock" class="tool-group">
-            <TextFormatButtons v-if="config.textFormat" :editor="editor" />
-            <CodeBlockDropdown v-if="config.codeBlock" :editor="editor" />
+            <TextFormatButtons v-if="config.textFormat" />
+            <CodeBlockDropdown v-if="config.codeBlock" />
           </div>
 
           <div v-if="config.colorPicker" class="tool-group">
@@ -76,12 +76,12 @@
           :aria-label="t('editor.toolbarSectionParagraph')"
         >
           <div v-if="config.heading || config.list" class="tool-group">
-            <HeadingDropdown v-if="config.heading" :editor="editor" />
-            <ListTools v-if="config.list" :editor="editor" :show-task-list="true" />
+            <HeadingControl v-if="config.heading" variant="dropdown" />
+            <ListTools v-if="config.list" :show-task-list="true" />
           </div>
 
           <div v-if="config.align" class="tool-group">
-            <AlignDropdown :editor="editor" />
+            <AlignDropdown />
           </div>
         </div>
 
@@ -93,24 +93,24 @@
           :aria-label="t('editor.toolbarSectionInsert')"
         >
           <div v-if="config.link || config.table || config.image" class="tool-group">
-            <LinkButton v-if="config.link" :editor="editor" />
-            <TableButton v-if="config.table" :editor="editor" />
-            <ImageUpload v-if="config.image" :editor="editor" />
-            <VideoUpload v-if="config.image" :editor="editor" />
+            <LinkButton v-if="config.link" />
+            <TableButton v-if="config.table" />
+            <ImageUpload v-if="config.image" />
+            <VideoUpload v-if="config.image" />
           </div>
 
           <div v-if="config.subscriptSuperscript || config.math" class="tool-group">
-            <SubscriptSuperscriptButton v-if="config.subscriptSuperscript" :editor="editor" />
-            <MathButton v-if="config.math" :editor="editor" />
+            <SubscriptSuperscriptButton v-if="config.subscriptSuperscript" />
+            <MathButton v-if="config.math" />
           </div>
 
           <div v-if="config.word" class="tool-group">
-            <WordButton :editor="editor" />
+            <WordButton />
           </div>
 
           <div v-if="config.template || config.gallery" class="tool-group">
-            <TemplateButton v-if="config.template" :editor="editor" />
-            <GalleryButton v-if="config.gallery" :editor="editor" />
+            <TemplateButton v-if="config.template" />
+            <GalleryButton v-if="config.gallery" />
           </div>
         </div>
 
@@ -148,7 +148,7 @@
  * @description 可配置的工具栏组件，支持通过配置控制显示哪些工具
  * @example
  * ```vue
- * <ToolbarNav :editor="editor" :config="{ textFormat: true, colorPicker: true }" />
+ * <ToolbarNav :config="{ textFormat: true, colorPicker: true }" />
  * ```
  */
 import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
@@ -163,7 +163,7 @@ import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";
 import { FormatPainterButton } from "@/components/editor/format-painter";
 import { GalleryButton } from "@/components/editor/gallery";
-import { HeadingDropdown } from "@/components/editor/heading";
+import { HeadingControl } from "@/components/editor/heading";
 import { ImageUpload } from "@/components/editor/image";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";
@@ -177,6 +177,7 @@ import { UndoRedoButton } from "@/components/editor/undo-redo";
 import { VideoUpload } from "@/components/editor/video";
 import { WordButton } from "@/components/editor/word";
 import { useEditorColorState } from "@/composables/useEditorColorState";
+import { useYanivEditor } from "@/core/editorContext";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 
@@ -187,15 +188,15 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  /** 编辑器实例 */
-  editor: Editor | null | undefined;
+  /** 独立拼装时传入；YanivEditor 内可省略 */
+  editor?: Editor | null;
   /** 工具栏配置，控制显示哪些工具 */
   config?: ToolbarToolsConfig;
 }
 
 const props = defineProps<Props>();
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 const config = computed(() => ({
   ...FULL_TOOLBAR_CONFIG,

@@ -45,6 +45,7 @@ import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -52,7 +53,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 图片上传函数（可选） */
   uploadImage?: (file: File) => Promise<string>;
 }
@@ -61,7 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
   uploadImage: undefined,
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 const runCommand = createCommandRunner(editor);
 
 // ===== 状态 =====

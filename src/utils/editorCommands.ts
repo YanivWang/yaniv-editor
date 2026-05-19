@@ -3,8 +3,9 @@
  * @description 编辑器命令执行工具函数
  */
 
+import { toValue, type MaybeRefOrGetter } from "vue";
+
 import type { Editor } from "@tiptap/core";
-import type { Ref } from "vue";
 
 /**
  * 链式命令类型
@@ -29,9 +30,9 @@ export type CommandBuilder = (chain: EditorChain) => EditorChain;
  * toggleBold() // 执行粗体切换
  * ```
  */
-export function createCommandRunner(editor: Ref<Editor | null | undefined>) {
+export function createCommandRunner(editor: MaybeRefOrGetter<Editor | null | undefined>) {
   return (fn: CommandBuilder) => () => {
-    const e = editor.value;
+    const e = toValue(editor);
     if (!e) {
       console.warn("[editorCommands] Editor instance is null or undefined");
       return;
@@ -46,9 +47,11 @@ export function createCommandRunner(editor: Ref<Editor | null | undefined>) {
  * @param editor - 编辑器实例引用
  * @returns 命令执行函数
  */
-export function createCommandRunnerWithoutFocus(editor: Ref<Editor | null | undefined>) {
+export function createCommandRunnerWithoutFocus(
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
+) {
   return (fn: CommandBuilder) => () => {
-    const e = editor.value;
+    const e = toValue(editor);
     if (!e) {
       console.warn("[editorCommands] Editor instance is null or undefined");
       return;
@@ -71,11 +74,11 @@ export function createCommandRunnerWithoutFocus(editor: Ref<Editor | null | unde
  * ```
  */
 export function executeCommand(
-  editor: Ref<Editor | null | undefined>,
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
   fn: CommandBuilder,
   withFocus = true,
 ): boolean {
-  const e = editor.value;
+  const e = toValue(editor);
   if (!e) {
     console.warn("[editorCommands] Editor instance is null or undefined");
     return false;
@@ -102,11 +105,11 @@ export function executeCommand(
  * ```
  */
 export function executeBatchCommands(
-  editor: Ref<Editor | null | undefined>,
+  editor: MaybeRefOrGetter<Editor | null | undefined>,
   commands: CommandBuilder[],
   withFocus = true,
 ): boolean {
-  const e = editor.value;
+  const e = toValue(editor);
   if (!e) {
     console.warn("[editorCommands] Editor instance is null or undefined");
     return false;

@@ -1,10 +1,10 @@
 /**
  * FloatingMenu 样式
- * @description 浮动菜单（依赖 variables.css）
+ * @description 选中文本时的浮动工具栏（BubbleMenu）
  */
 
 .floating-menu {
-  z-index: 999;
+  z-index: 1010;
   display: flex;
   padding: 4px;
   background: var(--ye-bubble-bg);
@@ -14,6 +14,7 @@
 
 .menu-content {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   align-items: center;
 }
@@ -30,10 +31,6 @@
   border-right: none;
 }
 
-.ProseMirror-floatingmenu {
-  animation: ye-slide-in 0.2s ease-in-out;
-}
-
 .tippy-box[data-theme~="light"] {
   background-color: transparent;
   border: none;
@@ -46,7 +43,11 @@
 
 @media (width <= 768px) {
   .floating-menu,
-  .ProseMirror-floatingmenu {
+  .menu-content {
+    gap: 2px;
+  }
+
+  .floating-menu {
     display: none !important;
   }
 }

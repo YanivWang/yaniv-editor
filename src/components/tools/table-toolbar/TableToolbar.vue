@@ -100,21 +100,17 @@ import {
   TableOutlined,
   DeleteOutlined,
 } from "@ant-design/icons-vue";
-import { CellSelection } from "@tiptap/pm/tables";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { Tooltip as ATooltip } from "ant-design-vue";
-import { computed } from "vue";
 
-import { isBlockDragging } from "@/components/tools/drag-handle";
+import { shouldShowTableBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
-import type { Editor } from "@tiptap/vue-3";
-
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined;
     readonly?: boolean;
     showMode?: 1 | 2;
   }>(),
@@ -124,7 +120,7 @@ const props = withDefaults(
   },
 );
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor();
 
 const runCommand = createCommandRunner(editor);
 const { canExecute } = createStateCheckers(editor);
@@ -208,22 +204,8 @@ const cellTools = [
   },
 ];
 
-const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (props.readonly) return false;
-
-  if (isBlockDragging(bubbleProps.editor)) return false;
-
-  if (props.showMode === 1) {
-    if (!bubbleProps.editor.isActive("table")) return false;
-  }
-
-  if (props.showMode === 2) {
-    const sel = bubbleProps.state?.selection;
-    return sel instanceof CellSelection;
-  }
-
-  return true;
-};
+const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
+  shouldShowTableBubbleMenu(bubbleProps, props.readonly, props.showMode);
 
 function deleteTable() {
   runCommand((chain) => chain.deleteTable())();

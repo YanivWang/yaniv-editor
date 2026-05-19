@@ -1,4 +1,4 @@
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 
 /**
  * Returns true while a block is being dragged via the drag handle.

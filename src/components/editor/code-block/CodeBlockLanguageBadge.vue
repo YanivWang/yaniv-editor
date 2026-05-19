@@ -28,17 +28,19 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { CODE_LANGUAGES, DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
+import { useYanivEditor } from "@/core/editorContext";
 
 import { findCodeBlockDepth, updateCodeBlockLanguage } from "./codeBlockUtils";
 
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   container?: HTMLElement | null;
 }
 
 const props = defineProps<Props>();
+const editor = useYanivEditor(() => props.editor);
 
 const visible = ref(false);
 const badgeStyle = ref<Record<string, string>>({ top: "0", left: "0" });
@@ -49,7 +51,7 @@ const languageOptions = CODE_LANGUAGES.map((lang) => ({
 }));
 
 const currentLanguage = computed(() => {
-  const lang = props.editor?.getAttributes("codeBlock")?.language;
+  const lang = editor.value?.getAttributes("codeBlock")?.language;
   return typeof lang === "string" && lang ? lang : DEFAULT_CODE_BLOCK_LANGUAGE;
 });
 
@@ -81,14 +83,14 @@ function findActivePre(editor: Editor): HTMLElement | null {
 }
 
 function updatePosition() {
-  const editor = props.editor;
+  const e = editor.value;
   const container = props.container;
-  if (!editor?.view || !container) {
+  if (!e?.view || !container) {
     visible.value = false;
     return;
   }
 
-  const pre = findActivePre(editor);
+  const pre = findActivePre(e);
   if (!pre) {
     visible.value = false;
     return;
@@ -109,24 +111,24 @@ function scheduleUpdate() {
 }
 
 function onLanguageChange(language: string) {
-  const editor = props.editor;
-  if (!editor) return;
-  updateCodeBlockLanguage(editor, language);
+  const e = editor.value;
+  if (!e) return;
+  updateCodeBlockLanguage(e, language);
   scheduleUpdate();
 }
 
 function bindEditorEvents() {
-  const editor = props.editor;
-  if (!editor) return;
-  editor.on("selectionUpdate", scheduleUpdate);
-  editor.on("transaction", scheduleUpdate);
+  const e = editor.value;
+  if (!e) return;
+  e.on("selectionUpdate", scheduleUpdate);
+  e.on("transaction", scheduleUpdate);
 }
 
 function unbindEditorEvents() {
-  const editor = props.editor;
-  if (!editor) return;
-  editor.off("selectionUpdate", scheduleUpdate);
-  editor.off("transaction", scheduleUpdate);
+  const e = editor.value;
+  if (!e) return;
+  e.off("selectionUpdate", scheduleUpdate);
+  e.off("transaction", scheduleUpdate);
 }
 
 let scrollEl: HTMLElement | null = null;
@@ -136,7 +138,7 @@ function onScroll() {
 }
 
 watch(
-  () => props.editor,
+  () => editor.value,
   (next, prev) => {
     if (prev) unbindEditorEvents();
     if (next) {

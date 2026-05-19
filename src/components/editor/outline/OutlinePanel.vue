@@ -36,13 +36,14 @@
 
 <script setup lang="ts">
 import { CloseOutlined } from "@ant-design/icons-vue";
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import { useOutlinePanel } from "./useOutlinePanel";
 
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 
 interface OutlineItem {
   id: string;
@@ -54,7 +55,7 @@ interface OutlineItem {
 }
 
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
@@ -62,7 +63,7 @@ const props = defineProps<Props>();
 const { close } = useOutlinePanel();
 const items = ref<OutlineItem[]>([]);
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 function syncItems() {
   const e = editor.value;

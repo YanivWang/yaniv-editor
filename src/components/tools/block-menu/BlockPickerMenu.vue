@@ -46,6 +46,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import {
@@ -66,8 +67,10 @@ import type {
 import type { Editor } from "@tiptap/core";
 
 const props = defineProps<{
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }>();
+
+const editor = useYanivEditor(() => props.editor);
 
 const isVisible = ref(false);
 const mode = ref<BlockPickerMode | null>(null);
@@ -114,14 +117,14 @@ function isFlatIndex(group: BlockMenuGroupDef, itemIdx: number): number {
 }
 
 function setInsertMenuOpen(open: boolean): void {
-  const editor = props.editor;
-  if (!editor?.storage.dragHandle) return;
-  editor.storage.dragHandle.insertMenuOpen = open;
+  const e = editor.value;
+  if (!e?.storage.dragHandle) return;
+  e.storage.dragHandle.insertMenuOpen = open;
 }
 
 function selectItem(item: BlockMenuItemDef) {
-  const editor = props.editor;
-  if (!editor || !mode.value) return;
+  const e = editor.value;
+  if (!e || !mode.value) return;
 
   const blockId = item.id;
   if (isMediaBlockId(blockId)) {
@@ -130,20 +133,20 @@ function selectItem(item: BlockMenuItemDef) {
     const context = insertContext.value;
 
     if (currentMode === "slash") {
-      const pluginState = slashCommandKey.getState(editor.state) as SlashCommandState | undefined;
+      const pluginState = slashCommandKey.getState(e.state) as SlashCommandState | undefined;
       const slashRange = pluginState?.range ? { ...pluginState.range } : null;
-      const insertPos = slashRange?.from ?? editor.state.selection.from;
+      const insertPos = slashRange?.from ?? e.state.selection.from;
 
       // 先删除 "/" 触发文本再打开文件选择器，避免失焦后斜杠命令重新激活并残留「无匹配结果」
       if (slashRange) {
-        editor.chain().focus().deleteRange(slashRange).run();
+        e.chain().focus().deleteRange(slashRange).run();
       }
 
       hide();
 
       void pickMediaFile(accept).then((src) => {
         if (!src) return;
-        insertBlockMediaAt(editor, insertPos, blockId, src);
+        insertBlockMediaAt(e, insertPos, blockId, src);
       });
 
       return;
@@ -154,7 +157,7 @@ function selectItem(item: BlockMenuItemDef) {
     void pickMediaFile(accept).then((src) => {
       if (!src) return;
       if (context) {
-        insertBlockMediaAt(editor, context.insertPos, blockId, src);
+        insertBlockMediaAt(e, context.insertPos, blockId, src);
       }
     });
 
@@ -162,13 +165,13 @@ function selectItem(item: BlockMenuItemDef) {
   }
 
   if (mode.value === "slash") {
-    const pluginState = slashCommandKey.getState(editor.state) as SlashCommandState | undefined;
+    const pluginState = slashCommandKey.getState(e.state) as SlashCommandState | undefined;
     if (pluginState?.range) {
-      editor.chain().focus().deleteRange(pluginState.range).run();
+      e.chain().focus().deleteRange(pluginState.range).run();
     }
-    applyBlockTransform(editor, item.id);
+    applyBlockTransform(e, item.id);
   } else if (insertContext.value) {
-    applyBlockInsert(editor, insertContext.value, item.id);
+    applyBlockInsert(e, insertContext.value, item.id);
   }
 
   hide();
@@ -210,7 +213,7 @@ function hide() {
   if (!isVisible.value) return;
 
   const previousMode = mode.value;
-  const editor = props.editor;
+  const e = editor.value;
 
   if (previousMode === "insert") {
     setInsertMenuOpen(false);
@@ -222,10 +225,10 @@ function hide() {
   query.value = "";
   selectedIndex.value = 0;
 
-  if (editor && previousMode === "slash") {
-    const { tr } = editor.state;
+  if (e && previousMode === "slash") {
+    const { tr } = e.state;
     tr.setMeta(slashCommandKey, { deactivate: true });
-    editor.view.dispatch(tr);
+    e.view.dispatch(tr);
   }
 }
 

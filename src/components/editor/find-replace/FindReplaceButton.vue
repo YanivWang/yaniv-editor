@@ -44,16 +44,18 @@
  */
 import { SearchOutlined } from "@ant-design/icons-vue";
 import { Modal, Input, Button, Checkbox, Space } from "ant-design-vue";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
+
 
 import { ToolbarButton } from "@/components/base";
 import { useFindReplaceHotkey } from "@/composables/useFindReplaceHotkey";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
 import type { Editor } from "@tiptap/vue-3";
 
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** Ctrl/Cmd+F 是否打开面板 */
   hotkeysEnabled?: boolean;
 }
@@ -62,7 +64,7 @@ const props = withDefaults(defineProps<Props>(), {
   hotkeysEnabled: true,
 });
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 const visible = ref(false);
 const term = ref("");

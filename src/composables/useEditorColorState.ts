@@ -1,18 +1,18 @@
-import { ref, watch, type Ref } from "vue";
+import { ref, toValue, watch, type MaybeRefOrGetter } from "vue";
 
 import { normalizeColor } from "@/utils/color";
 import { createCommandRunner } from "@/utils/editorCommands";
 
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 
-export function useEditorColorState(editor: Ref<Editor | null>) {
+export function useEditorColorState(editor: MaybeRefOrGetter<Editor | null>) {
   const currentTextColor = ref("#000000");
   const currentBgColor = ref("#ffffff");
 
   const runCommand = createCommandRunner(editor);
 
   watch(
-    () => editor.value?.getAttributes("textStyle"),
+    () => toValue(editor)?.getAttributes("textStyle"),
     (attrs) => {
       currentTextColor.value = attrs?.color ? normalizeColor(attrs.color) : "#000000";
     },
@@ -20,7 +20,7 @@ export function useEditorColorState(editor: Ref<Editor | null>) {
   );
 
   watch(
-    () => editor.value?.getAttributes("highlight"),
+    () => toValue(editor)?.getAttributes("highlight"),
     (attrs) => {
       currentBgColor.value = attrs?.color ? normalizeColor(attrs.color) : "#ffffff";
     },

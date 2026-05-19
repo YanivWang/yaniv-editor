@@ -17,9 +17,10 @@
  * FontSizeSelect - 字号选择器组件
  * @description 可复用的字号选择器组件，支持选择字号大小
  */
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 import { FONT_SIZES, DEFAULT_VALUES } from "@/configs/editorConstants";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner, executeBatchCommands } from "@/utils/editorCommands";
 
@@ -27,11 +28,11 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);

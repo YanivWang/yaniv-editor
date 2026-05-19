@@ -21,9 +21,10 @@
  * @description 可复用的撤销/重做按钮组件，提供撤销和重做功能
  */
 import { UndoOutlined, RedoOutlined } from "@ant-design/icons-vue";
-import { computed, ref, watch, onBeforeUnmount, nextTick } from "vue";
+import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 
@@ -31,7 +32,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
 interface Props {
-  editor: Editor | null | undefined;
+  editor?: Editor | null;
   /** 是否禁用按钮 */
   disabled?: boolean;
 }
@@ -39,7 +40,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
 });
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor(() => props.editor);
 
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);

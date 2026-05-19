@@ -47,15 +47,13 @@
 import { EyeOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 
-import { isBlockDragging } from "@/components/tools/drag-handle";
-
-import type { Editor } from "@tiptap/vue-3";
+import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useYanivEditor } from "@/core/editorContext";
 
 const props = withDefaults(
   defineProps<{
-    editor: Editor | null | undefined;
     readonly?: boolean;
   }>(),
   {
@@ -63,7 +61,7 @@ const props = withDefaults(
   },
 );
 
-const editor = computed(() => props.editor ?? null);
+const editor = useYanivEditor();
 const previewVisible = ref(false);
 const previewVideoRef = ref<HTMLVideoElement | null>(null);
 const currentVideoSrc = ref("");
@@ -100,24 +98,13 @@ function getCurrentVideoInfo() {
   return { node, pos };
 }
 
-const shouldShow = (bubbleProps: { editor: any }) => {
-  if (props.readonly || !bubbleProps.editor) {
-    return false;
-  }
-
-  if (isBlockDragging(bubbleProps.editor)) return false;
-
-  if (!bubbleProps.editor.isActive("video")) {
-    return false;
-  }
+const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
+  if (!shouldShowVideoBubbleMenu(bubbleProps, props.readonly)) return false;
 
   const { node } = getCurrentVideoInfo();
-  if (node?.type.name !== "video") {
-    return false;
-  }
+  if (node?.type.name !== "video") return false;
 
   currentVideoSrc.value = node.attrs.src || "";
-
   return true;
 };
 
