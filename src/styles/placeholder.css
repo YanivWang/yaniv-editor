@@ -23,12 +23,9 @@
 .ProseMirror h3.is-empty::before,
 .ProseMirror h4.is-empty::before,
 .ProseMirror h5.is-empty::before,
-.ProseMirror h6.is-empty::before {
-  color: var(--tiptap-text-muted, #9b9a97);
-}
-
+.ProseMirror h6.is-empty::before,
 .ProseMirror pre.is-empty::before {
-  color: var(--tiptap-text-muted, #9b9a97);
+  color: var(--tiptap-placeholder-color, #ccc);
 }
 
 .theme-notion .ProseMirror p.is-empty::before,
@@ -40,5 +37,4 @@
 .theme-notion .ProseMirror h6.is-empty::before,
 .theme-notion .ProseMirror pre.is-empty::before {
   font-style: italic;
-  color: var(--tiptap-text-muted, #9b9a97);
 }

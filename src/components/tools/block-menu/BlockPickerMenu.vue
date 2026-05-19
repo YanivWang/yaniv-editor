@@ -150,7 +150,7 @@ function openInsert(context: BlockInsertContext) {
   insertContext.value = context;
   position.value = {
     x: context.anchorRect.right + 8,
-    y: context.anchorRect.top,
+    y: context.blockRect.bottom,
   };
   query.value = "";
   isVisible.value = true;
@@ -205,7 +205,13 @@ function adjustPosition() {
     x = viewportWidth - rect.width - margin;
   }
 
-  if (y + rect.height + margin > viewportHeight) {
+  if (mode.value === "insert" && insertContext.value) {
+    // 菜单底部与当前块底部对齐（与占位行下边一致）
+    y = insertContext.value.blockRect.bottom - rect.height;
+    if (y < margin) {
+      y = margin;
+    }
+  } else if (y + rect.height + margin > viewportHeight) {
     y = y - rect.height - 24;
   }
 

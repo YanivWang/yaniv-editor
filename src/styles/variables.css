@@ -16,6 +16,7 @@
   --tiptap-text: #1a1a1a;
   --tiptap-text-secondary: #666666;
   --tiptap-text-muted: #999999;
+  --tiptap-placeholder-color: #ccc;
 
   /* ===== Borders ===== */
   --tiptap-border: #e5e5e5;
@@ -105,6 +106,7 @@
   --tiptap-text: #e5e5e5;
   --tiptap-text-secondary: #a3a3a3;
   --tiptap-text-muted: #737373;
+  --tiptap-placeholder-color: #666;
   --tiptap-border: #333333;
   --tiptap-border-hover: #444444;
   --tiptap-selection: rgba(96, 165, 250, 0.25);

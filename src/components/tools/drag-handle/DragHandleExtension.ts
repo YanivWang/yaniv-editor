@@ -19,6 +19,7 @@ export interface DragInsertMenuContext {
   targetNodeSize: number;
   insertPos: number;
   anchorRect: DOMRect;
+  blockRect: DOMRect;
 }
 
 export interface DragHandleOptions {
@@ -712,6 +713,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
               targetNodeSize: target.node.nodeSize,
               insertPos: target.pos + target.node.nodeSize,
               anchorRect: plusButton.getBoundingClientRect(),
+              blockRect: target.dom.getBoundingClientRect(),
             });
           };
 

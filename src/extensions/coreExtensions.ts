@@ -8,7 +8,6 @@ import { Color } from "@tiptap/extension-color";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
-import { Placeholder } from "@tiptap/extension-placeholder";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Table } from "@tiptap/extension-table";
@@ -47,6 +46,7 @@ import { ResizableImage } from "./resizableImage";
 import { resolveExtensionGates, type ResolvedExtensionGates } from "./resolveExtensionGates";
 import { SearchReplace } from "./search-replace";
 import { Video } from "./video";
+import { YanivPlaceholder } from "./yanivPlaceholder";
 
 import type { AnyExtension } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
@@ -121,10 +121,9 @@ export function getExtensionsByVersion(
   extensions.push(StarterKit.configure(starterKitConfig));
   extensions.push(codeBlockLowlightExtension);
 
-  // 占位符扩展（每个空块显示提示，需配合 src/styles/placeholder.css）
+  // 占位符：段落仅光标所在时显示；标题/代码块等空块始终显示（见 yanivPlaceholder.ts）
   extensions.push(
-    Placeholder.configure({
-      showOnlyCurrent: false,
+    YanivPlaceholder.configure({
       placeholder: ({ node }: { node: ProseMirrorNode }) => {
         if (node.type.name === "heading") {
           return t("placeholder.heading");
