@@ -45,7 +45,7 @@
 | 链接气泡菜单        | 关          | `features.linkBubbleMenu: true`     |
 | 表格工具栏          | 关          | `features.tableToolbar: true`       |
 | 图片工具栏          | 关          | 随 image 扩展 + Demo 配置           |
-| 块拖拽排序          | 开          | `features.dragHandle !== false`     |
+| 块添加/菜单/拖拽    | 开          | `features.dragHandle !== false`     |
 | Office/WPS 粘贴增强 | 开          | `features.officePaste !== false`    |
 | 标题大纲/锚点       | advanced 开 | `features.outline`                  |
 | 分页视图            | 开          | Word 模式 CSS + useEditorPagination |

@@ -28,7 +28,7 @@
 | `tableToolbar`        | `boolean` | `false`                        | 表格上下文工具栏 UI  |
 | `mention`             | `boolean` | —                              | **预留，未实现**     |
 | `slashCommand`        | `boolean` | `false`                        | 斜杠命令菜单         |
-| `dragHandle`          | `boolean` | `true`                         | 块拖拽手柄           |
+| `dragHandle`          | `boolean` | `true`                         | 块添加、块菜单与拖拽 |
 | `floatingMenu`        | `boolean` | `false`                        | 选区浮动菜单         |
 | `linkBubbleMenu`      | `boolean` | `false`                        | 链接气泡             |
 | `headerNav`           | `boolean` | `false`                        | 顶部工具栏           |

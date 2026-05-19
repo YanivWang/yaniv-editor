@@ -32,18 +32,18 @@
 
 .drag-handle {
   display: grid;
-  grid-template-columns: repeat(2, 3px);
-  gap: 3px 4px;
+  grid-template-columns: repeat(2, 2px);
+  gap: 3px 5px;
   cursor: grab;
 }
 
 .drag-handle-plus {
   display: flex;
   padding: 0;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 31px;
+  font-weight: 300;
   line-height: 1;
-  color: #6b7280;
+  color: #cfcfcf;
   cursor: pointer;
 }
 
@@ -54,25 +54,25 @@
 
 .drag-handle:hover,
 .drag-handle-plus:hover {
-  background: rgb(0 0 0 / 8%);
+  background: rgb(55 53 47 / 8%);
 }
 
 .drag-handle:active,
 .drag-handle.is-dragging {
   cursor: grabbing;
-  background: rgb(59 130 246 / 15%);
+  background: rgb(55 53 47 / 8%);
 }
 
 .drag-handle__dot {
   display: block;
-  width: 3px;
-  height: 3px;
-  background: #6b7280;
+  width: 2px;
+  height: 2px;
+  background: #cfcfcf;
   border-radius: 999px;
 }
 
 .drag-handle.is-dragging .drag-handle__dot {
-  background: #3b82f6;
+  background: #cfcfcf;
 }
 
 .drag-handle-menu {
@@ -104,6 +104,13 @@
   display: block;
 }
 
+.drag-handle-menu.is-actions-menu {
+  width: 196px;
+  max-height: min(360px, calc(100vh - 16px));
+  padding: 8px;
+  overflow: visible;
+}
+
 .drag-handle-menu__item {
   display: flex;
   flex-direction: column;
@@ -117,6 +124,19 @@
   background: transparent;
   border: 0;
   border-radius: 6px;
+}
+
+.drag-handle-menu.is-actions-menu .drag-handle-menu__item {
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 15px;
+}
+
+.drag-handle-menu.is-actions-menu .drag-handle-menu__item.has-submenu {
+  cursor: default;
 }
 
 .drag-handle-menu__item:hover {
@@ -133,10 +153,56 @@
   line-height: 1.35;
 }
 
+.drag-handle-menu.is-actions-menu .drag-handle-menu__label {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
 .drag-handle-menu__description {
   font-size: 12px;
   line-height: 1.35;
   color: #6b7280;
+}
+
+.drag-handle-menu.is-actions-menu .drag-handle-menu__description {
+  display: none;
+}
+
+.drag-handle-menu__arrow {
+  margin-left: auto;
+  font-size: 18px;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.drag-handle-menu__submenu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px);
+  z-index: 1004;
+  display: none;
+  width: 196px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid rgb(15 23 42 / 10%);
+  border-radius: 8px;
+  box-shadow:
+    0 12px 32px rgb(15 23 42 / 14%),
+    0 2px 8px rgb(15 23 42 / 8%);
+}
+
+.drag-handle-menu.is-actions-menu .drag-handle-menu__submenu {
+  top: auto;
+  bottom: 0;
+  max-height: min(360px, calc(100vh - 16px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.drag-handle-menu__item.has-submenu:hover > .drag-handle-menu__submenu,
+.drag-handle-menu__item.has-submenu.is-submenu-open > .drag-handle-menu__submenu,
+.drag-handle-menu__item.has-submenu:focus-within > .drag-handle-menu__submenu {
+  display: block;
 }
 
 .drag-handle-menu__divider {
@@ -146,9 +212,9 @@
 }
 
 .theme-notion .drag-handle-plus {
-  width: 26px;
-  height: 26px;
-  color: rgb(120 119 116);
+  width: 24px;
+  height: 24px;
+  color: #cfcfcf;
   border: 1px solid transparent;
   border-radius: 5px;
   transition:
@@ -160,8 +226,8 @@
 
 .theme-notion .drag-handle {
   left: max(12px, var(--drag-handle-left, 0px));
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border: 1px solid transparent;
   border-radius: 5px;
   transition:
@@ -175,16 +241,16 @@
 .theme-notion .drag-handle-plus:hover,
 .theme-notion .drag-handle.is-dragging {
   background: rgb(55 53 47 / 8%);
-  border-color: rgb(55 53 47 / 9%);
-  box-shadow: 0 1px 2px rgb(15 15 15 / 6%);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .theme-notion .drag-handle__dot {
-  background: rgb(120 119 116);
+  background: #cfcfcf;
 }
 
 .theme-notion .drag-handle.is-dragging .drag-handle__dot {
-  background: rgb(35 131 226);
+  background: #cfcfcf;
 }
 
 .drag-handle-menu.theme-notion-menu {
@@ -212,18 +278,18 @@
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle__dot {
-  background: #a3a3a3;
+  background: #cfcfcf;
 }
 
 .theme-notion[data-theme="dark"] .drag-handle-plus:hover,
 .theme-notion[data-theme="dark"] .drag-handle:hover,
 .theme-notion[data-theme="dark"] .drag-handle.is-dragging {
   background: rgb(255 255 255 / 10%);
-  border-color: rgb(255 255 255 / 12%);
+  border-color: transparent;
 }
 
 .theme-notion[data-theme="dark"] .drag-handle__dot {
-  background: rgb(155 154 151);
+  background: #cfcfcf;
 }
 
 :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .drag-handle-menu,

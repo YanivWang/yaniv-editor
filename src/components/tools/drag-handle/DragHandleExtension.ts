@@ -102,7 +102,8 @@ interface BlockMenuItem {
   description?: string;
   danger?: boolean;
   dividerBefore?: boolean;
-  run: () => void;
+  submenu?: BlockMenuItem[];
+  run?: () => void;
 }
 
 function isDraggableNode(node: ProseMirrorNode): boolean {
@@ -421,38 +422,6 @@ function setCursorAfterTarget(view: EditorView, target: DragTarget): void {
   view.focus();
 }
 
-function moveTarget(view: EditorView, target: DragTarget, direction: "up" | "down"): boolean {
-  const $pos = view.state.doc.resolve(target.pos);
-  const index = $pos.index();
-  const parent = $pos.parent;
-  const nodeToMove = target.node.copy(target.node.content);
-
-  if (direction === "up") {
-    if (index <= 0) return false;
-
-    const previousNode = parent.child(index - 1);
-    const previousPos = target.pos - previousNode.nodeSize;
-    const tr = view.state.tr
-      .delete(target.pos, target.pos + target.node.nodeSize)
-      .insert(previousPos, nodeToMove);
-    tr.setSelection(NodeSelection.create(tr.doc, previousPos));
-    view.dispatch(tr.scrollIntoView());
-    view.focus();
-    return true;
-  }
-
-  if (index >= parent.childCount - 1) return false;
-
-  const nextNode = parent.child(index + 1);
-  const tr = view.state.tr
-    .delete(target.pos, target.pos + target.node.nodeSize)
-    .insert(target.pos + nextNode.nodeSize, nodeToMove);
-  tr.setSelection(NodeSelection.create(tr.doc, target.pos + nextNode.nodeSize));
-  view.dispatch(tr.scrollIntoView());
-  view.focus();
-  return true;
-}
-
 function createInsertItems(
   view: EditorView,
   target: DragTarget,
@@ -513,91 +482,147 @@ function createInsertItems(
   ];
 }
 
-function createActionItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
+function createTransformItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
   const { schema } = view.state;
   const text = target.node.textContent;
 
   return [
     {
+      id: "paragraph",
+      label: "正文",
+      run: () => replaceTargetNode(view, target, createParagraph(schema, text)),
+    },
+    {
+      id: "heading1",
+      label: "标题 1",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 1, text)),
+    },
+    {
+      id: "heading2",
+      label: "标题 2",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 2, text)),
+    },
+    {
+      id: "heading3",
+      label: "标题 3",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 3, text)),
+    },
+    {
+      id: "blockquote",
+      label: "引用",
+      run: () => replaceTargetNode(view, target, createBlockquote(schema, text)),
+    },
+    {
+      id: "bulletList",
+      label: "无序列表",
+      run: () => replaceTargetNode(view, target, createList(schema, "bulletList", text)),
+    },
+    {
+      id: "orderedList",
+      label: "有序列表",
+      run: () => replaceTargetNode(view, target, createList(schema, "orderedList", text)),
+    },
+    {
+      id: "codeBlock",
+      label: "代码块",
+      run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
+    },
+  ];
+}
+
+function createActionItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
+  return [
+    {
       id: "duplicate",
       label: "复制块",
-      description: "在下方复制当前块",
       run: () => duplicateTargetNode(view, target),
     },
     {
       id: "delete",
       label: "删除块",
-      description: "删除当前块",
       danger: true,
       run: () => deleteTargetNode(view, target),
     },
     {
-      id: "moveUp",
-      label: "上移",
-      description: "与上一个块交换位置",
+      id: "turnInto",
+      label: "转换",
       dividerBefore: true,
-      run: () => moveTarget(view, target, "up"),
-    },
-    {
-      id: "moveDown",
-      label: "下移",
-      description: "与下一个块交换位置",
-      run: () => moveTarget(view, target, "down"),
-    },
-    {
-      id: "paragraph",
-      label: "转成正文",
-      description: "转换为普通段落",
-      dividerBefore: true,
-      run: () => replaceTargetNode(view, target, createParagraph(schema, text)),
-    },
-    {
-      id: "heading1",
-      label: "转成标题 1",
-      description: "转换为大标题",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 1, text)),
-    },
-    {
-      id: "heading2",
-      label: "转成标题 2",
-      description: "转换为中标题",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 2, text)),
-    },
-    {
-      id: "heading3",
-      label: "转成标题 3",
-      description: "转换为小标题",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 3, text)),
-    },
-    {
-      id: "blockquote",
-      label: "转成引用",
-      description: "转换为引用块",
-      run: () => replaceTargetNode(view, target, createBlockquote(schema, text)),
-    },
-    {
-      id: "bulletList",
-      label: "转成无序列表",
-      description: "转换为列表块",
-      run: () => replaceTargetNode(view, target, createList(schema, "bulletList", text)),
-    },
-    {
-      id: "orderedList",
-      label: "转成有序列表",
-      description: "转换为编号列表",
-      run: () => replaceTargetNode(view, target, createList(schema, "orderedList", text)),
-    },
-    {
-      id: "codeBlock",
-      label: "转成代码块",
-      description: "转换为代码块",
-      run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
+      submenu: createTransformItems(view, target),
     },
   ];
 }
 
 function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: () => void): void {
   menu.replaceChildren();
+
+  const createItemButton = (item: BlockMenuItem): HTMLElement => {
+    const itemElement = document.createElement(item.submenu ? "div" : "button");
+    itemElement.className = "drag-handle-menu__item";
+    itemElement.setAttribute("role", "menuitem");
+    itemElement.dataset.itemId = item.id;
+
+    if (itemElement instanceof HTMLButtonElement) {
+      itemElement.type = "button";
+    }
+
+    if (item.danger) {
+      itemElement.classList.add("is-danger");
+    }
+
+    if (item.submenu) {
+      itemElement.classList.add("has-submenu");
+      itemElement.tabIndex = 0;
+      itemElement.addEventListener("mouseenter", () => {
+        itemElement.classList.add("is-submenu-open");
+      });
+      itemElement.addEventListener("mouseleave", () => {
+        itemElement.classList.remove("is-submenu-open");
+      });
+    }
+
+    const label = document.createElement("span");
+    label.className = "drag-handle-menu__label";
+    label.textContent = item.label;
+    itemElement.appendChild(label);
+
+    if (item.submenu) {
+      const arrow = document.createElement("span");
+      arrow.className = "drag-handle-menu__arrow";
+      arrow.textContent = "›";
+      itemElement.appendChild(arrow);
+
+      const submenu = document.createElement("div");
+      submenu.className = "drag-handle-menu__submenu";
+      submenu.setAttribute("role", "menu");
+
+      for (const submenuItem of item.submenu) {
+        submenu.appendChild(createItemButton(submenuItem));
+      }
+
+      itemElement.appendChild(submenu);
+    }
+
+    if (item.description) {
+      const description = document.createElement("span");
+      description.className = "drag-handle-menu__description";
+      description.textContent = item.description;
+      itemElement.appendChild(description);
+    }
+
+    itemElement.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+    itemElement.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      if (item.submenu) return;
+
+      item.run?.();
+      closeMenu();
+    });
+
+    return itemElement;
+  };
 
   for (const item of items) {
     if (item.dividerBefore) {
@@ -606,45 +631,21 @@ function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: (
       menu.appendChild(divider);
     }
 
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "drag-handle-menu__item";
-    button.setAttribute("role", "menuitem");
-    button.dataset.itemId = item.id;
-    if (item.danger) {
-      button.classList.add("is-danger");
-    }
-
-    const label = document.createElement("span");
-    label.className = "drag-handle-menu__label";
-    label.textContent = item.label;
-    button.appendChild(label);
-
-    if (item.description) {
-      const description = document.createElement("span");
-      description.className = "drag-handle-menu__description";
-      description.textContent = item.description;
-      button.appendChild(description);
-    }
-
-    button.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-    });
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      item.run();
-      closeMenu();
-    });
-
-    menu.appendChild(button);
+    menu.appendChild(createItemButton(item));
   }
 }
 
-function positionBlockMenu(menu: HTMLElement, target: DragTarget, kind: BlockMenuKind): void {
+function positionBlockMenu(
+  menu: HTMLElement,
+  target: DragTarget,
+  kind: BlockMenuKind,
+  anchor?: HTMLElement,
+): void {
+  const anchorRect = anchor?.getBoundingClientRect() ?? target.dom.getBoundingClientRect();
   const targetRect = target.dom.getBoundingClientRect();
-  const xOffset = kind === "insert" ? 28 : 4;
+  const xOffset = kind === "insert" ? 8 : 10;
 
-  menu.style.left = `${Math.max(8, targetRect.left - 240 + xOffset)}px`;
+  menu.style.left = `${Math.max(8, anchorRect.right + xOffset)}px`;
   menu.style.top = `${Math.max(8, targetRect.top)}px`;
 
   requestAnimationFrame(() => {
@@ -714,15 +715,20 @@ export const DragHandleExtension = Extension.create({
             const rootRect = handleRoot.getBoundingClientRect();
             const targetRect = target.dom.getBoundingClientRect();
 
-            plusButton.style.left = `${targetRect.left - rootRect.left - 68}px`;
+            plusButton.style.left = `${targetRect.left - rootRect.left - 54}px`;
             plusButton.style.top = `${targetRect.top - rootRect.top + targetRect.height / 2}px`;
-            handle.style.left = `${targetRect.left - rootRect.left - 38}px`;
+            handle.style.left = `${targetRect.left - rootRect.left - 30}px`;
             handle.style.top = `${targetRect.top - rootRect.top + targetRect.height / 2}px`;
             plusButton.classList.add("is-visible");
             handle.classList.add("is-visible");
 
             if (activeMenuKind) {
-              positionBlockMenu(menu, target, activeMenuKind);
+              positionBlockMenu(
+                menu,
+                target,
+                activeMenuKind,
+                activeMenuKind === "insert" ? plusButton : handle,
+              );
             }
           };
 
@@ -730,6 +736,16 @@ export const DragHandleExtension = Extension.create({
             if (isDragging) return;
 
             const target = findTargetFromCoords(view, event);
+            if (
+              activeMenuKind &&
+              (!target ||
+                !currentTarget ||
+                target.pos !== currentTarget.pos ||
+                target.dom !== currentTarget.dom)
+            ) {
+              closeMenu();
+            }
+
             if (!target || !hasBlockContent(target.node)) {
               hideHandle();
               return;
@@ -778,7 +794,7 @@ export const DragHandleExtension = Extension.create({
                 : createActionItems(view, target),
               closeMenu,
             );
-            positionBlockMenu(menu, target, kind);
+            positionBlockMenu(menu, target, kind, kind === "insert" ? plusButton : handle);
             menu.classList.add("is-visible");
           };
 

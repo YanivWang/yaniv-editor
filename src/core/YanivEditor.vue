@@ -255,7 +255,7 @@ const initEditor = async () => {
       },
     });
 
-    // 添加块拖拽手柄扩展（只负责拖动排序，不提供点击菜单）
+    // 添加块控制扩展（左侧 + 添加、六点菜单与拖拽排序）
     if (!props.readonly && !isPreviewMode.value && props.features?.dragHandle !== false) {
       extensions.push(DragHandleExtension);
     }
