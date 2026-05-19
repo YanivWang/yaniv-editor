@@ -10,8 +10,13 @@ export interface TemplateItem {
   nameKey: string;
   /** 模板描述（翻译 key） */
   descKey: string;
-  /** 模板 HTML 内容 */
+  /** 模板 HTML 内容（表格单元格须含段落，如 `<td><p></p></td>`） */
   content: string;
+}
+
+/** 将空表格单元格补全为 `<p></p>`，满足 Tiptap tableCell schema */
+export function normalizeTemplateHtml(html: string): string {
+  return html.replace(/<(td|th)(\s[^>]*)?>\s*<\/\1>/gi, "<$1$2><p></p></$1>");
 }
 
 /**
@@ -25,10 +30,10 @@ const meetingMinutes: TemplateItem = {
 <h2>会议纪要</h2>
 <table>
   <tr><th>项目</th><th>内容</th></tr>
-  <tr><td>会议主题</td><td></td></tr>
-  <tr><td>日期</td><td></td></tr>
-  <tr><td>参会人</td><td></td></tr>
-  <tr><td>主持人</td><td></td></tr>
+  <tr><td>会议主题</td><td><p></p></td></tr>
+  <tr><td>日期</td><td><p></p></td></tr>
+  <tr><td>参会人</td><td><p></p></td></tr>
+  <tr><td>主持人</td><td><p></p></td></tr>
 </table>
 <h3>议题与讨论</h3>
 <ol>
@@ -41,8 +46,8 @@ const meetingMinutes: TemplateItem = {
 <h3>待办事项</h3>
 <table>
   <tr><th>事项</th><th>负责人</th><th>截止日期</th></tr>
-  <tr><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td></tr>
+  <tr><td><p></p></td><td><p></p></td><td><p></p></td></tr>
+  <tr><td><p></p></td><td><p></p></td><td><p></p></td></tr>
 </table>
 `.trim(),
 };
@@ -98,15 +103,15 @@ const projectPlan: TemplateItem = {
 <h4>3.2 时间计划</h4>
 <table>
   <tr><th>阶段</th><th>任务</th><th>起止时间</th><th>负责人</th></tr>
-  <tr><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td><p></p></td><td><p></p></td><td><p></p></td><td><p></p></td></tr>
+  <tr><td><p></p></td><td><p></p></td><td><p></p></td><td><p></p></td></tr>
 </table>
 <h3>4. 资源需求</h3>
 <p></p>
 <h3>5. 风险评估</h3>
 <table>
   <tr><th>风险</th><th>影响</th><th>应对措施</th></tr>
-  <tr><td></td><td></td><td></td></tr>
+  <tr><td><p></p></td><td><p></p></td><td><p></p></td></tr>
 </table>
 `.trim(),
 };
@@ -156,8 +161,8 @@ const productRequirement: TemplateItem = {
 <h4>4.1 功能列表</h4>
 <table>
   <tr><th>功能</th><th>优先级</th><th>描述</th></tr>
-  <tr><td></td><td>P0</td><td></td></tr>
-  <tr><td></td><td>P1</td><td></td></tr>
+  <tr><td><p></p></td><td>P0</td><td><p></p></td></tr>
+  <tr><td><p></p></td><td>P1</td><td><p></p></td></tr>
 </table>
 <h4>4.2 详细设计</h4>
 <p></p>
