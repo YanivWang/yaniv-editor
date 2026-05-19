@@ -33,8 +33,7 @@ import {
   AiHighlightMark,
 } from "@/ai";
 
-// import { CodeBlock } from '@tiptap/extension-code-block'
-
+import { codeBlockLowlightExtension } from "./codeBlockLowlight";
 import { FontSize } from "./fontSize";
 import { FormatPainter } from "./formatPainter";
 import { LineHeight } from "./lineHeight";
@@ -113,9 +112,12 @@ export function getExtensionsByVersion(
       width: 6,
       color: false,
     },
+    // 使用 CodeBlockLowlight 替代 StarterKit 内置代码块
+    codeBlock: false,
   };
 
   extensions.push(StarterKit.configure(starterKitConfig));
+  extensions.push(codeBlockLowlightExtension);
 
   // 占位符扩展
   extensions.push(
@@ -172,13 +174,6 @@ export function getExtensionsByVersion(
       nested: true,
     }),
   );
-
-  // 代码块扩展（StarterKit 已包含）
-  // extensions.push(
-  //   CodeBlock.configure({
-  //     languageClassPrefix: 'language-',
-  //   })
-  // )
 
   // 表格扩展（与 features.table 对齐）
   if (gates.table) {

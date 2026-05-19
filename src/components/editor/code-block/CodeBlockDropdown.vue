@@ -1,30 +1,33 @@
 <template>
   <ToolbarGroup>
-    <ToolbarButton
+    <ToolbarDropdownButton
       :icon="CodeOutlined"
       :title="t('toolbar.insertCodeBlock')"
       :active="isCodeBlockActive"
-      @click="insertCodeBlock"
+      :items="languageItems"
+      placement="bottomLeft"
     />
   </ToolbarGroup>
 </template>
 
 <script setup lang="ts">
 /**
- * CodeBlockDropdown - 代码块按钮组件
- * @description 点击直接插入代码块，使用默认语言
+ * CodeBlockDropdown - 代码块与语言选择
  */
 import { CodeOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import { ToolbarGroup, ToolbarButton } from "@/base";
+import { ToolbarGroup, ToolbarDropdownButton } from "@/base";
+import { CODE_LANGUAGES, DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
+import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
+import { insertDefaultCodeBlock, updateCodeBlockLanguage } from "./codeBlockUtils";
+
 import type { Editor } from "@tiptap/vue-3";
 
-// ===== Props =====
 interface Props {
   editor: Editor | null | undefined;
 }
@@ -32,48 +35,62 @@ interface Props {
 const props = defineProps<Props>();
 const editor = computed(() => props.editor ?? null);
 
-// ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);
 const { isActive } = createStateCheckers(editor);
 
-// ===== 检查是否激活代码块 =====
-const isCodeBlockActive = computed(() => {
-  return isActive("codeBlock");
+const isCodeBlockActive = computed(() => isActive("codeBlock"));
+
+const currentLanguage = computed(() => {
+  const lang = editor.value?.getAttributes("codeBlock")?.language;
+  return typeof lang === "string" && lang ? lang : DEFAULT_CODE_BLOCK_LANGUAGE;
 });
 
-/**
- * 插入代码块（使用默认语言）
- * 处理多行选择：将所有选中的文本合并到一个代码块中
- */
-function insertCodeBlock() {
+const languageItems = computed<MenuItemConfig[]>(() => {
+  if (!editor.value) return [];
+
+  return CODE_LANGUAGES.map((lang) => ({
+    key: lang,
+    label: lang,
+    active: isCodeBlockActive.value && currentLanguage.value === lang,
+    action: () => onLanguageSelect(lang),
+  }));
+});
+
+function onLanguageSelect(language: string) {
   const e = editor.value;
   if (!e) return;
 
-  // 如果当前已经是代码块，则退出代码块模式
   if (isCodeBlockActive.value) {
-    runCommand((chain) => chain.setParagraph())();
+    updateCodeBlockLanguage(e, language);
     return;
   }
 
-  // 获取选区
+  insertCodeBlock(language);
+}
+
+function insertCodeBlock(language: string) {
+  const e = editor.value;
+  if (!e) return;
+
   const { from, to, empty } = e.state.selection;
 
-  // 如果没有选中任何内容，直接插入空代码块
   if (empty) {
-    runCommand((chain) => chain.setCodeBlock({ language: "javascript" }))();
+    if (language === DEFAULT_CODE_BLOCK_LANGUAGE) {
+      insertDefaultCodeBlock(e);
+    } else {
+      runCommand((chain) => chain.setCodeBlock({ language }))();
+    }
     return;
   }
 
-  // 获取选中的文本内容（保留换行）
   const selectedText = e.state.doc.textBetween(from, to, "\n");
 
-  // 删除选中内容并插入代码块
   e.chain()
     .focus()
     .deleteSelection()
     .insertContent({
       type: "codeBlock",
-      attrs: { language: "javascript" },
+      attrs: { language },
       content: selectedText ? [{ type: "text", text: selectedText }] : undefined,
     })
     .run();

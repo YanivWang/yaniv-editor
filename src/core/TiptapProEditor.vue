@@ -60,6 +60,11 @@
 
     <!-- Word 文档区域容器 -->
     <div ref="containerRef" class="word-document-container">
+      <CodeBlockLanguageBadge
+        v-if="editorInstance && !isPreviewMode && toolbarConfig.codeBlock"
+        :editor="editorInstance"
+        :container="containerRef"
+      />
       <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
         <div class="continuous-pages">
           <EditorContent
@@ -93,6 +98,7 @@ import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
 
+import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
@@ -124,6 +130,7 @@ import "@/styles/floating-menu-toolbar.css";
 import "@/styles/image-resize.css";
 import "@/styles/slash-command.css";
 import "@/styles/drag-handle.css";
+import "@/styles/code-block.css";
 
 const props = withDefaults(defineProps<TiptapProEditorProps>(), {
   zoomBarPlacement: "bottom",

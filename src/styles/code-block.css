@@ -1,0 +1,136 @@
+/**
+ * Code Block - 语法高亮与深色代码块样式
+ */
+
+.tiptap-pro-editor .word-document-container {
+  position: relative;
+}
+
+/* 代码块容器：始终深色，覆盖各主题 preset 中的浅色 pre */
+.tiptap-pro-editor .ProseMirror pre,
+.theme-notion .tiptap-pro-editor .ProseMirror pre,
+.theme-github .tiptap-pro-editor .ProseMirror pre,
+.theme-typora .tiptap-pro-editor .ProseMirror pre {
+  position: relative;
+  min-height: 4.5em;
+  padding: 40px 24px 24px !important;
+  margin: 12px 0;
+  overflow-x: auto;
+  font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
+  font-size: 13px !important;
+  line-height: 1.5;
+  color: var(--tiptap-codeblock-text, #d4d4d4) !important;
+  tab-size: 2;
+  background: var(--tiptap-codeblock-bg, #1e1e1e) !important;
+  border: none !important;
+  border-radius: 8px;
+}
+
+.tiptap-pro-editor .ProseMirror pre code,
+.theme-notion .tiptap-pro-editor .ProseMirror pre code,
+.theme-github .tiptap-pro-editor .ProseMirror pre code {
+  display: block;
+  padding: 0 !important;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit !important;
+  background: none !important;
+  border-radius: 0;
+}
+
+/* GitHub Dark 语法 token（仅作用于代码块内，避免全量引入 highlight.js 主题） */
+.tiptap-pro-editor
+  .ProseMirror
+  pre
+  :is(
+    .hljs-keyword,
+    .hljs-meta .hljs-keyword,
+    .hljs-template-tag,
+    .hljs-template-variable,
+    .hljs-type,
+    .hljs-variable.language_
+  ) {
+  color: #ff7b72;
+}
+
+.tiptap-pro-editor .ProseMirror pre :is(.hljs-title, .hljs-title.class_, .hljs-title.function_) {
+  color: #d2a8ff;
+}
+
+.tiptap-pro-editor
+  .ProseMirror
+  pre
+  :is(
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-literal,
+    .hljs-meta,
+    .hljs-number,
+    .hljs-operator,
+    .hljs-variable,
+    .hljs-selector-attr,
+    .hljs-selector-class,
+    .hljs-selector-id
+  ) {
+  color: #79c0ff;
+}
+
+.tiptap-pro-editor .ProseMirror pre :is(.hljs-regexp, .hljs-string, .hljs-meta .hljs-string) {
+  color: #a5d6ff;
+}
+
+.tiptap-pro-editor .ProseMirror pre :is(.hljs-built_in, .hljs-symbol) {
+  color: #ffa657;
+}
+
+.tiptap-pro-editor .ProseMirror pre :is(.hljs-comment, .hljs-code, .hljs-formula) {
+  color: #8b949e;
+}
+
+.tiptap-pro-editor
+  .ProseMirror
+  pre
+  :is(.hljs-name, .hljs-quote, .hljs-selector-tag, .hljs-selector-pseudo) {
+  color: #7ee787;
+}
+
+.tiptap-pro-editor .ProseMirror pre .hljs-section {
+  font-weight: bold;
+  color: #1f6feb;
+}
+
+.tiptap-pro-editor .ProseMirror pre .hljs-bullet {
+  color: #f2cc60;
+}
+
+/* 语言角标 */
+.code-block-language-badge {
+  position: absolute;
+  z-index: 30;
+  pointer-events: auto;
+}
+
+.code-block-language-badge__select {
+  min-width: 120px;
+}
+
+.code-block-language-badge__select.ant-select .ant-select-selector {
+  height: 26px !important;
+  min-height: 26px;
+  padding: 0 8px !important;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 4px;
+}
+
+.code-block-language-badge__select.ant-select .ant-select-selection-item {
+  line-height: 24px !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.code-block-language-badge__select.ant-select .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.7);
+}

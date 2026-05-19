@@ -179,21 +179,7 @@
   border-radius: 3px;
 }
 
-.theme-notion .ProseMirror pre {
-  padding: 32px 16px 32px 32px;
-  margin: 8px 0;
-  overflow-x: auto;
-  font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
-  font-size: 85%;
-  background: #f7f6f3;
-  border-radius: 4px;
-}
-
-.theme-notion .ProseMirror pre code {
-  padding: 0;
-  color: inherit;
-  background: none;
-}
+/* 代码块样式由 src/styles/code-block.css 统一提供 */
 
 /* ===== Notion 风格 - 引用 ===== */
 .theme-notion .ProseMirror blockquote {
@@ -294,10 +280,6 @@
 .theme-notion[data-theme="dark"] .tt-dropdown-btn:hover {
   color: rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.055);
-}
-
-.theme-notion[data-theme="dark"] .ProseMirror pre {
-  background: #2f2f2f;
 }
 
 .theme-notion[data-theme="dark"] .ProseMirror th {

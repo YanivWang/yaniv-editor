@@ -5,3 +5,4 @@
 
 // 组件导出
 export { default as CodeBlockDropdown } from "./CodeBlockDropdown.vue";
+export { default as CodeBlockLanguageBadge } from "./CodeBlockLanguageBadge.vue";

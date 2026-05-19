@@ -88,6 +88,9 @@ export const HEADING_OPTIONS = [
   { label: "H6", value: "h6" },
 ] as const;
 
+/** 代码块默认语言 */
+export const DEFAULT_CODE_BLOCK_LANGUAGE = "javascript";
+
 /**
  * 代码块语言选项
  */

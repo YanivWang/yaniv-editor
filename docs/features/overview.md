@@ -29,7 +29,7 @@
 | 表格                  |   —   |    ✅    | `features.table`           |
 | 图片（上传/URL/缩放） |  ✅   |    ✅    | `features.image`           |
 | 视频                  |   —   |    ✅    | 与 image 同门控            |
-| 代码块                |   —   |    ✅    | StarterKit（无语法高亮）   |
+| 代码块                |   —   |    ✅    | CodeBlockLowlight 语法高亮 |
 | 数学公式              |  ✅   |    ✅    | `features.math`            |
 | 分隔线                |  ✅   |    ✅    | StarterKit HorizontalRule  |
 | 引用块                |  ✅   |    ✅    | StarterKit Blockquote      |
@@ -70,7 +70,6 @@
 | 评论 / 批注         | ❌                                                      |
 | 版本历史 / 自动保存 | ❌ UI 文案存在，无内置逻辑                              |
 | Markdown 双向编辑   | ❌ Typora 仅为视觉主题                                  |
-| 代码块语法高亮      | ❌ 依赖已存在，核心未启用 lowlight                      |
 | 内容持久化 API      | ❌ 业务层实现                                           |
 
 ## 适用场景评估

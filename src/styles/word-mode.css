@@ -247,23 +247,7 @@
   cursor: col-resize;
 }
 
-/* Word 代码块样式 */
-.word-content-multi .ProseMirror pre {
-  padding: 12px;
-  margin: 14px 0;
-  overflow-x: auto;
-  font-family: "Courier New", Courier, monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  background: var(--color-bg-gray);
-  border: 1px solid var(--color-border);
-}
-
-.word-content-multi .ProseMirror pre code {
-  padding: 0;
-  color: var(--color-text);
-  background: none;
-}
+/* Word 代码块样式（语法高亮见 code-block.css，此处仅保留行内 code） */
 
 /* Word 行内代码样式 - 参考邮件效果，浅灰背景+边框 */
 .word-content-multi .ProseMirror code.inline-code,

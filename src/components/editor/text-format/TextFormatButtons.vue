@@ -26,6 +26,8 @@ import {
 import { computed } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/base";
+import { DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
+import { insertDefaultCodeBlock } from "@/editor/code-block/codeBlockUtils";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
@@ -91,7 +93,7 @@ const textFormats = computed(() => {
     formats.push({
       name: "code",
       icon: CodeOutlined,
-      title: t("editor.inlineCode"),
+      title: t("toolbar.insertCodeBlock"),
       activeCheck: () => isActive("code") || isActive("codeBlock"),
       action: () => {
         const e = editor.value;
@@ -103,8 +105,15 @@ const textFormats = computed(() => {
           return;
         }
 
+        const { from, to, empty } = e.state.selection;
+
+        // 空光标：插入默认代码块
+        if (empty) {
+          insertDefaultCodeBlock(e);
+          return;
+        }
+
         // 检查选区是否跨越多个文本块
-        const { from, to } = e.state.selection;
         let blockCount = 0;
         e.state.doc.nodesBetween(from, to, (node) => {
           if (node.isTextblock) {
@@ -113,22 +122,19 @@ const textFormats = computed(() => {
         });
 
         if (blockCount > 1) {
-          // 多行选中：使用代码块
-          // 获取选中的文本内容（保留换行）
           const selectedText = e.state.doc.textBetween(from, to, "\n");
 
-          // 删除选中内容并插入代码块
           e.chain()
             .focus()
             .deleteSelection()
             .insertContent({
               type: "codeBlock",
-              attrs: { language: "plaintext" },
+              attrs: { language: DEFAULT_CODE_BLOCK_LANGUAGE },
               content: selectedText ? [{ type: "text", text: selectedText }] : undefined,
             })
             .run();
         } else {
-          // 单行选中：使用行内代码
+          // 单行有选中文字：行内代码
           runCommand((chain) => chain.toggleCode())();
         }
       },
