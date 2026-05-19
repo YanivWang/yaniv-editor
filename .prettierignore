@@ -9,6 +9,8 @@ pnpm-lock.yaml
 logs
 uploads
 .pnpm-store
+docs/.vitepress/cache
+docs/.vitepress/dist
 **/*.vue.d.ts
 src/**/*.d.ts
 src/**/*.d.ts.map

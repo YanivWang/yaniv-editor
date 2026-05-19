@@ -36,6 +36,8 @@ export default tseslint.config(
       "pnpm-lock.yaml",
       ".pnpm-store/**",
       "commitlint.config.cjs",
+      "docs/.vitepress/cache/**",
+      "docs/.vitepress/dist/**",
     ],
   },
   {

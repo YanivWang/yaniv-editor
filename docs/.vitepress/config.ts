@@ -1,0 +1,67 @@
+import { defineConfig } from "vitepress";
+
+export default defineConfig({
+  title: "yaniv-editor",
+  description: "Vue 3 + Tiptap 3 富文本编辑器 UI 套件",
+  lang: "zh-CN",
+  cleanUrls: true,
+  lastUpdated: true,
+  themeConfig: {
+    logo: "/logo.svg",
+    nav: [
+      { text: "指南", link: "/guide/getting-started" },
+      { text: "功能", link: "/features/overview" },
+      { text: "API", link: "/api/tiptap-pro-editor" },
+      { text: "FAQ", link: "/faq" },
+      {
+        text: "示例",
+        link: "https://github.com/benngaihk/yaniv-editor",
+        target: "_blank",
+      },
+    ],
+    sidebar: {
+      "/guide/": [
+        {
+          text: "指南",
+          items: [
+            { text: "快速开始", link: "/guide/getting-started" },
+            { text: "Full Editor", link: "/guide/full-editor" },
+            { text: "Inline 按需拼装", link: "/guide/inline-composition" },
+            { text: "主题与样式", link: "/guide/theming" },
+          ],
+        },
+      ],
+      "/features/": [
+        {
+          text: "功能",
+          items: [
+            { text: "功能总览", link: "/features/overview" },
+            { text: "文本与排版", link: "/features/text-formatting" },
+            { text: "媒体", link: "/features/media" },
+            { text: "表格", link: "/features/table" },
+            { text: "AI 辅助", link: "/features/ai" },
+            { text: "Word 导入导出", link: "/features/word-import-export" },
+          ],
+        },
+      ],
+      "/api/": [
+        {
+          text: "API",
+          items: [
+            { text: "TiptapProEditor", link: "/api/tiptap-pro-editor" },
+            { text: "功能配置", link: "/api/features-config" },
+            { text: "Composables", link: "/api/composables" },
+          ],
+        },
+      ],
+    },
+    socialLinks: [{ icon: "github", link: "https://github.com/benngaihk/yaniv-editor" }],
+    footer: {
+      message: "MIT Licensed",
+      copyright: "Copyright © yaniv-editor contributors",
+    },
+    search: {
+      provider: "local",
+    },
+  },
+});
