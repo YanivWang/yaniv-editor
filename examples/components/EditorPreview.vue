@@ -126,24 +126,9 @@
         <span class="floating-label__text">AI Powered</span>
       </div>
       <div
-        class="floating-label label--collab"
-        :class="{ 'pop-in': entered }"
-        style="animation-delay: 0.4s"
-      >
-        <span class="floating-label__icon">
-          <svg viewBox="0 0 16 16" width="14" height="14">
-            <path
-              fill="currentColor"
-              d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 100-6 3 3 0 000 6zM5.216 14A2.238 2.238 0 015 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 005 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 100-5 2.5 2.5 0 000 5z"
-            />
-          </svg>
-        </span>
-        <span class="floating-label__text">Realtime Collab</span>
-      </div>
-      <div
         class="floating-label label--word"
         :class="{ 'pop-in': entered }"
-        style="animation-delay: 0.6s"
+        style="animation-delay: 0.4s"
       >
         <span class="floating-label__icon">
           <svg viewBox="0 0 16 16" width="14" height="14">
@@ -194,7 +179,6 @@ let aborted = false;
 const mobileLabels = [
   { text: "5 Themes", color: "linear-gradient(135deg, #667eea, #764ba2)" },
   { text: "AI Powered", color: "linear-gradient(135deg, #f093fb, #f5576c)" },
-  { text: "Collab", color: "linear-gradient(135deg, #43e97b, #38f9d7)" },
   { text: "Word", color: "linear-gradient(135deg, #4facfe, #00f2fe)" },
 ];
 
@@ -882,20 +866,6 @@ onBeforeUnmount(() => {
   background: linear-gradient(135deg, #f093fb, #f5576c);
 }
 
-.label--collab {
-  top: 55%;
-  right: -85px;
-  color: #333;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow:
-    0 4px 20px rgba(67, 233, 123, 0.15),
-    0 0 0 1px rgba(67, 233, 123, 0.1);
-}
-
-.label--collab .floating-label__icon {
-  background: linear-gradient(135deg, #43e97b, #38f9d7);
-}
-
 .label--word {
   bottom: 10%;
   left: -65px;
@@ -925,12 +895,6 @@ onBeforeUnmount(() => {
   box-shadow:
     0 4px 20px rgba(240, 147, 251, 0.2),
     0 0 0 1px rgba(240, 147, 251, 0.15);
-}
-
-.editor-preview[data-theme="dark"] .label--collab {
-  box-shadow:
-    0 4px 20px rgba(67, 233, 123, 0.2),
-    0 0 0 1px rgba(67, 233, 123, 0.15);
 }
 
 .editor-preview[data-theme="dark"] .label--word {
@@ -981,11 +945,7 @@ onBeforeUnmount(() => {
 }
 
 .mobile-label:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-.mobile-label:nth-child(4) {
-  animation-delay: 0.75s;
+  animation-delay: 0.4s;
 }
 
 @keyframes fade-in-up {
@@ -1020,9 +980,6 @@ onBeforeUnmount(() => {
   }
   .label--themes {
     right: -90px;
-  }
-  .label--collab {
-    right: -100px;
   }
   .label--ai {
     left: -85px;

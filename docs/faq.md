@@ -63,9 +63,9 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ### 协作编辑支持吗？
 
-**当前版本不支持**多人实时协作。`.env.example` 中的 `VITE_COLLABORATION_WS_URL` 为预留配置，代码库未集成 Yjs / Hocuspocus。
+**当前版本不支持**多人实时协作，代码库未内置相关扩展或配置项。
 
-如需协作，需自行接入 `@tiptap/extension-collaboration` 等扩展。
+如需协作，需自行接入 `@tiptap/extension-collaboration` 等 Tiptap 扩展。
 
 ### @提及（@mention）支持吗？
 

@@ -27,7 +27,7 @@ export interface ToolbarToolsConfig {
   table?: boolean;
   /** 是否显示撤销/重做工具 */
   undoRedo?: boolean;
-  /** 是否禁用撤销/重做工具（协作模式下需要禁用） */
+  /** 是否禁用撤销/重做按钮（仅 UI 置灰，扩展仍可用） */
   undoRedoDisabled?: boolean;
   /** 是否显示清除格式工具 */
   clearFormat?: boolean;
@@ -39,7 +39,7 @@ export interface ToolbarToolsConfig {
   subscriptSuperscript?: boolean;
   /** 是否显示格式刷工具 */
   formatPainter?: boolean;
-  /** 是否禁用格式刷工具（协作模式多人时需要禁用） */
+  /** 是否禁用格式刷按钮 */
   formatPainterDisabled?: boolean;
   /** 是否显示 Word 导入/导出工具 */
   word?: boolean;

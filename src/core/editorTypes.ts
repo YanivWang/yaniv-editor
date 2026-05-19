@@ -25,7 +25,7 @@ export interface FeatureConfig {
   ai?: boolean;
   /** 是否注册格式刷扩展（默认随版本：basic 为 false，advanced 为 true；可显式覆盖） */
   formatPainter?: boolean;
-  /** 标题锚点 UniqueID + 目录（TableOfContents）扩展；进阶版默认开，协作中会由扩展层跳过 */
+  /** 标题锚点 UniqueID + 目录（TableOfContents）扩展；进阶版默认开 */
   outline?: boolean;
   /** 查找替换扩展 */
   searchReplace?: boolean;
@@ -65,7 +65,7 @@ export interface TiptapProEditorProps {
   readonly?: boolean;
   /** 是否为预览模式（无头部/底部导航，不可编辑，不可点击） */
   previewMode?: boolean;
-  /** 文档ID(用于加载和保存以及协同房间) */
+  /** 文档 ID（供业务层加载/保存，编辑器不会自动请求） */
   documentId?: string;
   /** 初始内容 - 可以是 HTML 字符串或 JSON 对象（ProseMirror 格式） */
   initialContent?: string | object;

@@ -10,18 +10,18 @@
 
 以下能力在类型、文案或环境变量中有痕迹，但**没有**对应的 Tiptap 扩展或 UI。
 
-| 能力                | 现状                                                                     | 相关位置                  |
-| ------------------- | ------------------------------------------------------------------------ | ------------------------- |
-| 多人实时协作        | `.env.example` 预留 `VITE_COLLABORATION_WS_URL`，未集成 Yjs / Hocuspocus | `docs/faq.md`             |
-| @提及（mention）    | `FeatureConfig.mention` 为预留字段，无扩展实现                           | `src/core/editorTypes.ts` |
-| 评论 / 批注         | 无                                                                       | —                         |
-| 版本历史 / 自动保存 | i18n 有 `versionHistory.*` 文案，**无组件与 API**                        | `src/locales/*.ts`        |
-| Markdown 双向编辑   | Typora 主题为视觉风格，非 MD 源码模式                                    | `docs/faq.md`             |
-| 内容持久化          | 由业务层实现；`documentId` 不会触发加载/保存                             | `TiptapProEditor` props   |
+| 能力                | 现状                                              | 相关位置                  |
+| ------------------- | ------------------------------------------------- | ------------------------- |
+| 多人实时协作        | 未内置，无相关 API / 配置                         | `docs/faq.md`             |
+| @提及（mention）    | `FeatureConfig.mention` 为预留字段，无扩展实现    | `src/core/editorTypes.ts` |
+| 评论 / 批注         | 无                                                | —                         |
+| 版本历史 / 自动保存 | i18n 有 `versionHistory.*` 文案，**无组件与 API** | `src/locales/*.ts`        |
+| Markdown 双向编辑   | Typora 主题为视觉风格，非 MD 源码模式             | `docs/faq.md`             |
+| 内容持久化          | 由业务层实现；`documentId` 不会触发加载/保存      | `TiptapProEditor` props   |
 
 ### documentId
 
-`documentId` 已声明用于「加载、保存及协同房间」，但**当前版本不会自动发起网络请求**：
+`documentId` 已声明供业务层「加载、保存」标识文档，但**当前版本不会自动发起网络请求**：
 
 ```ts
 // 典型集成模式（需自行实现）
@@ -30,11 +30,6 @@ GET /api/documents/:id → :initial-content="data.content"
 ```
 
 详见 [FAQ — 如何保存和加载文档](/faq#如何保存和加载文档)。
-
-### 协作相关预留
-
-- 工具栏 `ToolbarNav` 的 `right` 插槽注释为「协作开关」，无内置实现。
-- `toolbarConfig` 提供 `undoRedoDisabled`、`formatPainterDisabled`，供协作模式禁用部分工具，但需宿主自行接入协作方案。
 
 ---
 
@@ -149,7 +144,7 @@ GET /api/documents/:id → :initial-content="data.content"
 若对标 **Notion / Google Docs**，还需规划：
 
 - 大纲侧栏 UI（基于现有 `TableOfContents` 数据）
-- 协作（Yjs 等）与 mention
+- mention（@提及）
 - 版本历史（当前仅有 i18n，需从零实现）
 
 ---

@@ -94,7 +94,7 @@ export interface SearchReplaceOptions {
   searchResultClass: string;
   /**
    * 查找上一处/下一处、选中当前命中后是否滚入视口；默认 true。
-   * 协作场景若由宿主自己接管滚动可设 false。
+   * 若由宿主接管滚动可设 false。
    */
   scrollIntoViewOnNavigate: boolean;
 }

@@ -242,7 +242,7 @@ export function getExtensionsByVersion(
 
   extensions.push(ListShortcuts);
 
-  // 查找替换（协作时默认关闭「命中后滚入视口」，减轻与他人光标/视口抢占）
+  // 查找替换
   if (gates.searchReplace) {
     extensions.push(
       SearchReplace.configure({

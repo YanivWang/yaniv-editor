@@ -129,7 +129,7 @@
         <slot name="extra" />
       </div>
 
-      <!-- 右侧：额外工具（如协作开关） -->
+      <!-- 右侧：宿主自定义工具 -->
       <div v-if="$slots.right" class="toolbar-right">
         <slot name="right" />
       </div>

@@ -41,7 +41,7 @@
 
 - 扩展：`FormatPainter`
 - 门控：`features.formatPainter`（advanced 默认开启）
-- 协作场景下可通过 `undoRedoDisabled` / `formatPainterDisabled` 禁用工具栏按钮
+- 可通过 `undoRedoDisabled` / `formatPainterDisabled` 禁用工具栏按钮
 
 ## 查找与替换
 
