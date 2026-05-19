@@ -169,6 +169,15 @@
   color: var(--tiptap-text);
 }
 
+/* 任务列表：与 Notion 列表项保持相同行距 */
+.theme-notion .ProseMirror ul[data-type="taskList"] > li {
+  padding: 3px 0;
+}
+
+.theme-notion .ProseMirror ul[data-type="taskList"] > li > div > p {
+  padding: 0;
+}
+
 /* ===== Notion 风格 - 代码 ===== */
 .theme-notion .ProseMirror code {
   padding: 0.2em 0.4em;

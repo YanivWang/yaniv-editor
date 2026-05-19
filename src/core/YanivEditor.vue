@@ -131,6 +131,7 @@ import { useEditorPagination } from "./useEditorPagination";
 import "@/styles/variables.css";
 import "@/styles/base.css";
 import "@/styles/word-mode.css";
+import "@/styles/task-list.css";
 import "@/styles/toolbar.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";

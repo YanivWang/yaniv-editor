@@ -200,7 +200,10 @@
 .demo-main {
   display: flex;
   flex: 1;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
   min-height: 0;
   padding: 0;
   overflow: hidden;
@@ -215,10 +218,22 @@
 }
 
 .demo-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   background: var(--demo-card-bg);
   border-radius: 0;
   box-shadow: none;
+}
+
+/* 与 Tiptap-UI-Kit DeviceFrame PC 模式一致：编辑器撑满 main，滚动条在视口最右侧 */
+.demo-app.editor-mode .demo-card :deep(.yaniv-editor.word-mode) {
+  flex: 1;
+  min-height: 0;
 }
 
 .theme-notion .demo-main {

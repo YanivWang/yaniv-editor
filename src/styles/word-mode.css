@@ -164,7 +164,7 @@
   margin: 4px 0;
 }
 
-.word-content-multi .ProseMirror ul li {
+.word-content-multi .ProseMirror ul:not([data-type="taskList"]) > li:not([data-checked]) {
   list-style-type: disc;
 }
 

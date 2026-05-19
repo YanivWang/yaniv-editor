@@ -1,0 +1,59 @@
+/**
+ * Task list (checkbox + text on one line)
+ * Requires @tiptap/extension-task-list / task-item
+ *
+ * Note: TaskItem uses a NodeView; rendered <li> has data-checked but not data-type.
+ */
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] {
+  padding-left: 0;
+  margin: 0 0 14px;
+  list-style: none;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] ul[data-type="taskList"] {
+  margin: 0;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  list-style: none;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > label {
+  flex: 0 0 auto;
+  margin: 0.2em 0 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > label input[type="checkbox"] {
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  accent-color: var(--tiptap-primary, #1890ff);
+  cursor: pointer;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > div > p,
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > p {
+  margin: 0;
+}
+
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li[data-checked="true"] > div,
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li[data-checked="true"] > p {
+  color: var(--tiptap-text-muted, #9b9a97);
+  text-decoration: line-through;
+}
+
+/* 隐藏 label 内占位 span */
+.yaniv-editor .ProseMirror ul[data-type="taskList"] > li > label > span {
+  display: none;
+}

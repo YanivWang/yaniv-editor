@@ -12,6 +12,9 @@
 /* Word mode (A4 paper layout) */
 @import "./word-mode.css";
 
+/* Task list (checkbox + text inline) */
+@import "./task-list.css";
+
 /* Toolbar */
 @import "./toolbar.css";
 
