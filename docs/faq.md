@@ -85,26 +85,25 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ## 主题相关
 
-### theme prop 在哪里？
+### 如何设置主题？
 
-主题不是组件 prop。使用：
+使用 `YanivEditor` 的 props：
 
-```ts
-import { setTheme } from "@yanivjs/yaniv-editor";
-import "@yanivjs/yaniv-editor/src/themes/presets/notion.css";
-
-setTheme("notion", "light");
+```vue
+<YanivEditor theme-preset="notion" theme-mode="light" v-bind="editorPresets.notion" />
 ```
+
+无需手动 import `presets/*.css`。
 
 ### 如何切换暗色模式？
 
-```ts
-setTheme("word", "dark");
-// 或
-toggleThemeMode();
+```vue
+<YanivEditor theme-mode="dark" />
+<!-- 或跟随系统 -->
+<YanivEditor theme-mode="auto" />
 ```
 
-容器需有 `data-theme="dark"`（`setTheme` 会自动设置）。
+编辑器根节点会设置 `data-theme="dark"`，子组件样式通过 `[data-theme="dark"]` 选择器生效。
 
 ## Full Editor vs Inline
 

@@ -17,8 +17,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { usePreferences } from "@/adapters";
-
 import ToolbarDivider from "./ToolbarDivider.vue";
 
 interface Props {
@@ -35,8 +33,6 @@ const props = withDefaults(defineProps<Props>(), {
   dividerColor: undefined,
 });
 
-const { isDark } = usePreferences();
-
 const groupStyle = computed(() => ({
   gap: `${props.gap}px`,
 }));
@@ -45,12 +41,7 @@ const dividerDirection = computed(() => {
   return props.direction === "horizontal" ? "vertical" : "horizontal";
 });
 
-const computedDividerColor = computed(() => {
-  if (props.dividerColor) {
-    return props.dividerColor;
-  }
-  return isDark.value ? "#434343" : "#e8e8e8";
-});
+const computedDividerColor = computed(() => props.dividerColor ?? "var(--tiptap-border, #e8e8e8)");
 </script>
 
 <style scoped>

@@ -23,22 +23,16 @@ YanivEditor
 
 ```vue
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { YanivEditor, setTheme } from "@yanivjs/yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
-
-// 主题 CSS（按需引入）
-import "@yanivjs/yaniv-editor/src/themes/presets/word.css";
-
-onMounted(() => {
-  setTheme("word", "light");
-});
 </script>
 
 <template>
   <YanivEditor
     version="advanced"
     locale="zh-CN"
+    theme-preset="word"
+    theme-mode="light"
     :initial-content="sampleHtml"
     :features="{
       headerNav: true,
@@ -56,7 +50,7 @@ onMounted(() => {
 ```
 
 ::: tip 主题说明
-主题通过 `setTheme(preset, mode)` + 引入对应 CSS 文件生效，**不是** `YanivEditor` 的 prop。详见 [主题与样式](/guide/theming)。
+通过 `theme-preset` / `theme-mode` 控制视觉，预设 CSS 由组件按需加载。详见 [主题与样式](/guide/theming)。
 :::
 
 ## 版本与工具栏

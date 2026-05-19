@@ -294,7 +294,7 @@ watch(
 
 <style lang="scss" scoped>
 // Dark 模式选择器变量（用于统一管理暗色主题样式）
-$dark-selector: ":where(.dark, .dark *) &";
+$dark-selector: "[data-theme=" dark "] &";
 
 /* ===== 工具栏容器 ===== */
 .editor-toolbar-container {

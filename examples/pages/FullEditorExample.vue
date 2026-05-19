@@ -2,27 +2,32 @@
   <a-config-provider :theme="antdTheme">
     <div
       class="demo-app editor-mode"
-      :data-theme="theme"
-      :class="{ 'theme-notion': themePreset === 'notion' }"
+      :class="[`theme-${themePreset}`]"
+      :data-theme="resolvedShellTheme"
     >
       <DemoAppHeader
         subtitle-key="demo.subtitle.fullEditor"
-        :theme="theme"
+        :theme="resolvedShellTheme"
+        :theme-mode="themeMode"
         :locale="locale"
         :theme-preset="themePreset"
         show-locale-select
         show-theme-preset
+        show-theme-mode
         @toggle-theme="toggleTheme"
         @update:locale="locale = $event"
-        @update:theme-preset="handleThemePresetUpdate"
+        @update:theme-preset="themePreset = $event"
+        @update:theme-mode="themeMode = $event"
       />
 
       <main class="demo-main">
         <div class="demo-card">
           <YanivEditor
-            :key="themePreset"
+            :key="editorPresetKey"
             :initial-content="sampleContent"
             :locale="locale"
+            :theme-preset="themePreset"
+            :theme-mode="themeMode"
             v-bind="editorPreset"
           />
         </div>
@@ -38,46 +43,52 @@ import { computed, onMounted, ref, watch } from "vue";
 import { editorPresets } from "../../src/configs/editorPresets";
 import YanivEditor from "../../src/core/YanivEditor.vue";
 import { useI18n, type LocaleCode } from "../../src/locales";
-import { setTheme } from "../../src/themes";
+import { registerTheme, useResolvedThemeMode } from "../../src/themes";
 import DemoAppHeader from "../components/DemoAppHeader.vue";
 
-import type { ThemePreset } from "../../src/configs/editorConfig";
+import type { ThemeMode, ThemePreset } from "../../src/configs/editorConfig";
 
-import "../../src/themes/presets/word.css";
-import "../../src/themes/presets/notion.css";
-import "../../src/themes/presets/github.css";
-import "../../src/themes/presets/typora.css";
-
-const theme = ref<"light" | "dark">("light");
-const themePreset = ref<ThemePreset>("word");
+const themeMode = ref<ThemeMode>("light");
+const themePreset = ref<ThemePreset>("default");
 const locale = ref<LocaleCode>("zh-CN");
 
 const { setLocale } = useI18n();
 
-const antdTheme = computed(() => ({
-  algorithm: theme.value === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
-}));
-
+/** 皮肤（CSS）与功能配置（features）分离：Notion 仅切换 editorPresets.notion */
 const editorPreset = computed(() =>
   themePreset.value === "notion" ? editorPresets.notion : editorPresets.full,
 );
+
+const editorPresetKey = computed(() =>
+  themePreset.value === "notion" ? "notion-features" : "full-features",
+);
+
+/** 外壳与编辑器共用：解析 light/dark，auto 时跟随系统 */
+const resolvedShellTheme = useResolvedThemeMode(themeMode);
+
+const antdTheme = computed(() => ({
+  algorithm:
+    resolvedShellTheme.value === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
+}));
 
 watch(locale, (newLocale) => {
   setLocale(newLocale);
 });
 
 onMounted(() => {
-  setTheme(themePreset.value, theme.value);
+  registerTheme("custom", {
+    "--tiptap-primary": "#6366f1",
+    "--tiptap-primary-hover": "#4f46e5",
+    "--tiptap-bg": "#faf5ff",
+    "--tiptap-bg-secondary": "#f3e8ff",
+    "--tiptap-text": "#1e1b4b",
+    "--tiptap-border": "#c4b5fd",
+  });
 });
 
+/** 快捷切换：从 auto 切出为显式 light/dark */
 const toggleTheme = () => {
-  theme.value = theme.value === "light" ? "dark" : "light";
-  setTheme(themePreset.value, theme.value);
-};
-
-const handleThemePresetUpdate = (preset: ThemePreset) => {
-  themePreset.value = preset;
-  setTheme(themePreset.value, theme.value);
+  themeMode.value = resolvedShellTheme.value === "light" ? "dark" : "light";
 };
 
 const sampleContent = `
@@ -88,7 +99,7 @@ const sampleContent = `
   <li><strong>完整编辑</strong> — 标题、列表、表格、图片、视频、代码块、数学公式等</li>
   <li><strong>灵活集成</strong> — Full Editor 一站式接入，或 Inline 模式按需拼装工具栏</li>
   <li><strong>功能门控</strong> — 通过 version 与 features 精确控制扩展与界面显示</li>
-  <li><strong>多主题</strong> — Word / Notion / GitHub / Typora，支持明暗色切换</li>
+  <li><strong>多主题</strong> — Word / Notion / GitHub / Typora，支持明暗色与跟随系统</li>
 </ul>
 <h2>文本与排版</h2>
 <p>选中这段文字，用工具栏试试各种格式：<strong>粗体</strong>、<em>斜体</em>、<u>下划线</u>、<s>删除线</s>、<code>行内代码</code>、H<sub>2</sub>O 与 x<sup>2</sup>。还可以设置 <span style="color: #e03131">文字颜色</span>、<mark>背景高亮</mark>、<span style="font-size: 20px">字号</span>，以及段落对齐与行距。</p>
@@ -101,8 +112,8 @@ const sampleContent = `
 </ul>
 <p>有序步骤：</p>
 <ol>
-  <li>在上方切换主题预设（Word / Notion / GitHub / Typora）</li>
-  <li>尝试明暗模式与语言切换</li>
+  <li>在上方切换主题预设（Word / Notion / GitHub / Typora / 自定义）</li>
+  <li>尝试明暗模式、跟随系统与语言切换</li>
   <li>浏览工具栏，体验查找替换、格式刷、Word 互转等功能</li>
 </ol>
 <p>任务列表：</p>
@@ -121,7 +132,6 @@ const sampleContent = `
 <pre><code class="language-javascript">import { YanivEditor, editorPresets } from '@yanivjs/yaniv-editor'
 import '@yanivjs/yaniv-editor/style.css'
 
-// 一行接入完整编辑器
 export default { components: { YanivEditor } }</code></pre>
 <h2>表格</h2>
 <table>

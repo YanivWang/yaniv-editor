@@ -63,8 +63,7 @@
   transform: translateY(0);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .table-menu-btn:active:not(:disabled) {
+[data-theme="dark"] .table-menu-btn:active:not(:disabled) {
   background: #303030;
 }
 
@@ -74,7 +73,7 @@
   opacity: 0.5;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .table-menu-btn:disabled {
+[data-theme="dark"] .table-menu-btn:disabled {
   color: #595959;
 }
 
@@ -117,7 +116,7 @@
   border: 2px solid #333;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) :deep(table.table-border-outer) {
+[data-theme="dark"] :deep(table.table-border-outer) {
   border-color: #f0f0f0;
 }
 

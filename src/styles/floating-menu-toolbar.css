@@ -18,16 +18,16 @@
   color: var(--tp-color-text, #333);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .floating-btn {
+[data-theme="dark"] .floating-btn {
   color: var(--tp-color-text, #f0f0f0);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .floating-btn:hover {
+[data-theme="dark"] .floating-btn:hover {
   color: #fff;
   background: var(--tp-color-bg-hover, #303030);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .floating-btn.active {
+[data-theme="dark"] .floating-btn.active {
   color: var(--tp-color-primary, #4fc3f7);
   background: var(--tp-color-primary-bg, #1a4d6e);
 }
@@ -121,26 +121,26 @@
 }
 
 /* 深色模式 */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .floating-menu {
+[data-theme="dark"] .floating-menu {
   background: var(--tp-menu-bg, #1f1f1f);
   box-shadow: var(--tp-menu-shadow, 0 4px 12px rgb(0 0 0 / 40%));
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .floating-group,
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-group {
+[data-theme="dark"] .floating-group,
+[data-theme="dark"] .menu-group {
   border-right-color: var(--tp-color-border, #434343);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-btn {
+[data-theme="dark"] .menu-btn {
   color: var(--tp-color-text-secondary, #d0d0d0);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-btn:hover {
+[data-theme="dark"] .menu-btn:hover {
   color: var(--tp-color-text, #f0f0f0);
   background: var(--tp-color-bg-hover, #303030);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .menu-btn.active {
+[data-theme="dark"] .menu-btn.active {
   color: var(--tp-color-primary, #4fc3f7);
   background: var(--tp-color-primary-bg, #1a4d6e);
 }

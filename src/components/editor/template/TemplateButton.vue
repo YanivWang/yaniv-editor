@@ -106,11 +106,11 @@ function insertTemplate(tpl: TemplateItem) {
   border-color: var(--menu-primary, #1890ff);
 }
 
-:where(.dark, .dark *) .template-card {
+[data-theme="dark"] .template-card {
   border-color: #434343;
 }
 
-:where(.dark, .dark *) .template-card:hover {
+[data-theme="dark"] .template-card:hover {
   background: #1a3a4d;
   border-color: #4fc3f7;
 }
@@ -128,7 +128,7 @@ function insertTemplate(tpl: TemplateItem) {
   border-radius: 8px;
 }
 
-:where(.dark, .dark *) .template-card__icon {
+[data-theme="dark"] .template-card__icon {
   color: #4fc3f7;
   background: #1a4d6e;
 }
@@ -145,7 +145,7 @@ function insertTemplate(tpl: TemplateItem) {
   color: #262626;
 }
 
-:where(.dark, .dark *) .template-card__name {
+[data-theme="dark"] .template-card__name {
   color: #e0e0e0;
 }
 
@@ -155,7 +155,7 @@ function insertTemplate(tpl: TemplateItem) {
   color: #8c8c8c;
 }
 
-:where(.dark, .dark *) .template-card__desc {
+[data-theme="dark"] .template-card__desc {
   color: #8c8c8c;
 }
 

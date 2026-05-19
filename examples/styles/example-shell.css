@@ -231,7 +231,7 @@
 }
 
 /* 与 Tiptap-UI-Kit DeviceFrame PC 模式一致：编辑器撑满 main，滚动条在视口最右侧 */
-.demo-app.editor-mode .demo-card :deep(.yaniv-editor.word-mode) {
+.demo-app.editor-mode .demo-card :deep(.yaniv-editor.document-layout) {
   flex: 1;
   min-height: 0;
 }
@@ -255,7 +255,7 @@
   background: #191919;
 }
 
-.theme-notion .word-toolbar {
+.theme-notion .document-toolbar {
   position: fixed;
   top: 60px;
   right: 24px;

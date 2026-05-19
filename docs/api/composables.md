@@ -70,10 +70,16 @@ const label = t("editor.bold");
 ## 主题 API
 
 ```ts
-import { setTheme, getTheme, toggleThemeMode, registerTheme } from "@yanivjs/yaniv-editor";
+import {
+  registerTheme,
+  resolveThemeMode,
+  watchSystemTheme,
+  editorThemeInjectionKey,
+  useInjectEditorTheme,
+} from "@yanivjs/yaniv-editor";
 ```
 
-详见 [主题与样式](/guide/theming)。
+主题由 `YanivEditor` 的 `themePreset` / `themeMode` props 驱动。详见 [主题与样式](/guide/theming)。
 
 ## resolveExtensionGates
 

@@ -31,7 +31,7 @@
   border-radius: 0; /* 移除圆角，底部导航应该贴合底部 */
   box-shadow: 0 -2px 8px rgb(0 0 0 / 5%);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     background: #262626;
     border-top-color: #434343;
     box-shadow: 0 -2px 8px rgb(0 0 0 / 20%);
@@ -72,13 +72,13 @@
 }
 
 /* ===== 暗黑模式按钮样式 ===== */
-:where([data-theme="dark"], [data-theme="dark"] *) .footer-nav-container .ant-btn {
+[data-theme="dark"] .footer-nav-container .ant-btn {
   color: rgba(255, 255, 255, 0.85);
   background: transparent;
   border-color: #434343;
 }
 
-:where([data-theme="dark"], [data-theme="dark"] *) .footer-nav-container .ant-btn:hover {
+[data-theme="dark"] .footer-nav-container .ant-btn:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.08);
   border-color: #595959;

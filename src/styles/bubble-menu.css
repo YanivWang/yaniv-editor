@@ -14,7 +14,7 @@
 }
 
 /* 暗黑模式 - 气泡菜单 */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .bubble-menu {
+[data-theme="dark"] .bubble-menu {
   background: #1f1f1f;
   border: 1px solid #434343;
   box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
@@ -26,7 +26,7 @@
 }
 
 /* 暗黑模式 - 按钮 */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .bubble-btn {
+[data-theme="dark"] .bubble-btn {
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -61,7 +61,7 @@
   transform: scale(1.2);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .color-item:hover {
+[data-theme="dark"] .color-item:hover {
   box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
 }
 

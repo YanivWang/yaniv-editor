@@ -275,7 +275,7 @@ function deleteTable() {
   border-radius: 6px;
 }
 
-:where(.dark, .dark *) .grid {
+[data-theme="dark"] .grid {
   background: #262626;
   border-color: #434343;
 }
@@ -296,7 +296,7 @@ function deleteTable() {
   transition: all 0.15s;
 }
 
-:where(.dark, .dark *) .grid-cell {
+[data-theme="dark"] .grid-cell {
   background: #1f1f1f;
   border-color: #434343;
 }
@@ -305,7 +305,7 @@ function deleteTable() {
   border-color: #40a9ff;
 }
 
-:where(.dark, .dark *) .grid-cell:hover {
+[data-theme="dark"] .grid-cell:hover {
   border-color: #4fc3f7;
 }
 
@@ -314,7 +314,7 @@ function deleteTable() {
   border-color: #91caff;
 }
 
-:where(.dark, .dark *) .grid-cell.active {
+[data-theme="dark"] .grid-cell.active {
   background: #1a4d6e;
   border-color: #4fc3f7;
 }
@@ -338,7 +338,7 @@ function deleteTable() {
   border: 1px solid #e8e8e8;
   border-radius: 6px;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #262626;
     border-color: #434343;
   }
@@ -362,7 +362,7 @@ function deleteTable() {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -385,7 +385,7 @@ function deleteTable() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -393,7 +393,7 @@ function deleteTable() {
 .table-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #303030;
   }
 }

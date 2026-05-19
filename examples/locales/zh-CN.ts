@@ -19,10 +19,17 @@ export const demoZhCN: DemoMessages = {
       switchToLight: "切换到浅色模式",
     },
     themePreset: {
+      default: "默认风格",
       word: "Word 风格",
       notion: "Notion 风格",
       github: "GitHub 风格",
       typora: "Typora 风格",
+      custom: "自定义",
+    },
+    themeMode: {
+      light: "浅色",
+      dark: "深色",
+      auto: "跟随系统",
     },
     locale: {
       enUS: "English",

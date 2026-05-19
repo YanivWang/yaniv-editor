@@ -2,8 +2,11 @@
  * Yaniv Editor Types
  * @description 档位（version）+ 功能开关（features）
  */
+import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
+
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
+
 
 /**
  * 版本类型
@@ -75,6 +78,16 @@ export interface YanivEditorProps {
   features?: FeatureConfig;
   /** 语言设置 */
   locale?: string;
+  /**
+   * 视觉主题预设（皮肤 CSS，按需加载）
+   * @default 'default'
+   */
+  themePreset?: ThemePreset;
+  /**
+   * 明暗模式；`auto` 跟随系统（见 watchSystemTheme）
+   * @default 'light'
+   */
+  themeMode?: ThemeMode;
 }
 
 /**

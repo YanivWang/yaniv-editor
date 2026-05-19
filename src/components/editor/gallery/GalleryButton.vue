@@ -186,7 +186,7 @@ function insertSelected() {
   color: #d9d9d9;
 }
 
-:where(.dark, .dark *) .gallery-empty__icon {
+[data-theme="dark"] .gallery-empty__icon {
   color: #434343;
 }
 
@@ -196,7 +196,7 @@ function insertSelected() {
   color: #595959;
 }
 
-:where(.dark, .dark *) .gallery-empty__text {
+[data-theme="dark"] .gallery-empty__text {
   color: #a0a0a0;
 }
 
@@ -232,7 +232,7 @@ function insertSelected() {
   transition: all 0.2s;
 }
 
-:where(.dark, .dark *) .gallery-item {
+[data-theme="dark"] .gallery-item {
   background: #2a2a2a;
 }
 
@@ -261,7 +261,7 @@ function insertSelected() {
   border-radius: 50%;
 }
 
-:where(.dark, .dark *) .gallery-item__check {
+[data-theme="dark"] .gallery-item__check {
   color: #4fc3f7;
   background: #1a1a1a;
 }
@@ -276,7 +276,7 @@ function insertSelected() {
   border-top: 1px solid #f0f0f0;
 }
 
-:where(.dark, .dark *) .gallery-footer {
+[data-theme="dark"] .gallery-footer {
   border-top-color: #434343;
 }
 

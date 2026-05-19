@@ -17,10 +17,17 @@ export interface DemoMessages {
       switchToLight: string;
     };
     themePreset: {
+      default: string;
       word: string;
       notion: string;
       github: string;
       typora: string;
+      custom: string;
+    };
+    themeMode: {
+      light: string;
+      dark: string;
+      auto: string;
     };
     locale: {
       enUS: string;

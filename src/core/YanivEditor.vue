@@ -1,12 +1,16 @@
 <template>
-  <div class="yaniv-editor word-mode" :class="{ 'is-preview-mode': isPreviewMode }">
+  <div
+    ref="rootRef"
+    class="yaniv-editor document-layout"
+    :class="{ 'is-preview-mode': isPreviewMode }"
+  >
     <!-- 工具栏（预览模式下隐藏） -->
     <ToolbarNav
       v-if="editorInstance && !isPreviewMode"
       :editor="editorInstance"
       :config="toolbarConfig"
       :enabled="shouldShowHeaderNav"
-      class="word-toolbar"
+      class="document-toolbar"
     >
     </ToolbarNav>
 
@@ -59,12 +63,12 @@
     />
 
     <!-- Word 文档区域容器 -->
-    <div class="word-editor-body">
+    <div class="document-body">
       <OutlinePanel
         v-if="editorInstance && !isPreviewMode && showOutlinePanel"
         :editor="editorInstance"
       />
-      <div ref="containerRef" class="word-document-container">
+      <div ref="containerRef" class="document-container">
         <CodeBlockLanguageBadge
           v-if="editorInstance && !isPreviewMode && toolbarConfig.codeBlock"
           :editor="editorInstance"
@@ -75,7 +79,7 @@
             <EditorContent
               v-if="editorInstance"
               :editor="editorInstance"
-              class="word-content-multi"
+              class="document-content"
             />
             <div v-else class="editor-fallback">{{ editorError || "正在初始化编辑器..." }}</div>
           </div>
@@ -102,13 +106,14 @@
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, watch } from "vue";
 
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
 import { getExtensionsByVersion } from "@/extensions/coreExtensions";
 // @vben/locales removed - using built-in i18n
 import { t } from "@/locales";
+import { useEditorTheme } from "@/themes";
 import { BlockPickerMenu } from "@/tools/block-menu";
 import { DragHandleExtension } from "@/tools/drag-handle";
 import { FloatingMenu } from "@/tools/floating-menu";
@@ -122,6 +127,7 @@ import { TableToolbar } from "@/tools/table-toolbar";
 import { VideoToolbar } from "@/tools/video-toolbar";
 import { validateYanivEditorProps } from "@/utils/validateEditorProps";
 
+
 import { DEFAULT_EDITOR_VERSION, type YanivEditorProps } from "./editorTypes";
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
@@ -130,7 +136,7 @@ import { useEditorPagination } from "./useEditorPagination";
 // 样式（variables.css 需最先加载以定义 CSS 变量，base.css 需在其他样式之前加载）
 import "@/styles/variables.css";
 import "@/styles/base.css";
-import "@/styles/word-mode.css";
+import "@/styles/document-layout.css";
 import "@/styles/task-list.css";
 import "@/styles/toolbar.css";
 import "@/styles/image-toolbar.css";
@@ -148,6 +154,8 @@ const props = withDefaults(defineProps<YanivEditorProps>(), {
   previewMode: false,
   initialContent: "<p>开始编辑你的文档...</p>",
   version: DEFAULT_EDITOR_VERSION,
+  themePreset: "default",
+  themeMode: "light",
 });
 
 // ===== 预览模式 =====
@@ -160,7 +168,14 @@ const emit = defineEmits<{
 // ===== 基础状态 =====
 const editor = shallowRef<Editor | null>(null);
 const editorError = ref<string | null>(null);
+const rootRef = ref<HTMLElement | null>(null);
 const containerRef = ref<HTMLElement | null>(null);
+
+useEditorTheme({
+  rootRef,
+  preset: toRef(props, "themePreset"),
+  mode: toRef(props, "themeMode"),
+});
 
 type BlockPickerMenuInstance = {
   activate: (state: SlashCommandState) => void;
@@ -298,7 +313,7 @@ const initEditor = async () => {
       extensions,
       content: initialContentToUse,
       editorProps: {
-        attributes: { class: "word-editor-content" },
+        attributes: { class: "document-editor-content" },
       },
       onUpdate: ({ editor }) => {
         calculatePages();

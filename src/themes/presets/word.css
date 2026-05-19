@@ -3,7 +3,7 @@
  * 类似 Microsoft Word 的专业文档风格
  */
 
-.theme-word {
+.yaniv-editor.theme-word {
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #f2f2f2;
   --tiptap-bg-hover: #e6e6e6;
@@ -30,7 +30,7 @@
 }
 
 /* Word 风格 - 厚重工具栏 (sticky 定位) */
-.theme-word .word-toolbar {
+.yaniv-editor.theme-word .document-toolbar {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -40,14 +40,14 @@
 }
 
 /* Word 风格 - A4 纸张 */
-.theme-word .continuous-pages {
+.yaniv-editor.theme-word .continuous-pages {
   max-width: 816px;
   border-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Word 风格 - 专业标题 */
-.theme-word .ProseMirror h1 {
+.yaniv-editor.theme-word .ProseMirror h1 {
   margin-top: 24px;
   margin-bottom: 12px;
   font-size: 26pt;
@@ -55,7 +55,7 @@
   color: var(--tiptap-text);
 }
 
-.theme-word .ProseMirror h2 {
+.yaniv-editor.theme-word .ProseMirror h2 {
   margin-top: 18px;
   margin-bottom: 10px;
   font-size: 18pt;
@@ -63,7 +63,7 @@
   color: #2e74b5;
 }
 
-.theme-word .ProseMirror h3 {
+.yaniv-editor.theme-word .ProseMirror h3 {
   margin-top: 14px;
   margin-bottom: 8px;
   font-size: 14pt;
@@ -72,13 +72,13 @@
 }
 
 /* Word 风格 - 段落缩进 */
-.theme-word .ProseMirror p {
+.yaniv-editor.theme-word .ProseMirror p {
   margin-bottom: 8pt;
   text-indent: 0;
 }
 
 /* Word 深色模式 */
-.theme-word[data-theme="dark"] {
+.yaniv-editor.theme-word[data-theme="dark"] {
   --tiptap-bg: #1e1e1e;
   --tiptap-bg-secondary: #252525;
   --tiptap-bg-hover: #3e3e3e;
@@ -93,12 +93,12 @@
   --tiptap-link: #4fc3f7;
 }
 
-.theme-word[data-theme="dark"] .word-toolbar {
+.yaniv-editor.theme-word[data-theme="dark"] .document-toolbar {
   background: linear-gradient(180deg, #2d2d2d 0%, #252525 100%) !important;
   border-bottom-color: #3e3e3e !important;
 }
 
-.theme-word[data-theme="dark"] .ProseMirror h2,
-.theme-word[data-theme="dark"] .ProseMirror h3 {
+.yaniv-editor.theme-word[data-theme="dark"] .ProseMirror h2,
+.yaniv-editor.theme-word[data-theme="dark"] .ProseMirror h3 {
   color: #6db3f2;
 }

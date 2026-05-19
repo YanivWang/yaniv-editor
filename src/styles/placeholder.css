@@ -28,13 +28,13 @@
   color: var(--tiptap-placeholder-color, #ccc);
 }
 
-.theme-notion .ProseMirror p.is-empty::before,
-.theme-notion .ProseMirror h1.is-empty::before,
-.theme-notion .ProseMirror h2.is-empty::before,
-.theme-notion .ProseMirror h3.is-empty::before,
-.theme-notion .ProseMirror h4.is-empty::before,
-.theme-notion .ProseMirror h5.is-empty::before,
-.theme-notion .ProseMirror h6.is-empty::before,
-.theme-notion .ProseMirror pre.is-empty::before {
+.yaniv-editor.theme-notion .ProseMirror p.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h1.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h2.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h3.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h4.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h5.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror h6.is-empty::before,
+.yaniv-editor.theme-notion .ProseMirror pre.is-empty::before {
   font-style: italic;
 }

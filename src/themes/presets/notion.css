@@ -4,7 +4,7 @@
  */
 
 /* ===== Notion 主题变量 ===== */
-.theme-notion {
+.yaniv-editor.theme-notion {
   --tiptap-bg: #ffffff;
   --tiptap-bg-secondary: #ffffff;
   --tiptap-bg-hover: rgba(55, 53, 47, 0.08);
@@ -33,17 +33,17 @@
 }
 
 /* ===== Notion 风格 - 全宽无纸张边框布局 ===== */
-.theme-notion .yaniv-editor.word-mode {
+.yaniv-editor.theme-notion.document-layout {
   background: #ffffff;
 }
 
-.theme-notion .word-document-container {
+.yaniv-editor.theme-notion .document-container {
   padding: 0;
   background: #ffffff;
 }
 
 /* 隐藏纸张阴影和边框 */
-.theme-notion .continuous-pages {
+.yaniv-editor.theme-notion .continuous-pages {
   max-width: 900px;
   padding: 0 96px;
   margin: 0 auto;
@@ -53,7 +53,7 @@
 }
 
 /* ===== Notion 风格 - 极简工具栏 ===== */
-.theme-notion .word-toolbar {
+.yaniv-editor.theme-notion .document-toolbar {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -67,8 +67,8 @@
 }
 
 /* 工具栏按钮 */
-.theme-notion .tt-toolbar-button,
-.theme-notion .tt-dropdown-btn {
+.yaniv-editor.theme-notion .tt-toolbar-button,
+.yaniv-editor.theme-notion .tt-dropdown-btn {
   min-width: 28px;
   height: 28px;
   padding: 0 6px;
@@ -78,20 +78,20 @@
   border-radius: 4px;
 }
 
-.theme-notion .tt-toolbar-button:hover,
-.theme-notion .tt-dropdown-btn:hover {
+.yaniv-editor.theme-notion .tt-toolbar-button:hover,
+.yaniv-editor.theme-notion .tt-dropdown-btn:hover {
   color: #37352f;
   background: rgba(55, 53, 47, 0.08);
 }
 
-.theme-notion .tt-toolbar-button.is-active,
-.theme-notion .tt-dropdown-btn.is-active {
+.yaniv-editor.theme-notion .tt-toolbar-button.is-active,
+.yaniv-editor.theme-notion .tt-dropdown-btn.is-active {
   color: rgb(35, 131, 226);
   background: rgba(35, 131, 226, 0.12);
 }
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
-.theme-notion .word-content-multi .ProseMirror {
+.yaniv-editor.theme-notion .document-content .ProseMirror {
   min-height: calc(100vh - 100px);
   padding: 32px 0 100px;
   font-family:
@@ -111,7 +111,7 @@
 }
 
 /* ===== Notion 风格 - 大标题 ===== */
-.theme-notion .ProseMirror h1 {
+.yaniv-editor.theme-notion .ProseMirror h1 {
   margin-top: 2rem;
   margin-bottom: 4px;
   font-size: 1.875rem;
@@ -120,13 +120,13 @@
   color: #37352f;
 }
 
-.theme-notion .ProseMirror h1:first-child {
+.yaniv-editor.theme-notion .ProseMirror h1:first-child {
   margin-top: 0;
   font-size: 2.5rem;
   font-weight: 700;
 }
 
-.theme-notion .ProseMirror h2 {
+.yaniv-editor.theme-notion .ProseMirror h2 {
   margin-top: 1.5rem;
   margin-bottom: 4px;
   font-size: 1.5rem;
@@ -135,7 +135,7 @@
   color: #37352f;
 }
 
-.theme-notion .ProseMirror h3 {
+.yaniv-editor.theme-notion .ProseMirror h3 {
   margin-top: 1rem;
   margin-bottom: 4px;
   font-size: 1.25rem;
@@ -145,41 +145,41 @@
 }
 
 /* ===== Notion 风格 - 段落 ===== */
-.theme-notion .ProseMirror p {
+.yaniv-editor.theme-notion .ProseMirror p {
   padding: 3px 0;
   margin: 0;
 }
 
-.theme-notion .ProseMirror p + p {
+.yaniv-editor.theme-notion .ProseMirror p + p {
   margin-top: 0;
 }
 
 /* ===== Notion 风格 - 列表 ===== */
-.theme-notion .ProseMirror ul,
-.theme-notion .ProseMirror ol {
+.yaniv-editor.theme-notion .ProseMirror ul,
+.yaniv-editor.theme-notion .ProseMirror ol {
   padding-left: 1.5rem;
   margin: 0;
 }
 
-.theme-notion .ProseMirror li {
+.yaniv-editor.theme-notion .ProseMirror li {
   padding: 3px 0;
 }
 
-.theme-notion .ProseMirror li::marker {
+.yaniv-editor.theme-notion .ProseMirror li::marker {
   color: var(--tiptap-text);
 }
 
 /* 任务列表：与 Notion 列表项保持相同行距 */
-.theme-notion .ProseMirror ul[data-type="taskList"] > li {
+.yaniv-editor.theme-notion .ProseMirror ul[data-type="taskList"] > li {
   padding: 3px 0;
 }
 
-.theme-notion .ProseMirror ul[data-type="taskList"] > li > div > p {
+.yaniv-editor.theme-notion .ProseMirror ul[data-type="taskList"] > li > div > p {
   padding: 0;
 }
 
 /* ===== Notion 风格 - 代码 ===== */
-.theme-notion .ProseMirror code {
+.yaniv-editor.theme-notion .ProseMirror code {
   padding: 0.2em 0.4em;
   font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
   font-size: 85%;
@@ -191,7 +191,7 @@
 /* 代码块样式由 src/styles/code-block.css 统一提供 */
 
 /* ===== Notion 风格 - 引用 ===== */
-.theme-notion .ProseMirror blockquote {
+.yaniv-editor.theme-notion .ProseMirror blockquote {
   padding-left: 14px;
   margin: 8px 0;
   color: var(--tiptap-text);
@@ -199,50 +199,50 @@
 }
 
 /* ===== Notion 风格 - 链接 ===== */
-.theme-notion .ProseMirror a {
+.yaniv-editor.theme-notion .ProseMirror a {
   color: var(--tiptap-link);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.theme-notion .ProseMirror a:hover {
+.yaniv-editor.theme-notion .ProseMirror a:hover {
   opacity: 0.8;
 }
 
 /* ===== Notion 风格 - 分割线 ===== */
-.theme-notion .ProseMirror hr {
+.yaniv-editor.theme-notion .ProseMirror hr {
   margin: 24px 0;
   border: none;
   border-top: 1px solid rgba(55, 53, 47, 0.09);
 }
 
 /* ===== Notion 风格 - 表格 ===== */
-.theme-notion .ProseMirror table {
+.yaniv-editor.theme-notion .ProseMirror table {
   width: 100%;
   margin: 8px 0;
   border-collapse: collapse;
 }
 
-.theme-notion .ProseMirror th,
-.theme-notion .ProseMirror td {
+.yaniv-editor.theme-notion .ProseMirror th,
+.yaniv-editor.theme-notion .ProseMirror td {
   padding: 8px 12px;
   text-align: left;
   border: 1px solid rgba(55, 53, 47, 0.09);
 }
 
-.theme-notion .ProseMirror th {
+.yaniv-editor.theme-notion .ProseMirror th {
   font-weight: 600;
   background: rgba(55, 53, 47, 0.04);
 }
 
 /* ===== Notion 风格 - 图片 ===== */
-.theme-notion .ProseMirror img {
+.yaniv-editor.theme-notion .ProseMirror img {
   max-width: 100%;
   border-radius: 4px;
 }
 
 /* ===== Notion 深色模式 ===== */
-.theme-notion[data-theme="dark"] {
+.yaniv-editor.theme-notion[data-theme="dark"] {
   --tiptap-bg: #191919;
   --tiptap-bg-secondary: #191919;
   --tiptap-bg-hover: rgba(255, 255, 255, 0.055);
@@ -258,48 +258,121 @@
   --tiptap-link: rgb(82, 156, 202);
 }
 
-.theme-notion[data-theme="dark"] .yaniv-editor.word-mode,
-.theme-notion[data-theme="dark"] .word-document-container,
-.theme-notion[data-theme="dark"] .continuous-pages {
+.yaniv-editor.theme-notion.document-layout[data-theme="dark"],
+.yaniv-editor.theme-notion[data-theme="dark"] .document-container,
+.yaniv-editor.theme-notion[data-theme="dark"] .continuous-pages {
   background: #191919;
 }
 
-.theme-notion[data-theme="dark"] .word-toolbar {
+.yaniv-editor.theme-notion[data-theme="dark"] .document-toolbar {
   background: #191919 !important;
   border-bottom-color: rgba(255, 255, 255, 0.09) !important;
 }
 
-.theme-notion[data-theme="dark"] .word-content-multi .ProseMirror {
+.yaniv-editor.theme-notion[data-theme="dark"] .document-content .ProseMirror {
   color: rgba(255, 255, 255, 0.9);
   background: #191919;
 }
 
-.theme-notion[data-theme="dark"] .ProseMirror h1,
-.theme-notion[data-theme="dark"] .ProseMirror h2,
-.theme-notion[data-theme="dark"] .ProseMirror h3 {
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h1,
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h2,
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h3 {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.theme-notion[data-theme="dark"] .tt-toolbar-button,
-.theme-notion[data-theme="dark"] .tt-dropdown-btn {
+.yaniv-editor.theme-notion[data-theme="dark"] .tt-toolbar-button,
+.yaniv-editor.theme-notion[data-theme="dark"] .tt-dropdown-btn {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.theme-notion[data-theme="dark"] .tt-toolbar-button:hover,
-.theme-notion[data-theme="dark"] .tt-dropdown-btn:hover {
+.yaniv-editor.theme-notion[data-theme="dark"] .tt-toolbar-button:hover,
+.yaniv-editor.theme-notion[data-theme="dark"] .tt-dropdown-btn:hover {
   color: rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.055);
 }
 
-.theme-notion[data-theme="dark"] .ProseMirror th {
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror th {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.theme-notion[data-theme="dark"] .ProseMirror th,
-.theme-notion[data-theme="dark"] .ProseMirror td {
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror th,
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror td {
   border-color: rgba(255, 255, 255, 0.09);
 }
 
-.theme-notion[data-theme="dark"] .ProseMirror hr {
+.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror hr {
   border-top-color: rgba(255, 255, 255, 0.09);
+}
+
+/* ===== Notion 拖拽手柄与块菜单（自 drag-handle.css 收拢） ===== */
+.yaniv-editor.theme-notion .drag-handle-plus {
+  width: 24px;
+  height: 24px;
+  color: #cfcfcf;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  transition:
+    opacity 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.yaniv-editor.theme-notion .drag-handle {
+  left: max(12px, var(--drag-handle-left, 0px));
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  transition:
+    opacity 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.yaniv-editor.theme-notion .drag-handle:hover,
+.yaniv-editor.theme-notion .drag-handle-plus:hover,
+.yaniv-editor.theme-notion .drag-handle.is-dragging {
+  background: rgb(55 53 47 / 8%);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.yaniv-editor.theme-notion .drag-handle__dot {
+  background: #c4c4c4;
+}
+
+.yaniv-editor.theme-notion .drag-handle.is-dragging .drag-handle__dot {
+  background: #c4c4c4;
+}
+
+.drag-handle-menu.theme-notion-menu {
+  color: rgb(55 53 47);
+  border-color: rgb(55 53 47 / 9%);
+  border-radius: 6px;
+  box-shadow:
+    rgb(15 15 15 / 5%) 0 0 0 1px,
+    rgb(15 15 15 / 10%) 0 3px 6px,
+    rgb(15 15 15 / 20%) 0 9px 24px;
+}
+
+.drag-handle-menu.theme-notion-menu .drag-handle-menu__item {
+  color: rgb(55 53 47);
+  border-radius: 4px;
+}
+
+.drag-handle-menu.theme-notion-menu .drag-handle-menu__description {
+  color: rgb(120 119 116);
+}
+
+.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle-plus:hover,
+.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle:hover,
+.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle.is-dragging {
+  background: rgb(255 255 255 / 10%);
+  border-color: transparent;
+}
+
+.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle__dot {
+  background: #c4c4c4;
 }

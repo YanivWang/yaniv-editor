@@ -677,10 +677,9 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
             const target = currentTarget;
             activeMenuKind = "actions";
-            menu.classList.toggle("theme-notion-menu", Boolean(view.dom.closest(".theme-notion")));
             menu.classList.toggle(
-              "is-dark",
-              Boolean(view.dom.closest('[data-theme="dark"], .dark')),
+              "theme-notion-menu",
+              Boolean(view.dom.closest(".yaniv-editor.theme-notion")),
             );
             menu.classList.add("is-actions-menu");
 

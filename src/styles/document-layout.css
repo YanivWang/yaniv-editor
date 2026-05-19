@@ -1,16 +1,16 @@
-/* Yaniv Editor Word 模式样式 */
+/* Yaniv Editor 文档布局样式（原 word-mode，适用于所有 themePreset） */
 
 /* 基于原 tiptap 样式，适配 yaniv-editor 类名 */
 
 /* ===== Word 文档模式编辑器容器 ===== */
-.yaniv-editor.word-mode {
+.yaniv-editor.document-layout {
   /* 布局与尺寸 */
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
   min-height: 0; /* 允许 flex 子元素收缩 */
-  overflow: hidden; /* 容器不滚动，由内部 word-document-container 滚动 */
+  overflow: hidden; /* 容器不滚动，由内部 document-container 滚动 */
 
   /* 统一色彩与变量（引用主题预设变量，由 themes/presets/*.css 定义） */
   --color-text: var(--tiptap-text, #000);
@@ -44,8 +44,8 @@
 }
 
 /* 深色模式下的编辑器容器 */
-.dark .yaniv-editor.word-mode,
-[data-theme="dark"] .yaniv-editor.word-mode {
+[data-theme="dark"] .yaniv-editor.document-layout,
+[data-theme="dark"] .yaniv-editor.document-layout {
   --color-text: #f0f0f0;
   --color-bg: #1f1f1f;
   --color-bg-gray: #262626;
@@ -71,7 +71,7 @@
 }
 
 /* Word 文档区域容器 - 这是唯一可滚动的区域 */
-.word-document-container {
+.document-container {
   position: relative;
   display: flex;
   flex: 1;
@@ -103,7 +103,7 @@
 }
 
 /* ===== Word 文档内容样式（多页模式）===== */
-.word-content-multi .ProseMirror {
+.document-content .ProseMirror {
   min-height: var(--page-content-height-px, 939px);
   padding: var(--padding-top-px, 96px) 92px var(--padding-bottom-px, 88px) 92px;
   font-family: var(--font-family);
@@ -115,8 +115,8 @@
 }
 
 /* 格式刷激活态光标 */
-.word-content-multi.cursor-format-painter,
-.word-content-multi .ProseMirror.cursor-format-painter {
+.document-content.cursor-format-painter,
+.document-content .ProseMirror.cursor-format-painter {
   cursor:
     url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g transform="rotate(-30 12 12)"><rect x="8" y="2" width="8" height="10" rx="1" fill="%233b82f6" stroke="%232563eb" stroke-width="0.5"/><rect x="7" y="11" width="10" height="8" rx="1" fill="%239ca3af" stroke="%236b7280" stroke-width="0.5"/><path d="M8 19 L8 22 L16 22 L16 19" fill="%234b5563"/></g></svg>')
       12 12,
@@ -124,56 +124,56 @@
 }
 
 /* Word 标题样式 */
-.word-content-multi .ProseMirror h1,
-.word-content-multi .ProseMirror h2,
-.word-content-multi .ProseMirror h3 {
+.document-content .ProseMirror h1,
+.document-content .ProseMirror h2,
+.document-content .ProseMirror h3 {
   font-weight: bold;
   line-height: 1.3;
   color: var(--color-text);
 }
 
-.word-content-multi .ProseMirror h1 {
+.document-content .ProseMirror h1 {
   margin: 24px 0 12px;
   font-size: 26px;
 }
 
-.word-content-multi .ProseMirror h2 {
+.document-content .ProseMirror h2 {
   margin: 18px 0 10px;
   font-size: 20px;
 }
 
-.word-content-multi .ProseMirror h3 {
+.document-content .ProseMirror h3 {
   margin: 14px 0 8px;
   font-size: 16px;
 }
 
 /* Word 段落样式 */
-.word-content-multi .ProseMirror p {
+.document-content .ProseMirror p {
   margin: 0 0 14px;
 }
 
 /* Word 列表样式 */
-.word-content-multi .ProseMirror ul,
-.word-content-multi .ProseMirror ol {
+.document-content .ProseMirror ul,
+.document-content .ProseMirror ol {
   padding-left: 14px;
   margin: 0 0 14px;
 }
 
-.word-content-multi .ProseMirror ul li,
-.word-content-multi .ProseMirror ol li {
+.document-content .ProseMirror ul li,
+.document-content .ProseMirror ol li {
   margin: 4px 0;
 }
 
-.word-content-multi .ProseMirror ul:not([data-type="taskList"]) > li:not([data-checked]) {
+.document-content .ProseMirror ul:not([data-type="taskList"]) > li:not([data-checked]) {
   list-style-type: disc;
 }
 
-.word-content-multi .ProseMirror ol li {
+.document-content .ProseMirror ol li {
   list-style-type: decimal;
 }
 
 /* Word 图片样式 */
-.word-content-multi .ProseMirror img {
+.document-content .ProseMirror img {
   display: block;
   max-width: 100%;
   height: auto;
@@ -181,7 +181,7 @@
 }
 
 /* Word 表格样式 */
-.word-content-multi .ProseMirror table {
+.document-content .ProseMirror table {
   width: 100%;
   max-width: 100%;
   margin: 14px 0;
@@ -234,7 +234,7 @@
   }
 }
 
-.word-content-multi .ProseMirror .tableWrapper {
+.document-content .ProseMirror .tableWrapper {
   box-sizing: border-box;
   max-width: 100%;
   margin: 1.5rem 0;
@@ -242,7 +242,7 @@
 }
 
 /* 表格调整大小光标 */
-.word-content-multi .ProseMirror.resize-cursor {
+.document-content .ProseMirror.resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
 }
@@ -250,8 +250,8 @@
 /* Word 代码块样式（语法高亮见 code-block.css，此处仅保留行内 code） */
 
 /* Word 行内代码样式 - 参考邮件效果，浅灰背景+边框 */
-.word-content-multi .ProseMirror code.inline-code,
-.word-content-multi .ProseMirror code:not(pre code) {
+.document-content .ProseMirror code.inline-code,
+.document-content .ProseMirror code:not(pre code) {
   display: inline;
   padding: 2px 6px !important;
   margin: 0 1px !important;
@@ -268,7 +268,7 @@
   border: 1px solid #e0e0e0 !important;
   border-radius: 3px !important;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: var(--color-text, #f0f0f0) !important;
     background: #2a2a2a !important;
     border-color: #404040 !important;
@@ -276,26 +276,26 @@
 }
 
 /* 确保行内代码在段落、列表、表格、标题中正确显示 */
-.word-content-multi .ProseMirror p code.inline-code,
-.word-content-multi .ProseMirror p code:not(pre code),
-.word-content-multi .ProseMirror li code.inline-code,
-.word-content-multi .ProseMirror li code:not(pre code),
-.word-content-multi .ProseMirror td code.inline-code,
-.word-content-multi .ProseMirror td code:not(pre code),
-.word-content-multi .ProseMirror th code.inline-code,
-.word-content-multi .ProseMirror th code:not(pre code),
-.word-content-multi .ProseMirror h1 code.inline-code,
-.word-content-multi .ProseMirror h1 code:not(pre code),
-.word-content-multi .ProseMirror h2 code.inline-code,
-.word-content-multi .ProseMirror h2 code:not(pre code),
-.word-content-multi .ProseMirror h3 code.inline-code,
-.word-content-multi .ProseMirror h3 code:not(pre code),
-.word-content-multi .ProseMirror h4 code.inline-code,
-.word-content-multi .ProseMirror h4 code:not(pre code),
-.word-content-multi .ProseMirror h5 code.inline-code,
-.word-content-multi .ProseMirror h5 code:not(pre code),
-.word-content-multi .ProseMirror h6 code.inline-code,
-.word-content-multi .ProseMirror h6 code:not(pre code) {
+.document-content .ProseMirror p code.inline-code,
+.document-content .ProseMirror p code:not(pre code),
+.document-content .ProseMirror li code.inline-code,
+.document-content .ProseMirror li code:not(pre code),
+.document-content .ProseMirror td code.inline-code,
+.document-content .ProseMirror td code:not(pre code),
+.document-content .ProseMirror th code.inline-code,
+.document-content .ProseMirror th code:not(pre code),
+.document-content .ProseMirror h1 code.inline-code,
+.document-content .ProseMirror h1 code:not(pre code),
+.document-content .ProseMirror h2 code.inline-code,
+.document-content .ProseMirror h2 code:not(pre code),
+.document-content .ProseMirror h3 code.inline-code,
+.document-content .ProseMirror h3 code:not(pre code),
+.document-content .ProseMirror h4 code.inline-code,
+.document-content .ProseMirror h4 code:not(pre code),
+.document-content .ProseMirror h5 code.inline-code,
+.document-content .ProseMirror h5 code:not(pre code),
+.document-content .ProseMirror h6 code.inline-code,
+.document-content .ProseMirror h6 code:not(pre code) {
   display: inline !important;
   padding: 2px 6px !important;
   margin: 0 1px !important;
@@ -312,7 +312,7 @@
   border: 1px solid #e0e0e0 !important;
   border-radius: 3px !important;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: var(--color-text, #f0f0f0) !important;
     background: #2a2a2a !important;
     border-color: #404040 !important;
@@ -320,25 +320,25 @@
 }
 
 /* 行内代码在链接中的样式 */
-.word-content-multi .ProseMirror a code.inline-code,
-.word-content-multi .ProseMirror a code:not(pre code) {
+.document-content .ProseMirror a code.inline-code,
+.document-content .ProseMirror a code:not(pre code) {
   color: var(--color-link, #0563c1) !important;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: var(--color-link, #4fc3f7) !important;
   }
 }
 
 /* 行内代码在强调文本中的样式 */
-.word-content-multi .ProseMirror strong code.inline-code,
-.word-content-multi .ProseMirror strong code:not(pre code),
-.word-content-multi .ProseMirror em code.inline-code,
-.word-content-multi .ProseMirror em code:not(pre code) {
+.document-content .ProseMirror strong code.inline-code,
+.document-content .ProseMirror strong code:not(pre code),
+.document-content .ProseMirror em code.inline-code,
+.document-content .ProseMirror em code:not(pre code) {
   font-weight: 600 !important;
 }
 
 /* Word 链接样式 */
-.word-content-multi .ProseMirror a {
+.document-content .ProseMirror a {
   color: var(--color-link);
   word-break: break-word;
   text-decoration: underline;
@@ -347,14 +347,14 @@
 }
 
 /* ===== Gapcursor 样式（表格光标效果）===== */
-.word-content-multi .ProseMirror-gapcursor {
+.document-content .ProseMirror-gapcursor {
   position: absolute;
   display: none;
   margin: 0;
   pointer-events: none;
 }
 
-.word-content-multi .ProseMirror-gapcursor::after {
+.document-content .ProseMirror-gapcursor::after {
   position: absolute;
   top: -2px;
   display: block;
@@ -370,13 +370,11 @@
   }
 }
 
-.word-content-multi .ProseMirror-focused .ProseMirror-gapcursor {
+.document-content .ProseMirror-focused .ProseMirror-gapcursor {
   display: block;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .word-content-multi
-  .ProseMirror-gapcursor::after {
+[data-theme="dark"] .document-content .ProseMirror-gapcursor::after {
   border-top-color: var(--color-text, #f0f0f0);
 }
 
@@ -390,25 +388,25 @@
   color: #999;
   background: #fff;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #666;
     background: #1f1f1f;
   }
 }
 
 /* ===== 预览模式样式 ===== */
-.yaniv-editor.word-mode.is-preview-mode {
+.yaniv-editor.document-layout.is-preview-mode {
   /* 预览模式下禁止选中文本 */
   user-select: none;
 }
 
-.yaniv-editor.word-mode.is-preview-mode .word-document-container {
+.yaniv-editor.document-layout.is-preview-mode .document-container {
   /* 容器保持可滚动 */
   overflow: auto;
   cursor: default;
 }
 
-.yaniv-editor.word-mode.is-preview-mode .ProseMirror {
+.yaniv-editor.document-layout.is-preview-mode .ProseMirror {
   /* 内容区域禁止点击交互，但不影响容器滚动 */
   pointer-events: none;
 
@@ -416,7 +414,7 @@
   caret-color: transparent;
 }
 
-.yaniv-editor.word-mode.is-preview-mode .ProseMirror * {
+.yaniv-editor.document-layout.is-preview-mode .ProseMirror * {
   cursor: default !important;
 
   /* 预览模式下禁止选中 */
@@ -424,19 +422,19 @@
 }
 
 /* 预览模式下链接保持视觉样式但不可点击 */
-.yaniv-editor.word-mode.is-preview-mode .ProseMirror a {
+.yaniv-editor.document-layout.is-preview-mode .ProseMirror a {
   pointer-events: none;
   cursor: default;
 }
 
 /* 预览模式下图片不显示调整手柄 */
-.yaniv-editor.word-mode.is-preview-mode .ProseMirror img {
+.yaniv-editor.document-layout.is-preview-mode .ProseMirror img {
   resize: none;
 }
 
 /* 预览模式下隐藏所有可调整大小的手柄 */
-.yaniv-editor.word-mode.is-preview-mode .resize-handle,
-.yaniv-editor.word-mode.is-preview-mode .image-resizer {
+.yaniv-editor.document-layout.is-preview-mode .resize-handle,
+.yaniv-editor.document-layout.is-preview-mode .image-resizer {
   display: none !important;
 }
 

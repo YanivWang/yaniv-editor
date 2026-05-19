@@ -10,7 +10,7 @@
 @import "./base.css";
 
 /* Word mode (A4 paper layout) */
-@import "./word-mode.css";
+@import "./document-layout.css";
 
 /* Task list (checkbox + text inline) */
 @import "./task-list.css";

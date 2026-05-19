@@ -22,6 +22,20 @@
         {{ theme === "light" ? t("demo.theme.dark") : t("demo.theme.light") }}
       </button>
 
+      <a-dropdown v-if="showThemeMode" :trigger="['click']" placement="bottomLeft">
+        <button type="button" class="demo-header-select">
+          <span>{{ currentThemeModeLabel }}</span>
+          <DownOutlined class="demo-header-select__arrow" />
+        </button>
+        <template #overlay>
+          <a-menu :selected-keys="[themeMode]" @click="handleThemeModeMenuClick">
+            <a-menu-item v-for="option in themeModeOptions" :key="option.value">
+              {{ option.label }}
+            </a-menu-item>
+          </a-menu>
+        </template>
+      </a-dropdown>
+
       <a-dropdown v-if="showThemePreset" :trigger="['click']" placement="bottomLeft">
         <button type="button" class="demo-header-select">
           <span>{{ currentThemePresetLabel }}</span>
@@ -60,7 +74,7 @@ import { RouterLink } from "vue-router";
 
 import { t, type LocaleCode } from "../../src/locales";
 
-import type { ThemePreset } from "../../src/configs/editorConfig";
+import type { ThemeMode, ThemePreset } from "../../src/configs/editorConfig";
 import type { MenuInfo } from "ant-design-vue/es/menu/src/interface";
 
 const props = withDefaults(
@@ -69,13 +83,17 @@ const props = withDefaults(
     theme: "light" | "dark";
     showLocaleSelect?: boolean;
     showThemePreset?: boolean;
+    showThemeMode?: boolean;
     themePreset?: ThemePreset;
+    themeMode?: ThemeMode;
     locale?: LocaleCode;
   }>(),
   {
     showLocaleSelect: false,
     showThemePreset: false,
-    themePreset: "word",
+    showThemeMode: false,
+    themePreset: "default",
+    themeMode: "light",
     locale: "zh-CN",
   },
 );
@@ -84,6 +102,7 @@ const emit = defineEmits<{
   toggleTheme: [];
   "update:locale": [value: LocaleCode];
   "update:themePreset": [value: ThemePreset];
+  "update:themeMode": [value: ThemeMode];
 }>();
 
 const themeToggleTitle = computed(() =>
@@ -91,10 +110,18 @@ const themeToggleTitle = computed(() =>
 );
 
 const themePresetOptions = computed(() => [
+  { value: "default" as const, label: t("demo.themePreset.default") },
   { value: "word" as const, label: t("demo.themePreset.word") },
   { value: "notion" as const, label: t("demo.themePreset.notion") },
   { value: "github" as const, label: t("demo.themePreset.github") },
   { value: "typora" as const, label: t("demo.themePreset.typora") },
+  { value: "custom" as const, label: t("demo.themePreset.custom") },
+]);
+
+const themeModeOptions = computed(() => [
+  { value: "light" as const, label: t("demo.themeMode.light") },
+  { value: "dark" as const, label: t("demo.themeMode.dark") },
+  { value: "auto" as const, label: t("demo.themeMode.auto") },
 ]);
 
 const localeOptions = computed(() => [
@@ -107,12 +134,20 @@ const currentThemePresetLabel = computed(
   () => themePresetOptions.value.find((option) => option.value === props.themePreset)?.label ?? "",
 );
 
+const currentThemeModeLabel = computed(
+  () => themeModeOptions.value.find((option) => option.value === props.themeMode)?.label ?? "",
+);
+
 const currentLocaleLabel = computed(
   () => localeOptions.value.find((option) => option.value === props.locale)?.label ?? "",
 );
 
 const handleThemePresetMenuClick = ({ key }: MenuInfo) => {
   emit("update:themePreset", key as ThemePreset);
+};
+
+const handleThemeModeMenuClick = ({ key }: MenuInfo) => {
+  emit("update:themeMode", key as ThemeMode);
 };
 
 const handleLocaleMenuClick = ({ key }: MenuInfo) => {

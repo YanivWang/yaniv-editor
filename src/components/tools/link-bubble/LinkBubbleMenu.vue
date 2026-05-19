@@ -372,7 +372,7 @@ function removeLink() {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
   }
@@ -395,7 +395,7 @@ function removeLink() {
   color: #262626;
   white-space: nowrap;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -414,7 +414,7 @@ function removeLink() {
   margin: 0 4px;
   background: #e8e8e8;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #434343;
   }
 }
@@ -434,7 +434,7 @@ function removeLink() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -442,7 +442,7 @@ function removeLink() {
 .link-action-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #303030;
   }
 }
@@ -456,7 +456,7 @@ function removeLink() {
 .link-action-btn--danger {
   color: #ff4d4f;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #ff7875;
   }
 }
@@ -465,7 +465,7 @@ function removeLink() {
   color: #ff4d4f;
   background: #fff1f0;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #ff7875;
     background: #3a1a1a;
   }

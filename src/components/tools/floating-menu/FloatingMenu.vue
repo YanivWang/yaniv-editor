@@ -234,7 +234,7 @@ const setHighlight = (color: string) => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
     box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
@@ -268,7 +268,7 @@ const setHighlight = (color: string) => {
   border-radius: 4px;
   transition: all 0.2s;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -276,7 +276,7 @@ const setHighlight = (color: string) => {
 .bubble-btn:hover {
   background: #f5f5f5;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     background: #303030;
   }
 }
@@ -285,7 +285,7 @@ const setHighlight = (color: string) => {
   color: #1890ff;
   background: #e6f4ff;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #4fc3f7;
     background: #1a4d6e;
   }
@@ -306,7 +306,7 @@ const setHighlight = (color: string) => {
   background: #fff;
   border-radius: 4px;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     background: #1f1f1f;
   }
 }
@@ -319,7 +319,7 @@ const setHighlight = (color: string) => {
   border-radius: 4px;
   transition: transform 0.2s;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     border-color: #434343;
   }
 }
@@ -328,7 +328,7 @@ const setHighlight = (color: string) => {
   box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
   transform: scale(1.2);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
   }
 }

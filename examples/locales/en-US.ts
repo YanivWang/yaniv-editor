@@ -19,10 +19,17 @@ export const demoEnUS: DemoMessages = {
       switchToLight: "Switch to Light",
     },
     themePreset: {
+      default: "Default Style",
       word: "Word Style",
       notion: "Notion Style",
       github: "GitHub Style",
       typora: "Typora Style",
+      custom: "Custom",
+    },
+    themeMode: {
+      light: "Light",
+      dark: "Dark",
+      auto: "System",
     },
     locale: {
       enUS: "English",

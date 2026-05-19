@@ -250,7 +250,7 @@ function deleteTable() {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
   }
@@ -269,7 +269,7 @@ function deleteTable() {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -296,7 +296,7 @@ function deleteTable() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -304,7 +304,7 @@ function deleteTable() {
 .table-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #303030;
   }
 }
@@ -317,7 +317,7 @@ function deleteTable() {
 .table-menu-btn--danger {
   color: #ff4d4f;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #ff7875;
   }
 }
@@ -326,7 +326,7 @@ function deleteTable() {
   color: #fff;
   background: #ff4d4f;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #ff7875;
   }
 }

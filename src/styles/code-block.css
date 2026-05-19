@@ -2,15 +2,12 @@
  * Code Block - 语法高亮与深色代码块样式
  */
 
-.yaniv-editor .word-document-container {
+.yaniv-editor .document-container {
   position: relative;
 }
 
 /* 代码块容器：始终深色，覆盖各主题 preset 中的浅色 pre */
-.yaniv-editor .ProseMirror pre,
-.theme-notion .yaniv-editor .ProseMirror pre,
-.theme-github .yaniv-editor .ProseMirror pre,
-.theme-typora .yaniv-editor .ProseMirror pre {
+.yaniv-editor .ProseMirror pre {
   position: relative;
   min-height: 4.5em;
   padding: 40px 24px 24px !important;
@@ -26,9 +23,7 @@
   border-radius: 8px;
 }
 
-.yaniv-editor .ProseMirror pre code,
-.theme-notion .yaniv-editor .ProseMirror pre code,
-.theme-github .yaniv-editor .ProseMirror pre code {
+.yaniv-editor .ProseMirror pre code {
   display: block;
   padding: 0 !important;
   font-family: inherit;

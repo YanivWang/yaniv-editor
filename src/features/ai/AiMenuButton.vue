@@ -620,7 +620,7 @@ const menuItems = computed(() => {
   border-radius: 4px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -629,7 +629,7 @@ const menuItems = computed(() => {
   color: #262626;
   background: #f5f5f5;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
     background: #303030;
   }
@@ -639,7 +639,7 @@ const menuItems = computed(() => {
   color: #1890ff;
   background: #e6f4ff;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #4fc3f7;
     background: #1a4d6e;
   }
@@ -714,7 +714,7 @@ const menuItems = computed(() => {
   font-size: 16px;
   color: rgb(0 0 0 / 65%);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: rgb(255 255 255 / 65%);
   }
 }
@@ -735,7 +735,7 @@ const menuItems = computed(() => {
   color: #1677ff !important;
   background: #e6f4ff !important;
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     color: #4fc3f7 !important;
     background: #1a4d6e !important;
   }
@@ -774,7 +774,7 @@ const menuItems = computed(() => {
 .ai-menu-translate-split__arrow:hover {
   background-color: rgba(0, 0, 0, 0.06);
 
-  :where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) & {
+  [data-theme="dark"] & {
     background-color: rgba(255, 255, 255, 0.1);
   }
 }

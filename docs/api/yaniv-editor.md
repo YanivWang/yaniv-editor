@@ -12,17 +12,19 @@ import "@yanivjs/yaniv-editor/style.css";
 
 ## Props
 
-| Prop                | 类型                         | 默认值             | 说明                                          |
-| ------------------- | ---------------------------- | ------------------ | --------------------------------------------- |
-| `version`           | `'basic' \| 'advanced'`      | `'advanced'`       | 工具栏档位与扩展门控基准                      |
-| `initialContent`    | `string \| object`           | `'<p>开始编辑...'` | 初始内容，支持 HTML 或 ProseMirror JSON       |
-| `features`          | `FeatureConfig`              | —                  | 功能门控，见 [功能配置](/api/features-config) |
-| `locale`            | `string`                     | `'zh-CN'`          | 界面语言                                      |
-| `readonly`          | `boolean`                    | `false`            | 只读模式                                      |
-| `previewMode`       | `boolean`                    | `false`            | 预览模式（无工具栏、不可编辑）                |
-| `documentId`        | `string`                     | —                  | 预留字段，当前不触发加载/保存                 |
-| `tableMenuShowMode` | `1 \| 2`                     | `2`                | 表格工具栏显示时机                            |
-| `zoomBarPlacement`  | `'bottom' \| 'belowToolbar'` | `'bottom'`         | 缩放条位置                                    |
+| Prop                | 类型                          | 默认值             | 说明                                          |
+| ------------------- | ----------------------------- | ------------------ | --------------------------------------------- |
+| `version`           | `'basic' \| 'advanced'`       | `'advanced'`       | 工具栏档位与扩展门控基准                      |
+| `initialContent`    | `string \| object`            | `'<p>开始编辑...'` | 初始内容，支持 HTML 或 ProseMirror JSON       |
+| `features`          | `FeatureConfig`               | —                  | 功能门控，见 [功能配置](/api/features-config) |
+| `locale`            | `string`                      | `'zh-CN'`          | 界面语言                                      |
+| `themePreset`       | `ThemePreset`                 | `'default'`        | 视觉预设，CSS 按需加载                        |
+| `themeMode`         | `'light' \| 'dark' \| 'auto'` | `'light'`          | 明暗模式，`auto` 跟随系统                     |
+| `readonly`          | `boolean`                     | `false`            | 只读模式                                      |
+| `previewMode`       | `boolean`                     | `false`            | 预览模式（无工具栏、不可编辑）                |
+| `documentId`        | `string`                      | —                  | 预留字段，当前不触发加载/保存                 |
+| `tableMenuShowMode` | `1 \| 2`                      | `2`                | 表格工具栏显示时机                            |
+| `zoomBarPlacement`  | `'bottom' \| 'belowToolbar'`  | `'bottom'`         | 缩放条位置                                    |
 
 ### FeatureConfig 速查
 
@@ -77,13 +79,10 @@ function exportContent() {
 ```vue
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { YanivEditor, setTheme } from "@yanivjs/yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
-import "@yanivjs/yaniv-editor/src/themes/presets/word.css";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
-
-onMounted(() => setTheme("word", "light"));
 
 async function save() {
   await fetch("/api/docs/1", {
@@ -99,6 +98,8 @@ async function save() {
     ref="editorRef"
     version="advanced"
     locale="zh-CN"
+    theme-preset="word"
+    theme-mode="light"
     :initial-content="'<h1>标题</h1><p>正文</p>'"
     :features="{
       headerNav: true,

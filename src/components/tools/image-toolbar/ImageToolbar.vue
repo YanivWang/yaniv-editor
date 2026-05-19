@@ -272,7 +272,7 @@ function deleteImage() {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
   }
@@ -285,7 +285,7 @@ function deleteImage() {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -308,7 +308,7 @@ function deleteImage() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -316,7 +316,7 @@ function deleteImage() {
 .image-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     background: #303030;
   }
 }
@@ -330,7 +330,7 @@ function deleteImage() {
   color: #1677ff;
   background: #e6f4ff;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #4fc3f7;
     background: #15395b;
   }
@@ -339,7 +339,7 @@ function deleteImage() {
 .image-menu-btn--danger {
   color: #ff4d4f;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #ff7875;
   }
 }
@@ -348,7 +348,7 @@ function deleteImage() {
   color: #ff4d4f;
   background: #fff1f0;
 
-  :where(.dark, .dark *) & {
+  [data-theme="dark"] & {
     color: #ff7875;
     background: #3a1a1a;
   }

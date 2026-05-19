@@ -144,56 +144,50 @@
 }
 
 /* ========== 深色模式 ========== */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-menu {
+[data-theme="dark"] .block-picker-menu {
   background: var(--tp-menu-bg, #1f1f1f);
   box-shadow:
     0 4px 16px rgb(0 0 0 / 40%),
     0 0 1px rgb(255 255 255 / 10%);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item {
+[data-theme="dark"] .block-picker-item {
   color: #e8e8e8;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item:hover,
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item.active {
+[data-theme="dark"] .block-picker-item:hover,
+[data-theme="dark"] .block-picker-item.active {
   background: #2a2a2a;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-icon {
+[data-theme="dark"] .block-picker-item-icon {
   color: #a8a8a8;
   background: #2a2a2a;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .block-picker-item.active
-  .block-picker-item-icon,
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .block-picker-item:hover
-  .block-picker-item-icon {
+[data-theme="dark"] .block-picker-item.active .block-picker-item-icon,
+[data-theme="dark"] .block-picker-item:hover .block-picker-item-icon {
   color: var(--tp-color-primary, #4fc3f7);
   background: var(--tp-color-primary-bg, #15395b);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-title {
+[data-theme="dark"] .block-picker-item-title {
   color: #e8e8e8;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-item-desc {
+[data-theme="dark"] .block-picker-item-desc {
   color: #808080;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .block-picker-group-title {
+[data-theme="dark"] .block-picker-group-title {
   color: #808080;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .block-picker-menu::-webkit-scrollbar-thumb {
+[data-theme="dark"] .block-picker-menu::-webkit-scrollbar-thumb {
   background: #434343;
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *)
-  .block-picker-menu::-webkit-scrollbar-thumb:hover {
+[data-theme="dark"] .block-picker-menu::-webkit-scrollbar-thumb:hover {
   background: #595959;
 }
 

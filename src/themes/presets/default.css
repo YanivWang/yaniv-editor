@@ -1,0 +1,80 @@
+/**
+ * Default Theme Preset
+ * 通用 Web 编辑器风格（非 Word 分页纸张）
+ * 依赖 variables.css 中的 CSS 变量，仅覆盖布局与少量视觉差异
+ */
+
+.yaniv-editor.theme-default {
+  --tiptap-bg-secondary: #f5f5f5;
+}
+
+/* 浅灰画布，区别于 Word 的深灰纸张背景 */
+.yaniv-editor.theme-default.document-layout {
+  background: var(--tiptap-bg-secondary);
+}
+
+.yaniv-editor.theme-default .document-container {
+  padding: 24px 16px;
+}
+
+/* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
+.yaniv-editor.theme-default .continuous-pages {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--tiptap-bg);
+  border: 1px solid var(--tiptap-border);
+  border-radius: var(--tiptap-radius-md);
+  box-shadow: var(--tiptap-shadow-sm);
+}
+
+.yaniv-editor.theme-default .document-content .ProseMirror {
+  min-height: 480px;
+  padding: 40px 56px;
+  font-family: var(--tiptap-font-family);
+  font-size: var(--tiptap-font-size);
+  line-height: var(--tiptap-line-height);
+}
+
+.yaniv-editor.theme-default .document-content .ProseMirror h1 {
+  margin: 0 0 16px;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--tiptap-text);
+}
+
+.yaniv-editor.theme-default .document-content .ProseMirror h2 {
+  margin: 24px 0 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--tiptap-text);
+}
+
+.yaniv-editor.theme-default .document-content .ProseMirror h3 {
+  margin: 20px 0 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--tiptap-text);
+}
+
+/* 扁平工具栏，无 Word 渐变 */
+.yaniv-editor.theme-default .document-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 6px 12px;
+  background: var(--tiptap-toolbar-bg) !important;
+  border-bottom: 1px solid var(--tiptap-border) !important;
+}
+
+.yaniv-editor.theme-default[data-theme="dark"] {
+  --tiptap-bg-secondary: #141414;
+}
+
+.yaniv-editor.theme-default.document-layout[data-theme="dark"] {
+  background: var(--tiptap-bg-secondary);
+}
+
+.yaniv-editor.theme-default[data-theme="dark"] .continuous-pages {
+  border-color: var(--tiptap-border);
+  box-shadow: none;
+}

@@ -37,8 +37,8 @@
 }
 
 /* 暗色模式变量 */
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *),
-:where([data-theme="dark"], [data-theme="dark"] *) {
+[data-theme="dark"],
+[data-theme="dark"] {
   --tp-color-text: #f0f0f0;
   --tp-color-text-secondary: #d0d0d0;
   --tp-color-text-muted: #8c8c8c;
@@ -153,8 +153,8 @@
   transform: scale(1.2);
 }
 
-:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) .tp-color-item:hover,
-:where([data-theme="dark"], [data-theme="dark"] *) .tp-color-item:hover {
+[data-theme="dark"] .tp-color-item:hover,
+[data-theme="dark"] .tp-color-item:hover {
   box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
 }
 

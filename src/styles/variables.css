@@ -1,8 +1,9 @@
 /**
- * Yaniv Editor - CSS Variables System
- * 
- * Light theme (default) and Dark theme variables
- * Users can override these variables to customize the theme
+ * Yaniv Editor — Design Tokens（唯一变量源）
+ *
+ * - 浅色：:root
+ * - 深色：[data-theme="dark"]（由 YanivEditor themeMode 设置在编辑器根节点）
+ * - 视觉预设：.yaniv-editor.theme-{preset} 覆盖部分 token（见 src/themes/presets/）
  */
 
 :root {
@@ -13,6 +14,8 @@
 
   /* ===== Editor Core ===== */
   --tiptap-bg: #ffffff;
+  --tiptap-bg-secondary: #f9fafb;
+  --tiptap-bg-hover: #f3f4f6;
   --tiptap-text: #1a1a1a;
   --tiptap-text-secondary: #666666;
   --tiptap-text-muted: #999999;
@@ -35,8 +38,12 @@
   --tiptap-toolbar-btn-active: #e5e5e5;
   --tiptap-toolbar-btn-disabled: #cccccc;
   --tiptap-toolbar-btn-text: var(--tiptap-text);
+  --tiptap-toolbar-button-bg: transparent;
+  --tiptap-toolbar-button-hover: #f3f4f6;
+  --tiptap-toolbar-button-active: #e5e7eb;
+  --tiptap-toolbar-divider: #e5e7eb;
 
-  /* ===== Toolbar Button (shared by inline & word mode) ===== */
+  /* ===== Toolbar Button (shared) ===== */
   --menu-btn-color: var(--tiptap-text);
   --menu-btn-hover-bg: var(--tiptap-toolbar-btn-hover);
   --menu-primary: var(--tiptap-primary);
@@ -46,7 +53,7 @@
   --tiptap-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   --tiptap-bubble-border: var(--tiptap-border);
 
-  /* ===== Code Block ===== */
+  /* ===== Code ===== */
   --tiptap-code-bg: #f5f5f5;
   --tiptap-code-text: #e11d48;
   --tiptap-codeblock-bg: #1e1e1e;
@@ -56,6 +63,7 @@
   --tiptap-table-border: #d0d0d0;
   --tiptap-table-header-bg: #f5f5f5;
   --tiptap-table-selected: rgba(59, 130, 246, 0.1);
+  --tiptap-table-selected-bg: rgba(59, 130, 246, 0.1);
 
   /* ===== Blockquote ===== */
   --tiptap-blockquote-border: var(--tiptap-primary);
@@ -97,17 +105,19 @@
 
   /* ===== Z-Index ===== */
   --tiptap-z-toolbar: 100;
+  --tiptap-z-dropdown: 100;
   --tiptap-z-bubble: 200;
   --tiptap-z-modal: 300;
 }
 
-/* ===== Dark Theme ===== */
-[data-theme="dark"],
-.dark {
+/* ===== Dark Mode（唯一约定：data-theme="dark"） ===== */
+[data-theme="dark"] {
   --tiptap-primary: #60a5fa;
   --tiptap-primary-hover: #93c5fd;
   --tiptap-primary-light: rgba(96, 165, 250, 0.15);
   --tiptap-bg: #1a1a1a;
+  --tiptap-bg-secondary: #111827;
+  --tiptap-bg-hover: #374151;
   --tiptap-text: #e5e5e5;
   --tiptap-text-secondary: #a3a3a3;
   --tiptap-text-muted: #737373;
@@ -119,6 +129,9 @@
   --tiptap-toolbar-btn-hover: #333333;
   --tiptap-toolbar-btn-active: #404040;
   --tiptap-toolbar-btn-text: var(--tiptap-text);
+  --tiptap-toolbar-button-hover: #374151;
+  --tiptap-toolbar-button-active: #4b5563;
+  --tiptap-toolbar-divider: #374151;
   --menu-btn-color: #f0f0f0;
   --menu-btn-hover-bg: #303030;
   --menu-primary: #4fc3f7;
@@ -129,4 +142,7 @@
   --tiptap-codeblock-bg: #0d0d0d;
   --tiptap-table-header-bg: #2a2a2a;
   --tiptap-blockquote-bg: #262626;
+  --tiptap-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --tiptap-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --tiptap-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
