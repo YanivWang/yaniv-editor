@@ -109,6 +109,10 @@ export function getExtensionsByVersion(
     // 禁用 link 和 underline，因为后面会单独添加配置版本
     link: false,
     underline: false,
+    dropcursor: {
+      width: 6,
+      color: false,
+    },
   };
 
   extensions.push(StarterKit.configure(starterKitConfig));
