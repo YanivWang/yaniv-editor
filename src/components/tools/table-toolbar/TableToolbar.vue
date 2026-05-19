@@ -11,30 +11,42 @@
       <div class="table-menu-row">
         <!-- 行操作 -->
         <div class="table-menu-group">
-          <button
+          <a-tooltip
             v-for="item in rowTools"
             :key="item.name"
-            class="table-menu-btn"
-            :disabled="!canExecute(item.command)"
             :title="item.title"
-            @click="item.action"
+            placement="bottom"
           >
-            <component :is="item.icon" />
-          </button>
+            <span class="table-menu-btn-trigger">
+              <button
+                class="table-menu-btn"
+                :disabled="!canExecute(item.command)"
+                @click="item.action"
+              >
+                <component :is="item.icon" />
+              </button>
+            </span>
+          </a-tooltip>
         </div>
 
         <!-- 列操作 -->
         <div class="table-menu-group">
-          <button
+          <a-tooltip
             v-for="item in columnTools"
             :key="item.name"
-            class="table-menu-btn"
-            :disabled="!canExecute(item.command)"
             :title="item.title"
-            @click="item.action"
+            placement="bottom"
           >
-            <component :is="item.icon" />
-          </button>
+            <span class="table-menu-btn-trigger">
+              <button
+                class="table-menu-btn"
+                :disabled="!canExecute(item.command)"
+                @click="item.action"
+              >
+                <component :is="item.icon" />
+              </button>
+            </span>
+          </a-tooltip>
         </div>
       </div>
 
@@ -42,27 +54,33 @@
       <div class="table-menu-row">
         <!-- 单元格操作 -->
         <div class="table-menu-group">
-          <button
+          <a-tooltip
             v-for="item in cellTools"
             :key="item.name"
-            class="table-menu-btn"
-            :disabled="!canExecute(item.command)"
             :title="item.title"
-            @click="item.action"
+            placement="bottom"
           >
-            <component :is="item.icon" />
-          </button>
+            <span class="table-menu-btn-trigger">
+              <button
+                class="table-menu-btn"
+                :disabled="!canExecute(item.command)"
+                @click="item.action"
+              >
+                <component :is="item.icon" />
+              </button>
+            </span>
+          </a-tooltip>
         </div>
 
         <!-- 删除表格 -->
         <div class="table-menu-group">
-          <button
-            class="table-menu-btn table-menu-btn--danger"
-            :title="t('editor.deleteTable')"
-            @click="deleteTable"
-          >
-            <DeleteOutlined />
-          </button>
+          <a-tooltip :title="t('editor.deleteTable')" placement="bottom">
+            <span class="table-menu-btn-trigger">
+              <button class="table-menu-btn table-menu-btn--danger" @click="deleteTable">
+                <DeleteOutlined />
+              </button>
+            </span>
+          </a-tooltip>
         </div>
       </div>
     </div>
@@ -84,6 +102,7 @@ import {
 } from "@ant-design/icons-vue";
 import { CellSelection } from "@tiptap/pm/tables";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
+import { Tooltip as ATooltip } from "ant-design-vue";
 import { computed } from "vue";
 
 import { t } from "@/locales";
@@ -257,6 +276,10 @@ function deleteTable() {
 
 .table-menu-group:last-child {
   border-right: none;
+}
+
+.table-menu-btn-trigger {
+  display: inline-flex;
 }
 
 .table-menu-btn {

@@ -121,20 +121,20 @@ const handleOrientationChange = (orientation: Orientation) => {
 };
 
 const sampleContent = `
-<h1>Welcome to Yaniv Editor!</h1>
-<p>This is a <strong>beautiful</strong> and <em>customizable</em> rich-text editor built with:</p>
+<h1>欢迎使用 Yaniv Editor！</h1>
+<p>这是一款<strong>美观</strong>且<em>可定制</em>的富文本编辑器，基于以下技术构建：</p>
 <ul>
-  <li><strong>Tiptap 3</strong> - The headless editor framework</li>
-  <li><strong>Vue 3</strong> - The progressive JavaScript framework</li>
-  <li><strong>CSS Variables</strong> - Easy theming with Light/Dark mode</li>
+  <li><strong>Tiptap 3</strong> — 无头编辑器框架</li>
+  <li><strong>Vue 3</strong> — 渐进式 JavaScript 框架</li>
+  <li><strong>CSS Variables</strong> — 轻松实现明暗主题切换</li>
 </ul>
-<h2>Pluggable Toolbar</h2>
-<p>Try switching the toolbar preset above. Each feature is independently toggleable.</p>
+<h2>可插拔工具栏</h2>
+<p>试试在上方切换工具栏预设，每个功能都可以独立开关。</p>
 <blockquote>
-  <p><strong>Tip:</strong> Configure AI in .env file to enable the AI button.</p>
+  <p><strong>提示：</strong>在 .env 文件中配置 AI 即可启用 AI 按钮。</p>
 </blockquote>
-<h2>AI Features</h2>
-<p>When configured, the AI button provides continue writing, polish, summarize, and translate.</p>
+<h2>AI 功能</h2>
+<p>配置完成后，AI 按钮支持续写、润色、摘要和翻译。</p>
 `;
 
 type YanivEditorInstance = {
