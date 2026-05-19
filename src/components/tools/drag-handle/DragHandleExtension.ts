@@ -33,6 +33,55 @@ const DRAGGABLE_NODE_TYPES = new Set([
 
 const MEDIA_NODE_TYPES = new Set(["image", "video"]);
 const LIST_NODE_TYPES = new Set(["orderedList", "bulletList"]);
+const TEXT_BLOCK_TYPES = new Set(["paragraph", "heading", "codeBlock"]);
+
+function isTextBlockEmpty(node: ProseMirrorNode): boolean {
+  let hasContent = false;
+
+  node.descendants((child) => {
+    if (child.isText && (child.text?.trim().length ?? 0) > 0) {
+      hasContent = true;
+      return false;
+    }
+    if (child.isAtom && child.type.name !== "hardBreak") {
+      hasContent = true;
+      return false;
+    }
+  });
+
+  return !hasContent;
+}
+
+function hasBlockContent(node: ProseMirrorNode): boolean {
+  const type = node.type.name;
+
+  if (MEDIA_NODE_TYPES.has(type) || type === "table") {
+    return true;
+  }
+
+  if (TEXT_BLOCK_TYPES.has(type)) {
+    return !isTextBlockEmpty(node);
+  }
+
+  if (type === "blockquote" || LIST_NODE_TYPES.has(type)) {
+    let hasContent = false;
+
+    node.descendants((child) => {
+      if (TEXT_BLOCK_TYPES.has(child.type.name) && !isTextBlockEmpty(child)) {
+        hasContent = true;
+        return false;
+      }
+      if (MEDIA_NODE_TYPES.has(child.type.name)) {
+        hasContent = true;
+        return false;
+      }
+    });
+
+    return hasContent;
+  }
+
+  return node.textContent.trim().length > 0;
+}
 
 interface DragTarget {
   node: ProseMirrorNode;
@@ -318,7 +367,7 @@ export const DragHandleExtension = Extension.create({
             if (isDragging) return;
 
             const target = findTargetFromCoords(view, event);
-            if (!target) {
+            if (!target || !hasBlockContent(target.node)) {
               hideHandle();
               return;
             }
@@ -391,7 +440,12 @@ export const DragHandleExtension = Extension.create({
 
               const node = updatedView.state.doc.nodeAt(currentTarget.pos);
               const dom = getDomElement(updatedView, currentTarget.pos);
-              if (!node || !dom || node.type.name !== currentTarget.node.type.name) {
+              if (
+                !node ||
+                !dom ||
+                node.type.name !== currentTarget.node.type.name ||
+                !hasBlockContent(node)
+              ) {
                 hideHandle();
                 return;
               }
