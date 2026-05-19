@@ -155,5 +155,5 @@ pnpm docs:preview
 
 ## 反馈与贡献
 
-- [GitHub Issues](https://github.com/benngaihk/yaniv-editor/issues)
-- [GitHub 仓库](https://github.com/benngaihk/yaniv-editor)
+- [GitHub Issues](https://github.com/YanivWang/yaniv-editor/issues)
+- [GitHub 仓库](https://github.com/YanivWang/yaniv-editor)

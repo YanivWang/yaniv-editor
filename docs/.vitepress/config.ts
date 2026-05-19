@@ -15,7 +15,7 @@ export default defineConfig({
       { text: "FAQ", link: "/faq" },
       {
         text: "示例",
-        link: "https://github.com/benngaihk/yaniv-editor",
+        link: "https://github.com/YanivWang/yaniv-editor",
         target: "_blank",
       },
     ],
@@ -56,7 +56,7 @@ export default defineConfig({
         },
       ],
     },
-    socialLinks: [{ icon: "github", link: "https://github.com/benngaihk/yaniv-editor" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/YanivWang/yaniv-editor" }],
     footer: {
       message: "MIT Licensed",
       copyright: "Copyright © Yaniv Editor contributors",

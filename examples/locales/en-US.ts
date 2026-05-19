@@ -72,7 +72,6 @@ export const demoEnUS: DemoMessages = {
       hero: {
         subtitle: "A production-ready, AI-powered rich text editor for Vue 3",
         starGithub: "Star on GitHub",
-        mitLicense: "MIT License",
         openSource: "🔥 Open Source",
         tryDemo: "Try Live Demo",
         viewGithub: "View on GitHub",

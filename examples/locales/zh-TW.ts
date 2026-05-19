@@ -72,9 +72,8 @@ export const demoZhTW: DemoMessages = {
       hero: {
         subtitle: "面向 Vue 3 的生產級 AI 富文字編輯器",
         starGithub: "在 GitHub 上 Star",
-        mitLicense: "MIT 授權",
         openSource: "🔥 開源",
-        tryDemo: "體驗線上演示",
+        tryDemo: "線上體驗",
         viewGithub: "在 GitHub 查看",
       },
       stats: {
@@ -122,7 +121,7 @@ export const demoZhTW: DemoMessages = {
         title: "準備開始？",
         subtitle: "透過 npm 安裝，幾分鐘內即可構建出色的編輯器",
         copyTitle: "複製到剪貼簿",
-        tryDemo: "體驗線上演示",
+        tryDemo: "線上體驗",
       },
       footer: {
         text: "由開源社群用 ❤️ 打造",

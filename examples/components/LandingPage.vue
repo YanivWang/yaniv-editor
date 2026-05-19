@@ -29,7 +29,7 @@
 
         <!-- Badges -->
         <div class="hero__badges">
-          <a href="https://github.com/benngaihk/yaniv-editor" target="_blank" class="badge">
+          <a href="https://github.com/YanivWang/yaniv-editor" target="_blank" class="badge">
             <svg class="badge__icon" viewBox="0 0 16 16" width="16" height="16">
               <path
                 fill="currentColor"
@@ -38,10 +38,6 @@
             </svg>
             <span>{{ t("demo.landing.hero.starGithub") }}</span>
           </a>
-          <span class="badge badge--static">
-            <span class="badge__dot"></span>
-            {{ t("demo.landing.hero.mitLicense") }}
-          </span>
           <span class="badge badge--static">{{ t("demo.landing.hero.openSource") }}</span>
         </div>
 
@@ -57,7 +53,7 @@
             </svg>
           </button>
           <a
-            href="https://github.com/benngaihk/yaniv-editor"
+            href="https://github.com/YanivWang/yaniv-editor"
             target="_blank"
             class="btn btn--secondary"
           >
@@ -211,7 +207,7 @@
         </div>
         <div class="tech-item">
           <div class="tech-item__icon">🎨</div>
-          <div class="tech-item__name">Ant Design Vue</div>
+          <div class="tech-item__name">Ant Design Vue 4</div>
         </div>
       </div>
     </section>
@@ -252,15 +248,15 @@
     <footer class="footer">
       <p class="footer__text">{{ t("demo.landing.footer.text") }}</p>
       <div class="footer__links">
-        <a href="https://github.com/benngaihk/yaniv-editor" target="_blank">{{
+        <a href="https://github.com/YanivWang/yaniv-editor" target="_blank">{{
           t("demo.landing.footer.github")
         }}</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/yaniv-editor/issues" target="_blank">{{
+        <a href="https://github.com/YanivWang/yaniv-editor/issues" target="_blank">{{
           t("demo.landing.footer.issues")
         }}</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/yaniv-editor/blob/main/LICENSE" target="_blank">{{
+        <a href="https://github.com/YanivWang/yaniv-editor/blob/main/LICENSE" target="_blank">{{
           t("demo.landing.footer.license")
         }}</a>
       </div>
@@ -439,25 +435,6 @@ const copyInstallCommand = () => {
 .badge__icon {
   width: 16px;
   height: 16px;
-}
-
-.badge__dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #10b981;
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
 }
 
 .hero__actions {

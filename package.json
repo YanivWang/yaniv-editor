@@ -172,13 +172,13 @@
   ],
   "author": "benngaihk",
   "license": "MIT",
-  "homepage": "https://github.com/benngaihk/yaniv-editor#readme",
+  "homepage": "https://github.com/YanivWang/yaniv-editor#readme",
   "bugs": {
-    "url": "https://github.com/benngaihk/yaniv-editor/issues"
+    "url": "https://github.com/YanivWang/yaniv-editor/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/benngaihk/yaniv-editor.git"
+    "url": "https://github.com/YanivWang/yaniv-editor.git"
   },
   "engines": {
     "node": ">=20.19.5",

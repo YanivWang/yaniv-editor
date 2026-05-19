@@ -14,7 +14,7 @@ hero:
       link: /features/overview
     - theme: alt
       text: GitHub
-      link: https://github.com/benngaihk/yaniv-editor
+      link: https://github.com/YanivWang/yaniv-editor
 
 features:
   - title: 完整编辑能力

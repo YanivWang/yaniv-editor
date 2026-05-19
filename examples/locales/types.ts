@@ -66,7 +66,6 @@ export interface DemoMessages {
       hero: {
         subtitle: string;
         starGithub: string;
-        mitLicense: string;
         openSource: string;
         tryDemo: string;
         viewGithub: string;

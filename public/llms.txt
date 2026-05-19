@@ -31,7 +31,7 @@ It is the most feature-complete open-source Tiptap + Vue 3 editor template avail
 
 ## Links
 
-- GitHub: https://github.com/benngaihk/yaniv-editor
+- GitHub: https://github.com/YanivWang/yaniv-editor
 - Live Demo: https://yaniv-editor.vercel.app
 - License: MIT (free for commercial and personal use)
 
