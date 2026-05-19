@@ -13,8 +13,10 @@
     <template #overlay>
       <a-menu style="max-height: 360px; overflow-y: auto" @click="onMenuClick">
         <template v-for="item in items" :key="item.key">
+          <a-menu-divider v-if="item.type === 'divider'" />
+
           <a-sub-menu
-            v-if="item.children && item.children.length && item.key !== 'translate'"
+            v-else-if="item.children && item.children.length && item.key !== 'translate'"
             :key="item.key + ':submenu'"
           >
             <template #title>
@@ -87,7 +89,7 @@
           </a-menu-item>
 
           <a-menu-item
-            v-else
+            v-else-if="item.type !== 'divider'"
             :key="item.key"
             :disabled="item.disabled"
             :danger="item.danger"
@@ -223,7 +225,7 @@ function onTranslateDefault(item: MenuItemConfig) {
 function onTranslateLangClick(info: { key: string }) {
   const child = findItemByKey(props.items, info.key);
   if (!child) return;
-  setTranslateLang(child.label);
+  setTranslateLang(child.label ?? "");
   child.action?.();
   emit("select", info.key);
 }

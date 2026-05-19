@@ -117,6 +117,7 @@ export interface TiptapLocale {
   codeBlock: {
     language: string;
     selectLanguage: string;
+    exitCodeBlock: string;
   };
 
   // 统计信息

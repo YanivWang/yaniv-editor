@@ -108,6 +108,7 @@ export const zhTW: TiptapLocale = {
   codeBlock: {
     language: "語言",
     selectLanguage: "選擇語言",
+    exitCodeBlock: "退出程式碼區塊",
   },
 
   stats: {

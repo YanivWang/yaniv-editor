@@ -3,8 +3,8 @@
     <ToolbarDropdownButton
       :icon="CodeOutlined"
       :title="t('toolbar.insertCodeBlock')"
-      :active="isCodeBlockActive"
-      :items="languageItems"
+      :active="isCodeOrBlockActive"
+      :items="menuItems"
       placement="bottomLeft"
     />
   </ToolbarGroup>
@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 /**
- * CodeBlockDropdown - 代码块与语言选择
+ * CodeBlockDropdown - 代码块与语言选择（含行内代码、退出代码块）
  */
 import { CodeOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
@@ -39,21 +39,46 @@ const runCommand = createCommandRunner(editor);
 const { isActive } = createStateCheckers(editor);
 
 const isCodeBlockActive = computed(() => isActive("codeBlock"));
+const isInlineCodeActive = computed(() => isActive("code"));
+const isCodeOrBlockActive = computed(() => isCodeBlockActive.value || isInlineCodeActive.value);
 
 const currentLanguage = computed(() => {
   const lang = editor.value?.getAttributes("codeBlock")?.language;
   return typeof lang === "string" && lang ? lang : DEFAULT_CODE_BLOCK_LANGUAGE;
 });
 
-const languageItems = computed<MenuItemConfig[]>(() => {
+const menuItems = computed<MenuItemConfig[]>(() => {
   if (!editor.value) return [];
 
-  return CODE_LANGUAGES.map((lang) => ({
-    key: lang,
-    label: lang,
-    active: isCodeBlockActive.value && currentLanguage.value === lang,
-    action: () => onLanguageSelect(lang),
-  }));
+  const items: MenuItemConfig[] = [];
+
+  if (isCodeBlockActive.value) {
+    items.push({
+      key: "exit-code-block",
+      label: t("codeBlock.exitCodeBlock"),
+      action: () => runCommand((chain) => chain.setParagraph())(),
+    });
+  } else {
+    items.push({
+      key: "inline-code",
+      label: t("editor.inlineCode"),
+      active: isInlineCodeActive.value,
+      action: () => runCommand((chain) => chain.toggleCode())(),
+    });
+  }
+
+  items.push({ key: "divider-languages", type: "divider" });
+
+  for (const lang of CODE_LANGUAGES) {
+    items.push({
+      key: lang,
+      label: lang,
+      active: isCodeBlockActive.value && currentLanguage.value === lang,
+      action: () => onLanguageSelect(lang),
+    });
+  }
+
+  return items;
 });
 
 function onLanguageSelect(language: string) {

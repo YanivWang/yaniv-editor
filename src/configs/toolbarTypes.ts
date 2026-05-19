@@ -165,12 +165,14 @@ export interface AiToolConfig {
 export interface MenuItemConfig {
   /** 菜单项 key */
   key: string;
+  /** 菜单项类型（divider 为分隔线，无点击行为） */
+  type?: "divider";
   /** 菜单项标签 */
-  label: string;
+  label?: string;
   /** 图标组件（可选） */
   icon?: Component;
-  /** 点击时执行的操作 */
-  action: () => void;
+  /** 点击时执行的操作（divider 可省略） */
+  action?: () => void;
   /** 是否禁用 */
   disabled?: boolean;
   /** 是否为危险操作（红色） */

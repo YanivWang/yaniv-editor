@@ -40,7 +40,8 @@
           </div>
 
           <div v-if="config.textFormat || config.codeBlock" class="tool-group">
-            <TextFormatButtons :editor="editor" :show-code="config.codeBlock" />
+            <TextFormatButtons v-if="config.textFormat" :editor="editor" />
+            <CodeBlockDropdown v-if="config.codeBlock" :editor="editor" />
           </div>
 
           <div v-if="config.colorPicker" class="tool-group">
@@ -152,6 +153,7 @@ import { computed, ref, watch } from "vue";
 import { AiMenuButton } from "@/ai";
 import { ToolbarGroup } from "@/base";
 import { AlignDropdown } from "@/editor/align";
+import { CodeBlockDropdown } from "@/editor/code-block";
 import { ColorPicker } from "@/editor/color";
 import FindReplaceButton from "@/editor/find-replace/FindReplaceButton.vue";
 import { FontFamilySelect, FontSizeSelect } from "@/editor/font";

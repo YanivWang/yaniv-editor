@@ -108,6 +108,7 @@ export const enUS: TiptapLocale = {
   codeBlock: {
     language: "Language",
     selectLanguage: "Select Language",
+    exitCodeBlock: "Exit Code Block",
   },
 
   stats: {

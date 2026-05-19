@@ -79,7 +79,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ### 代码块有语法高亮吗？
 
-已启用 `CodeBlockLowlight`（lowlight + highlight.js）。工具栏或代码块角标可切换语言；advanced 版本工具栏默认展示代码块入口。
+已启用 `CodeBlockLowlight`（lowlight + highlight.js）。工具栏 `</>` 下拉可选语言或行内代码；焦点在代码块内时角标也可切换语言；advanced 版本工具栏默认展示代码入口。
 
 ## 主题相关
 
