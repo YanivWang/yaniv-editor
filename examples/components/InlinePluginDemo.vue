@@ -16,9 +16,9 @@
             <path d="M9 3v18M3 9h18" />
           </svg>
         </span>
-        Inline Editor
+        {{ t("demo.inline.title") }}
       </h2>
-      <p class="inline-demo__subtitle">Compact inline editor with hot-swappable feature plugins</p>
+      <p class="inline-demo__subtitle">{{ t("demo.inline.subtitle") }}</p>
     </div>
 
     <div class="inline-demo__body">
@@ -79,9 +79,7 @@
 
           <!-- Empty state when no plugins -->
           <div v-else class="inline-toolbar inline-toolbar--empty">
-            <span class="inline-toolbar__empty-text"
-              >Toggle plugins from the panel to add toolbar features</span
-            >
+            <span class="inline-toolbar__empty-text">{{ t("demo.inline.emptyToolbar") }}</span>
           </div>
 
           <!-- Editor Content -->
@@ -91,12 +89,8 @@
 
           <!-- Status Bar -->
           <div class="inline-editor-footer">
-            <span class="inline-editor-footer__stats">
-              {{ characterCount }} characters &middot; {{ wordCount }} words
-            </span>
-            <span class="inline-editor-footer__plugins">
-              {{ enabledCount }}/{{ totalCount }} plugins active
-            </span>
+            <span class="inline-editor-footer__stats">{{ statsText }}</span>
+            <span class="inline-editor-footer__plugins">{{ pluginsActiveText }}</span>
           </div>
         </div>
       </div>
@@ -105,21 +99,21 @@
       <div class="inline-demo__panel">
         <div class="plugin-panel">
           <div class="plugin-panel__header">
-            <h3 class="plugin-panel__title">Feature Plugins</h3>
+            <h3 class="plugin-panel__title">{{ t("demo.inline.panel.title") }}</h3>
             <div class="plugin-panel__actions">
               <button
                 class="plugin-panel__btn"
                 :class="{ 'plugin-panel__btn--active': enabledCount === totalCount }"
                 @click="toggleAll(true)"
               >
-                All On
+                {{ t("demo.inline.panel.allOn") }}
               </button>
               <button
                 class="plugin-panel__btn"
                 :class="{ 'plugin-panel__btn--active': enabledCount === 0 }"
                 @click="toggleAll(false)"
               >
-                All Off
+                {{ t("demo.inline.panel.allOff") }}
               </button>
             </div>
           </div>
@@ -127,7 +121,7 @@
           <!-- Preset Buttons -->
           <div class="plugin-panel__presets">
             <button
-              v-for="preset in presets"
+              v-for="preset in localizedPresets"
               :key="preset.id"
               class="preset-btn"
               :class="{ 'preset-btn--active': activePreset === preset.id }"
@@ -141,7 +135,7 @@
           <!-- Plugin List -->
           <div class="plugin-panel__list">
             <div
-              v-for="plugin in allPlugins"
+              v-for="plugin in localizedPlugins"
               :key="plugin.id"
               class="plugin-item"
               :class="{ 'plugin-item--enabled': plugin.enabled }"
@@ -193,6 +187,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { ref, computed, onMounted, onBeforeUnmount, reactive } from "vue";
 
+
 import {
   UndoRedoGroup,
   FontSizeDropdown,
@@ -206,6 +201,7 @@ import { ListTools as ListGroup } from "@/editor/list";
 import { TextFormatButtons as TextFormatGroup } from "@/editor/text-format";
 
 import { FontSize } from "../../src/extensions/fontSize";
+import { t } from "../../src/locales";
 import "../../src/styles/variables.css";
 import "../../src/styles/base.css";
 import "../../src/styles/toolbar.css";
@@ -216,84 +212,69 @@ defineProps<{
 
 interface PluginDef {
   id: string;
-  name: string;
-  description: string;
   enabled: boolean;
   color: string;
   iconComponent?: any;
   iconSvg?: string;
 }
 
+interface LocalizedPlugin extends PluginDef {
+  name: string;
+  description: string;
+}
+
 // Plugin definitions
 const allPlugins = reactive<PluginDef[]>([
   {
     id: "undoRedo",
-    name: "Undo / Redo",
-    description: "History navigation",
     enabled: true,
     color: "linear-gradient(135deg, #667eea, #764ba2)",
     iconComponent: UndoOutlined,
   },
   {
     id: "heading",
-    name: "Heading",
-    description: "H1-H6 titles",
     enabled: true,
     color: "linear-gradient(135deg, #f093fb, #f5576c)",
     iconComponent: FontColorsOutlined,
   },
   {
     id: "textFormat",
-    name: "Text Format",
-    description: "Bold, italic, underline, strike",
     enabled: true,
     color: "linear-gradient(135deg, #4facfe, #00f2fe)",
     iconComponent: BoldOutlined,
   },
   {
     id: "fontSize",
-    name: "Font Size",
-    description: "Adjust text size",
     enabled: false,
     color: "linear-gradient(135deg, #43e97b, #38f9d7)",
     iconComponent: FontSizeOutlined,
   },
   {
     id: "list",
-    name: "Lists",
-    description: "Bullet, numbered, task list",
     enabled: true,
     color: "linear-gradient(135deg, #fa709a, #fee140)",
     iconComponent: OrderedListOutlined,
   },
   {
     id: "align",
-    name: "Alignment",
-    description: "Left, center, right, justify",
     enabled: false,
     color: "linear-gradient(135deg, #a18cd1, #fbc2eb)",
     iconComponent: AlignLeftOutlined,
   },
   {
     id: "link",
-    name: "Link",
-    description: "Insert hyperlinks",
     enabled: false,
     color: "linear-gradient(135deg, #ffecd2, #fcb69f)",
     iconComponent: LinkOutlined,
   },
   {
     id: "codeBlock",
-    name: "Code Block",
-    description: "Syntax highlighted code",
     enabled: false,
     color: "linear-gradient(135deg, #89f7fe, #66a6ff)",
     iconComponent: CodeOutlined,
   },
   {
     id: "formatClear",
-    name: "Clear Format",
-    description: "Remove all formatting",
     enabled: false,
     color: "linear-gradient(135deg, #fddb92, #d1fdff)",
     iconComponent: ClearOutlined,
@@ -340,6 +321,25 @@ const presets = [
 
 const activePreset = ref("writer");
 
+function getPluginLabel(id: string, field: "name" | "description") {
+  return t(`demo.inline.plugins.${id}.${field}`);
+}
+
+const localizedPlugins = computed<LocalizedPlugin[]>(() =>
+  allPlugins.map((plugin) => ({
+    ...plugin,
+    name: getPluginLabel(plugin.id, "name"),
+    description: getPluginLabel(plugin.id, "description"),
+  })),
+);
+
+const localizedPresets = computed(() =>
+  presets.map((preset) => ({
+    ...preset,
+    label: t(`demo.inline.presets.${preset.id}`),
+  })),
+);
+
 const enabledPluginsList = computed(() => allPlugins.filter((p) => p.enabled));
 const enabledCount = computed(() => allPlugins.filter((p) => p.enabled).length);
 const totalCount = computed(() => allPlugins.length);
@@ -371,6 +371,20 @@ function applyPreset(preset: (typeof presets)[0]) {
 const editor = ref<Editor | null>(null);
 const characterCount = computed(() => editor.value?.storage.characterCount?.characters() || 0);
 const wordCount = computed(() => editor.value?.storage.characterCount?.words() || 0);
+
+const statsText = computed(() =>
+  t("demo.inline.stats", {
+    characters: String(characterCount.value),
+    words: String(wordCount.value),
+  }),
+);
+
+const pluginsActiveText = computed(() =>
+  t("demo.inline.pluginsActive", {
+    enabled: String(enabledCount.value),
+    total: String(totalCount.value),
+  }),
+);
 
 const inlineContent = `<h2>Inline Editor Demo</h2>
 <p>This is a <strong>compact inline editor</strong> with a <em>pluggable</em> toolbar system. Try toggling the plugins on the right panel!</p>

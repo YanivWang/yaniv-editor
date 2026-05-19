@@ -52,6 +52,8 @@ interface Props {
   modelValue?: DeviceView;
   /** 当前屏幕方向 */
   orientation?: Orientation;
+  /** 自定义设备 tooltip 文案 */
+  labels?: Partial<Record<DeviceView, string>>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -147,7 +149,7 @@ const OrientationIcon: FunctionalComponent = () =>
     ],
   );
 
-const allDevices = [
+const defaultDevices = [
   { value: "pc" as DeviceView, label: "Desktop", icon: DesktopIcon },
   { value: "pad" as DeviceView, label: "Tablet (iPad)", icon: TabletIcon },
   { value: "mobile" as DeviceView, label: "Mobile (iPhone)", icon: MobileIcon },
@@ -155,10 +157,13 @@ const allDevices = [
 
 // 手机浏览器下只保留 Mobile 选项
 const devices = computed(() => {
-  if (isMobileBrowser.value) {
-    return allDevices.filter((d) => d.value === "mobile");
-  }
-  return allDevices;
+  const list = isMobileBrowser.value
+    ? defaultDevices.filter((d) => d.value === "mobile")
+    : defaultDevices;
+  return list.map((device) => ({
+    ...device,
+    label: props.labels?.[device.value] ?? device.label,
+  }));
 });
 
 const handleDeviceChange = (device: DeviceView) => {

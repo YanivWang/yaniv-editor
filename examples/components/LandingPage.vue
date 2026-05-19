@@ -25,7 +25,7 @@
         </h1>
 
         <!-- Subtitle -->
-        <p class="hero__subtitle">A production-ready, AI-powered rich text editor for Vue 3</p>
+        <p class="hero__subtitle">{{ t("demo.landing.hero.subtitle") }}</p>
 
         <!-- Badges -->
         <div class="hero__badges">
@@ -36,19 +36,19 @@
                 d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
               />
             </svg>
-            <span>Star on GitHub</span>
+            <span>{{ t("demo.landing.hero.starGithub") }}</span>
           </a>
           <span class="badge badge--static">
             <span class="badge__dot"></span>
-            MIT License
+            {{ t("demo.landing.hero.mitLicense") }}
           </span>
-          <span class="badge badge--static"> 🔥 Open Source </span>
+          <span class="badge badge--static">{{ t("demo.landing.hero.openSource") }}</span>
         </div>
 
         <!-- CTA Buttons -->
         <div class="hero__actions">
           <button class="btn btn--primary" @click="$emit('start-demo')">
-            <span>Try Live Demo</span>
+            <span>{{ t("demo.landing.hero.tryDemo") }}</span>
             <svg class="btn__icon" viewBox="0 0 20 20" width="20" height="20">
               <path
                 fill="currentColor"
@@ -67,7 +67,7 @@
                 d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
               />
             </svg>
-            <span>View on GitHub</span>
+            <span>{{ t("demo.landing.hero.viewGithub") }}</span>
           </a>
         </div>
 
@@ -75,19 +75,19 @@
         <div class="hero__stats">
           <div class="stat">
             <div class="stat__value">5</div>
-            <div class="stat__label">Themes</div>
+            <div class="stat__label">{{ t("demo.landing.stats.themes") }}</div>
           </div>
           <div class="stat">
             <div class="stat__value">15+</div>
-            <div class="stat__label">Features</div>
+            <div class="stat__label">{{ t("demo.landing.stats.features") }}</div>
           </div>
           <div class="stat">
             <div class="stat__value">3</div>
-            <div class="stat__label">Languages</div>
+            <div class="stat__label">{{ t("demo.landing.stats.languages") }}</div>
           </div>
           <div class="stat">
             <div class="stat__value">100%</div>
-            <div class="stat__label">Free</div>
+            <div class="stat__label">{{ t("demo.landing.stats.free") }}</div>
           </div>
         </div>
       </div>
@@ -100,15 +100,15 @@
 
     <!-- Features Section -->
     <section class="features">
-      <h2 class="section-title">Why Choose yaniv-editor?</h2>
+      <h2 class="section-title">{{ t("demo.landing.features.title") }}</h2>
 
       <div class="features-grid">
         <!-- Feature 1 -->
         <div class="feature-card">
           <div class="feature-card__icon">🎨</div>
-          <h3 class="feature-card__title">5 Beautiful Themes</h3>
+          <h3 class="feature-card__title">{{ t("demo.landing.features.themes.title") }}</h3>
           <p class="feature-card__description">
-            From Notion-like to Word-style. Each theme has perfect dark mode support.
+            {{ t("demo.landing.features.themes.description") }}
           </p>
           <div class="feature-card__tags">
             <span class="tag">Default</span>
@@ -122,9 +122,9 @@
         <!-- Feature 2 -->
         <div class="feature-card">
           <div class="feature-card__icon">🤖</div>
-          <h3 class="feature-card__title">AI-Powered</h3>
+          <h3 class="feature-card__title">{{ t("demo.landing.features.ai.title") }}</h3>
           <p class="feature-card__description">
-            Smart writing assistance with continue writing, polish, translate, and summarize.
+            {{ t("demo.landing.features.ai.description") }}
           </p>
           <div class="feature-card__tags">
             <span class="tag">OpenAI</span>
@@ -137,27 +137,27 @@
         <!-- Feature 3 -->
         <div class="feature-card">
           <div class="feature-card__icon">🌓</div>
-          <h3 class="feature-card__title">Perfect Dark Mode</h3>
+          <h3 class="feature-card__title">{{ t("demo.landing.features.darkMode.title") }}</h3>
           <p class="feature-card__description">
-            Seamless light/dark theme switching. Every detail looks great in both modes.
+            {{ t("demo.landing.features.darkMode.description") }}
           </p>
         </div>
 
         <!-- Feature 4 -->
         <div class="feature-card">
           <div class="feature-card__icon">📝</div>
-          <h3 class="feature-card__title">Word Mode</h3>
+          <h3 class="feature-card__title">{{ t("demo.landing.features.wordMode.title") }}</h3>
           <p class="feature-card__description">
-            Professional A4 paper layout with automatic pagination for document editing.
+            {{ t("demo.landing.features.wordMode.description") }}
           </p>
         </div>
 
         <!-- Feature 5 -->
         <div class="feature-card">
           <div class="feature-card__icon">🌍</div>
-          <h3 class="feature-card__title">i18n Ready</h3>
+          <h3 class="feature-card__title">{{ t("demo.landing.features.i18n.title") }}</h3>
           <p class="feature-card__description">
-            Built-in support for Chinese (Simplified/Traditional) and English.
+            {{ t("demo.landing.features.i18n.description") }}
           </p>
         </div>
       </div>
@@ -165,8 +165,8 @@
 
     <!-- Themes Preview -->
     <section class="themes-preview">
-      <h2 class="section-title">Explore Themes</h2>
-      <p class="section-subtitle">Choose the perfect theme for your application</p>
+      <h2 class="section-title">{{ t("demo.landing.themes.title") }}</h2>
+      <p class="section-subtitle">{{ t("demo.landing.themes.subtitle") }}</p>
 
       <div class="themes-grid">
         <div v-for="themeItem in themes" :key="themeItem.id" class="theme-card">
@@ -188,7 +188,7 @@
 
     <!-- Tech Stack -->
     <section class="tech-stack">
-      <h2 class="section-title">Built With Modern Technologies</h2>
+      <h2 class="section-title">{{ t("demo.landing.tech.title") }}</h2>
 
       <div class="tech-grid">
         <div class="tech-item">
@@ -219,11 +219,15 @@
     <!-- CTA Section -->
     <section class="cta">
       <div class="cta__content">
-        <h2 class="cta__title">Ready to Start?</h2>
-        <p class="cta__subtitle">Install via npm and start building amazing editors in minutes</p>
+        <h2 class="cta__title">{{ t("demo.landing.cta.title") }}</h2>
+        <p class="cta__subtitle">{{ t("demo.landing.cta.subtitle") }}</p>
         <div class="cta__code">
           <code>npm install benngaihk/yaniv-editor</code>
-          <button class="cta__copy" title="Copy to clipboard" @click="copyInstallCommand">
+          <button
+            class="cta__copy"
+            :title="t('demo.landing.cta.copyTitle')"
+            @click="copyInstallCommand"
+          >
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path
                 fill="currentColor"
@@ -233,7 +237,7 @@
           </button>
         </div>
         <button class="btn btn--primary btn--large" @click="$emit('start-demo')">
-          <span>Try Live Demo</span>
+          <span>{{ t("demo.landing.cta.tryDemo") }}</span>
           <svg class="btn__icon" viewBox="0 0 20 20" width="20" height="20">
             <path
               fill="currentColor"
@@ -246,22 +250,28 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p class="footer__text">Made with ❤️ by the open source community</p>
+      <p class="footer__text">{{ t("demo.landing.footer.text") }}</p>
       <div class="footer__links">
-        <a href="https://github.com/benngaihk/yaniv-editor" target="_blank">GitHub</a>
+        <a href="https://github.com/benngaihk/yaniv-editor" target="_blank">{{
+          t("demo.landing.footer.github")
+        }}</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/yaniv-editor/issues" target="_blank">Issues</a>
+        <a href="https://github.com/benngaihk/yaniv-editor/issues" target="_blank">{{
+          t("demo.landing.footer.issues")
+        }}</a>
         <span>·</span>
-        <a href="https://github.com/benngaihk/yaniv-editor/blob/main/LICENSE" target="_blank"
-          >MIT License</a
-        >
+        <a href="https://github.com/benngaihk/yaniv-editor/blob/main/LICENSE" target="_blank">{{
+          t("demo.landing.footer.license")
+        }}</a>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
+
+import { t } from "../../src/locales";
 
 import EditorPreview from "./EditorPreview.vue";
 
@@ -273,38 +283,36 @@ defineEmits<{
   "start-demo": [];
 }>();
 
-const themes = [
+const themeDefs = [
   {
-    id: "word",
-    name: "Word",
-    description: "Professional document style with A4 layout",
+    id: "word" as const,
     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
   },
   {
-    id: "notion",
-    name: "Notion",
-    description: "Modern, distraction-free writing",
+    id: "notion" as const,
     gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
   },
   {
-    id: "github",
-    name: "GitHub",
-    description: "Developer-friendly markdown style",
+    id: "github" as const,
     gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
   },
   {
-    id: "typora",
-    name: "Typora",
-    description: "Elegant reading and writing",
+    id: "typora" as const,
     gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
   },
   {
-    id: "default",
-    name: "Default",
-    description: "Clean and minimal design",
+    id: "default" as const,
     gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
   },
 ];
+
+const themes = computed(() =>
+  themeDefs.map((item) => ({
+    ...item,
+    name: t(`demo.landing.themes.${item.id}.name`),
+    description: t(`demo.landing.themes.${item.id}.description`),
+  })),
+);
 
 const copyInstallCommand = () => {
   navigator.clipboard.writeText("npm install benngaihk/yaniv-editor");

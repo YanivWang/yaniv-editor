@@ -5,61 +5,31 @@
       :data-theme="theme"
       :class="{ 'theme-notion': themePreset === 'notion' }"
     >
-      <header class="demo-header">
-        <div class="demo-header__content">
-          <RouterLink class="demo-header__title" :to="{ name: 'home' }">
-            <span class="demo-header__icon">T</span>
-            yaniv-editor Examples
-          </RouterLink>
-          <p class="demo-header__subtitle">Full editor example with themes and device preview</p>
-        </div>
-
-        <div class="demo-header__actions">
-          <nav class="demo-mode-switcher" aria-label="Examples">
-            <RouterLink class="demo-mode-btn" :to="{ name: 'full-editor' }">
-              Full Editor
-            </RouterLink>
-            <RouterLink class="demo-mode-btn" :to="{ name: 'inline-plugins' }">
-              Inline + Plugins
-            </RouterLink>
-          </nav>
-
-          <DeviceSwitcher
-            v-model="deviceView"
-            v-model:orientation="deviceOrientation"
-            @change="handleDeviceChange"
-            @orientation-change="handleOrientationChange"
-          />
-
-          <button
-            class="demo-theme-toggle"
-            :title="theme === 'light' ? 'Switch to Dark' : 'Switch to Light'"
-            @click="toggleTheme"
-          >
-            {{ theme === "light" ? "Dark" : "Light" }}
-          </button>
-
-          <select :value="themePreset" class="demo-theme-select" @change="handleThemeChange">
-            <option value="word">Word Style</option>
-            <option value="notion">Notion Style</option>
-            <option value="github">GitHub Style</option>
-            <option value="typora">Typora Style</option>
-          </select>
-
-          <select v-model="locale" class="demo-locale-select">
-            <option value="en-US">English</option>
-            <option value="zh-CN">简体中文</option>
-            <option value="zh-TW">繁體中文</option>
-          </select>
-        </div>
-      </header>
+      <DemoAppHeader
+        subtitle-key="demo.subtitle.fullEditor"
+        :theme="theme"
+        :locale="locale"
+        :theme-preset="themePreset"
+        :device-view="deviceView"
+        :device-orientation="deviceOrientation"
+        show-locale-select
+        show-device-switcher
+        show-theme-preset
+        @toggle-theme="toggleTheme"
+        @update:locale="locale = $event"
+        @update:theme-preset="handleThemePresetUpdate"
+        @update:device-view="deviceView = $event"
+        @update:device-orientation="deviceOrientation = $event"
+        @device-change="handleDeviceChange"
+        @orientation-change="handleOrientationChange"
+      />
 
       <EditorAutoDemo
         :get-editor="getEditorInstance"
         :typing-speed="35"
-        play-label="Watch Auto Demo"
-        stop-label="Stop"
-        replay-label="Replay Demo"
+        :play-label="t('demo.autoDemo.play')"
+        :stop-label="t('demo.autoDemo.stop')"
+        :replay-label="t('demo.autoDemo.replay')"
       />
 
       <main class="demo-main">
@@ -83,17 +53,13 @@
 <script setup lang="ts">
 import { theme as antTheme } from "ant-design-vue";
 import { computed, onMounted, ref, watch } from "vue";
-import { RouterLink } from "vue-router";
 
-import {
-  DeviceFrame,
-  DeviceSwitcher,
-  type Orientation,
-} from "../../src/components/tools/device-switcher";
+import { DeviceFrame, type Orientation } from "../../src/components/tools/device-switcher";
 import { editorPresets } from "../../src/configs/editorPresets";
 import TiptapProEditor from "../../src/core/TiptapProEditor.vue";
-import { createI18n, type LocaleCode } from "../../src/locales";
+import { t, useI18n, type LocaleCode } from "../../src/locales";
 import { setDeviceView, setOrientation, setTheme, type DeviceView } from "../../src/themes";
+import DemoAppHeader from "../components/DemoAppHeader.vue";
 import EditorAutoDemo from "../components/EditorAutoDemo.vue";
 
 import type { ThemePreset } from "../../src/configs/editorConfig";
@@ -107,7 +73,9 @@ import "../../src/styles/device-responsive.css";
 
 const theme = ref<"light" | "dark">("light");
 const themePreset = ref<ThemePreset>("word");
-const locale = ref<LocaleCode>("en-US");
+const locale = ref<LocaleCode>("zh-CN");
+
+const { setLocale } = useI18n();
 
 const isMobileBrowser =
   /Android.*Mobile|iPhone|iPod|Windows Phone|BlackBerry|Opera Mini|IEMobile/i.test(
@@ -126,7 +94,7 @@ const editorPreset = computed(() =>
 );
 
 watch(locale, (newLocale) => {
-  createI18n({ locale: newLocale });
+  setLocale(newLocale);
 });
 
 onMounted(() => {
@@ -139,9 +107,8 @@ const toggleTheme = () => {
   setTheme(themePreset.value, theme.value);
 };
 
-const handleThemeChange = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
-  themePreset.value = target.value as ThemePreset;
+const handleThemePresetUpdate = (preset: ThemePreset) => {
+  themePreset.value = preset;
   setTheme(themePreset.value, theme.value);
 };
 
