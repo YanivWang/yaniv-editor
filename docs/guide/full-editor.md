@@ -72,12 +72,14 @@ import "@yanivjs/yaniv-editor/style.css";
 | `slashCommand`   | `/` 唤起 `BlockPickerMenu`（块类型选择）                | `false`               |
 | `linkBubbleMenu` | 链接编辑气泡                                            | `false`               |
 | `tableToolbar`   | 表格上下文工具栏                                        | `false`               |
-| `image`          | 注册图片/视频扩展                                       | `true`                |
-| `table`          | 注册表格扩展                                            | `true`                |
-| `ai`             | 注册 AI 扩展                                            | `true`                |
-| `dragHandle`     | 块左侧 `+` / 六点柄与拖拽（`+` 共用 `BlockPickerMenu`） | `true`                |
-| `searchReplace`  | 查找替换扩展                                            | advanced 默认 `true`  |
-| `officePaste`    | Office/WPS 粘贴增强                                     | `true`                |
+| `image`          | 图片/视频扩展与上下文工具栏                             | `false`               |
+| `table`          | 注册表格扩展                                            | `false`               |
+| `ai`             | 注册 AI 扩展                                            | `false`               |
+| `dragHandle`     | 块左侧 `+` / 六点柄与拖拽（`+` 共用 `BlockPickerMenu`） | `false`               |
+| `searchReplace`  | 查找替换扩展                                            | `false`               |
+| `officePaste`    | Office/WPS 粘贴增强                                     | `false`               |
+
+推荐使用 `v-bind="editorPresets.production"` 一次性开启生产常用能力。
 
 完整列表见 [功能配置](/api/features-config)。
 

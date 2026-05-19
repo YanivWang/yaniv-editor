@@ -30,7 +30,7 @@ npm install @yanivjs/yaniv-editor
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import { YanivEditor } from "@yanivjs/yaniv-editor";
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
@@ -51,12 +51,9 @@ function save() {
 <template>
   <YanivEditor
     ref="editorRef"
+    v-bind="editorPresets.production"
     locale="zh-CN"
     :initial-content="'<p>Hello Yaniv!</p>'"
-    :features="{
-      headerNav: true,
-      footerNav: true,
-    }"
     @update="onUpdate"
   />
   <button type="button" @click="save">保存</button>
@@ -72,18 +69,9 @@ function save() {
 ```vue
 <YanivEditor
   ref="editorRef"
+  v-bind="editorPresets.production"
   locale="zh-CN"
   :initial-content="loadedContent"
-  :features="{
-    headerNav: true,
-    footerNav: true,
-    floatingMenu: true,
-    slashCommand: true,
-    linkBubbleMenu: true,
-    tableToolbar: true,
-    image: true,
-    ai: true,
-  }"
   @update="handleUpdate"
 />
 ```
@@ -103,7 +91,7 @@ await fetch("/api/documents/123", {
 // 加载：传入 initialContent
 const res = await fetch("/api/documents/123");
 const { content } = await res.json();
-// content 可以是 HTML 字符串或 ProseMirror JSON
+// content 为 HTML 字符串或 ProseMirror JSON（type: 'doc'）
 ```
 
 ## 预设配置

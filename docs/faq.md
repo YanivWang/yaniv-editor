@@ -32,7 +32,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 检查：
 
-1. `features.ai !== false`（默认 true）
+1. `features.ai: true`
 2. `features.headerNav: true`（AI 按钮在工具栏）
 3. 已配置 `VITE_AI_API_KEY` 或在 AI 设置面板保存了 Key
 4. 网络可访问对应 Provider
@@ -48,6 +48,8 @@ GET /api/documents/:id → :initial-content="data.content"
 ```vue
 :features="{ ai: false, table: false, slashCommand: false }"
 ```
+
+未设置或为 `false` 即关闭；仅 `true` 才开启。
 
 ### 斜杠命令不生效？
 
@@ -79,7 +81,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ### 代码块有语法高亮吗？
 
-已启用 `CodeBlockLowlight`（lowlight + highlight.js）。工具栏 `</>` 下拉可选语言或行内代码；焦点在代码块内时角标也可切换语言；advanced 版本工具栏默认展示代码入口。
+已启用 `CodeBlockLowlight`（lowlight + highlight.js）。工具栏 `</>` 下拉可选语言或行内代码；焦点在代码块内时角标也可切换语言；`editorPresets.production` 完整工具栏默认展示代码入口。
 
 ## 主题相关
 

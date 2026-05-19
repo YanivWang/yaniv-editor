@@ -18,16 +18,30 @@ export interface ResolvedExtensionGates {
   searchReplace: boolean;
   /** 强化 Office/WPS 粘贴（列表/MSO/Excel 等） */
   officePaste: boolean;
+  /** 斜杠命令扩展 */
+  slashCommand: boolean;
+  /** 块拖拽手柄扩展 */
+  dragHandle: boolean;
 }
 
 export interface ResolveExtensionGatesInput {
   features?: FeatureConfig;
 }
 
+type BooleanFeatureKey = Exclude<keyof FeatureConfig, "toolbar">;
+
+/** 判断 features 中某项是否显式开启 */
+export function isFeatureEnabled(
+  features: FeatureConfig | undefined,
+  key: BooleanFeatureKey,
+): boolean {
+  return features?.[key] === true;
+}
+
 /**
  * 解析扩展层应注册的能力
  *
- * 规则：未在 features 中声明的项默认开启；显式 `false` 则关闭。
+ * 规则：所有能力均为 opt-in，须显式 `true` 才开启。
  */
 export function resolveExtensionGates(
   input: ResolveExtensionGatesInput = {},
@@ -35,13 +49,15 @@ export function resolveExtensionGates(
   const f = input.features;
 
   return {
-    table: f?.table !== false,
-    image: f?.image !== false,
-    math: f?.math !== false,
-    ai: f?.ai !== false,
-    formatPainter: f?.formatPainter !== false,
-    outline: f?.outline !== false,
-    searchReplace: f?.searchReplace !== false,
-    officePaste: f?.officePaste !== false,
+    table: isFeatureEnabled(f, "table"),
+    image: isFeatureEnabled(f, "image"),
+    math: isFeatureEnabled(f, "math"),
+    ai: isFeatureEnabled(f, "ai"),
+    formatPainter: isFeatureEnabled(f, "formatPainter"),
+    outline: isFeatureEnabled(f, "outline"),
+    searchReplace: isFeatureEnabled(f, "searchReplace"),
+    officePaste: isFeatureEnabled(f, "officePaste"),
+    slashCommand: isFeatureEnabled(f, "slashCommand"),
+    dragHandle: isFeatureEnabled(f, "dragHandle"),
   };
 }

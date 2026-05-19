@@ -16,10 +16,10 @@
 
     <!-- 功能模块：链接悬浮框（预览模式下禁用） -->
     <LinkBubbleMenu
-      v-if="editorInstance && !isPreviewMode && (props.features?.linkBubbleMenu ?? false)"
+      v-if="editorInstance && !isPreviewMode && featureFlags.linkBubbleMenu"
       :editor="editorInstance"
       :readonly="readonly"
-      :enabled="props.features?.linkBubbleMenu ?? false"
+      :enabled="featureFlags.linkBubbleMenu"
     />
 
     <!-- 功能模块：表格工具栏（预览模式下禁用） -->
@@ -28,31 +28,31 @@
       :editor="editorInstance"
       :readonly="readonly"
       :show-mode="props.tableMenuShowMode ?? 2"
-      :enabled="props.features?.tableToolbar ?? false"
+      :enabled="featureFlags.tableToolbar"
     />
 
     <!-- 功能模块：图片工具栏（预览模式下禁用） -->
     <ImageToolbar
-      v-if="editorInstance && !isPreviewMode && (props.features?.image ?? false)"
+      v-if="editorInstance && !isPreviewMode && featureFlags.image"
       :editor="editorInstance"
       :readonly="readonly"
-      :enabled="props.features?.image ?? false"
+      :enabled="featureFlags.image"
     />
 
     <!-- 功能模块：视频工具栏（预览模式下禁用） -->
     <VideoToolbar
-      v-if="editorInstance && !isPreviewMode && (props.features?.image ?? false)"
+      v-if="editorInstance && !isPreviewMode && featureFlags.image"
       :editor="editorInstance"
       :readonly="readonly"
-      :enabled="props.features?.image ?? false"
+      :enabled="featureFlags.image"
     />
 
     <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
     <FloatingMenu
-      v-if="editorInstance && !isPreviewMode && (props.features?.floatingMenu ?? false)"
+      v-if="editorInstance && !isPreviewMode && featureFlags.floatingMenu"
       :editor="editorInstance"
       :readonly="readonly"
-      :enabled="props.features?.floatingMenu ?? false"
+      :enabled="featureFlags.floatingMenu"
     />
 
     <!-- 功能模块：Notion 风格块选择菜单（/ 转换当前块，+ 在下方插入新块） -->
@@ -95,14 +95,15 @@
       :editor="editorInstance"
       :show-char-count="true"
       :show-shortcut-hints="showStatusShortcutHints"
+      :zoom-bar-placement="props.zoomBarPlacement"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 /**
- * YanivEditor - 基础版富文本编辑器
- * @description 支持基础版功能的 Tiptap 编辑器
+ * YanivEditor - 富文本编辑器
+ * @description 由 features 门控扩展注册与 UI 显隐
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
@@ -122,6 +123,7 @@ import type { SlashCommandState } from "@/components/tools/slash-command";
 import { TableToolbar } from "@/components/tools/table-toolbar";
 import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { buildEditorExtensions } from "@/extensions/coreExtensions";
+import { isFeatureEnabled } from "@/extensions/resolveExtensionGates";
 import { t } from "@/locales";
 import { useEditorTheme } from "@/themes";
 import { validateYanivEditorProps } from "@/utils/validateEditorProps";
@@ -131,6 +133,7 @@ import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
 
 import type { YanivEditorProps } from "./editorTypes";
+import type { JSONContent } from "@tiptap/core";
 
 // 样式（variables.css 需最先加载以定义 CSS 变量，base.css 需在其他样式之前加载）
 import "@/styles/variables.css";
@@ -155,14 +158,12 @@ const props = withDefaults(defineProps<YanivEditorProps>(), {
   themeMode: "light",
 });
 
-// ===== 预览模式 =====
 const isPreviewMode = computed(() => props.previewMode);
 
 const emit = defineEmits<{
-  update: [content: any];
+  update: [content: JSONContent];
 }>();
 
-// ===== 基础状态 =====
 const editor = shallowRef<Editor | null>(null);
 const editorError = ref<string | null>(null);
 const rootRef = ref<HTMLElement | null>(null);
@@ -183,16 +184,6 @@ type BlockPickerMenuInstance = {
 
 const blockPickerMenuRef = ref<BlockPickerMenuInstance | null>(null);
 
-const showBlockPickerMenu = computed(
-  () => Boolean(props.features?.slashCommand) || props.features?.dragHandle !== false,
-);
-const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
-  useEditorPagination(containerRef);
-const isFirstInit = ref(true);
-const isInitializing = ref(false);
-
-const editorInstance = computed(() => editor.value as Editor);
-
 const {
   shouldShowHeaderNav,
   shouldShowFooterNav,
@@ -201,20 +192,36 @@ const {
   showStatusShortcutHints,
 } = useEditorFeatures(props);
 
+const featureFlags = computed(() => ({
+  linkBubbleMenu: isFeatureEnabled(props.features, "linkBubbleMenu"),
+  tableToolbar: isFeatureEnabled(props.features, "tableToolbar"),
+  image: isFeatureEnabled(props.features, "image"),
+  floatingMenu: isFeatureEnabled(props.features, "floatingMenu"),
+}));
+
+const showBlockPickerMenu = computed(
+  () => resolvedExtensionGates.value.slashCommand || resolvedExtensionGates.value.dragHandle,
+);
+
+const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
+  useEditorPagination(containerRef);
+const isFirstInit = ref(true);
+const isInitializing = ref(false);
+
+const editorInstance = computed(() => editor.value as Editor);
+
 const { visible: outlinePanelVisible } = provideOutlinePanel();
 
 const showOutlinePanel = computed(
   () =>
     resolvedExtensionGates.value.outline &&
     outlinePanelVisible.value &&
-    toolbarConfig.value.outline !== false,
+    toolbarConfig.value.outline,
 );
 
-// ===== 国际化 =====
 useEditorI18n(props);
 
-// ===== 编辑器内容管理 =====
-const getEditorContent = () => {
+const getEditorContent = (): JSONContent | null => {
   try {
     return editor.value?.getJSON() ?? null;
   } catch {
@@ -222,22 +229,18 @@ const getEditorContent = () => {
   }
 };
 
-const EMPTY_DOC = { type: "doc", content: [{ type: "paragraph" }] };
+const EMPTY_DOC: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
 
-const normalizeInitialContent = (content: any): any => {
+const normalizeInitialContent = (
+  content: string | JSONContent | undefined,
+): string | JSONContent => {
   if (!content) return EMPTY_DOC;
   if (typeof content === "string") return content;
-  if (Array.isArray(content)) return { type: "doc", content };
-  if (typeof content === "object") {
-    if (content.type === "doc") return content;
-    if (Array.isArray(content.content)) return { type: "doc", content: content.content };
-    return { type: "doc", content: [content] };
-  }
+  if (content.type === "doc") return content;
   return EMPTY_DOC;
 };
 
-const getInitialContent = (): any => {
-  // 非首次初始化时保留当前内容
+const getInitialContent = (): string | JSONContent => {
   if (!isFirstInit.value && editor.value) {
     const currentContent = getEditorContent();
     if (currentContent) return currentContent;
@@ -245,7 +248,6 @@ const getInitialContent = (): any => {
   return normalizeInitialContent(props.initialContent);
 };
 
-// ===== 编辑器初始化 =====
 const initEditor = async () => {
   if (isInitializing.value) return;
 
@@ -253,16 +255,14 @@ const initEditor = async () => {
     isInitializing.value = true;
 
     const initialContentToUse = getInitialContent();
+    const gates = resolvedExtensionGates.value;
 
     if (isFirstInit.value) {
       isFirstInit.value = false;
     }
 
-    // 获取扩展配置
-    const enableImageResize = resolvedExtensionGates.value.image;
     const extensions = buildEditorExtensions({
-      enableImageResize,
-      features: resolvedExtensionGates.value,
+      features: gates,
       outline: {
         scrollParent: () => containerRef.value ?? window,
       },
@@ -275,8 +275,7 @@ const initEditor = async () => {
       },
     });
 
-    // 添加块控制扩展（左侧 + 添加、六点菜单与拖拽排序）
-    if (!props.readonly && !isPreviewMode.value && props.features?.dragHandle !== false) {
+    if (!props.readonly && !isPreviewMode.value && gates.dragHandle) {
       extensions.push(
         DragHandleExtension.configure({
           onOpenInsertMenu: (context) => blockPickerMenuRef.value?.openInsert(context),
@@ -285,8 +284,7 @@ const initEditor = async () => {
       );
     }
 
-    // 添加斜杠命令扩展
-    if (props.features?.slashCommand) {
+    if (gates.slashCommand) {
       extensions.push(
         SlashCommandExtension.configure({
           onActivate: (state: SlashCommandState) => blockPickerMenuRef.value?.activate(state),
@@ -296,7 +294,6 @@ const initEditor = async () => {
       );
     }
 
-    // 销毁旧编辑器
     if (editor.value) {
       editor.value.destroy();
       editor.value = null;
@@ -304,7 +301,6 @@ const initEditor = async () => {
 
     await nextTick();
 
-    // 创建编辑器（预览模式下也设为不可编辑）
     editor.value = new Editor({
       editable: !props.readonly && !isPreviewMode.value,
       extensions,
@@ -321,7 +317,6 @@ const initEditor = async () => {
     await nextTick();
 
     initPageCssVariables();
-
     calculatePages();
   } catch (error) {
     console.error("[YanivEditor] Editor initialization failed:", error);
@@ -331,7 +326,6 @@ const initEditor = async () => {
   }
 };
 
-// ===== 清理 =====
 const destroyEditor = async () => {
   if (editor.value) {
     editor.value.destroy();
@@ -339,7 +333,6 @@ const destroyEditor = async () => {
   }
 };
 
-// ===== 生命周期 =====
 onMounted(async () => {
   validateYanivEditorProps(props);
   await initEditor();
@@ -349,26 +342,6 @@ onBeforeUnmount(async () => {
   await destroyEditor();
 });
 
-// ===== 属性监听 =====
-const watchAndReinit = (
-  getter: () => any,
-  shouldReinit: (newValue: any, oldValue: any) => boolean = (newVal, oldVal) => newVal !== oldVal,
-) => {
-  watch(getter, async (newValue, oldValue) => {
-    if (oldValue === undefined || !editor.value || isInitializing.value) return;
-    if (shouldReinit(newValue, oldValue)) {
-      await nextTick();
-      await initEditor();
-    }
-  });
-};
-
-watchAndReinit(
-  () => props.features?.slashCommand,
-  (newVal, oldVal) => (newVal ?? false) !== (oldVal ?? false),
-);
-
-// 功能门控变化时重建编辑器，保持扩展与 UI 一致
 watch(resolvedExtensionGates, async (next, prev) => {
   if (prev === undefined || !editor.value || isInitializing.value) return;
   if (JSON.stringify(next) === JSON.stringify(prev)) return;
@@ -376,7 +349,6 @@ watch(resolvedExtensionGates, async (next, prev) => {
   await initEditor();
 });
 
-// ===== 暴露方法 =====
 defineExpose({
   getEditor: () => editor.value,
   getJSON: () => editor.value?.getJSON() || null,

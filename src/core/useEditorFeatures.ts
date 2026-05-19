@@ -6,34 +6,32 @@ import {
   type ToolbarToolsConfig,
 } from "@/components/tools/header-nav";
 import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
-import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
+import { isFeatureEnabled, resolveExtensionGates } from "@/extensions/resolveExtensionGates";
 
 import type { YanivEditorProps } from "./editorTypes";
 
-type FeatureName = "headerNav" | "footerNav";
-
 export function useEditorFeatures(props: YanivEditorProps) {
-  const getFeatureConfig = (featureName: FeatureName): boolean => {
-    return props.features?.[featureName] === true;
-  };
+  const features = computed(() => props.features);
 
-  const shouldShowHeaderNav = computed(() => getFeatureConfig("headerNav"));
-  const shouldShowFooterNav = computed(() => getFeatureConfig("footerNav"));
+  const shouldShowHeaderNav = computed(() => isFeatureEnabled(features.value, "headerNav"));
+  const shouldShowFooterNav = computed(() => isFeatureEnabled(features.value, "footerNav"));
 
   const resolvedExtensionGates = computed(() =>
     resolveExtensionGates({
-      features: props.features,
+      features: features.value,
     }),
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
     const base =
-      props.features?.toolbar === "compact" ? COMPACT_TOOLBAR_CONFIG : FULL_TOOLBAR_CONFIG;
+      features.value?.toolbar === "compact" ? COMPACT_TOOLBAR_CONFIG : FULL_TOOLBAR_CONFIG;
 
     return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);
   });
 
-  const showStatusShortcutHints = computed(() => props.features?.statusShortcutHints !== false);
+  const showStatusShortcutHints = computed(() =>
+    isFeatureEnabled(features.value, "statusShortcutHints"),
+  );
 
   return {
     shouldShowHeaderNav,

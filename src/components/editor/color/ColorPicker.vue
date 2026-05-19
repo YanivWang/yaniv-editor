@@ -152,6 +152,7 @@ import { Popover, Tooltip } from "ant-design-vue";
 import { ref, computed, watch } from "vue";
 
 import { t } from "@/locales";
+import { normalizeColor } from "@/utils/color";
 
 import type { Component } from "vue";
 
@@ -287,17 +288,6 @@ const STANDARD_COLORS = [
   "#7030a0", // 紫色
 ] as const;
 
-/**
- * 颜色标准化函数
- * @param color - 颜色值（可能包含空格、大小写不一致）
- * @returns 标准化后的颜色值（小写、去除空格，默认 '#000000'）
- */
-const normalizeColor = (color: string | undefined | null) =>
-  color?.trim().toLowerCase() || "#000000";
-
-/**
- * 标准化后的当前颜色值（计算属性）
- */
 const normalizedColor = computed(() => normalizeColor(props.modelValue));
 
 /**

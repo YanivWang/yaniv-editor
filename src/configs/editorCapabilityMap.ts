@@ -17,7 +17,7 @@ export function applyExtensionGatesToToolbarConfig(
     math: !!(base.math && gates.math),
     formatPainter: !!(base.formatPainter && gates.formatPainter),
     ai: !!(base.ai && gates.ai),
-    searchReplace: base.searchReplace !== false && gates.searchReplace,
-    outline: base.outline !== false && gates.outline,
+    searchReplace: !!(base.searchReplace && gates.searchReplace),
+    outline: !!(base.outline && gates.outline),
   };
 }

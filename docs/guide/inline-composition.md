@@ -14,7 +14,7 @@
 ```text
 new Editor({ extensions: [...] })
   + EditorContent
-  + 按需渲染 Toolbar 组件（UndoRedoGroup、HeadingDropdown、TextFormatGroup ...）
+  + 按需渲染 Toolbar 组件（UndoRedoButton、HeadingDropdown、TextFormatButtons ...）
 ```
 
 工具栏组件从 `@/components/editor` 路径导入（对外集成可参考 examples 或按需 re-export）。
@@ -28,7 +28,12 @@ import Underline from "@tiptap/extension-underline";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 
-import { UndoRedoGroup, HeadingDropdown, TextFormatButtons, LinkButton } from "@/components/editor";
+import {
+  UndoRedoButton,
+  HeadingDropdown,
+  TextFormatButtons,
+  LinkButton,
+} from "@/components/editor";
 
 const editor = ref<Editor | null>(null);
 
@@ -50,7 +55,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="inline-editor-card">
     <div v-if="editor" class="inline-toolbar">
-      <UndoRedoGroup :editor="editor" />
+      <UndoRedoButton :editor="editor" />
       <HeadingDropdown :editor="editor" />
       <TextFormatButtons :editor="editor" />
       <LinkButton :editor="editor" />
@@ -66,15 +71,15 @@ onBeforeUnmount(() => {
 
 | 组件                | 功能                                |
 | ------------------- | ----------------------------------- |
-| `UndoRedoGroup`     | 撤销 / 重做                         |
+| `UndoRedoButton`    | 撤销 / 重做                         |
 | `HeadingDropdown`   | H1–H6 标题                          |
 | `TextFormatButtons` | 粗体、斜体、下划线、删除线          |
-| `FontSizeDropdown`  | 字号                                |
+| `FontSizeSelect`    | 字号                                |
 | `ListTools`         | 有序 / 无序 / 任务列表              |
 | `AlignDropdown`     | 对齐                                |
 | `LinkButton`        | 插入链接                            |
-| `CodeBlockButton`   | 代码块                              |
-| `FormatClearButton` | 清除格式                            |
+| `CodeBlockDropdown` | 代码块                              |
+| `ClearFormatButton` | 清除格式                            |
 | `ImageUpload`       | 图片上传（支持 `uploadImage` 回调） |
 
 ## 动态插件面板

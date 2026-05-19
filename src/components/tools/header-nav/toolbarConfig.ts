@@ -31,8 +31,6 @@ export interface ToolbarToolsConfig {
   clearFormat?: boolean;
   /** 是否显示字体工具 */
   font?: boolean;
-  /** 是否显示行距工具 */
-  lineHeight?: boolean;
   /** 是否显示下标/上标工具 */
   subscriptSuperscript?: boolean;
   /** 是否显示数学公式工具 */
@@ -69,7 +67,6 @@ export const COMPACT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   undoRedo: true,
   clearFormat: false,
   font: false,
-  lineHeight: false,
   subscriptSuperscript: false,
   formatPainter: false,
   ai: true,
@@ -91,7 +88,6 @@ export const FULL_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   undoRedo: true,
   clearFormat: true,
   font: true,
-  lineHeight: true,
   subscriptSuperscript: true,
   math: true,
   formatPainter: true,

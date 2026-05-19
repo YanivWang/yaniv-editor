@@ -179,6 +179,7 @@ import { VideoUpload } from "@/components/editor/video";
 import { WordButton } from "@/components/editor/word";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
+import { normalizeColor } from "@/utils/color";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import { FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
@@ -197,19 +198,15 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  config: () => FULL_TOOLBAR_CONFIG,
   enabled: true,
 });
 
 const editor = computed(() => props.editor ?? null);
 
-// ===== 合并配置 =====
-const config = computed(() => {
-  return {
-    ...FULL_TOOLBAR_CONFIG,
-    ...props.config,
-  };
-});
+const config = computed(() => ({
+  ...FULL_TOOLBAR_CONFIG,
+  ...props.config,
+}));
 
 /** 工具栏分区显隐（信息架构：文档 / 字体 / 段落 / 插入 / 智能） */
 const showSection = computed(() => {
@@ -238,21 +235,6 @@ const currentTextColor = ref<string>("#000000");
 const currentBgColor = ref<string>("#ffffff");
 
 // ===== 辅助函数 =====
-/**
- * 标准化颜色值（确保格式统一）
- */
-function normalizeColor(color: string | undefined): string {
-  if (!color) return "#000000";
-  const trimmed = color.trim();
-  if (trimmed.startsWith("#")) {
-    return trimmed.toLowerCase();
-  }
-  return trimmed.toLowerCase();
-}
-
-/**
- * 命令执行器
- */
 const runCommand = createCommandRunner(editor);
 
 // ===== 颜色应用函数 =====

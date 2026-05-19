@@ -21,7 +21,7 @@ export * from "./locales";
 export * from "./features/ai";
 
 // Extension feature gates（高级接入：与编辑器 props 对齐）
-export { resolveExtensionGates } from "./extensions/resolveExtensionGates";
+export { resolveExtensionGates, isFeatureEnabled } from "./extensions/resolveExtensionGates";
 export type {
   ResolvedExtensionGates,
   ResolveExtensionGatesInput,

@@ -78,6 +78,7 @@ import { TextFormatButtons } from "@/components/editor/text-format";
 import { isBlockDragging } from "@/components/tools/drag-handle";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
+import { normalizeColor } from "@/utils/color";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -107,19 +108,6 @@ const currentBgColor = ref<string>("#ffffff");
 
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);
-
-// ===== 辅助函数 =====
-/**
- * 标准化颜色值（确保格式统一）
- */
-function normalizeColor(color: string | undefined): string {
-  if (!color) return "#000000";
-  const trimmed = color.trim();
-  if (trimmed.startsWith("#")) {
-    return trimmed.toLowerCase();
-  }
-  return trimmed.toLowerCase();
-}
 
 // 监听编辑器状态，更新当前颜色
 watch(

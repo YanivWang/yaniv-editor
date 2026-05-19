@@ -10,25 +10,25 @@
 
 定义于 `src/core/editorTypes.ts`。
 
-| 字段                  | 类型                  | 默认    | 说明                             |
-| --------------------- | --------------------- | ------- | -------------------------------- |
-| `table`               | `boolean`             | `true`  | 表格扩展                         |
-| `image`               | `boolean`             | `true`  | 图片、视频、粘贴图片             |
-| `math`                | `boolean`             | `true`  | 数学公式                         |
-| `ai`                  | `boolean`             | `true`  | AI 相关扩展                      |
-| `formatPainter`       | `boolean`             | `true`  | 格式刷                           |
-| `outline`             | `boolean`             | `true`  | 标题 ID + 目录扩展 + 侧栏大纲 UI |
-| `searchReplace`       | `boolean`             | `true`  | 查找替换                         |
-| `officePaste`         | `boolean`             | `true`  | Office/WPS 粘贴增强              |
-| `tableToolbar`        | `boolean`             | `false` | 表格上下文工具栏 UI              |
-| `toolbar`             | `'full' \| 'compact'` | `full`  | 顶栏工具按钮密度                 |
-| `slashCommand`        | `boolean`             | `false` | 斜杠命令菜单                     |
-| `dragHandle`          | `boolean`             | `true`  | 块添加、块菜单与拖拽             |
-| `floatingMenu`        | `boolean`             | `false` | 选区浮动菜单                     |
-| `linkBubbleMenu`      | `boolean`             | `false` | 链接气泡                         |
-| `headerNav`           | `boolean`             | `false` | 顶部工具栏                       |
-| `footerNav`           | `boolean`             | `false` | 底部导航/字数                    |
-| `statusShortcutHints` | `boolean`             | `true`  | 底部快捷键提示                   |
+| 字段                  | 类型                  | 默认    | 说明                                     |
+| --------------------- | --------------------- | ------- | ---------------------------------------- |
+| `table`               | `boolean`             | `false` | 表格扩展                                 |
+| `image`               | `boolean`             | `false` | 图片/视频扩展、粘贴图片、图片/视频工具栏 |
+| `math`                | `boolean`             | `false` | 数学公式                                 |
+| `ai`                  | `boolean`             | `false` | AI 相关扩展                              |
+| `formatPainter`       | `boolean`             | `false` | 格式刷                                   |
+| `outline`             | `boolean`             | `false` | 标题 ID + 目录扩展 + 侧栏大纲 UI         |
+| `searchReplace`       | `boolean`             | `false` | 查找替换                                 |
+| `officePaste`         | `boolean`             | `false` | Office/WPS 粘贴增强                      |
+| `slashCommand`        | `boolean`             | `false` | 斜杠命令菜单                             |
+| `dragHandle`          | `boolean`             | `false` | 块添加、块菜单与拖拽                     |
+| `tableToolbar`        | `boolean`             | `false` | 表格上下文工具栏 UI                      |
+| `floatingMenu`        | `boolean`             | `false` | 选区浮动菜单                             |
+| `linkBubbleMenu`      | `boolean`             | `false` | 链接气泡                                 |
+| `headerNav`           | `boolean`             | `false` | 顶部工具栏                               |
+| `footerNav`           | `boolean`             | `false` | 底部导航/字数                            |
+| `statusShortcutHints` | `boolean`             | `false` | 底部快捷键提示                           |
+| `toolbar`             | `'full' \| 'compact'` | `full`  | 顶栏工具按钮密度（非布尔门控）           |
 
 ### 手写配置
 
@@ -46,6 +46,7 @@
     ai: true,
     searchReplace: true,
     officePaste: true,
+    dragHandle: true,
   }"
 />
 ```
@@ -66,28 +67,30 @@ mergeEditorPreset("production", { features: { ai: false } });
 <YanivEditor v-bind="editorPresets.production" />
 ```
 
-| 名称         | 说明                                                  |
-| ------------ | ----------------------------------------------------- |
-| `production` | 生产推荐（完整工具栏 + 常用模块）                     |
-| `basic`      | 精简工具栏 + 顶栏，关闭表格/公式/格式刷/大纲/查找替换 |
-| `minimal`    | 精简工具栏，无顶栏                                    |
-| `notion`     | 隐藏顶栏，启用浮动菜单、斜杠菜单与块级操作体验        |
+| 名称         | 说明                                           |
+| ------------ | ---------------------------------------------- |
+| `production` | 生产推荐（完整工具栏 + 常用模块）              |
+| `basic`      | 精简工具栏 + 顶栏（图片、AI）                  |
+| `minimal`    | 精简工具栏，无顶栏                             |
+| `notion`     | 隐藏顶栏，启用浮动菜单、斜杠菜单与块级操作体验 |
 
 ## resolveExtensionGates
 
 高级接入：统一解析扩展层门控。
 
 ```ts
-import { resolveExtensionGates } from "@yanivjs/yaniv-editor";
+import { resolveExtensionGates, isFeatureEnabled } from "@yanivjs/yaniv-editor";
 
 const gates = resolveExtensionGates({
-  features: { ai: false, table: true },
+  features: { ai: true, table: true },
 });
+
+isFeatureEnabled({ headerNav: true }, "headerNav"); // true
 ```
 
 ### 解析规则
 
-未在 `features` 中声明的扩展能力**默认开启**；显式 `false` 则关闭。
+所有布尔能力均为 **opt-in**：须显式 `true` 才开启；未声明或为 `false` 均关闭。
 
 ## 工具栏与扩展对齐
 

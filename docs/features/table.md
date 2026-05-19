@@ -7,7 +7,7 @@
 - 合并/拆分单元格、增删行列（通过表格工具栏）
 - 表头行支持（`TableHeader`）
 
-扩展门控：`features.table !== false`（默认开启）
+扩展门控：`features.table: true`（opt-in，推荐通过 `editorPresets.production` 开启）
 
 ## 表格工具栏
 
@@ -32,12 +32,15 @@
 
 ## 从 Excel 粘贴
 
-启用 `officePaste`（默认 true）时，从 Excel 复制的表格可粘贴为 HTML 表格结构。
+启用 `features.officePaste: true` 时，从 Excel 复制的表格可粘贴为 HTML 表格结构。
 
 关闭 Excel 表格粘贴（宿主传入）：
 
 ```ts
-buildEditorExtensions("advanced", {
+import { buildEditorExtensions, resolveExtensionGates } from "@yanivjs/yaniv-editor";
+
+buildEditorExtensions({
+  features: resolveExtensionGates({ features: { officePaste: true, table: true } }),
   officePaste: {
     excelTablePaste: false,
   },
@@ -52,6 +55,12 @@ buildEditorExtensions("advanced", {
 
 ```vue
 <YanivEditor :features="{ table: false, tableToolbar: false }" />
+```
+
+需显式开启时：
+
+```vue
+<YanivEditor :features="{ table: true, tableToolbar: true }" />
 ```
 
 扩展与工具栏按钮将同步隐藏（通过 `applyExtensionGatesToToolbarConfig`）。

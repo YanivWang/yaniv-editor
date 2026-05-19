@@ -4,7 +4,7 @@ Yaniv Editor 内置 AI 写作辅助 UI，支持续写、润色、摘要、翻译
 
 ## 前置条件
 
-1. `features.ai !== false`（默认 true）
+1. `features.ai: true`
 2. `features.headerNav: true`（工具栏包含 AI 按钮）
 3. 配置 AI API（环境变量或 UI 设置）
 

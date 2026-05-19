@@ -13,11 +13,8 @@ export type EditorPresetName = keyof typeof editorPresets;
 const compactFeatures = {
   toolbar: "compact",
   headerNav: true,
-  table: false,
-  math: false,
-  formatPainter: false,
-  outline: false,
-  searchReplace: false,
+  image: true,
+  ai: true,
 } as const satisfies FeatureConfig;
 
 /** 生产环境推荐：完整工具栏 + 常用体验模块 */
@@ -30,10 +27,14 @@ const productionFeatures = {
   tableToolbar: true,
   image: true,
   table: true,
+  math: true,
   ai: true,
+  formatPainter: true,
+  outline: true,
   searchReplace: true,
   officePaste: true,
   dragHandle: true,
+  statusShortcutHints: true,
 } satisfies FeatureConfig;
 
 export const editorPresets = {

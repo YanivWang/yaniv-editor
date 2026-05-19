@@ -37,7 +37,7 @@ features:
 | ----------------------- | ------------------------------------------ |
 | CMS / 博客 / 知识库正文 | `YanivEditor` + `editorPresets.production` |
 | 内网文档（单人编辑）    | Full Editor + 自建保存 API                 |
-| 评论 / 聊天 / 表单内嵌  | Inline 按需拼装 `@/editor` 组件            |
+| 评论 / 聊天 / 表单内嵌  | Inline 按需拼装 `@/components/editor` 组件 |
 | 多人实时协作文档        | 当前未内置，需基于 Tiptap 协作扩展自行扩展 |
 
 ## 在线示例
@@ -54,6 +54,6 @@ pnpm dev
 ## 文档导航
 
 - [快速开始](/guide/getting-started) — 10 分钟完成集成
-- [功能总览](/features/overview) — 完整能力清单与版本差异
+- [功能总览](/features/overview) — 完整能力清单与预设差异
 - [YanivEditor API](/api/yaniv-editor) — Props、Events、Expose
 - [FAQ](/faq) — 持久化、图片上传、协作等常见问题

@@ -33,16 +33,16 @@
 
 ## 核心亮点
 
-| 维度             | 说明                                                                                                 |
-| ---------------- | ---------------------------------------------------------------------------------------------------- |
-| **完整编辑能力** | 标题、列表、表格、图片、视频、链接、代码块、数学公式、查找替换、Office/WPS 粘贴增强等                |
-| **两种集成方式** | `YanivEditor` 一站式接入，或按需拼装 `@/editor` 工具栏组件（Inline 模式）                            |
-| **功能门控**     | 通过 `version`（`basic` / `advanced`）与 `features` 精确控制扩展注册与 UI 显示，避免能力与界面不一致 |
-| **多主题**       | Word / Notion / GitHub / Typora 视觉预设，支持明暗色与自定义 CSS 变量                                |
-| **AI 辅助**      | 续写、润色、摘要、翻译、自定义指令；可对接 OpenAI、DeepSeek、通义千问、Ollama 等                     |
-| **Word 互转**    | `.docx` 导入导出（`docx` + `mammoth`）                                                               |
-| **i18n**         | 简体中文、繁体中文、English                                                                          |
-| **面向生产**     | 暴露 `getJSON` / `getHTML` / `getText`；内容持久化、图片 OSS 上传由业务层接入                        |
+| 维度             | 说明                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| **完整编辑能力** | 标题、列表、表格、图片、视频、链接、代码块、数学公式、查找替换、Office/WPS 粘贴增强等 |
+| **两种集成方式** | `YanivEditor` 一站式接入，或按需拼装 `@/components/editor` 工具栏组件（Inline 模式）  |
+| **功能门控**     | 通过 `features` 与 `editorPresets` 精确控制扩展注册与 UI 显示，避免能力与界面不一致   |
+| **多主题**       | Word / Notion / GitHub / Typora 视觉预设，支持明暗色与自定义 CSS 变量                 |
+| **AI 辅助**      | 续写、润色、摘要、翻译、自定义指令；可对接 OpenAI、DeepSeek、通义千问、Ollama 等      |
+| **Word 互转**    | `.docx` 导入导出（`docx` + `mammoth`）                                                |
+| **i18n**         | 简体中文、繁体中文、English                                                           |
+| **面向生产**     | 暴露 `getJSON` / `getHTML` / `getText`；内容持久化、图片 OSS 上传由业务层接入         |
 
 > 多人实时协作、@提及、版本历史等能力**尚未内置**，需业务层基于 Tiptap 协作扩展自行实现。详见 [FAQ](docs/faq.md) 与 [功能缺口](docs/features/incomplete-features.md)。
 
@@ -63,13 +63,13 @@
 
 ## 适用场景
 
-| 场景                    | 推荐方案                                                           |
-| ----------------------- | ------------------------------------------------------------------ |
-| CMS / 博客 / 知识库正文 | `YanivEditor` + `version="advanced"` 或 `editorPresets.production` |
-| 内网文档（单人编辑）    | Full Editor + 自建保存 API                                         |
-| 评论 / 聊天 / 表单内嵌  | Inline 按需拼装 `@/editor` 组件                                    |
-| Notion 风格块编辑       | `editorPresets.notion`（浮动菜单 + 斜杠命令，无固定顶栏）          |
-| Google Docs 式多人协作  | ❌ 当前未内置，需自行扩展                                          |
+| 场景                    | 推荐方案                                                  |
+| ----------------------- | --------------------------------------------------------- |
+| CMS / 博客 / 知识库正文 | `YanivEditor` + `editorPresets.production`                |
+| 内网文档（单人编辑）    | Full Editor + 自建保存 API                                |
+| 评论 / 聊天 / 表单内嵌  | Inline 按需拼装 `@/components/editor` 组件                |
+| Notion 风格块编辑       | `editorPresets.notion`（浮动菜单 + 斜杠命令，无固定顶栏） |
+| Google Docs 式多人协作  | ❌ 当前未内置，需自行扩展                                 |
 
 ---
 
@@ -109,7 +109,7 @@ pnpm add @yanivjs/yaniv-editor
 ```vue
 <script setup lang="ts">
 import { ref } from "vue";
-import { YanivEditor } from "@yanivjs/yaniv-editor";
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
@@ -129,13 +129,9 @@ function save() {
 <template>
   <YanivEditor
     ref="editorRef"
-    version="advanced"
+    v-bind="editorPresets.production"
     locale="zh-CN"
     :initial-content="'<p>Hello Yaniv!</p>'"
-    :features="{
-      headerNav: true,
-      footerNav: true,
-    }"
     @update="handleUpdate"
   />
   <button type="button" @click="save">保存</button>
@@ -150,12 +146,12 @@ function save() {
 
 内置与 `YanivEditor` 同构的集成预设，可直接 `v-bind`：
 
-| 预设                  | 说明                                                |
-| --------------------- | --------------------------------------------------- |
-| `production` / `full` | 生产推荐：完整工具栏 + 常用体验模块                 |
-| `basic`               | 基础档位 + 顶栏                                     |
-| `minimal`             | 基础档位，无顶栏                                    |
-| `notion`              | Notion 风格：浮动菜单、斜杠命令、块拖拽，无固定顶栏 |
+| 预设         | 说明                                                |
+| ------------ | --------------------------------------------------- |
+| `production` | 生产推荐：完整工具栏 + 常用体验模块                 |
+| `basic`      | 基础档位 + 顶栏                                     |
+| `minimal`    | 基础档位，无顶栏                                    |
+| `notion`     | Notion 风格：浮动菜单、斜杠命令、块拖拽，无固定顶栏 |
 
 ```vue
 <script setup lang="ts">

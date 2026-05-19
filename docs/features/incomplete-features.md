@@ -63,9 +63,9 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ---
 
-## 三、默认关闭的体验模块
+## 三、需通过 editorPresets 或 features 显式开启
 
-以下能力已实现，开箱需通过 `features` 或 `editorPresets.production` 开启：
+以下能力已实现，开箱需通过 `features: { ...: true }` 或 `editorPresets.production` 开启：
 
 - `headerNav`、`footerNav`
 - `slashCommand`、`floatingMenu`、`linkBubbleMenu`

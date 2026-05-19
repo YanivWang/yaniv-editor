@@ -49,7 +49,7 @@ const props = withDefaults(
     min: 50,
     max: 200,
     step: 10,
-    placement: "belowToolbar",
+    placement: "bottom",
     showCharCount: true,
     showShortcutHints: false,
   },

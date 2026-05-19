@@ -1,6 +1,6 @@
 /**
  * Core Extensions - 核心扩展配置
- * @description 根据版本动态加载编辑器扩展
+ * @description 由 resolveExtensionGates 门控动态加载编辑器扩展
  */
 
 import { CharacterCount } from "@tiptap/extension-character-count";
@@ -11,7 +11,6 @@ import { Link } from "@tiptap/extension-link";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Table } from "@tiptap/extension-table";
-import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import TableOfContents from "@tiptap/extension-table-of-contents";
 import { TableRow } from "@tiptap/extension-table-row";
@@ -23,6 +22,7 @@ import { Underline } from "@tiptap/extension-underline";
 import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 
+import { TableCellWithBackground } from "@/components/editor/table/TableCellWithBackground";
 import {
   CustomAiExtension,
   ContinueWritingExtension,
@@ -42,11 +42,11 @@ import { MathExtension } from "./math";
 import { OfficePaste, type OfficePasteOptions } from "./office-paste";
 import { PasteImage } from "./pasteImage";
 import { ResizableImage } from "./resizableImage";
-import { resolveExtensionGates, type ResolvedExtensionGates } from "./resolveExtensionGates";
 import { SearchReplace } from "./search-replace";
 import { Video } from "./video";
 import { YanivPlaceholder } from "./yanivPlaceholder";
 
+import type { ResolvedExtensionGates } from "./resolveExtensionGates";
 import type { AnyExtension } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
@@ -54,8 +54,6 @@ import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
  * 扩展配置选项
  */
 export interface ExtensionsOptions {
-  /** 是否启用图片增强功能（拖拽大小调整），默认 true */
-  enableImageResize?: boolean;
   /** OfficePaste 回调与流水线开关（宿主可弹窗提示、逐项关闭 transform） */
   officePaste?: Partial<
     Pick<
@@ -63,11 +61,8 @@ export interface ExtensionsOptions {
       "onPasteFromOfficeWithImages" | "imagePlaceholderHtml" | "htmlTransforms" | "excelTablePaste"
     >
   >;
-  /**
-   * 功能门控（由 resolveExtensionGates 生成或与 UI 对齐）
-   * 不传则默认由版本解析（参见 resolveExtensionGates）
-   */
-  features?: ResolvedExtensionGates;
+  /** 功能门控（由 resolveExtensionGates 生成，须显式传入） */
+  features: ResolvedExtensionGates;
   /** 大纲扩展：滚动容器（用于高亮当前章节） */
   outline?: {
     scrollParent?: () => HTMLElement | Window;
@@ -77,16 +72,12 @@ export interface ExtensionsOptions {
 /**
  * 构建编辑器扩展列表（能力由 options.features 门控）
  */
-export function buildEditorExtensions(options: ExtensionsOptions = {}): AnyExtension[] {
-  const { enableImageResize = true, officePaste, outline: outlineOptions } = options;
-
-  const gates: ResolvedExtensionGates = options.features ?? resolveExtensionGates();
+export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[] {
+  const { officePaste, outline: outlineOptions, features: gates } = options;
 
   const extensions: AnyExtension[] = [];
 
-  // 基础扩展（所有版本都包含）
   const starterKitConfig: Record<string, unknown> = {
-    // 禁用一些高级功能，在基础版中通过其他扩展提供
     heading: {
       levels: [1, 2, 3, 4, 5, 6],
     },
@@ -144,7 +135,7 @@ export function buildEditorExtensions(options: ExtensionsOptions = {}): AnyExten
       ResizableImage.configure({
         inline: true,
         allowBase64: true,
-        enableResize: enableImageResize,
+        enableResize: gates.image,
       }),
     );
   }
@@ -176,7 +167,7 @@ export function buildEditorExtensions(options: ExtensionsOptions = {}): AnyExten
       }),
     );
     extensions.push(TableRow);
-    extensions.push(TableCell);
+    extensions.push(TableCellWithBackground);
     extensions.push(TableHeader);
   }
 

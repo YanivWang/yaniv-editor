@@ -40,14 +40,14 @@
 格式刷复制当前选区格式并应用到下一选区。
 
 - 扩展：`FormatPainter`
-- 门控：`features.formatPainter`（advanced 默认开启）
-- 可通过 `undoRedoDisabled` / `formatPainterDisabled` 禁用工具栏按钮
+- 门控：`features.formatPainter: true`
+- 未注册格式刷扩展时，按钮自动禁用并提示
 
 ## 查找与替换
 
 - 快捷键：`Ctrl/Cmd + F`（通过 `useFindReplaceHotkey`）
 - 扩展：`SearchReplace`
-- 门控：`features.searchReplace`（advanced 默认开启）
+- 门控：`features.searchReplace: true`
 - 工具栏：`FindReplaceButton`（`searchReplace` 配置项）
 
 ## 斜杠命令
@@ -67,16 +67,16 @@
 - Excel 表格转 HTML 表格
 - 含图片的 Office 粘贴会提示（图片需单独处理）
 
-关闭：`features.officePaste: false`
+关闭：`features.officePaste: false` 或不设置
 
 ## 大纲与锚点
 
-advanced 默认注册：
+开启 `features.outline: true` 后注册：
 
 - `UniqueID` — 为标题生成唯一 ID
 - `TableOfContents` — 目录数据（供扩展 UI 使用）
 
-关闭：`features.outline: false`
+关闭：不设置或 `features.outline: false`
 
 ## 字符统计
 
