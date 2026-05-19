@@ -64,7 +64,7 @@
 import { editorPresets, mergeEditorPreset } from "@yanivjs/yaniv-editor";
 
 editorPresets.production; // 生产推荐
-editorPresets.notion; // Notion 风格（无顶栏 + 浮动菜单）
+editorPresets.notion; // Notion 风格（无顶栏 + 浮动菜单 + 斜杠菜单）
 mergeEditorPreset("production", { features: { ai: false } });
 ```
 
@@ -72,13 +72,13 @@ mergeEditorPreset("production", { features: { ai: false } });
 <YanivEditor v-bind="editorPresets.production" />
 ```
 
-| 名称         | 说明                              |
-| ------------ | --------------------------------- |
-| `production` | 生产推荐（完整工具栏 + 常用模块） |
-| `full`       | 同 `production`                   |
-| `basic`      | 基础档位 + 顶栏                   |
-| `minimal`    | 基础档位，无顶栏                  |
-| `notion`     | 隐藏顶栏，启用浮动菜单与链接气泡  |
+| 名称         | 说明                                                      |
+| ------------ | --------------------------------------------------------- |
+| `production` | 生产推荐（完整工具栏 + 常用模块）                         |
+| `full`       | 同 `production`                                           |
+| `basic`      | 基础档位 + 顶栏                                           |
+| `minimal`    | 基础档位，无顶栏                                          |
+| `notion`     | 隐藏顶栏，启用浮动菜单、链接气泡、斜杠菜单与媒体/表格工具 |
 
 ## resolveExtensionGates
 

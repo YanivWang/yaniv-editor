@@ -1,11 +1,16 @@
 /**
  * DragHandle Extension
- * @description Adds a left-side drag handle for moving editor blocks without a menu.
+ * @description Adds Notion-like left-side block controls for inserting, moving and transforming blocks.
  */
 
 import { Extension } from "@tiptap/core";
-import { DOMSerializer, type Node as ProseMirrorNode } from "@tiptap/pm/model";
-import { NodeSelection, Plugin, PluginKey } from "@tiptap/pm/state";
+import {
+  DOMSerializer,
+  Fragment,
+  type Node as ProseMirrorNode,
+  type Schema,
+} from "@tiptap/pm/model";
+import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
 import type { EditorView } from "@tiptap/pm/view";
 
@@ -87,6 +92,17 @@ interface DragTarget {
   node: ProseMirrorNode;
   pos: number;
   dom: HTMLElement;
+}
+
+type BlockMenuKind = "insert" | "actions";
+
+interface BlockMenuItem {
+  id: string;
+  label: string;
+  description?: string;
+  danger?: boolean;
+  dividerBefore?: boolean;
+  run: () => void;
 }
 
 function isDraggableNode(node: ProseMirrorNode): boolean {
@@ -236,12 +252,24 @@ function findTargetFromCoords(view: EditorView, event: MouseEvent): DragTarget |
   return null;
 }
 
+function createPlusButtonElement(): HTMLButtonElement {
+  const plusButton = document.createElement("button");
+  plusButton.type = "button";
+  plusButton.className = "drag-handle-plus";
+  plusButton.contentEditable = "false";
+  plusButton.setAttribute("aria-label", "添加块");
+  plusButton.textContent = "+";
+  return plusButton;
+}
+
 function createHandleElement(): HTMLElement {
   const handle = document.createElement("div");
   handle.className = "drag-handle";
   handle.contentEditable = "false";
   handle.draggable = true;
-  handle.setAttribute("aria-hidden", "true");
+  handle.setAttribute("aria-label", "打开块菜单或拖拽排序");
+  handle.setAttribute("role", "button");
+  handle.setAttribute("tabindex", "0");
 
   for (let index = 0; index < 6; index += 1) {
     const dot = document.createElement("span");
@@ -250,6 +278,14 @@ function createHandleElement(): HTMLElement {
   }
 
   return handle;
+}
+
+function createBlockMenuElement(): HTMLElement {
+  const menu = document.createElement("div");
+  menu.className = "drag-handle-menu";
+  menu.contentEditable = "false";
+  menu.setAttribute("role", "menu");
+  return menu;
 }
 
 function serializeDragData(view: EditorView, selection: NodeSelection): string {
@@ -321,6 +357,315 @@ function createTransparentDragImage(source: HTMLElement): HTMLElement {
   return dragImage;
 }
 
+function createInlineContent(schema: Schema, text: string): Fragment | null {
+  return text.trim().length > 0 ? Fragment.from(schema.text(text)) : null;
+}
+
+function createParagraph(schema: Schema, text = ""): ProseMirrorNode {
+  return schema.nodes.paragraph.create(null, createInlineContent(schema, text));
+}
+
+function createHeading(schema: Schema, level: 1 | 2 | 3, text = ""): ProseMirrorNode {
+  return schema.nodes.heading.create({ level }, createInlineContent(schema, text));
+}
+
+function createCodeBlock(schema: Schema, text = ""): ProseMirrorNode {
+  return schema.nodes.codeBlock.create(null, createInlineContent(schema, text));
+}
+
+function createBlockquote(schema: Schema, text = ""): ProseMirrorNode {
+  return schema.nodes.blockquote.create(null, createParagraph(schema, text));
+}
+
+function createList(schema: Schema, type: "bulletList" | "orderedList" | "taskList", text = "") {
+  const listType = schema.nodes[type];
+  const itemType = type === "taskList" ? schema.nodes.taskItem : schema.nodes.listItem;
+  const attrs = type === "taskList" ? { checked: false } : null;
+
+  return listType.create(null, itemType.create(attrs, createParagraph(schema, text)));
+}
+
+function insertNodeAfter(view: EditorView, target: DragTarget, node: ProseMirrorNode): void {
+  const insertPos = target.pos + target.node.nodeSize;
+  const tr = view.state.tr.insert(insertPos, node);
+  const selectionPos = Math.min(insertPos + 1, tr.doc.content.size);
+  tr.setSelection(TextSelection.near(tr.doc.resolve(selectionPos), 1));
+  view.dispatch(tr.scrollIntoView());
+  view.focus();
+}
+
+function replaceTargetNode(view: EditorView, target: DragTarget, node: ProseMirrorNode): void {
+  const tr = view.state.tr.replaceWith(target.pos, target.pos + target.node.nodeSize, node);
+  const selectionPos = Math.min(target.pos + 1, tr.doc.content.size);
+  tr.setSelection(TextSelection.near(tr.doc.resolve(selectionPos), 1));
+  view.dispatch(tr.scrollIntoView());
+  view.focus();
+}
+
+function deleteTargetNode(view: EditorView, target: DragTarget): void {
+  const tr = view.state.tr.delete(target.pos, target.pos + target.node.nodeSize);
+  const selectionPos = Math.min(target.pos, tr.doc.content.size);
+  tr.setSelection(TextSelection.near(tr.doc.resolve(selectionPos), -1));
+  view.dispatch(tr.scrollIntoView());
+  view.focus();
+}
+
+function duplicateTargetNode(view: EditorView, target: DragTarget): void {
+  insertNodeAfter(view, target, target.node.copy(target.node.content));
+}
+
+function setCursorAfterTarget(view: EditorView, target: DragTarget): void {
+  const pos = target.pos + target.node.nodeSize;
+  const tr = view.state.tr.setSelection(TextSelection.near(view.state.doc.resolve(pos), 1));
+  view.dispatch(tr);
+  view.focus();
+}
+
+function moveTarget(view: EditorView, target: DragTarget, direction: "up" | "down"): boolean {
+  const $pos = view.state.doc.resolve(target.pos);
+  const index = $pos.index();
+  const parent = $pos.parent;
+  const nodeToMove = target.node.copy(target.node.content);
+
+  if (direction === "up") {
+    if (index <= 0) return false;
+
+    const previousNode = parent.child(index - 1);
+    const previousPos = target.pos - previousNode.nodeSize;
+    const tr = view.state.tr
+      .delete(target.pos, target.pos + target.node.nodeSize)
+      .insert(previousPos, nodeToMove);
+    tr.setSelection(NodeSelection.create(tr.doc, previousPos));
+    view.dispatch(tr.scrollIntoView());
+    view.focus();
+    return true;
+  }
+
+  if (index >= parent.childCount - 1) return false;
+
+  const nextNode = parent.child(index + 1);
+  const tr = view.state.tr
+    .delete(target.pos, target.pos + target.node.nodeSize)
+    .insert(target.pos + nextNode.nodeSize, nodeToMove);
+  tr.setSelection(NodeSelection.create(tr.doc, target.pos + nextNode.nodeSize));
+  view.dispatch(tr.scrollIntoView());
+  view.focus();
+  return true;
+}
+
+function createInsertItems(
+  view: EditorView,
+  target: DragTarget,
+  insertTable: () => void,
+): BlockMenuItem[] {
+  const { schema } = view.state;
+
+  return [
+    {
+      id: "paragraph",
+      label: "正文",
+      description: "插入普通文本块",
+      run: () => insertNodeAfter(view, target, createParagraph(schema)),
+    },
+    {
+      id: "heading1",
+      label: "标题 1",
+      description: "插入大标题",
+      run: () => insertNodeAfter(view, target, createHeading(schema, 1)),
+    },
+    {
+      id: "heading2",
+      label: "标题 2",
+      description: "插入中标题",
+      run: () => insertNodeAfter(view, target, createHeading(schema, 2)),
+    },
+    {
+      id: "bulletList",
+      label: "无序列表",
+      description: "插入列表块",
+      run: () => insertNodeAfter(view, target, createList(schema, "bulletList")),
+    },
+    {
+      id: "taskList",
+      label: "任务列表",
+      description: "插入待办块",
+      run: () => insertNodeAfter(view, target, createList(schema, "taskList")),
+    },
+    {
+      id: "blockquote",
+      label: "引用",
+      description: "插入引用块",
+      run: () => insertNodeAfter(view, target, createBlockquote(schema)),
+    },
+    {
+      id: "codeBlock",
+      label: "代码块",
+      description: "插入代码块",
+      run: () => insertNodeAfter(view, target, createCodeBlock(schema)),
+    },
+    {
+      id: "table",
+      label: "表格",
+      description: "插入 3x3 表格",
+      dividerBefore: true,
+      run: insertTable,
+    },
+  ];
+}
+
+function createActionItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
+  const { schema } = view.state;
+  const text = target.node.textContent;
+
+  return [
+    {
+      id: "duplicate",
+      label: "复制块",
+      description: "在下方复制当前块",
+      run: () => duplicateTargetNode(view, target),
+    },
+    {
+      id: "delete",
+      label: "删除块",
+      description: "删除当前块",
+      danger: true,
+      run: () => deleteTargetNode(view, target),
+    },
+    {
+      id: "moveUp",
+      label: "上移",
+      description: "与上一个块交换位置",
+      dividerBefore: true,
+      run: () => moveTarget(view, target, "up"),
+    },
+    {
+      id: "moveDown",
+      label: "下移",
+      description: "与下一个块交换位置",
+      run: () => moveTarget(view, target, "down"),
+    },
+    {
+      id: "paragraph",
+      label: "转成正文",
+      description: "转换为普通段落",
+      dividerBefore: true,
+      run: () => replaceTargetNode(view, target, createParagraph(schema, text)),
+    },
+    {
+      id: "heading1",
+      label: "转成标题 1",
+      description: "转换为大标题",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 1, text)),
+    },
+    {
+      id: "heading2",
+      label: "转成标题 2",
+      description: "转换为中标题",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 2, text)),
+    },
+    {
+      id: "heading3",
+      label: "转成标题 3",
+      description: "转换为小标题",
+      run: () => replaceTargetNode(view, target, createHeading(schema, 3, text)),
+    },
+    {
+      id: "blockquote",
+      label: "转成引用",
+      description: "转换为引用块",
+      run: () => replaceTargetNode(view, target, createBlockquote(schema, text)),
+    },
+    {
+      id: "bulletList",
+      label: "转成无序列表",
+      description: "转换为列表块",
+      run: () => replaceTargetNode(view, target, createList(schema, "bulletList", text)),
+    },
+    {
+      id: "orderedList",
+      label: "转成有序列表",
+      description: "转换为编号列表",
+      run: () => replaceTargetNode(view, target, createList(schema, "orderedList", text)),
+    },
+    {
+      id: "codeBlock",
+      label: "转成代码块",
+      description: "转换为代码块",
+      run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
+    },
+  ];
+}
+
+function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: () => void): void {
+  menu.replaceChildren();
+
+  for (const item of items) {
+    if (item.dividerBefore) {
+      const divider = document.createElement("div");
+      divider.className = "drag-handle-menu__divider";
+      menu.appendChild(divider);
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "drag-handle-menu__item";
+    button.setAttribute("role", "menuitem");
+    button.dataset.itemId = item.id;
+    if (item.danger) {
+      button.classList.add("is-danger");
+    }
+
+    const label = document.createElement("span");
+    label.className = "drag-handle-menu__label";
+    label.textContent = item.label;
+    button.appendChild(label);
+
+    if (item.description) {
+      const description = document.createElement("span");
+      description.className = "drag-handle-menu__description";
+      description.textContent = item.description;
+      button.appendChild(description);
+    }
+
+    button.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+    });
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      item.run();
+      closeMenu();
+    });
+
+    menu.appendChild(button);
+  }
+}
+
+function positionBlockMenu(menu: HTMLElement, target: DragTarget, kind: BlockMenuKind): void {
+  const targetRect = target.dom.getBoundingClientRect();
+  const xOffset = kind === "insert" ? 28 : 4;
+
+  menu.style.left = `${Math.max(8, targetRect.left - 240 + xOffset)}px`;
+  menu.style.top = `${Math.max(8, targetRect.top)}px`;
+
+  requestAnimationFrame(() => {
+    const rect = menu.getBoundingClientRect();
+    const margin = 8;
+    let left = rect.left;
+    let top = rect.top;
+
+    if (rect.right + margin > window.innerWidth) {
+      left = window.innerWidth - rect.width - margin;
+    }
+
+    if (rect.bottom + margin > window.innerHeight) {
+      top = window.innerHeight - rect.height - margin;
+    }
+
+    menu.style.left = `${Math.max(margin, left)}px`;
+    menu.style.top = `${Math.max(margin, top)}px`;
+  });
+}
+
 export const DragHandleExtension = Extension.create({
   name: "dragHandle",
 
@@ -331,26 +676,37 @@ export const DragHandleExtension = Extension.create({
   },
 
   addProseMirrorPlugins() {
-    const extension = this;
+    const editor = this.editor;
+    const storage = this.storage;
 
     return [
       new Plugin({
         key: dragHandleKey,
 
         view(view) {
+          const plusButton = createPlusButtonElement();
           const handle = createHandleElement();
+          const menu = createBlockMenuElement();
           const handleRoot = view.dom.parentElement ?? view.dom;
           let currentTarget: DragTarget | null = null;
           let isDragging = false;
+          let activeMenuKind: BlockMenuKind | null = null;
 
           const setDraggingState = (dragging: boolean) => {
             isDragging = dragging;
-            extension.storage.isDragging = dragging;
+            storage.isDragging = dragging;
+          };
+
+          const closeMenu = () => {
+            activeMenuKind = null;
+            menu.classList.remove("is-visible", "is-insert-menu", "is-actions-menu");
+            menu.replaceChildren();
           };
 
           const hideHandle = () => {
-            if (isDragging) return;
+            if (isDragging || activeMenuKind) return;
             currentTarget = null;
+            plusButton.classList.remove("is-visible");
             handle.classList.remove("is-visible");
           };
 
@@ -358,9 +714,16 @@ export const DragHandleExtension = Extension.create({
             const rootRect = handleRoot.getBoundingClientRect();
             const targetRect = target.dom.getBoundingClientRect();
 
+            plusButton.style.left = `${targetRect.left - rootRect.left - 68}px`;
+            plusButton.style.top = `${targetRect.top - rootRect.top + targetRect.height / 2}px`;
             handle.style.left = `${targetRect.left - rootRect.left - 38}px`;
             handle.style.top = `${targetRect.top - rootRect.top + targetRect.height / 2}px`;
+            plusButton.classList.add("is-visible");
             handle.classList.add("is-visible");
+
+            if (activeMenuKind) {
+              positionBlockMenu(menu, target, activeMenuKind);
+            }
           };
 
           const handleMouseMove = (event: MouseEvent) => {
@@ -380,15 +743,80 @@ export const DragHandleExtension = Extension.create({
             const relatedTarget = event.relatedTarget;
             if (
               relatedTarget instanceof Node &&
-              (view.dom.contains(relatedTarget) || handle.contains(relatedTarget))
+              (view.dom.contains(relatedTarget) ||
+                handle.contains(relatedTarget) ||
+                plusButton.contains(relatedTarget) ||
+                menu.contains(relatedTarget))
             ) {
               return;
             }
             hideHandle();
           };
 
-          handle.addEventListener("mousedown", (event) => {
+          const openMenu = (kind: BlockMenuKind) => {
+            if (!currentTarget) return;
+
+            const target = currentTarget;
+            activeMenuKind = kind;
+            menu.classList.toggle("theme-notion-menu", Boolean(view.dom.closest(".theme-notion")));
+            menu.classList.toggle(
+              "is-dark",
+              Boolean(view.dom.closest('[data-theme="dark"], .dark')),
+            );
+            menu.classList.toggle("is-insert-menu", kind === "insert");
+            menu.classList.toggle("is-actions-menu", kind === "actions");
+
+            const insertTable = () => {
+              setCursorAfterTarget(view, target);
+              editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+            };
+
+            renderBlockMenu(
+              menu,
+              kind === "insert"
+                ? createInsertItems(view, target, insertTable)
+                : createActionItems(view, target),
+              closeMenu,
+            );
+            positionBlockMenu(menu, target, kind);
+            menu.classList.add("is-visible");
+          };
+
+          const toggleMenu = (kind: BlockMenuKind) => {
+            if (activeMenuKind === kind) {
+              closeMenu();
+              return;
+            }
+
+            openMenu(kind);
+          };
+
+          plusButton.addEventListener("mousedown", (event) => {
+            event.preventDefault();
             event.stopPropagation();
+          });
+
+          plusButton.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleMenu("insert");
+          });
+
+          handle.addEventListener("mousedown", (event) => {
+            if (event.button !== 0) return;
+            event.stopPropagation();
+          });
+
+          handle.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleMenu("actions");
+          });
+
+          handle.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            openMenu("actions");
           });
 
           handle.addEventListener("dragstart", (event: DragEvent) => {
@@ -402,6 +830,7 @@ export const DragHandleExtension = Extension.create({
             const dragImage = createTransparentDragImage(currentTarget.dom);
 
             setDraggingState(true);
+            closeMenu();
             view.dragging = {
               slice: selection.content(),
               move: true,
@@ -430,9 +859,32 @@ export const DragHandleExtension = Extension.create({
             hideHandle();
           });
 
+          const handleDocumentPointerDown = (event: MouseEvent) => {
+            const target = event.target;
+            if (
+              target instanceof Node &&
+              (menu.contains(target) || handle.contains(target) || plusButton.contains(target))
+            ) {
+              return;
+            }
+            closeMenu();
+            hideHandle();
+          };
+
+          const handleDocumentKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+              closeMenu();
+              hideHandle();
+            }
+          };
+
+          handleRoot.appendChild(plusButton);
           handleRoot.appendChild(handle);
+          document.body.appendChild(menu);
           view.dom.addEventListener("mousemove", handleMouseMove);
           view.dom.addEventListener("mouseleave", handleMouseLeave);
+          document.addEventListener("mousedown", handleDocumentPointerDown);
+          document.addEventListener("keydown", handleDocumentKeyDown);
 
           return {
             update(updatedView) {
@@ -457,7 +909,11 @@ export const DragHandleExtension = Extension.create({
             destroy() {
               view.dom.removeEventListener("mousemove", handleMouseMove);
               view.dom.removeEventListener("mouseleave", handleMouseLeave);
+              document.removeEventListener("mousedown", handleDocumentPointerDown);
+              document.removeEventListener("keydown", handleDocumentKeyDown);
+              plusButton.remove();
               handle.remove();
+              menu.remove();
             },
           };
         },

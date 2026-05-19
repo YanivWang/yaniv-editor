@@ -452,6 +452,11 @@ export interface TiptapLocale {
     image: string;
     imageDesc: string;
     imageUrlPrompt: string;
+    video: string;
+    videoDesc: string;
+    videoUrlPrompt: string;
+    math: string;
+    mathDesc: string;
     horizontalRule: string;
     horizontalRuleDesc: string;
   };

@@ -50,14 +50,18 @@ export const editorPresets = {
     features: {},
   },
 
-  /** Notion 风格：隐藏固定工具栏，启用浮动菜单 */
+  /** Notion 风格：隐藏固定工具栏，启用浮动菜单、斜杠菜单与块级操作体验 */
   notion: {
     version: "advanced",
     features: {
       headerNav: false,
       footerNav: false,
       floatingMenu: true,
+      slashCommand: true,
       linkBubbleMenu: true,
+      tableToolbar: true,
+      image: true,
+      table: true,
       dragHandle: true,
     },
   },

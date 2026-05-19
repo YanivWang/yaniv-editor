@@ -56,6 +56,8 @@ import {
   CodeOutlined,
   TableOutlined,
   PictureOutlined,
+  VideoCameraOutlined,
+  FunctionOutlined,
   MinusOutlined,
 } from "@ant-design/icons-vue";
 import { computed, ref, watch, nextTick, onMounted, onUnmounted, type Component } from "vue";
@@ -232,6 +234,29 @@ const commandGroups = computed<SlashCommandGroup[]>(() => [
           if (url) {
             editor.chain().focus().setImage({ src: url }).run();
           }
+        },
+      },
+      {
+        id: "video",
+        title: t("slashCommand.video"),
+        description: t("slashCommand.videoDesc"),
+        icon: VideoCameraOutlined,
+        keywords: ["video", "media", "视频", "媒体", "mp4"],
+        action: (editor: Editor) => {
+          const url = window.prompt(t("slashCommand.videoUrlPrompt") || "Enter video URL");
+          if (url) {
+            editor.chain().focus().setVideo({ src: url }).run();
+          }
+        },
+      },
+      {
+        id: "math",
+        title: t("slashCommand.math"),
+        description: t("slashCommand.mathDesc"),
+        icon: FunctionOutlined,
+        keywords: ["math", "formula", "latex", "公式", "数学"],
+        action: (editor: Editor) => {
+          editor.chain().focus().insertBlockMath().run();
         },
       },
       {

@@ -53,7 +53,7 @@ const { preset, mode } = getTheme();
 
 ## Notion 风格配置
 
-Notion 风格建议配合 `editorPresets.notion`（隐藏顶栏，启用浮动菜单）：
+Notion 风格建议配合 `editorPresets.notion`（隐藏顶栏，启用浮动菜单、斜杠菜单、链接气泡与媒体/表格工具）：
 
 ```vue
 <YanivEditor v-bind="editorPresets.notion" />
