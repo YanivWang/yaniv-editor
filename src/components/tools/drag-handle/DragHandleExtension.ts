@@ -54,17 +54,52 @@ function getDomElement(view: EditorView, pos: number): HTMLElement | null {
 function resolveNodeAtDom(view: EditorView, element: HTMLElement): DragTarget | null {
   try {
     const pos = view.posAtDOM(element, 0);
-    const node = view.state.doc.nodeAt(pos);
-    const dom = getDomElement(view, pos);
+    const $pos = view.state.doc.resolve(pos);
 
-    if (node && dom && isDraggableNode(node)) {
-      return { node, pos, dom };
+    for (let depth = $pos.depth; depth >= 1; depth -= 1) {
+      const node = $pos.node(depth);
+      if (!isDraggableNode(node)) continue;
+
+      const nodePos = $pos.before(depth);
+      const dom = getDomElement(view, nodePos);
+      if (dom && (dom === element || dom.contains(element))) {
+        return { node, pos: nodePos, dom };
+      }
     }
   } catch {
     return null;
   }
 
   return null;
+}
+
+function findTargetFromElement(view: EditorView, element: HTMLElement): DragTarget | null {
+  let current: HTMLElement | null = element;
+
+  while (current && current !== view.dom) {
+    const resolved = resolveNodeAtDom(view, current);
+    if (resolved) return resolved;
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
+function getEditorPaddingLeft(view: EditorView): number {
+  return Number.parseFloat(window.getComputedStyle(view.dom).paddingLeft) || 0;
+}
+
+function isInEditorGutter(view: EditorView, clientX: number): boolean {
+  const rect = view.dom.getBoundingClientRect();
+  return clientX < rect.left + getEditorPaddingLeft(view);
+}
+
+function getContentProbePoint(view: EditorView, clientY: number): { left: number; top: number } {
+  const rect = view.dom.getBoundingClientRect();
+  return {
+    left: rect.left + getEditorPaddingLeft(view) + 8,
+    top: clientY,
+  };
 }
 
 function findMediaTarget(view: EditorView, event: MouseEvent): DragTarget | null {
@@ -93,10 +128,21 @@ function findTargetFromCoords(view: EditorView, event: MouseEvent): DragTarget |
   const mediaTarget = findMediaTarget(view, event);
   if (mediaTarget) return mediaTarget;
 
-  const posAtCoords = view.posAtCoords({
-    left: event.clientX,
-    top: event.clientY,
-  });
+  if (isInEditorGutter(view, event.clientX)) {
+    const probePoint = getContentProbePoint(view, event.clientY);
+    const element = document.elementFromPoint(probePoint.left, probePoint.top);
+
+    if (element instanceof HTMLElement && view.dom.contains(element)) {
+      const targetFromElement = findTargetFromElement(view, element);
+      if (targetFromElement) return targetFromElement;
+    }
+  }
+
+  const posAtCoords = view.posAtCoords(
+    isInEditorGutter(view, event.clientX)
+      ? getContentProbePoint(view, event.clientY)
+      : { left: event.clientX, top: event.clientY },
+  );
 
   if (!posAtCoords) return null;
 
