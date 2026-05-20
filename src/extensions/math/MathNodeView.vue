@@ -48,7 +48,7 @@ import { NodeViewWrapper, nodeViewProps } from "@tiptap/vue-3";
 import katex from "katex";
 import { ref, computed, watch, nextTick, onMounted } from "vue";
 
-import "katex/dist/katex.min.css";
+/* KaTeX 样式由接入方引入: import 'katex/dist/katex.min.css'（勿打入 npm 包） */
 import { t } from "@/locales";
 
 import { DEFAULT_KATEX_OPTIONS } from "./types";

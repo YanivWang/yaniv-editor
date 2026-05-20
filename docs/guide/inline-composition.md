@@ -93,7 +93,7 @@ import { YanivInlineEditor } from "@yanivjs/yaniv-editor/inline";
 import "@yanivjs/yaniv-editor/inline.css";
 ```
 
-`inline.css` 聚合 Inline 工具栏样式、正文排版与壳组件布局。使用 `YanivInlineEditor` 时无需手动设置 `inline-prose`；DIY 时在 `editorProps.attributes.class` 中设置 `inline-prose`，外层包 `.yaniv-editor`。
+`inline.css` 聚合 Inline 工具栏样式、正文排版、壳组件布局及共享工具栏组件的 Vue 样式（构建时与主包样式合并）。**仅引 `inline.css` 即可**，无需再引 `style.css`。使用 `YanivInlineEditor` 时无需手动设置 `inline-prose`；DIY 时在 `editorProps.attributes.class` 中设置 `inline-prose`，外层包 `.yaniv-editor`。
 
 Full Editor 仍使用：
 

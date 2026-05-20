@@ -42,3 +42,10 @@
 /* Tool chrome（原组件内零散 import，统一纳入全量包） */
 @import "../components/tools/footer-nav/footer-nav.css";
 @import "../features/ai/shared/ai-highlight.css";
+
+/* Theme presets（npm 全量打入 style.css；loadThemePreset 仅切换 class） */
+@import "../themes/presets/default.css";
+@import "../themes/presets/word.css";
+@import "../themes/presets/notion.css";
+@import "../themes/presets/github.css";
+@import "../themes/presets/typora.css";

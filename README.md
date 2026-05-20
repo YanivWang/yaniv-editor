@@ -92,20 +92,34 @@ pnpm add @yanivjs/yaniv-editor
 
 **Peer Dependencies**（宿主项目需安装，版本见 `package.json`）：
 
-| 包                                         | 说明             |
-| ------------------------------------------ | ---------------- |
-| `vue` ^3.4                                 | Vue 3 运行时     |
-| `@tiptap/core` ^3.0                        | Tiptap 核心      |
-| `@tiptap/vue-3` ^3.0                       | Vue 3 绑定       |
-| `@tiptap/starter-kit` ^3.0                 | 基础扩展集       |
-| `@tiptap/pm` ^3.0                          | ProseMirror 依赖 |
-| `@tiptap/extension-table-of-contents` ^3.0 | 大纲 / 目录      |
-| `@tiptap/extension-unique-id` ^3.0         | 块级唯一 ID      |
-| `ant-design-vue` ^4.0                      | 内置 UI 组件     |
-| `@ant-design/icons-vue` ^7.0               | 内置图标         |
-| `lowlight` ^3.0                            | 代码高亮         |
+| 包                                         | 说明                                      |
+| ------------------------------------------ | ----------------------------------------- |
+| `vue` ^3.4                                 | Vue 3 运行时                              |
+| `@tiptap/core` ^3.0                        | Tiptap 核心                               |
+| `@tiptap/vue-3` ^3.0                       | Vue 3 绑定                                |
+| `@tiptap/starter-kit` ^3.0                 | 基础扩展集                                |
+| `@tiptap/pm` ^3.0                          | ProseMirror 依赖                          |
+| `@tiptap/extension-table-of-contents` ^3.0 | 大纲 / 目录                               |
+| `@tiptap/extension-unique-id` ^3.0         | 块级唯一 ID                               |
+| `ant-design-vue` ^4.0                      | 内置 UI 组件                              |
+| `@ant-design/icons-vue` ^7.0               | 内置图标                                  |
+| `lowlight` ^3.0                            | 代码高亮                                  |
+| `katex` ^0.16                              | 数学公式（启用 `math` 时）                |
+| `hotkeys-js` ^4.0                          | 查找替换快捷键（启用 `searchReplace` 时） |
+| `docx` ^9.0、`file-saver` ^2.0             | Word 导出（启用 Word 导出时）             |
+| `mammoth` ^1.0                             | Word 导入（启用 Word 导入时）             |
 
 完整依赖列表以 `package.json` 的 `peerDependencies` 为准。
+
+### 可选能力样式
+
+启用 **数学公式** 时，除 `style.css` 外还需引入 KaTeX 样式（不随 npm 包分发，避免 ~1.4MB 字体冗余）：
+
+```ts
+import "katex/dist/katex.min.css";
+```
+
+主题预设（Notion / GitHub / Word 等）已包含在 `style.css` 中，切换 `preset` 即可，无需额外 CSS 文件。
 
 ### 最小示例
 

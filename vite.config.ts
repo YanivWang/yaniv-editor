@@ -9,29 +9,119 @@ import type { Plugin } from "vite";
 // Production build uses obfuscation
 const isProduction = process.env.NODE_ENV === "production";
 
-/** 将公开 CSS 入口稳定输出为 style.css / inline.css，KaTeX 样式保留在 math 异步 chunk。 */
-function publicCssAssetPlugin(): Plugin {
+function getAssetSource(asset: OutputAsset): string {
+  return typeof asset.source === "string"
+    ? asset.source
+    : Buffer.from(asset.source as Uint8Array).toString("utf-8");
+}
+
+function isInlineCssAsset(fileName: string): boolean {
+  return (
+    fileName === "inline.css" || fileName.includes("inline-style") || /\/inline[-.]/.test(fileName)
+  );
+}
+
+function isStyleEntryCssAsset(fileName: string): boolean {
+  return fileName === "style.css" || fileName.startsWith("assets/style-");
+}
+
+/**
+ * lib 构建 CSS 收敛：
+ * - 剔除 KaTeX（由接入方 import 'katex/dist/katex.min.css'）
+ * - 将全部非 inline 的 CSS 合并为 dist/style.css
+ * - 将 inline 相关 CSS 合并为 dist/inline.css
+ * - 删除 assets/*.css 孤立文件
+ */
+function consolidateLibCssPlugin(): Plugin {
   return {
-    name: "yaniv-public-css-asset",
+    name: "yaniv-consolidate-lib-css",
     generateBundle(_, bundle: OutputBundle) {
-      for (const [key, asset] of Object.entries(bundle)) {
-        if (asset.type === "chunk" && isCssOnlyEntryChunk(asset)) {
-          delete bundle[key];
+      const styleParts: string[] = [];
+      const inlineParts: string[] = [];
+      const deleteKeys: string[] = [];
+      let styleAssetKey: string | null = null;
+      let inlineAssetKey: string | null = null;
+
+      for (const [key, item] of Object.entries(bundle)) {
+        if (item.type === "chunk" && isCssOnlyEntryChunk(item)) {
+          deleteKeys.push(key);
           continue;
         }
 
-        if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) continue;
+        if (item.type !== "asset" || !item.fileName.endsWith(".css")) continue;
 
-        const source = typeof (asset as OutputAsset).source === "string" ? asset.source : "";
-        if (source.includes("font-family:KaTeX")) continue;
+        const asset = item as OutputAsset;
+        const source = getAssetSource(asset);
 
-        if (asset.fileName.startsWith("assets/style-")) {
-          asset.fileName = "style.css";
+        if (source.includes("font-family:KaTeX")) {
+          deleteKeys.push(key);
+          continue;
         }
 
-        if (asset.fileName.startsWith("assets/inline-style-")) {
-          asset.fileName = "inline.css";
+        if (isInlineCssAsset(asset.fileName)) {
+          if (asset.fileName === "inline.css") {
+            inlineAssetKey = key;
+            inlineParts.unshift(source);
+          } else {
+            inlineParts.push(source);
+            deleteKeys.push(key);
+          }
+          continue;
         }
+
+        if (isStyleEntryCssAsset(asset.fileName)) {
+          if (asset.fileName === "style.css") {
+            styleAssetKey = key;
+            styleParts.unshift(source);
+          } else {
+            styleParts.push(source);
+            deleteKeys.push(key);
+          }
+          continue;
+        }
+
+        styleParts.push(source);
+        deleteKeys.push(key);
+      }
+
+      const mergedStyle = styleParts.join("\n");
+      // Inline 入口复用 useEditorLocale 等共享组件：将全量组件样式一并打入 inline.css，保证仅引 inline.css 即可用
+      const mergedInline = inlineParts.length
+        ? `${inlineParts.join("\n")}\n${mergedStyle}`
+        : mergedStyle;
+
+      if (mergedStyle) {
+        if (styleAssetKey && bundle[styleAssetKey]?.type === "asset") {
+          (bundle[styleAssetKey] as OutputAsset).source = mergedStyle;
+          (bundle[styleAssetKey] as OutputAsset).fileName = "style.css";
+        } else {
+          bundle["style.css"] = {
+            type: "asset",
+            fileName: "style.css",
+            names: ["style.css"],
+            source: mergedStyle,
+            needsCodeReference: false,
+          } as OutputAsset;
+        }
+      }
+
+      if (mergedInline) {
+        if (inlineAssetKey && bundle[inlineAssetKey]?.type === "asset") {
+          (bundle[inlineAssetKey] as OutputAsset).source = mergedInline;
+          (bundle[inlineAssetKey] as OutputAsset).fileName = "inline.css";
+        } else {
+          bundle["inline.css"] = {
+            type: "asset",
+            fileName: "inline.css",
+            names: ["inline.css"],
+            source: mergedInline,
+            needsCodeReference: false,
+          } as OutputAsset;
+        }
+      }
+
+      for (const key of deleteKeys) {
+        delete bundle[key];
       }
     },
   };
@@ -75,7 +165,7 @@ export default defineConfig({
         return { filePath, content };
       },
     }),
-    publicCssAssetPlugin(),
+    consolidateLibCssPlugin(),
     removeCssEntryDeclarationsPlugin(),
   ],
   resolve: {

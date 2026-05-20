@@ -22,6 +22,10 @@ npm install @yanivjs/yaniv-editor
 - `ant-design-vue` ^4.0
 - `@ant-design/icons-vue` ^7.0
 - `lowlight` ^3.0
+- `katex` ^0.16（启用数学公式时）
+- `hotkeys-js` ^4.0（启用查找替换时）
+- `docx` ^9.0、`file-saver` ^2.0（Word 导出）
+- `mammoth` ^1.0（Word 导入）
 
 完整工具栏还会用到若干 `@tiptap/extension-*` 包，请以 `package.json` 的 `peerDependencies` 为准。
 
@@ -34,6 +38,10 @@ npm install @yanivjs/yaniv-editor
 
 ::: danger 禁止拆片引入
 不要单独 import `toolbar.css`、`toolbar-dropdown.css` 等 `src/styles/` 内部文件；Full Editor 使用 `style.css`，Inline 拼装使用 `inline.css`。
+:::
+
+::: tip 数学公式样式
+启用 `features.math` 时，请额外 `import "katex/dist/katex.min.css"`。主题预设（Notion / GitHub 等）已打入 `style.css`，无需再按 preset 单独引 CSS。
 :::
 
 ## 最小示例

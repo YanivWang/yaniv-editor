@@ -1,4 +1,3 @@
-import hotkeys from "hotkeys-js";
 import { onBeforeUnmount, onMounted } from "vue";
 
 export interface UseFindReplaceHotkeyOptions {
@@ -7,14 +6,19 @@ export interface UseFindReplaceHotkeyOptions {
   onOpen: () => void;
 }
 
+type HotkeysModule = typeof import("hotkeys-js").default;
+
 /**
  * 查找替换面板快捷键（Ctrl/Cmd+F），与 SearchReplace 扩展解耦，供工具栏或其他入口复用。
+ * hotkeys-js 按需加载，避免未启用查找替换时强依赖。
  */
 export function useFindReplaceHotkey(options: UseFindReplaceHotkeyOptions) {
-  let previousFilter: typeof hotkeys.filter | null = null;
+  let hotkeys: HotkeysModule | null = null;
+  let previousFilter: HotkeysModule["filter"] | null = null;
   const filter = () => true;
 
-  onMounted(() => {
+  onMounted(async () => {
+    hotkeys = (await import("hotkeys-js")).default;
     previousFilter = hotkeys.filter;
     hotkeys.filter = filter;
     hotkeys("ctrl+f,command+f", (evt) => {
@@ -23,11 +27,14 @@ export function useFindReplaceHotkey(options: UseFindReplaceHotkeyOptions) {
       options.onOpen();
     });
   });
+
   onBeforeUnmount(() => {
+    if (!hotkeys) return;
     hotkeys.unbind("ctrl+f,command+f");
     if (hotkeys.filter === filter && previousFilter) {
       hotkeys.filter = previousFilter;
     }
+    hotkeys = null;
     previousFilter = null;
   });
 }

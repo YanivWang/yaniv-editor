@@ -1,9 +1,8 @@
 /**
  * Yaniv Editor - Inline Stylesheet Entry
  *
- * Inline CSS is a lightweight aggregate for toolbar composition. Keep concrete
- * styles in feature modules and only list the modules needed by the inline
- * entry here.
+ * 构建后 dist/inline.css 会合并本入口与主包 Vue 组件样式（共享工具栏等），
+ * npm 接入仅 `import '@yanivjs/yaniv-editor/inline.css'` 即可，无需再引 style.css。
  */
 
 /* CSS variables must be loaded first. */

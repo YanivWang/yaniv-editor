@@ -100,17 +100,7 @@
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  shallowRef,
-  toRef,
-  Transition,
-  watch,
-} from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, watch } from "vue";
 
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
