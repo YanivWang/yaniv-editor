@@ -20,6 +20,7 @@ const compactFeatures = {
 
 /** 生产环境推荐：完整工具栏 + 常用体验模块 */
 const productionFeatures = {
+  toolbar: "full",
   headerNav: true,
   footerNav: true,
   floatingMenu: true,

@@ -3,10 +3,17 @@
     v-model:value="currentFontSize"
     :placeholder="t('toolbar.fontSize')"
     class="font-size-select"
-    style="width: 100px"
+    :dropdown-match-select-width="true"
+    option-label-prop="label"
+    popup-class-name="font-size-select-dropdown"
     @change="onFontSizeChange"
   >
-    <a-select-option v-for="size in FONT_SIZES" :key="size.value" :value="size.value">
+    <a-select-option
+      v-for="size in FONT_SIZES"
+      :key="size.value"
+      :value="size.value"
+      :label="size.label"
+    >
       {{ size.label }}
     </a-select-option>
   </a-select>
@@ -83,6 +90,57 @@ function onFontSizeChange(val: string) {
 
 <style scoped>
 .font-size-select {
-  font-size: 14px;
+  width: 60px;
+  min-width: 60px;
+  margin-inline-start: 4px;
+  font-size: 12px;
+
+  :deep(.ant-select-selector) {
+    padding: 0 24px 0 8px !important;
+    font-size: 12px;
+  }
+
+  :deep(.ant-select-selection-wrap) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :deep(.ant-select-selection-item),
+  :deep(.ant-select-selection-placeholder) {
+    flex: 1;
+    max-width: none !important;
+    padding-inline-end: 0 !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 12px;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  :deep(.ant-select-selection-search-input) {
+    text-align: center;
+  }
+
+  :deep(.ant-select-arrow) {
+    height: 10px;
+    margin-top: -5px;
+    font-size: 10px;
+
+    .anticon {
+      font-size: 10px;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.font-size-select-dropdown {
+  .ant-select-item {
+    justify-content: center;
+  }
+
+  .ant-select-item-option-content {
+    text-align: center;
+  }
 }
 </style>

@@ -18,12 +18,12 @@ export const zhTW: TiptapLocale = {
 
     // 標題
     heading: "標題",
-    heading1: "標題 1",
-    heading2: "標題 2",
-    heading3: "標題 3",
-    heading4: "標題 4",
-    heading5: "標題 5",
-    heading6: "標題 6",
+    heading1: "標題1",
+    heading2: "標題2",
+    heading3: "標題3",
+    heading4: "標題4",
+    heading5: "標題5",
+    heading6: "標題6",
     paragraph: "正文",
 
     // 字體
@@ -140,20 +140,20 @@ export const zhTW: TiptapLocale = {
 
   editor: {
     // 標題快捷方式
-    h1: "標題 1",
-    h2: "標題 2",
-    h3: "標題 3",
-    h4: "標題 4",
-    h5: "標題 5",
-    h6: "標題 6",
+    h1: "標題1",
+    h2: "標題2",
+    h3: "標題3",
+    h4: "標題4",
+    h5: "標題5",
+    h6: "標題6",
     paragraph: "正文",
     heading: "標題",
-    heading1: "標題 1",
-    heading2: "標題 2",
-    heading3: "標題 3",
-    heading4: "標題 4",
-    heading5: "標題 5",
-    heading6: "標題 6",
+    heading1: "標題1",
+    heading2: "標題2",
+    heading3: "標題3",
+    heading4: "標題4",
+    heading5: "標題5",
+    heading6: "標題6",
 
     // 文本格式
     bold: "粗體",
@@ -283,10 +283,11 @@ export const zhTW: TiptapLocale = {
     outlineEmpty: "尚無標題，插入 H1–H6 標題後將自動產生大綱。",
     outlineClose: "關閉大綱",
 
-    toolbarSectionDocument: "文件與編輯",
+    toolbarSectionHistory: "編輯",
     toolbarSectionTypography: "字型",
     toolbarSectionParagraph: "段落",
     toolbarSectionInsert: "插入",
+    toolbarSectionTools: "工具",
     toolbarSectionAssistant: "智慧助理",
     statusBarShortcutHints: "⌘/Ctrl+F 尋找 · ⌘/Ctrl+B 粗體 · ⌘/Ctrl+I 斜體 · ⌘/Ctrl+Z 復原",
     statusBarShortcutHintsTitle:

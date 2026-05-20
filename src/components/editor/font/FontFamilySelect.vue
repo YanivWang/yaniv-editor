@@ -83,6 +83,25 @@ function onFontChange(val: string) {
 
 <style scoped>
 .font-family-select {
-  font-size: 14px;
+  font-size: 12px;
+
+  :deep(.ant-select-selector) {
+    font-size: 12px;
+  }
+
+  :deep(.ant-select-selection-item),
+  :deep(.ant-select-selection-placeholder) {
+    font-size: 12px;
+  }
+
+  :deep(.ant-select-arrow) {
+    height: 10px;
+    margin-top: -5px;
+    font-size: 10px;
+
+    .anticon {
+      font-size: 10px;
+    }
+  }
 }
 </style>

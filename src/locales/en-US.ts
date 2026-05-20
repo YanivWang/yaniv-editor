@@ -284,10 +284,11 @@ export const enUS: TiptapLocale = {
     outlineEmpty: "No headings yet. Add H1–H6 to build an outline.",
     outlineClose: "Close outline",
 
-    toolbarSectionDocument: "Document",
+    toolbarSectionHistory: "Edit",
     toolbarSectionTypography: "Font",
     toolbarSectionParagraph: "Paragraph",
     toolbarSectionInsert: "Insert",
+    toolbarSectionTools: "Tools",
     toolbarSectionAssistant: "Assistant",
     statusBarShortcutHints: "⌘/Ctrl+F Find · ⌘/Ctrl+B Bold · ⌘/Ctrl+I Italic · ⌘/Ctrl+Z Undo",
     statusBarShortcutHintsTitle:

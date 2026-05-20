@@ -63,7 +63,15 @@ import "@yanivjs/yaniv-editor/style.css";
 | `compact`          | `COMPACT_TOOLBAR_CONFIG` | `basic`      |
 | `full`（默认）     | `FULL_TOOLBAR_CONFIG`    | `production` |
 
-完整工具栏包含：撤销/重做、格式刷、查找替换、字体、文本格式、颜色、标题、列表、对齐、链接、表格、图片、视频、上下标、Word、模板、图库、AI。
+完整工具栏（平铺分组，左 → 右）：
+
+- **编辑**：撤销/重做、格式刷、清除格式
+- **字体**：字体/字号、加粗/斜体/下划线/删除线、上标/下标、文字色/背景色
+- **段落**：标题、列表、对齐
+- **插入**：链接/表格/图片/视频 | 代码块/公式 | Word/模板/图库
+- **右侧**：查找替换、大纲、AI
+
+`editorPresets.production` 使用 `toolbar: "full"` 且 `FULL_TOOLBAR_CONFIG` 各项默认开启。
 
 ## 常用 features 开关
 

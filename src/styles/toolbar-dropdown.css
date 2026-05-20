@@ -127,6 +127,13 @@
   white-space: nowrap;
 }
 
+.ye-dropdown-menu-item__check {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--ye-primary);
+}
+
 .ye-dropdown-overlay .ant-dropdown-menu-item {
   padding: 8px 10px;
 }

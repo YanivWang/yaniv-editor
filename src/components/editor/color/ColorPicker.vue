@@ -137,9 +137,19 @@
     </template>
     <!-- Popover 触发器：颜色选择按钮 -->
     <Tooltip :title="buttonTitle" placement="top" :open="showPicker ? false : undefined">
-      <div class="ye-color-current-btn" :class="{ 'has-icon': icon }">
+      <div
+        class="ye-color-current-btn"
+        :class="{
+          'has-icon': icon,
+          'is-text': icon && type === 'text',
+          'is-background': icon && type === 'background',
+        }"
+      >
         <!-- 如果提供了图标，显示图标；否则显示颜色预览 -->
-        <component :is="icon" v-if="icon" class="ye-color-icon" />
+        <template v-if="icon">
+          <component :is="icon" class="ye-color-icon" />
+          <span class="ye-color-indicator" :style="indicatorBarStyle" />
+        </template>
         <div v-else class="ye-color-current-preview" />
       </div>
     </Tooltip>
@@ -361,6 +371,15 @@ const previewTextStyle = computed(() => {
   }
 });
 
+/** 工具栏图标下方的当前颜色横条（与文字颜色图标底部色条一致） */
+const indicatorBarStyle = computed(() => {
+  const color = normalizedColor.value;
+  if (!color || color === "transparent") {
+    return { backgroundColor: "transparent" };
+  }
+  return { backgroundColor: color };
+});
+
 /**
  * 颜色网格样式（计算属性）
  * @description 根据 columns、itemSize 动态生成 CSS Grid 布局样式
@@ -498,6 +517,11 @@ $dark-selector: "[data-theme=" dark "] &";
     overflow: hidden;
   }
 
+  &.has-icon.is-text,
+  &.has-icon.is-background {
+    gap: 1px;
+  }
+
   &:hover {
     background: #f5f5f5;
 
@@ -523,6 +547,34 @@ $dark-selector: "[data-theme=" dark "] &";
 
   #{$dark-selector} {
     color: #f0f0f0;
+  }
+}
+
+.is-text .ye-color-icon,
+.is-background .ye-color-icon {
+  font-size: 18px;
+}
+
+:deep(.color-icon--text) {
+  display: block;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* 背景颜色图标下方的当前色条 */
+.ye-color-indicator {
+  display: block;
+  flex-shrink: 0;
+  width: 14px;
+  height: 3px;
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+
+  #{$dark-selector} {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   }
 }
 

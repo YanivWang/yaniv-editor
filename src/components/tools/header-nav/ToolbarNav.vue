@@ -1,33 +1,22 @@
 <template>
   <div class="document-toolbar-container">
     <div class="document-toolbar">
-      <!-- 左侧：基础工具 -->
+      <!-- 左侧：平铺主流程（编辑 → 字体 → 段落 → 插入） -->
       <div class="toolbar-left">
-        <!-- 文档与编辑 -->
+        <!-- 编辑 -->
         <div
-          v-if="showSection.document"
+          v-if="showSection.history"
           class="toolbar-section"
           role="group"
-          :aria-label="t('editor.toolbarSectionDocument')"
+          :aria-label="t('editor.toolbarSectionHistory')"
         >
-          <div v-if="config.undoRedo" class="tool-group">
-            <UndoRedoButton />
-          </div>
-
-          <div v-if="config.formatPainter" class="tool-group">
-            <FormatPainterButton />
-          </div>
-
-          <div v-if="config.searchReplace" class="tool-group">
-            <FindReplaceButton :hotkeys-enabled="!!config.searchReplace" />
-          </div>
-
-          <div v-if="config.outline" class="tool-group">
-            <OutlineToggleButton />
-          </div>
-
-          <div v-if="config.clearFormat" class="tool-group">
-            <ClearFormatButton />
+          <div
+            v-if="config.undoRedo || config.formatPainter || config.clearFormat"
+            class="tool-group"
+          >
+            <UndoRedoButton v-if="config.undoRedo" />
+            <FormatPainterButton v-if="config.formatPainter" />
+            <ClearFormatButton v-if="config.clearFormat" />
           </div>
         </div>
 
@@ -43,15 +32,15 @@
             <FontSizeSelect />
           </div>
 
-          <div v-if="config.textFormat || config.codeBlock" class="tool-group">
+          <div
+            v-if="config.textFormat || config.subscriptSuperscript || config.colorPicker"
+            class="tool-group"
+          >
             <TextFormatButtons v-if="config.textFormat" />
-            <CodeBlockDropdown v-if="config.codeBlock" />
-          </div>
-
-          <div v-if="config.colorPicker" class="tool-group">
-            <ToolbarGroup>
+            <SubscriptSuperscriptButton v-if="config.subscriptSuperscript" />
+            <template v-if="config.colorPicker">
               <ColorPicker
-                :icon="FontColorsOutlined"
+                :icon="TextColorIcon"
                 type="text"
                 :model-value="currentTextColor"
                 :title="t('editor.textColor')"
@@ -64,7 +53,7 @@
                 :title="t('editor.backgroundColor')"
                 @select="setHighlight"
               />
-            </ToolbarGroup>
+            </template>
           </div>
         </div>
 
@@ -75,13 +64,10 @@
           role="group"
           :aria-label="t('editor.toolbarSectionParagraph')"
         >
-          <div v-if="config.heading || config.list" class="tool-group">
+          <div v-if="config.heading || config.list || config.align" class="tool-group">
             <HeadingControl v-if="config.heading" variant="dropdown" />
             <ListTools v-if="config.list" :show-task-list="true" />
-          </div>
-
-          <div v-if="config.align" class="tool-group">
-            <AlignDropdown />
+            <AlignDropdown v-if="config.align" />
           </div>
         </div>
 
@@ -102,22 +88,38 @@
             <VideoUpload v-if="config.video" :upload-video="uploadVideo" />
           </div>
 
-          <div v-if="config.subscriptSuperscript || config.math" class="tool-group">
-            <SubscriptSuperscriptButton v-if="config.subscriptSuperscript" />
+          <div v-if="config.codeBlock || config.math" class="tool-group">
+            <CodeBlockDropdown v-if="config.codeBlock" />
             <MathButton v-if="config.math" />
           </div>
 
-          <div v-if="config.word" class="tool-group">
-            <WordButton />
-          </div>
-
-          <div v-if="config.template || config.gallery" class="tool-group">
+          <div v-if="config.word || config.template || config.gallery" class="tool-group">
+            <WordButton v-if="config.word" />
             <TemplateButton v-if="config.template" :custom-templates="customTemplates" />
             <GalleryButton v-if="config.gallery" :images="galleryImages" />
           </div>
         </div>
 
-        <!-- 智能 -->
+        <slot name="extra" />
+      </div>
+
+      <!-- 右侧：工具 + 智能 + 宿主扩展 -->
+      <div v-if="showRightBar" class="toolbar-right">
+        <div
+          v-if="showSection.tools"
+          class="toolbar-section"
+          role="group"
+          :aria-label="t('editor.toolbarSectionTools')"
+        >
+          <div v-if="config.searchReplace || config.outline" class="tool-group">
+            <FindReplaceButton
+              v-if="config.searchReplace"
+              :hotkeys-enabled="!!config.searchReplace"
+            />
+            <OutlineToggleButton v-if="config.outline" />
+          </div>
+        </div>
+
         <div
           v-if="showSection.assistant"
           class="toolbar-section"
@@ -134,11 +136,6 @@
           </div>
         </div>
 
-        <slot name="extra" />
-      </div>
-
-      <!-- 右侧：宿主自定义工具 -->
-      <div v-if="$slots.right" class="toolbar-right">
         <slot name="right" />
       </div>
     </div>
@@ -148,19 +145,14 @@
 <script setup lang="ts">
 /**
  * ToolbarNav - 公共工具栏组件
- * @description 可配置的工具栏组件，支持通过配置控制显示哪些工具
- * @example
- * ```vue
- * <ToolbarNav :config="{ textFormat: true, colorPicker: true }" />
- * ```
+ * @description 平铺顶栏：左（编辑 → 字体 → 段落 → 插入）| 右（工具 → 智能 → slot）
  */
-import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
-import { computed } from "vue";
+import { HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { computed, useSlots } from "vue";
 
-import { ToolbarGroup } from "@/components/base";
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
-import { ColorPicker } from "@/components/editor/color";
+import { ColorPicker, TextColorIcon } from "@/components/editor/color";
 import FindReplaceButton from "@/components/editor/find-replace/FindReplaceButton.vue";
 import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";
@@ -191,23 +183,17 @@ import { FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 import type { ToolbarToolsConfig } from "./toolbarConfig";
 import type { Editor } from "@tiptap/vue-3";
 
-// ===== Props =====
 interface Props {
-  /** 独立拼装时传入；YanivEditor 内可省略 */
   editor?: Editor | null;
-  /** 工具栏配置，控制显示哪些工具 */
   config?: ToolbarToolsConfig;
-  /** 图片上传函数 */
   uploadImage?: MediaUploadHandler;
-  /** 视频上传函数 */
   uploadVideo?: MediaUploadHandler;
-  /** 外部图库图片源 */
   galleryImages?: GalleryImage[];
-  /** 自定义模板列表 */
   customTemplates?: TemplateItem[];
 }
 
 const props = defineProps<Props>();
+const slots = useSlots();
 
 const editor = useYanivEditor(() => props.editor);
 
@@ -216,38 +202,41 @@ const config = computed(() => ({
   ...props.config,
 }));
 
-/** 工具栏分区显隐（信息架构：文档 / 字体 / 段落 / 插入 / 智能） */
+/** 平铺信息架构：history | typography | paragraph | insert || tools | assistant */
 const showSection = computed(() => {
   const c = config.value;
   const ed = editor.value;
   return {
-    document: !!(c.undoRedo || c.formatPainter || c.searchReplace || c.outline || c.clearFormat),
-    typography: !!(c.font || c.textFormat || c.codeBlock || c.colorPicker),
+    history: !!(c.undoRedo || c.formatPainter || c.clearFormat),
+    typography: !!(c.font || c.textFormat || c.subscriptSuperscript || c.colorPicker),
     paragraph: !!(c.heading || c.list || c.align),
     insert: !!(
       c.link ||
       c.table ||
       c.image ||
       c.video ||
-      c.subscriptSuperscript ||
+      c.codeBlock ||
       c.math ||
       c.word ||
       c.template ||
       c.gallery
     ),
+    tools: !!(c.searchReplace || c.outline),
     assistant: !!(c.ai && ed),
   };
 });
+
+const showRightBar = computed(
+  () => showSection.value.tools || showSection.value.assistant || !!slots.right,
+);
 
 const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
   useEditorColorState(editor);
 </script>
 
 <style lang="scss" scoped>
-// Dark 模式选择器变量（用于统一管理暗色主题样式）
 $dark-selector: "[data-theme=" dark "] &";
 
-/* ===== 工具栏容器 ===== */
 .document-toolbar-container {
   position: sticky;
   top: 0;
@@ -262,7 +251,6 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-/* ===== 工具栏主体 ===== */
 .document-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -273,7 +261,6 @@ $dark-selector: "[data-theme=" dark "] &";
   padding: 6px 12px;
 }
 
-/* ===== 工具栏左侧区域 ===== */
 .toolbar-left {
   display: flex;
   flex: 1;
@@ -289,7 +276,7 @@ $dark-selector: "[data-theme=" dark "] &";
   align-items: center;
 }
 
-.toolbar-section + .toolbar-section {
+.toolbar-left .toolbar-section + .toolbar-section {
   padding-left: 8px;
   margin-left: 4px;
   border-left: 1px solid #e8e8e8;
@@ -299,16 +286,30 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 }
 
-/* ===== 工具栏右侧区域 ===== */
 .toolbar-right {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 2px;
   align-items: center;
   padding-left: 12px;
   margin-left: auto;
+  border-left: 1px solid #e8e8e8;
+
+  #{$dark-selector} {
+    border-left-color: #434343;
+  }
 }
 
-/* ===== 工具组 ===== */
+.toolbar-right .toolbar-section + .toolbar-section {
+  padding-left: 8px;
+  margin-left: 4px;
+  border-left: 1px solid #e8e8e8;
+
+  #{$dark-selector} {
+    border-left-color: #434343;
+  }
+}
+
 .tool-group {
   display: flex;
   gap: 2px;

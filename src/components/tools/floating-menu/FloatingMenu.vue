@@ -17,7 +17,7 @@
 
       <div class="menu-group">
         <ColorPicker
-          :icon="FontColorsOutlined"
+          :icon="TextColorIcon"
           type="text"
           :model-value="currentTextColor"
           :title="t('editor.textColor')"
@@ -57,10 +57,10 @@
 /**
  * FloatingMenu - 选中文本时的浮动工具栏
  */
-import { FontColorsOutlined, HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 
-import { ColorPicker } from "@/components/editor/color";
+import { ColorPicker, TextColorIcon } from "@/components/editor/color";
 import { HeadingControl } from "@/components/editor/heading";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";

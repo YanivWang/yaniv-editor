@@ -3,6 +3,7 @@
     v-model:open="dropdownOpen"
     :placement="placement"
     :trigger="['click']"
+    :overlay-class-name="overlayClassName"
     @open-change="handleOpenChange"
   >
     <a-tooltip :title="title" placement="top" :open="dropdownOpen ? false : undefined">
@@ -110,6 +111,7 @@
             <span class="ye-dropdown-menu-item">
               <component :is="item.icon" v-if="item.icon" class="ye-dropdown-menu-item__icon" />
               <span class="ye-dropdown-menu-item__label">{{ item.label }}</span>
+              <CheckOutlined v-if="item.active" class="ye-dropdown-menu-item__check" />
             </span>
           </a-menu-item>
         </template>
@@ -119,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { DownOutlined, RightOutlined } from "@ant-design/icons-vue";
+import { CheckOutlined, DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { Tooltip as ATooltip } from "ant-design-vue";
 import { ref } from "vue";
 
@@ -139,6 +141,8 @@ interface Props {
   active?: boolean;
   items: MenuItemConfig[];
   placement?: "top" | "bottom" | "bottomLeft" | "bottomRight" | "topLeft" | "topRight";
+  /** 下拉浮层 class，用于定制菜单外观 */
+  overlayClassName?: string;
   /** split-hover 项右侧箭头的默认 tooltip */
   splitHoverArrowTitle?: string;
 }
@@ -146,6 +150,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   active: false,
   placement: "bottom",
+  overlayClassName: "",
 });
 
 const emit = defineEmits<{

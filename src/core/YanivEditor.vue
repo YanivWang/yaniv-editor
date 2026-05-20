@@ -120,6 +120,7 @@ import "@/styles/document-layout.css";
 import "@/styles/task-list.css";
 import "@/styles/toolbar.css";
 import "@/styles/toolbar-dropdown.css";
+import "@/styles/heading-dropdown.css";
 import "@/styles/image-toolbar.css";
 import "@/styles/floating-menu-toolbar.css";
 import "@/styles/block-picker.css";

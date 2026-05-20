@@ -13,11 +13,12 @@
     </ToolbarButton>
   </ToolbarGroup>
 
-  <ToolbarGroup v-else>
+  <ToolbarGroup v-else class="heading-control-dropdown">
     <ToolbarDropdownButton
-      :icon="FontSizeOutlined"
+      :label="currentLabel"
       :title="t('editor.heading')"
       :items="dropdownItems"
+      overlay-class-name="ye-heading-dropdown-overlay"
       placement="bottomLeft"
     />
   </ToolbarGroup>
@@ -27,14 +28,15 @@
 /**
  * HeadingControl - 标题控件（按钮组 / 下拉）
  */
-import { FontSizeOutlined } from "@ant-design/icons-vue";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { ToolbarButton, ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { HeadingLevel, MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
+import { getCurrentParagraphStyle } from "@/utils/editorState";
 
+import { HEADING_ITEM_ICONS } from "./HeadingIcons";
 import { useHeadingActions } from "./useHeadingActions";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -57,6 +59,29 @@ const editor = useYanivEditor(() => props.editor);
 const { headingOptions, isHeadingActive, setHeadingValue, toggleHeadingLevel } =
   useHeadingActions(editor);
 
+const currentStyle = ref("paragraph");
+
+watch(
+  editor,
+  (e, _prev, onCleanup) => {
+    if (!e) return;
+
+    const sync = () => {
+      currentStyle.value = getCurrentParagraphStyle(e);
+    };
+
+    sync();
+    e.on("selectionUpdate", sync);
+    e.on("transaction", sync);
+
+    onCleanup(() => {
+      e.off("selectionUpdate", sync);
+      e.off("transaction", sync);
+    });
+  },
+  { immediate: true },
+);
+
 const buttonHeadings = computed(() =>
   props.levels.map((level) => ({
     level,
@@ -65,11 +90,15 @@ const buttonHeadings = computed(() =>
   })),
 );
 
+const currentLabel = computed(() => t(`editor.${currentStyle.value}`));
+
 const dropdownItems = computed<MenuItemConfig[]>(() => {
   if (!editor.value) return [];
   return headingOptions.map((opt) => ({
     key: opt.value,
     label: t(`editor.${opt.value}`),
+    icon: HEADING_ITEM_ICONS[opt.value],
+    active: currentStyle.value === opt.value,
     action: () => setHeadingValue(opt.value),
   }));
 });
@@ -81,5 +110,14 @@ const dropdownItems = computed<MenuItemConfig[]>(() => {
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
+}
+
+:deep(.heading-control-dropdown .ye-dropdown-btn) {
+  min-width: 56px;
+  padding-inline: 8px;
+}
+
+:deep(.heading-control-dropdown .ye-dropdown-btn__label) {
+  font-size: 13px;
 }
 </style>

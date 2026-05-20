@@ -296,10 +296,11 @@ export interface TiptapLocale {
     outlineClose: string;
 
     // 工具栏分区（信息架构 / 可访问性）
-    toolbarSectionDocument: string;
+    toolbarSectionHistory: string;
     toolbarSectionTypography: string;
     toolbarSectionParagraph: string;
     toolbarSectionInsert: string;
+    toolbarSectionTools: string;
     toolbarSectionAssistant: string;
     statusBarShortcutHints: string;
     statusBarShortcutHintsTitle: string;

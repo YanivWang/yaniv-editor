@@ -1,63 +1,90 @@
 <template>
   <ToolbarGroup>
-    <ToolbarButton
-      v-for="format in formats"
-      :key="format.name"
-      :icon="format.icon"
-      :title="format.title"
-      :active="isActive(format.name)"
-      @click="format.action"
+    <ToolbarDropdownButton
+      :icon="currentIcon"
+      :title="buttonTitle"
+      :active="isScriptActive"
+      :items="menuItems"
+      placement="bottomLeft"
     />
   </ToolbarGroup>
 </template>
 
 <script setup lang="ts">
 /**
- * SubscriptSuperscriptButton - 上标下标按钮组
- * @description 可复用的上标下标按钮组件，提供上标和下标切换功能
+ * SubscriptSuperscriptButton - 上标下标下拉按钮
+ * @description 将上标与下标合并为一个下拉按钮，通过菜单切换
  */
-import { SortAscendingOutlined, SortDescendingOutlined } from "@ant-design/icons-vue";
 import { computed } from "vue";
 
-import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { ToolbarDropdownButton, ToolbarGroup } from "@/components/base";
+import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createStateCheckers } from "@/utils/editorState";
 
+import { SubscriptIcon, SuperscriptIcon } from "./ScriptIcons";
+
 import type { Editor } from "@tiptap/vue-3";
 
-// ===== Props =====
 interface Props {
   editor?: Editor | null;
 }
 
 const props = defineProps<Props>();
 const editor = useYanivEditor(() => props.editor);
-
-// ===== 工具函数 =====
 const { isActive } = createStateCheckers(editor);
 
-// ===== 格式配置 =====
-const formats = computed(() => [
+const isScriptActive = computed(() => isActive("superscript") || isActive("subscript"));
+
+const currentIcon = computed(() => {
+  if (isActive("subscript")) return SubscriptIcon;
+  return SuperscriptIcon;
+});
+
+const buttonTitle = computed(() => `${t("editor.superscript")}/${t("editor.subscript")}`);
+
+const menuItems = computed<MenuItemConfig[]>(() => [
   {
-    name: "superscript",
-    icon: SortDescendingOutlined,
-    title: t("editor.superscript"),
+    key: "superscript",
+    label: t("editor.superscript"),
+    icon: SuperscriptIcon,
+    active: isActive("superscript"),
     action: () => {
-      const e = editor.value;
-      if (!e) return;
-      e.chain().focus().toggleSuperscript().run();
+      editor.value?.chain().focus().toggleSuperscript().run();
     },
   },
   {
-    name: "subscript",
-    icon: SortAscendingOutlined,
-    title: t("editor.subscript"),
+    key: "subscript",
+    label: t("editor.subscript"),
+    icon: SubscriptIcon,
+    active: isActive("subscript"),
     action: () => {
-      const e = editor.value;
-      if (!e) return;
-      e.chain().focus().toggleSubscript().run();
+      editor.value?.chain().focus().toggleSubscript().run();
     },
   },
 ]);
 </script>
+
+<style scoped>
+:deep(.script-icon) {
+  display: inline-flex;
+  align-items: center;
+  font-size: 19px;
+  line-height: 1;
+}
+
+:deep(.ye-dropdown-menu-item__icon .script-icon) {
+  font-size: 17px;
+}
+
+:deep(.script-icon__base) {
+  font-weight: 400;
+}
+
+:deep(.script-icon__mark) {
+  font-size: 0.55em;
+  font-weight: 600;
+  color: var(--ye-primary);
+}
+</style>

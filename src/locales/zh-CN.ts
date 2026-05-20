@@ -18,12 +18,12 @@ export const zhCN: TiptapLocale = {
 
     // 标题
     heading: "标题",
-    heading1: "标题 1",
-    heading2: "标题 2",
-    heading3: "标题 3",
-    heading4: "标题 4",
-    heading5: "标题 5",
-    heading6: "标题 6",
+    heading1: "标题1",
+    heading2: "标题2",
+    heading3: "标题3",
+    heading4: "标题4",
+    heading5: "标题5",
+    heading6: "标题6",
     paragraph: "正文",
 
     // 字体
@@ -140,20 +140,20 @@ export const zhCN: TiptapLocale = {
 
   editor: {
     // 标题快捷方式
-    h1: "标题 1",
-    h2: "标题 2",
-    h3: "标题 3",
-    h4: "标题 4",
-    h5: "标题 5",
-    h6: "标题 6",
+    h1: "标题1",
+    h2: "标题2",
+    h3: "标题3",
+    h4: "标题4",
+    h5: "标题5",
+    h6: "标题6",
     paragraph: "正文",
     heading: "标题",
-    heading1: "标题 1",
-    heading2: "标题 2",
-    heading3: "标题 3",
-    heading4: "标题 4",
-    heading5: "标题 5",
-    heading6: "标题 6",
+    heading1: "标题1",
+    heading2: "标题2",
+    heading3: "标题3",
+    heading4: "标题4",
+    heading5: "标题5",
+    heading6: "标题6",
 
     // 文本格式
     bold: "粗体",
@@ -283,10 +283,11 @@ export const zhCN: TiptapLocale = {
     outlineEmpty: "暂无标题，插入 H1–H6 标题后将自动生成大纲。",
     outlineClose: "关闭大纲",
 
-    toolbarSectionDocument: "文档与编辑",
+    toolbarSectionHistory: "编辑",
     toolbarSectionTypography: "字体",
     toolbarSectionParagraph: "段落",
     toolbarSectionInsert: "插入",
+    toolbarSectionTools: "工具",
     toolbarSectionAssistant: "智能助手",
     statusBarShortcutHints: "⌘/Ctrl+F 查找 · ⌘/Ctrl+B 加粗 · ⌘/Ctrl+I 斜体 · ⌘/Ctrl+Z 撤销",
     statusBarShortcutHintsTitle:

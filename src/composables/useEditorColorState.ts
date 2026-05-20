@@ -1,31 +1,66 @@
-import { ref, toValue, watch, type MaybeRefOrGetter } from "vue";
+import { onBeforeUnmount, ref, toValue, watch, type MaybeRefOrGetter } from "vue";
 
 import { normalizeColor } from "@/utils/color";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/core";
 
+const DEFAULT_TEXT_COLOR = "#000000";
+const DEFAULT_BG_COLOR = "transparent";
+
 export function useEditorColorState(editor: MaybeRefOrGetter<Editor | null>) {
-  const currentTextColor = ref("#000000");
-  const currentBgColor = ref("#ffffff");
+  const currentTextColor = ref(DEFAULT_TEXT_COLOR);
+  const currentBgColor = ref(DEFAULT_BG_COLOR);
 
   const runCommand = createCommandRunner(editor);
 
-  watch(
-    () => toValue(editor)?.getAttributes("textStyle"),
-    (attrs) => {
-      currentTextColor.value = attrs?.color ? normalizeColor(attrs.color) : "#000000";
-    },
-    { deep: true, immediate: true },
-  );
+  function syncColorFromSelection() {
+    const e = toValue(editor);
+    if (!e) return;
 
-  watch(
-    () => toValue(editor)?.getAttributes("highlight"),
-    (attrs) => {
-      currentBgColor.value = attrs?.color ? normalizeColor(attrs.color) : "#ffffff";
-    },
-    { deep: true, immediate: true },
-  );
+    const textStyleAttrs = e.getAttributes("textStyle") as { color?: string };
+    currentTextColor.value = textStyleAttrs?.color
+      ? normalizeColor(textStyleAttrs.color)
+      : DEFAULT_TEXT_COLOR;
+
+    if (e.isActive("highlight")) {
+      const highlightAttrs = e.getAttributes("highlight") as { color?: string };
+      currentBgColor.value = highlightAttrs?.color
+        ? normalizeColor(highlightAttrs.color)
+        : DEFAULT_BG_COLOR;
+    } else {
+      currentBgColor.value = DEFAULT_BG_COLOR;
+    }
+  }
+
+  function setupEditorSubscriptions() {
+    cleanupEditorSubscriptions();
+    const e = toValue(editor);
+    if (!e) return;
+
+    syncColorFromSelection();
+    e.on("selectionUpdate", syncColorFromSelection);
+    e.on("transaction", syncColorFromSelection);
+    e.on("update", syncColorFromSelection);
+  }
+
+  function cleanupEditorSubscriptions() {
+    const e = toValue(editor);
+    if (!e) return;
+    try {
+      e.off("selectionUpdate", syncColorFromSelection);
+      e.off("transaction", syncColorFromSelection);
+      e.off("update", syncColorFromSelection);
+    } catch {
+      // 忽略取消订阅时的错误
+    }
+  }
+
+  watch(() => toValue(editor), setupEditorSubscriptions, { immediate: true });
+
+  onBeforeUnmount(() => {
+    cleanupEditorSubscriptions();
+  });
 
   const setTextColor = (color: string) => {
     currentTextColor.value = color;

@@ -1,0 +1,123 @@
+/**
+ * 标题/正文下拉菜单样式
+ */
+
+.ye-heading-dropdown-overlay .ant-menu {
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
+}
+
+.ye-heading-dropdown-overlay .ant-menu-item {
+  height: auto;
+  padding: 0 !important;
+  margin: 0;
+  margin-block: 0;
+  line-height: normal;
+  border-radius: 8px;
+}
+
+.ye-heading-dropdown-overlay .ant-menu-item + .ant-menu-item {
+  margin-top: 2px;
+}
+
+.ye-heading-dropdown-overlay .ant-menu-item:not(.ant-menu-item-disabled):hover {
+  background: #f3f4f6;
+}
+
+.ye-heading-dropdown-overlay .ant-menu-item-selected,
+.ye-heading-dropdown-overlay .ant-menu-item.ant-menu-item-selected {
+  color: inherit !important;
+  background: #eef2ff !important;
+}
+
+.ye-heading-dropdown-overlay .ant-menu-item-selected:hover {
+  background: #eef2ff !important;
+}
+
+.ye-heading-dropdown-overlay .ye-dropdown-menu-item {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+.ye-heading-dropdown-overlay .ye-dropdown-menu-item__check {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 14px;
+  color: #4f46e5;
+}
+
+[data-theme="dark"] .ye-heading-dropdown-overlay .ant-menu {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
+}
+
+[data-theme="dark"] .ye-heading-dropdown-overlay .ant-menu-item:not(.ant-menu-item-disabled):hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+[data-theme="dark"] .ye-heading-dropdown-overlay .ant-menu-item-selected,
+[data-theme="dark"] .ye-heading-dropdown-overlay .ant-menu-item.ant-menu-item-selected {
+  background: rgb(79 70 229 / 20%) !important;
+}
+
+[data-theme="dark"] .ye-heading-dropdown-overlay .ye-dropdown-menu-item__check {
+  color: #818cf8;
+}
+
+.heading-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1;
+  color: rgb(0 0 0 / 75%);
+}
+
+.heading-icon--paragraph {
+  font-size: 18px;
+}
+
+.heading-icon--heading {
+  gap: 0;
+  font-size: 16px;
+}
+
+.heading-icon__h {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.heading-icon__level {
+  margin-left: -1px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 0;
+}
+
+.heading-trigger-icon {
+  display: inline-flex;
+  align-items: flex-end;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.heading-trigger-icon__large {
+  font-size: 16px;
+}
+
+.heading-trigger-icon__small {
+  margin-bottom: 1px;
+  margin-left: -1px;
+  font-size: 11px;
+}
+
+[data-theme="dark"] .heading-icon {
+  color: rgb(255 255 255 / 75%);
+}

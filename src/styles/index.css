@@ -18,6 +18,7 @@
 /* Toolbar */
 @import "./toolbar.css";
 @import "./toolbar-dropdown.css";
+@import "./heading-dropdown.css";
 
 /* Menus */
 @import "./floating-menu-toolbar.css";
