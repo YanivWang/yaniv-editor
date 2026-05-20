@@ -29,12 +29,13 @@ export function useHeadingActions(editor: MaybeRefOrGetter<Editor | null>) {
     const start = $from.start($from.depth);
     const end = $from.end($from.depth);
 
-    e.chain()
-      .setHeading({ level })
-      .setTextSelection({ from: start, to: end })
-      .unsetMark("textStyle")
-      .setTextSelection({ from, to })
-      .run();
+    let chain = e.chain().setHeading({ level });
+
+    if (e.schema.marks.textStyle) {
+      chain = chain.setTextSelection({ from: start, to: end }).unsetMark("textStyle");
+    }
+
+    chain.setTextSelection({ from, to }).run();
   }
 
   function toggleHeadingLevel(level: HeadingLevel) {

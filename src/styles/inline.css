@@ -22,3 +22,6 @@
 @import "./task-list.css";
 @import "./placeholder.css";
 @import "./code-block.css";
+
+/* Inline content area typography and focus reset. */
+@import "./inline-content.css";

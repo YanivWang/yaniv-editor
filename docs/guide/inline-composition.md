@@ -28,7 +28,7 @@ import { UndoRedoButton, HeadingControl, TextFormatButtons } from "@yanivjs/yani
 import "@yanivjs/yaniv-editor/inline.css";
 ```
 
-`inline.css` 由 `src/styles/inline.css` 聚合构建，第一版只包含 Inline 工具栏基础样式。不要单独 import `src/styles/toolbar.css`、`src/styles/toolbar-dropdown.css` 等内部文件。
+`inline.css` 由 `src/styles/inline.css` 聚合构建，包含 Inline 工具栏样式、正文区基础排版（标题/段落/列表/行内 code）以及编辑区 focus 重置。业务方只需在外层包一层 `.yaniv-editor` 容器（与 Demo 一致），并在 `editorProps.attributes.class` 中设置 `inline-prose`。不要单独 import `src/styles/toolbar.css`、`src/styles/toolbar-dropdown.css` 等内部文件。
 
 Full Editor 仍使用：
 
