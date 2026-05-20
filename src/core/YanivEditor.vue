@@ -242,7 +242,7 @@ const initEditor = async () => {
       isFirstInit.value = false;
     }
 
-    const extensions = buildEditorExtensions({
+    const extensions = await buildEditorExtensions({
       features: gates,
       outline: {
         scrollParent: () => containerRef.value ?? window,

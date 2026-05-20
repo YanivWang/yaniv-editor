@@ -2,9 +2,29 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import dts from "vite-plugin-dts";
 import { resolve } from "path";
+import type { OutputAsset, OutputBundle } from "rollup";
+import type { Plugin } from "vite";
 
 // Production build uses obfuscation
 const isProduction = process.env.NODE_ENV === "production";
+
+/** 将核心 CSS 稳定输出为 style.css，KaTeX 样式保留在 math 异步 chunk。 */
+function coreCssAssetPlugin(): Plugin {
+  return {
+    name: "yaniv-core-css-asset",
+    generateBundle(_, bundle: OutputBundle) {
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) continue;
+        if (!asset.fileName.startsWith("assets/index-")) continue;
+
+        const source = typeof (asset as OutputAsset).source === "string" ? asset.source : "";
+        if (source.includes("font-family:KaTeX")) continue;
+
+        asset.fileName = "style.css";
+      }
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
@@ -25,6 +45,7 @@ export default defineConfig({
         return { filePath, content };
       },
     }),
+    coreCssAssetPlugin(),
   ],
   resolve: {
     alias: {
@@ -81,12 +102,12 @@ export default defineConfig({
           vue: "Vue",
         },
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith(".css")) return "style.css";
+          if (assetInfo.name?.endsWith(".css")) return "assets/[name]-[hash][extname]";
           return assetInfo.name || "asset";
         },
       },
     },
-    cssCodeSplit: false,
+    cssCodeSplit: true,
   },
   define: {
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),

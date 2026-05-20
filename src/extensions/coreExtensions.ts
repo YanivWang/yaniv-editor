@@ -39,7 +39,6 @@ import { FontSize } from "./fontSize";
 import { FormatPainter } from "./formatPainter";
 import { LineHeight } from "./lineHeight";
 import { ListShortcuts } from "./listShortcuts";
-import { MathExtension } from "./math";
 import { OfficePaste, type OfficePasteOptions } from "./office-paste";
 import { PasteImage } from "./pasteImage";
 import { ResizableImage } from "./resizableImage";
@@ -72,8 +71,9 @@ export interface ExtensionsOptions {
 
 /**
  * 构建编辑器扩展列表（能力由 options.features 门控）
+ * MathExtension 仅在启用 math 时动态加载，避免 KaTeX 进入默认包。
  */
-export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[] {
+export async function buildEditorExtensions(options: ExtensionsOptions): Promise<AnyExtension[]> {
   const { officePaste, outline: outlineOptions, features: gates } = options;
 
   const extensions: AnyExtension[] = [];
@@ -248,8 +248,9 @@ export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[
     extensions.push(FormatPainter);
   }
 
-  // 数学公式扩展
+  // 数学公式扩展（KaTeX 按需加载）
   if (gates.math) {
+    const { MathExtension } = await import("./math");
     extensions.push(MathExtension);
   }
 
