@@ -283,10 +283,12 @@ export const zhTW: TiptapLocale = {
     outlineEmpty: "尚無標題，插入 H1–H6 標題後將自動產生大綱。",
     outlineClose: "關閉大綱",
 
+    toolbarLabel: "編輯器工具列",
     toolbarSectionHistory: "編輯",
     toolbarSectionTypography: "字型",
     toolbarSectionParagraph: "段落",
     toolbarSectionInsert: "插入",
+    toolbarSectionDocument: "文件",
     toolbarSectionTools: "工具",
     toolbarSectionAssistant: "智慧助理",
     statusBarShortcutHints: "⌘/Ctrl+F 尋找 · ⌘/Ctrl+B 粗體 · ⌘/Ctrl+I 斜體 · ⌘/Ctrl+Z 復原",

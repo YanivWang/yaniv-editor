@@ -25,6 +25,7 @@ import {
   TextFormatButtons,
   UndoRedoButton,
 } from "@yanivjs/yaniv-editor/inline";
+
 import "@yanivjs/yaniv-editor/inline.css";
 
 const editor = useEditor({

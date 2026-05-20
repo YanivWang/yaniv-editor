@@ -12,7 +12,6 @@
       :upload-video="props.uploadVideo"
       :gallery-images="props.galleryImages"
       :custom-templates="props.customTemplates"
-      class="document-toolbar"
     />
 
     <!-- 功能模块：链接悬浮框（预览模式下禁用） -->

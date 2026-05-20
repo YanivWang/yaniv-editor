@@ -2,8 +2,8 @@
  * Toolbar Configuration - 工具栏配置类型
  * @description 定义工具栏工具的显示配置
  *
- * 平铺顶栏信息架构（左 → 右）：
- * 编辑 | 字体 | 段落 | 插入（链接表图视 | 代码公式 | Word模板图库）|| 工具 | 智能
+ * 自然换行工具带信息架构：
+ * 编辑 | 字体 | 段落 | 插入（链接表图视 | 代码公式）| 文档（Word模板图库）| 工具 | 智能
  */
 
 /**
@@ -74,8 +74,14 @@ export const COMPACT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   clearFormat: true,
   font: false,
   subscriptSuperscript: false,
+  math: false,
   formatPainter: false,
+  word: false,
+  template: false,
+  gallery: false,
   ai: true,
+  searchReplace: false,
+  outline: false,
 };
 
 /**

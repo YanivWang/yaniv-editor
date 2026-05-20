@@ -283,10 +283,12 @@ export const zhCN: TiptapLocale = {
     outlineEmpty: "暂无标题，插入 H1–H6 标题后将自动生成大纲。",
     outlineClose: "关闭大纲",
 
+    toolbarLabel: "编辑器工具栏",
     toolbarSectionHistory: "编辑",
     toolbarSectionTypography: "字体",
     toolbarSectionParagraph: "段落",
     toolbarSectionInsert: "插入",
+    toolbarSectionDocument: "文档",
     toolbarSectionTools: "工具",
     toolbarSectionAssistant: "智能助手",
     statusBarShortcutHints: "⌘/Ctrl+F 查找 · ⌘/Ctrl+B 加粗 · ⌘/Ctrl+I 斜体 · ⌘/Ctrl+Z 撤销",
