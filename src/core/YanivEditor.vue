@@ -123,6 +123,7 @@ import { provideYanivEditor } from "./editorContext";
 import { useEditorFeatures } from "./useEditorFeatures";
 import { useEditorI18n } from "./useEditorI18n";
 import { useEditorPagination } from "./useEditorPagination";
+import { useYanivAiConfig } from "./useYanivAiConfig";
 
 import type { YanivEditorProps } from "./editorTypes";
 import type { JSONContent } from "@tiptap/core";
@@ -166,6 +167,8 @@ type BlockPickerMenuInstance = {
 };
 
 const blockPickerMenuRef = ref<BlockPickerMenuInstance | null>(null);
+
+useYanivAiConfig(props);
 
 const {
   shouldShowHeaderNav,

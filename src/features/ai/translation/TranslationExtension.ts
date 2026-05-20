@@ -2,6 +2,7 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
 import { aiClient } from "@/features/ai/client";
+import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { runAiSuggestionStream } from "@/features/ai/shared/runAiSuggestionStream";
 import { t } from "@/locales";
 
@@ -32,7 +33,7 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
     return {
       translate:
         (targetLang?: string) =>
-        ({ state, editor }) => {
+        ({ state, editor, tr }) => {
           const { selection } = state;
           const { from, to } = selection;
           const selectedText = state.doc.textBetween(from, to, " ");
@@ -50,6 +51,7 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
           const lang =
             targetLang || currentTranslateLang.value || this.options.defaultTargetLang || "英文";
 
+          preventCommandAutoDispatch(tr);
           runAiSuggestionStream(
             editor,
             selectedText,

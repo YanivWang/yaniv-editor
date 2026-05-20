@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
+import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { aiSuggestionStreams } from "@/features/ai/shared/runAiSuggestionStream";
 import { t } from "@/locales";
 
@@ -21,7 +22,7 @@ export const PolishExtension = Extension.create<PolishOptions>({
     return {
       polish:
         () =>
-        ({ state, editor }) => {
+        ({ state, editor, tr }) => {
           const { selection } = state;
           const { from, to } = selection;
           const selectedText = state.doc.textBetween(from, to, " ");
@@ -36,6 +37,7 @@ export const PolishExtension = Extension.create<PolishOptions>({
             return false;
           }
 
+          preventCommandAutoDispatch(tr);
           aiSuggestionStreams.polish(editor, selectedText, { from, to });
           return true;
         },

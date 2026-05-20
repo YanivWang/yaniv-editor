@@ -4,9 +4,24 @@
  */
 import type { TemplateItem } from "@/components/editor/template/templates";
 import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
+import type { AiProvider, AiStorageMode } from "@/features/ai/config/types";
 
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
+
+/** 集成方通过 YanivEditor `ai-config` 注入的 AI 配置（不写入 localStorage） */
+export interface YanivEditorAiConfig {
+  provider: AiProvider;
+  apiKey?: string;
+  endpoint?: string;
+  model?: string;
+  timeout?: number;
+  enabled?: boolean;
+  /** @default 'memory' */
+  storageMode?: AiStorageMode;
+  /** 是否显示工具栏「AI 设置」菜单项；有 ai-config 时默认 false */
+  showSettings?: boolean;
+}
 
 export interface GalleryImage {
   src: string;
@@ -104,6 +119,10 @@ export interface YanivEditorProps {
    * @default 'top-left'
    */
   outlinePlacement?: OutlinePlacement;
+  /**
+   * 集成方注入的 AI 配置；传入后完全托管（忽略 localStorage 与 .env），默认隐藏「AI 设置」
+   */
+  aiConfig?: YanivEditorAiConfig;
 }
 
 /**

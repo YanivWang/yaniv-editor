@@ -4,11 +4,7 @@ import { createApp, h, ref } from "vue";
 import { aiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
 import { t } from "@/locales";
-import {
-  buildParagraphNodesFromText,
-  hasNewlines,
-  isValidSelection,
-} from "@/utils/prosemirrorUtils";
+import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import {
   addAiHighlight,
@@ -199,28 +195,30 @@ class AiSuggestionManager {
     if (!this.editor || !this.state.visible) return;
 
     const { originalSelection, suggestedText } = this.state;
-    const { state } = this.editor;
-    const docSize = state.doc.content.size;
+    const docSize = this.editor.state.doc.content.size;
+
+    if (!suggestedText.trim()) {
+      this.hide();
+      return;
+    }
 
     if (!isValidSelection(originalSelection, docSize)) {
       this.hide();
       return;
     }
 
-    if (hasNewlines(suggestedText)) {
-      const nodes = buildParagraphNodesFromText(suggestedText, state.schema);
-      if (nodes.length > 0) {
-        const tr = state.tr;
-        tr.replaceWith(originalSelection.from, originalSelection.to, nodes);
-        this.editor.view.dispatch(tr);
-      }
-    } else {
-      this.editor
-        .chain()
-        .focus()
-        .deleteRange(originalSelection)
-        .insertContentAt(originalSelection.from, suggestedText)
-        .run();
+    const { from, to } = originalSelection;
+    removeAiHighlight(this.editor);
+
+    const applied = this.editor
+      .chain()
+      .focus()
+      .setTextSelection({ from, to })
+      .insertContent(suggestedText)
+      .run();
+
+    if (!applied) {
+      console.warn("[AI Suggestion] Failed to apply suggestion", { from, to });
     }
 
     this.hide();

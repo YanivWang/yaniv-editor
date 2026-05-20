@@ -17,22 +17,15 @@
 
 /* 工具栏内容 */
 .table-menu-content {
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(4, var(--ye-btn-size));
+  gap: 2px;
 }
 
-/* 工具组 */
-.table-menu-group {
+.table-menu-btn-trigger {
   display: flex;
   align-items: center;
-}
-
-.table-menu-group:first-child {
-  padding-left: 0;
-}
-
-.table-menu-group:last-child {
-  padding-right: 0;
-  border-right: none;
+  justify-content: center;
 }
 
 /* 工具按钮 */
@@ -134,13 +127,8 @@
   }
 
   .table-menu-content {
-    flex-wrap: nowrap;
+    grid-template-columns: repeat(4, var(--ye-btn-size-sm));
     gap: 2px;
-  }
-
-  .table-menu-group {
-    gap: 2px;
-    padding: 0 3px;
   }
 
   .table-menu-btn {

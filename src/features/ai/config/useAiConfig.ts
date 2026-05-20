@@ -5,6 +5,7 @@
 
 import { ref, computed, readonly } from "vue";
 
+import { getHostAiConfig, isHostAiManaged } from "./hostConfig";
 import { getAiConfigStore } from "./store";
 import { DEFAULT_CONFIG, getProviderInfo, AI_PROVIDERS } from "./types";
 
@@ -225,26 +226,23 @@ export function useAiConfig() {
   };
 }
 
-/**
- * 获取静态配置（非响应式，用于 API 调用）
- */
-export function getAiRequestConfig(): {
+function resolveRequestConfig(config: AiUserConfig): {
   endpoint: string;
   apiKey: string;
   model: string;
   timeout: number;
   provider: AiProvider;
 } | null {
-  const store = getAiConfigStore();
-  const config = store.getConfig();
-
-  if (!config || !config.enabled) return null;
+  if (!config.enabled) return null;
 
   const providerInfo = getProviderInfo(config.provider);
   if (!providerInfo) return null;
 
-  // 检查必要条件
   if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
+    return null;
+  }
+
+  if (config.provider === "custom" && !config.endpoint) {
     return null;
   }
 
@@ -256,3 +254,27 @@ export function getAiRequestConfig(): {
     provider: config.provider,
   };
 }
+
+/**
+ * 获取静态配置（非响应式，用于 API 调用）
+ */
+export function getAiRequestConfig(): {
+  endpoint: string;
+  apiKey: string;
+  model: string;
+  timeout: number;
+  provider: AiProvider;
+} | null {
+  if (isHostAiManaged()) {
+    const host = getHostAiConfig();
+    return host ? resolveRequestConfig(host) : null;
+  }
+
+  const store = getAiConfigStore();
+  const config = store.getConfig();
+  if (!config) return null;
+
+  return resolveRequestConfig(config);
+}
+
+export { isHostAiManaged };

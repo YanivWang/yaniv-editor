@@ -39,6 +39,8 @@ export type { CreateAiClientOptions } from "./client";
 
 export type { AiAdapter, AiMessage, AiStreamCallbacks } from "./types";
 
-export { useAiConfig, getAiRequestConfig } from "./config/useAiConfig";
+export { useAiConfig, getAiRequestConfig, isHostAiManaged } from "./config/useAiConfig";
+export { setHostAiConfig, getHostAiConfig } from "./config/hostConfig";
 export { AI_PROVIDERS, DEFAULT_CONFIG, getProviderInfo } from "./config/types";
 export type { AiProvider, AiProviderInfo, AiUserConfig, AiConfigState } from "./config/types";
+export type { YanivEditorAiConfig } from "@/core/editorTypes";

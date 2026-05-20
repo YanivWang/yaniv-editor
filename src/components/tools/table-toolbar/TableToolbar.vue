@@ -7,87 +7,26 @@
     class="table-bubble-menu"
   >
     <div class="table-menu-content">
-      <!-- 第一行 -->
-      <div class="table-menu-row">
-        <!-- 行操作 -->
-        <div class="table-menu-group">
-          <a-tooltip
-            v-for="item in rowTools"
-            :key="item.name"
-            :title="item.title"
-            placement="bottom"
-          >
-            <span class="table-menu-btn-trigger">
-              <button
-                class="table-menu-btn"
-                :disabled="!canExecute(item.command)"
-                @click="item.action"
-              >
-                <component :is="item.icon" />
-              </button>
-            </span>
-          </a-tooltip>
-        </div>
-
-        <!-- 列操作 -->
-        <div class="table-menu-group">
-          <a-tooltip
-            v-for="item in columnTools"
-            :key="item.name"
-            :title="item.title"
-            placement="bottom"
-          >
-            <span class="table-menu-btn-trigger">
-              <button
-                class="table-menu-btn"
-                :disabled="!canExecute(item.command)"
-                @click="item.action"
-              >
-                <component :is="item.icon" />
-              </button>
-            </span>
-          </a-tooltip>
-        </div>
-      </div>
-
-      <!-- 第二行 -->
-      <div class="table-menu-row">
-        <!-- 单元格操作 -->
-        <div class="table-menu-group">
-          <a-tooltip
-            v-for="item in cellTools"
-            :key="item.name"
-            :title="item.title"
-            placement="bottom"
-          >
-            <span class="table-menu-btn-trigger">
-              <button
-                class="table-menu-btn"
-                :disabled="!canExecute(item.command)"
-                @click="item.action"
-              >
-                <component :is="item.icon" />
-              </button>
-            </span>
-          </a-tooltip>
-        </div>
-
-        <!-- 删除表格 -->
-        <div class="table-menu-group">
-          <a-tooltip :title="t('editor.deleteTable')" placement="bottom">
-            <span class="table-menu-btn-trigger">
-              <button class="table-menu-btn table-menu-btn--danger" @click="deleteTable">
-                <DeleteOutlined />
-              </button>
-            </span>
-          </a-tooltip>
-        </div>
-      </div>
+      <template v-for="item in menuTools" :key="item.key">
+        <a-tooltip :title="item.title" placement="bottom">
+          <span class="table-menu-btn-trigger">
+            <button
+              class="table-menu-btn"
+              :class="{ 'table-menu-btn--danger': item.danger }"
+              :disabled="item.command ? !canExecute(item.command) : false"
+              @click="item.action"
+            >
+              <component :is="item.icon" />
+            </button>
+          </span>
+        </a-tooltip>
+      </template>
     </div>
   </bubble-menu>
 </template>
 
 <script setup lang="ts">
+
 import {
   InsertRowAboveOutlined,
   InsertRowBelowOutlined,
@@ -109,6 +48,8 @@ import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
+import type { Component } from "vue";
+
 const props = withDefaults(
   defineProps<{
     readonly?: boolean;
@@ -125,89 +66,114 @@ const editor = useYanivEditor();
 const runCommand = createCommandRunner(editor);
 const { canExecute } = createStateCheckers(editor);
 
-const rowTools = [
-  {
-    name: "addRowBefore",
-    icon: InsertRowAboveOutlined,
-    title: t("table.addRowBefore"),
-    command: "addRowBefore",
-    action: runCommand((chain) => chain.addRowBefore()),
-  },
-  {
-    name: "addRowAfter",
-    icon: InsertRowBelowOutlined,
-    title: t("table.addRowAfter"),
-    command: "addRowAfter",
-    action: runCommand((chain) => chain.addRowAfter()),
-  },
-  {
-    name: "deleteRow",
-    icon: DeleteRowOutlined,
-    title: t("table.deleteRow"),
-    command: "deleteRow",
-    action: runCommand((chain) => chain.deleteRow()),
-  },
-];
+type TableToolItem = {
+  key: string;
+  icon: Component;
+  title: string;
+  command?: string;
+  danger?: boolean;
+  action: () => void;
+};
 
-const columnTools = [
-  {
-    name: "addColumnBefore",
-    icon: InsertRowLeftOutlined,
-    title: t("table.addColumnBefore"),
-    command: "addColumnBefore",
-    action: runCommand((chain) => chain.addColumnBefore()),
-  },
-  {
-    name: "addColumnAfter",
-    icon: InsertRowRightOutlined,
-    title: t("table.addColumnAfter"),
-    command: "addColumnAfter",
-    action: runCommand((chain) => chain.addColumnAfter()),
-  },
-  {
-    name: "deleteColumn",
-    icon: DeleteColumnOutlined,
-    title: t("table.deleteColumn"),
-    command: "deleteColumn",
-    action: runCommand((chain) => chain.deleteColumn()),
-  },
-];
+const tool = (
+  key: string,
+  icon: Component,
+  title: string,
+  command: string,
+  action: () => void,
+): TableToolItem => ({
+  key,
+  icon,
+  title,
+  command,
+  action,
+});
 
-const cellTools = [
+function deleteTable() {
+  runCommand((chain) => chain.deleteTable())();
+}
+
+// 4 列网格：行(3)+合并 | 列(3)+拆分 | 表头行+表头列+删除
+const menuTools: TableToolItem[] = [
+  tool(
+    "addRowBefore",
+    InsertRowAboveOutlined,
+    t("table.addRowBefore"),
+    "addRowBefore",
+    runCommand((chain) => chain.addRowBefore()),
+  ),
+  tool(
+    "addRowAfter",
+    InsertRowBelowOutlined,
+    t("table.addRowAfter"),
+    "addRowAfter",
+    runCommand((chain) => chain.addRowAfter()),
+  ),
+  tool(
+    "deleteRow",
+    DeleteRowOutlined,
+    t("table.deleteRow"),
+    "deleteRow",
+    runCommand((chain) => chain.deleteRow()),
+  ),
+  tool(
+    "mergeCells",
+    MergeCellsOutlined,
+    t("table.mergeCells"),
+    "mergeCells",
+    runCommand((chain) => chain.mergeCells()),
+  ),
+  tool(
+    "addColumnBefore",
+    InsertRowLeftOutlined,
+    t("table.addColumnBefore"),
+    "addColumnBefore",
+    runCommand((chain) => chain.addColumnBefore()),
+  ),
+  tool(
+    "addColumnAfter",
+    InsertRowRightOutlined,
+    t("table.addColumnAfter"),
+    "addColumnAfter",
+    runCommand((chain) => chain.addColumnAfter()),
+  ),
+  tool(
+    "deleteColumn",
+    DeleteColumnOutlined,
+    t("table.deleteColumn"),
+    "deleteColumn",
+    runCommand((chain) => chain.deleteColumn()),
+  ),
+  tool(
+    "splitCell",
+    SplitCellsOutlined,
+    t("table.splitCell"),
+    "splitCell",
+    runCommand((chain) => chain.splitCell()),
+  ),
+  tool(
+    "toggleHeaderRow",
+    TableOutlined,
+    t("table.toggleHeaderRow"),
+    "toggleHeaderRow",
+    runCommand((chain) => chain.toggleHeaderRow()),
+  ),
+  tool(
+    "toggleHeaderColumn",
+    TableOutlined,
+    t("table.toggleHeaderColumn"),
+    "toggleHeaderColumn",
+    runCommand((chain) => chain.toggleHeaderColumn()),
+  ),
   {
-    name: "mergeCells",
-    icon: MergeCellsOutlined,
-    title: t("table.mergeCells"),
-    command: "mergeCells",
-    action: runCommand((chain) => chain.mergeCells()),
-  },
-  {
-    name: "splitCell",
-    icon: SplitCellsOutlined,
-    title: t("table.splitCell"),
-    command: "splitCell",
-    action: runCommand((chain) => chain.splitCell()),
-  },
-  {
-    name: "toggleHeaderRow",
-    icon: TableOutlined,
-    title: t("table.toggleHeaderRow"),
-    command: "toggleHeaderRow",
-    action: runCommand((chain) => chain.toggleHeaderRow()),
-  },
-  {
-    name: "toggleHeaderColumn",
-    icon: TableOutlined,
-    title: t("table.toggleHeaderColumn"),
-    command: "toggleHeaderColumn",
-    action: runCommand((chain) => chain.toggleHeaderColumn()),
+    key: "deleteTable",
+    icon: DeleteOutlined,
+    title: t("editor.deleteTable"),
+    danger: true,
+    action: deleteTable,
   },
 ];
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowTableBubbleMenu(bubbleProps, props.readonly, props.showMode);
-
-function deleteTable() {
-  runCommand((chain) => chain.deleteTable())();
-}
 </script>

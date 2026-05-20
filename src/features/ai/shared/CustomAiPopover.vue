@@ -120,6 +120,9 @@ const emit = defineEmits<{
   cancelGeneration: [];
 }>();
 
+/** 接受/拒绝/取消时会主动关闭 Popover，避免误触发 cancel */
+let suppressCloseCancel = false;
+
 const promptInputRef = ref<typeof ATextarea>();
 const promptInput = ref("");
 
@@ -156,21 +159,25 @@ const handleExecute = () => {
 };
 
 const handleAccept = () => {
+  suppressCloseCancel = true;
   emit("accept");
   promptInput.value = "";
 };
 
 const handleReject = () => {
+  suppressCloseCancel = true;
   emit("reject");
   promptInput.value = "";
 };
 
 const handleCancel = () => {
+  suppressCloseCancel = true;
   emit("cancel");
   promptInput.value = "";
 };
 
 const handleCancelGeneration = () => {
+  suppressCloseCancel = true;
   emit("cancelGeneration");
   promptInput.value = "";
 };
@@ -178,8 +185,11 @@ const handleCancelGeneration = () => {
 const handleVisibleChange = (val: boolean) => {
   emit("update:visible", val);
   if (!val) {
-    emit("cancel");
-    promptInput.value = "";
+    if (!suppressCloseCancel) {
+      emit("cancel");
+      promptInput.value = "";
+    }
+    suppressCloseCancel = false;
   }
 };
 

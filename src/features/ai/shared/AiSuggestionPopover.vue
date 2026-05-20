@@ -84,6 +84,9 @@ const emit = defineEmits<{
   cancel: [];
 }>();
 
+/** 接受/拒绝时会主动关闭 Popover，避免误触发 cancel */
+let suppressCloseCancel = false;
+
 const anchorRef = ref<HTMLElement>();
 
 const anchorStyle = computed(() => {
@@ -113,21 +116,27 @@ const getPopupContainer = () => {
 };
 
 const handleAccept = () => {
+  suppressCloseCancel = true;
   emit("accept");
 };
 
 const handleReject = () => {
+  suppressCloseCancel = true;
   emit("reject");
 };
 
 const handleCancel = () => {
+  suppressCloseCancel = true;
   emit("cancel");
 };
 
 const handleVisibleChange = (val: boolean) => {
   emit("update:visible", val);
   if (!val) {
-    emit("cancel");
+    if (!suppressCloseCancel) {
+      emit("cancel");
+    }
+    suppressCloseCancel = false;
   }
 };
 </script>

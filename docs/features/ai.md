@@ -6,9 +6,50 @@ Yaniv Editor 内置 AI 写作辅助 UI，支持续写、润色、摘要、翻译
 
 1. `features.ai: true`
 2. `features.headerNav: true`（工具栏包含 AI 按钮）
-3. 配置 AI API（环境变量或 UI 设置）
+3. 配置 AI API（`ai-config` props、环境变量或 UI 设置）
 
 ## 配置方式
+
+### 方式三：Props 注入（集成方推荐）
+
+通过 `YanivEditor` 的 `ai-config` 注入，**不写入 localStorage**，并默认隐藏工具栏「AI 设置」入口：
+
+```vue
+<script setup lang="ts">
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
+import type { YanivEditorAiConfig } from "@yanivjs/yaniv-editor";
+
+const aiConfig: YanivEditorAiConfig = {
+  provider: "openai",
+  apiKey: tokenFromYourBackend,
+  model: "gpt-4o-mini",
+  storageMode: "memory",
+};
+</script>
+
+<template>
+  <YanivEditor v-bind="editorPresets.production" :ai-config="aiConfig" />
+</template>
+```
+
+生产环境推荐使用后端代理（前端不传 Key）：
+
+```vue
+<YanivEditor
+  :ai-config="{
+    provider: 'openai',
+    storageMode: 'proxy',
+    endpoint: '/api/ai/v1',
+    model: 'gpt-4o-mini',
+  }"
+/>
+```
+
+| 行为           | 说明                                                     |
+| -------------- | -------------------------------------------------------- |
+| 有 `ai-config` | 完全由集成方托管，忽略 localStorage 与 `.env`            |
+| `showSettings` | 默认 `false`；调试时可设为 `true`（仍不读 localStorage） |
+| 移除 prop      | 恢复方式一 / 方式二的回退逻辑                            |
 
 ### 方式一：环境变量（开发 / Demo）
 
@@ -84,7 +125,13 @@ PolishExtension / SummarizeExtension / …
 ## 相关导出
 
 ```ts
-import { AiMenuButton, useAiConfig, createAiAdapter, AI_PROVIDERS } from "@yanivjs/yaniv-editor";
+import {
+  AiMenuButton,
+  useAiConfig,
+  createAiAdapter,
+  AI_PROVIDERS,
+  type YanivEditorAiConfig,
+} from "@yanivjs/yaniv-editor";
 ```
 
 ## 下一步

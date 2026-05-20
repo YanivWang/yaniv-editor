@@ -5,4 +5,5 @@
 
 export * from "./types";
 export * from "./store";
-export { useAiConfig, getAiRequestConfig } from "./useAiConfig";
+export { useAiConfig, getAiRequestConfig, isHostAiManaged } from "./useAiConfig";
+export { setHostAiConfig, getHostAiConfig } from "./hostConfig";

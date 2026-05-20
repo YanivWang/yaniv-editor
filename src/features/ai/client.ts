@@ -2,8 +2,9 @@
  * AI Client — 统一调用链（Extension + Vue UI 共用）
  */
 
+import { getHostAiConfig } from "./config/hostConfig";
 import { getProviderInfo } from "./config/types";
-import { getAiRequestConfig } from "./config/useAiConfig";
+import { getAiRequestConfig, isHostAiManaged } from "./config/useAiConfig";
 import { loadAiConfig } from "./envConfig";
 import { createAiAdapter } from "./factory";
 import { AI_PROMPTS } from "./prompts";
@@ -48,6 +49,19 @@ function getAiConfig(): ResolvedAiConfig {
       baseUrl: userConfig.endpoint,
       model: userConfig.model,
       timeout: userConfig.timeout,
+    };
+  }
+
+  if (isHostAiManaged()) {
+    const host = getHostAiConfig();
+    const provider = host?.provider ?? "openai";
+    const providerInfo = getProviderInfo(provider);
+    return {
+      provider,
+      apiKey: "",
+      baseUrl: host?.endpoint ?? providerInfo?.defaultEndpoint ?? "",
+      model: host?.model ?? providerInfo?.defaultModel ?? "gpt-4o-mini",
+      timeout: host?.timeout ?? DEFAULT_TIMEOUT,
     };
   }
 

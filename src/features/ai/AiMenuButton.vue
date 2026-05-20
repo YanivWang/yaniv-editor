@@ -9,9 +9,10 @@
     :split-hover-arrow-title="t('editor.selectLanguage')"
     @select="onMenuSelect"
     @split-primary="onSplitPrimary"
+    @open-change="onDropdownOpenChange"
   />
 
-  <AiSettingsModal v-model:open="showSettings" />
+  <AiSettingsModal v-if="showAiSettingsEntry" v-model:open="settingsModalOpen" />
 </template>
 
 <script setup lang="ts">
@@ -27,7 +28,9 @@ import { computed, nextTick, ref } from "vue";
 
 import { ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import { useYanivAiShowSettings } from "@/core/aiContext";
 import { t } from "@/locales";
+import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import AiSettingsModal from "./components/AiSettingsModal.vue";
 import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./translation";
@@ -35,7 +38,9 @@ import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./transl
 import type { Editor } from "@tiptap/core";
 import type { Component } from "vue";
 
-const showSettings = ref(false);
+const showAiSettingsEntry = useYanivAiShowSettings();
+const settingsModalOpen = ref(false);
+const savedSelection = ref<{ from: number; to: number } | null>(null);
 
 interface Props {
   editor: Editor;
@@ -57,18 +62,41 @@ const selectedLangKey = computed(() => {
   return lang ? `translate-${lang.code}` : "";
 });
 
+function onDropdownOpenChange(open: boolean) {
+  if (!open || !props.editor) return;
+
+  const { from, to } = props.editor.state.selection;
+  savedSelection.value = { from, to };
+}
+
+function resolveSelection(editor: Editor): { from: number; to: number } {
+  const selection = savedSelection.value ?? {
+    from: editor.state.selection.from,
+    to: editor.state.selection.to,
+  };
+  savedSelection.value = null;
+
+  const docSize = editor.state.doc.content.size;
+  if (!isValidSelection(selection, docSize)) {
+    return {
+      from: Math.max(0, Math.min(selection.from, docSize)),
+      to: Math.max(0, Math.min(selection.to, docSize)),
+    };
+  }
+
+  return selection;
+}
+
 function runAiCommandAfterMenuClose(
   run: (editor: Editor, selection: { from: number; to: number }) => void,
 ) {
   const { editor } = props;
   if (!editor) return;
 
-  const selection = { from: editor.state.selection.from, to: editor.state.selection.to };
-
   nextTick(() => {
     requestAnimationFrame(() => {
       try {
-        run(editor, selection);
+        run(editor, resolveSelection(editor));
       } catch (error) {
         console.error("[AI Menu] Error executing command:", error);
       }
@@ -82,23 +110,25 @@ function runEditorAiChain(
   command: "continueWriting" | "polish" | "summarize" | "customAi" | "translate",
   targetLang?: string,
 ) {
-  const chain = editor.chain().focus().setTextSelection(selection);
+  // 分开执行：AI 命令内部会直接 dispatch transaction，不能和 setTextSelection 放在同一个 chain 里
+  editor.view.focus();
+  editor.commands.setTextSelection(selection);
 
   switch (command) {
     case "continueWriting":
-      chain.continueWriting().run();
+      editor.commands.continueWriting();
       break;
     case "polish":
-      chain.polish().run();
+      editor.commands.polish();
       break;
     case "summarize":
-      chain.summarize().run();
+      editor.commands.summarize();
       break;
     case "customAi":
-      chain.customAi().run();
+      editor.commands.customAi();
       break;
     case "translate":
-      chain.translate(targetLang).run();
+      editor.commands.translate(targetLang);
       break;
   }
 }
@@ -115,7 +145,7 @@ function runTranslate(key: string) {
 
 function onMenuSelect(key: string) {
   if (key === "settings") {
-    showSettings.value = true;
+    settingsModalOpen.value = true;
     return;
   }
 
@@ -147,45 +177,52 @@ function onSplitPrimary(itemKey: string) {
   });
 }
 
-const menuItems = computed((): MenuItemConfig[] => [
-  {
-    key: "continueWriting",
-    label: t("editor.continueWriting"),
-    icon: ThunderboltOutlined,
-  },
-  {
-    key: "polish",
-    label: t("editor.polish"),
-    icon: EditOutlined,
-  },
-  {
-    key: "summarize",
-    label: t("editor.summarize"),
-    icon: FileTextOutlined,
-  },
-  {
-    key: "customAi",
-    label: t("editor.customAi"),
-    icon: BulbOutlined,
-  },
-  {
-    key: "translate",
-    label: currentTranslateLang.value
-      ? t("editor.translateTo", { lang: currentTranslateLang.value })
-      : t("editor.translate"),
-    icon: TranslationOutlined,
-    submenuMode: "split-hover",
-    selectedChildKey: selectedLangKey.value,
-    splitArrowTitle: t("editor.selectLanguage"),
-    children: LANGUAGE_CODES.map(({ code, key }) => ({
-      key: `translate-${code}`,
-      label: t(`editor.lang.${key}`),
-    })),
-  },
-  {
-    key: "settings",
-    label: t("aiSettings.title"),
-    icon: SettingOutlined,
-  },
-]);
+const menuItems = computed((): MenuItemConfig[] => {
+  const items: MenuItemConfig[] = [
+    {
+      key: "continueWriting",
+      label: t("editor.continueWriting"),
+      icon: ThunderboltOutlined,
+    },
+    {
+      key: "polish",
+      label: t("editor.polish"),
+      icon: EditOutlined,
+    },
+    {
+      key: "summarize",
+      label: t("editor.summarize"),
+      icon: FileTextOutlined,
+    },
+    {
+      key: "customAi",
+      label: t("editor.customAi"),
+      icon: BulbOutlined,
+    },
+    {
+      key: "translate",
+      label: currentTranslateLang.value
+        ? t("editor.translateTo", { lang: currentTranslateLang.value })
+        : t("editor.translate"),
+      icon: TranslationOutlined,
+      submenuMode: "split-hover",
+      selectedChildKey: selectedLangKey.value,
+      splitArrowTitle: t("editor.selectLanguage"),
+      children: LANGUAGE_CODES.map(({ code, key }) => ({
+        key: `translate-${code}`,
+        label: t(`editor.lang.${key}`),
+      })),
+    },
+  ];
+
+  if (showAiSettingsEntry.value) {
+    items.push({
+      key: "settings",
+      label: t("aiSettings.title"),
+      icon: SettingOutlined,
+    });
+  }
+
+  return items;
+});
 </script>

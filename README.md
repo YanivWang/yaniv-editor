@@ -292,7 +292,21 @@ VITE_AI_API_KEY=sk-...
 # VITE_AI_MODEL=
 ```
 
-也可在编辑器内 **AI 设置面板** 配置（存储于浏览器 localStorage）。详见 [AI 辅助文档](docs/features/ai.md)。
+**集成方推荐**通过组件 props 注入（不暴露设置面板、不写 localStorage）：
+
+```vue
+<YanivEditor
+  v-bind="editorPresets.production"
+  :ai-config="{
+    provider: 'openai',
+    storageMode: 'proxy',
+    endpoint: '/api/ai/v1',
+    model: 'gpt-4o-mini',
+  }"
+/>
+```
+
+也可在编辑器内 **AI 设置面板** 配置（存储于浏览器 localStorage，适合 Demo）。详见 [AI 辅助文档](docs/features/ai.md)。
 
 ---
 

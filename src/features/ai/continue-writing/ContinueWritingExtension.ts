@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
+import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { runAiContinueWritingStream } from "@/features/ai/shared/runAiSuggestionStream";
 import { t } from "@/locales";
 
@@ -21,7 +22,7 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
     return {
       continueWriting:
         () =>
-        ({ state, editor }) => {
+        ({ state, editor, tr }) => {
           const { selection } = state;
           const { from, to } = selection;
 
@@ -46,6 +47,7 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             return false;
           }
 
+          preventCommandAutoDispatch(tr);
           runAiContinueWritingStream(
             editor,
             selectedText,

@@ -156,6 +156,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   select: [key: string];
   splitPrimary: [itemKey: string];
+  openChange: [open: boolean];
 }>();
 
 function isSplitHoverItem(item: MenuItemConfig): boolean {
@@ -227,6 +228,7 @@ function onSplitChildSelect(info: { key: string }) {
 }
 
 function handleOpenChange(open: boolean) {
+  emit("openChange", open);
   if (!open) {
     splitOverlayKey.value = null;
     cancelSplitClose();

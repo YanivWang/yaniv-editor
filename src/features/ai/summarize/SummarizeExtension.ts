@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
+import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { aiSuggestionStreams } from "@/features/ai/shared/runAiSuggestionStream";
 import { t } from "@/locales";
 
@@ -21,7 +22,7 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
     return {
       summarize:
         () =>
-        ({ state, editor }) => {
+        ({ state, editor, tr }) => {
           const { selection } = state;
           const { from, to } = selection;
           let selectedText = state.doc.textBetween(from, to, " ");
@@ -43,6 +44,7 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
             return false;
           }
 
+          preventCommandAutoDispatch(tr);
           aiSuggestionStreams.summarize(editor, selectedText, summaryRange);
           return true;
         },

@@ -2,6 +2,7 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
 import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
+import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { t } from "@/locales";
 
 export type CustomAiOptions = Record<string, never>;
@@ -21,7 +22,7 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
     return {
       customAi:
         () =>
-        ({ state, editor }) => {
+        ({ state, editor, tr }) => {
           const { selection } = state;
           const { from, to } = selection;
           const selectedText = state.doc.textBetween(from, to, " ");
@@ -36,6 +37,7 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
             return false;
           }
 
+          preventCommandAutoDispatch(tr);
           aiSuggestionManager.showCustom(editor, selectedText, { from, to });
           return true;
         },
