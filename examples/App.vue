@@ -23,8 +23,4 @@ import { RouterLink, RouterView } from "vue-router";
   padding: 0;
   margin: 0;
 }
-
-body {
-  min-height: 100vh;
-}
 </style>

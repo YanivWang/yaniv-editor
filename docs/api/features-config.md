@@ -18,7 +18,7 @@
 | `math`                | `boolean`             | `false` | 数学公式                         |
 | `ai`                  | `boolean`             | `false` | AI 相关扩展                      |
 | `formatPainter`       | `boolean`             | `false` | 格式刷                           |
-| `outline`             | `boolean`             | `false` | 标题 ID + 目录扩展 + 侧栏大纲 UI |
+| `outline`             | `boolean`             | `false` | 标题 ID + 目录扩展 + 悬浮大纲 UI |
 | `searchReplace`       | `boolean`             | `false` | 查找替换                         |
 | `officePaste`         | `boolean`             | `false` | Office/WPS 粘贴增强              |
 | `slashCommand`        | `boolean`             | `false` | 斜杠命令菜单                     |

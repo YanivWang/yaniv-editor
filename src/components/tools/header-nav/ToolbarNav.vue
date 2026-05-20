@@ -252,9 +252,8 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 $dark-selector: "[data-theme=" dark "] &";
 
 .document-toolbar-container {
-  position: sticky;
-  top: 0;
   z-index: 1000;
+  flex-shrink: 0;
   width: 100%;
   background: #fff;
   box-shadow: 0 1px 4px rgb(0 0 0 / 8%);

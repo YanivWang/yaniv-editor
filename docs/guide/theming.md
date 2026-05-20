@@ -174,6 +174,7 @@ registerTheme("custom", {
 |          | `--ye-doc-page-padding`                                  | `.continuous-pages` 外层 padding（如 Notion 左右 96px） |
 |          | `--ye-doc-container-padding-y`                           | 滚动容器上下留白                                        |
 |          | `--ye-doc-page-cut-height`                               | 分页裁切线高度（预留）                                  |
+| 大纲     | `--ye-outline-scroll-offset`                             | 大纲跳转留白与高亮阈值（唯一数据源，默认 80px）         |
 
 文档布局尺寸由 `variables.css` 提供默认值（A4），各 **theme preset**（`src/themes/presets/*.css`）覆盖；Word 分页时 `useEditorPagination` 会在运行时写入同名字符串变量。
 
@@ -222,9 +223,12 @@ const theme = inject(editorThemeInjectionKey);
 | 类名                            | 说明                    |
 | ------------------------------- | ----------------------- |
 | `.yaniv-editor.document-layout` | 编辑器根                |
+| `.yaniv-editor-host`            | 可选宿主容器，限定高度  |
 | `.document-toolbar`             | 顶栏工具栏              |
 | `.document-container`           | 可滚动文档区            |
 | `.document-content`             | 编辑区 ProseMirror 容器 |
+
+长文档时仅 `.document-container` 滚动，顶栏、悬浮大纲与底栏固定。宿主需提供限定高度（如 `height: 100vh` 或 flex 子项 `flex: 1; min-height: 0`），可在外层使用 `.yaniv-editor-host`。点击大纲项时，目标标题会滚至滚动区上方约 `--ye-outline-scroll-offset` 处并聚焦，便于编辑。
 
 ## 深色模式约定
 

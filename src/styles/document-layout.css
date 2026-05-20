@@ -1,15 +1,52 @@
 /* Yaniv Editor 文档布局样式 */
 
+/*
+ * 宿主全屏容器（可选）：限定高度并禁止页面级滚动，编辑器内部仅 .document-container 滚动
+ *
+ * <div class="yaniv-editor-host">
+ *   <YanivEditor ... />
+ * </div>
+ */
+.yaniv-editor-host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.yaniv-editor-host > .yaniv-editor {
+  flex: 1;
+  min-height: 0;
+}
+
 /* ===== 文档模式编辑器容器 ===== */
 .yaniv-editor.document-layout {
-  /* 布局与尺寸 */
+  /* 布局与尺寸：占满宿主高度，滚动仅发生在 document-container */
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   width: 100%;
   height: 100%;
   min-height: 0; /* 允许 flex 子元素收缩 */
   overflow: hidden; /* 容器不滚动，由内部 document-container 滚动 */
   background: var(--ye-bg-secondary);
+}
+
+/* 顶栏 / 底栏固定高度，不参与滚动 */
+.yaniv-editor.document-layout > .document-toolbar-container,
+.yaniv-editor.document-layout > .footer-nav-container {
+  flex-shrink: 0;
+}
+
+/* 工具栏与底栏之间的可滚动工作区 */
+.yaniv-editor.document-layout > .yaniv-editor__workspace {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 [data-theme="dark"] .yaniv-editor.document-layout {
@@ -30,9 +67,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* 文档页面区域 */
+/* 文档页面区域：随内容增高，由 document-container 滚动，勿用 flex:1 撑开父级 */
 .document-pages {
-  flex: 1;
+  flex: 0 0 auto;
+  width: 100%;
   transform-origin: top center;
   transition: transform 0.2s ease;
 }

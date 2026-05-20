@@ -49,18 +49,32 @@
       :upload-video="props.uploadVideo"
     />
 
-    <!-- Word 文档区域容器 -->
-    <div class="document-body">
-      <OutlinePanel v-if="editor && !isPreviewMode && showOutlinePanel" />
-      <div ref="containerRef" class="document-container">
-        <CodeBlockLanguageBadge
-          v-if="editor && !isPreviewMode && toolbarConfig.codeBlock"
-          :container="containerRef"
-        />
-        <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
-          <div class="continuous-pages">
-            <EditorContent v-if="editor" :editor="editor" class="document-content" />
-            <div v-else class="editor-status">{{ editorError || "正在初始化编辑器..." }}</div>
+    <!-- 工作区：工具栏下方仅文档区滚动，大纲悬浮固定不随动 -->
+    <div class="yaniv-editor__workspace">
+      <div class="document-body">
+        <div
+          v-if="editor && !isPreviewMode && resolvedExtensionGates.outline"
+          class="document-body__outline-rail"
+        >
+          <Transition name="outline-panel">
+            <OutlinePanel
+              v-if="showOutlinePanel"
+              :placement="props.outlinePlacement"
+              :scroll-parent="getScrollParent"
+              :zoom-level="zoomLevel"
+            />
+          </Transition>
+        </div>
+        <div ref="containerRef" class="document-container">
+          <CodeBlockLanguageBadge
+            v-if="editor && !isPreviewMode && toolbarConfig.codeBlock"
+            :container="containerRef"
+          />
+          <div class="document-pages" :style="{ transform: `scale(${zoomLevel / 100})` }">
+            <div class="continuous-pages">
+              <EditorContent v-if="editor" :editor="editor" class="document-content" />
+              <div v-else class="editor-status">{{ editorError || "正在初始化编辑器..." }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -85,7 +99,17 @@
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  shallowRef,
+  toRef,
+  Transition,
+  watch,
+} from "vue";
 
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
@@ -119,6 +143,7 @@ const props = withDefaults(defineProps<YanivEditorProps>(), {
   initialContent: "<p>开始编辑你的文档...</p>",
   themePreset: "default",
   themeMode: "light",
+  outlinePlacement: "top-left",
 });
 
 const isPreviewMode = computed(() => props.previewMode);
@@ -133,6 +158,8 @@ provideYanivEditor(editor);
 const editorError = ref<string | null>(null);
 const rootRef = ref<HTMLElement | null>(null);
 const containerRef = ref<HTMLElement | null>(null);
+
+const getScrollParent = () => containerRef.value;
 
 useEditorTheme({
   rootRef,
@@ -226,11 +253,22 @@ const initEditor = async () => {
       isFirstInit.value = false;
     }
 
+    if (!containerRef.value) {
+      await nextTick();
+    }
+
+    const scrollContainer = containerRef.value;
+    if (!scrollContainer) {
+      console.warn("[YanivEditor] document-container not ready; outline scroll sync disabled.");
+    }
+
     const extensions = await buildEditorExtensions({
       features: gates,
-      outline: {
-        scrollParent: () => containerRef.value ?? window,
-      },
+      outline: scrollContainer
+        ? {
+            scrollParent: () => containerRef.value ?? scrollContainer,
+          }
+        : undefined,
       officePaste: {
         onPasteFromOfficeWithImages: () =>
           Modal.info({

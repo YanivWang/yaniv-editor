@@ -17,6 +17,9 @@ export interface GalleryImage {
 
 export type MediaUploadHandler = (file: File) => Promise<string>;
 
+/** 大纲悬浮面板锚点位置 */
+export type OutlinePlacement = "top-left" | "top-right";
+
 /**
  * 编辑器功能配置
  * @description 所有布尔开关均为 opt-in，须显式 `true` 才开启；推荐使用 editorPresets
@@ -96,6 +99,11 @@ export interface YanivEditorProps {
    * @default 'light'
    */
   themeMode?: ThemeMode;
+  /**
+   * 大纲悬浮面板位置
+   * @default 'top-left'
+   */
+  outlinePlacement?: OutlinePlacement;
 }
 
 /**

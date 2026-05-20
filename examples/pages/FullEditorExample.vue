@@ -1,5 +1,5 @@
 <template>
-  <div class="demo-page demo-page--full">
+  <div class="demo-page demo-page--full yaniv-editor-host">
     <YanivEditor
       v-bind="editorPresets.production"
       locale="zh-CN"

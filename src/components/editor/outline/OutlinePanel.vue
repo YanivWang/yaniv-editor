@@ -1,5 +1,5 @@
 <template>
-  <aside class="outline-panel" :aria-label="t('editor.outlineTitle')">
+  <aside class="outline-panel" :class="placementClass" :aria-label="t('editor.outlineTitle')">
     <header class="outline-panel__header">
       <span class="outline-panel__title">{{ t("editor.outlineTitle") }}</span>
       <button
@@ -17,14 +17,16 @@
       {{ t("editor.outlineEmpty") }}
     </div>
 
-    <nav v-else class="outline-panel__list">
+    <nav v-else ref="listRef" class="outline-panel__list">
       <button
         v-for="item in items"
         :key="item.id"
         type="button"
         class="outline-panel__item"
-        :class="{ 'is-active': item.isActive }"
+        :class="[headingLevelClass(item.originalLevel), { 'is-active': item.isActive }]"
         :style="{ paddingLeft: `${12 + (item.level - 1) * 14}px` }"
+        :data-outline-id="item.id"
+        :aria-current="item.isActive ? 'location' : undefined"
         @click="scrollToHeading(item)"
       >
         <span v-if="item.itemIndex" class="outline-panel__index">{{ item.itemIndex }}.</span>
@@ -36,11 +38,13 @@
 
 <script setup lang="ts">
 import { CloseOutlined } from "@ant-design/icons-vue";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { useYanivEditor } from "@/core/editorContext";
+import type { OutlinePlacement } from "@/core/editorTypes";
 import { t } from "@/locales";
 
+import { getOutlineScrollOffset, scrollToOutlineHeading } from "./scrollToOutlineHeading";
 import { useOutlinePanel } from "./useOutlinePanel";
 
 import type { Editor } from "@tiptap/core";
@@ -49,21 +53,90 @@ interface OutlineItem {
   id: string;
   textContent: string;
   level: number;
+  originalLevel: number;
   itemIndex: number;
   isActive: boolean;
   pos: number;
+  dom?: HTMLElement;
 }
 
 interface Props {
   editor?: Editor | null;
+  placement?: OutlinePlacement;
+  scrollParent?: () => HTMLElement | null;
+  zoomLevel?: number;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  placement: "top-left",
+  scrollParent: () => null,
+  zoomLevel: 100,
+});
 
 const { close } = useOutlinePanel();
 const items = ref<OutlineItem[]>([]);
+const listRef = ref<HTMLElement | null>(null);
 
 const editor = useYanivEditor(() => props.editor);
+
+const placementClass = computed(() => `outline-panel--${props.placement}`);
+
+const activeItemId = computed(() => items.value.find((item) => item.isActive)?.id ?? null);
+
+function clampHeadingLevel(level: number): number {
+  return Math.min(6, Math.max(1, Math.round(level) || 1));
+}
+
+function headingLevelClass(originalLevel: number): string {
+  return `outline-panel__item--h${clampHeadingLevel(originalLevel)}`;
+}
+
+function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): T {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return ((...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), wait);
+  }) as T;
+}
+
+function resolveHeadingIdAtSelection(e: Editor): string | null {
+  const { $from } = e.state.selection;
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const node = $from.node(depth);
+    if (node.type.name === "heading") {
+      const tocId = node.attrs["data-toc-id"];
+      if (typeof tocId === "string" && tocId.length > 0) return tocId;
+      const id = node.attrs.id;
+      if (typeof id === "string" && id.length > 0) return id;
+    }
+  }
+  return null;
+}
+
+function resolveActiveIdByScroll(scrollParent: HTMLElement, source: OutlineItem[]): string | null {
+  const containerRect = scrollParent.getBoundingClientRect();
+  let activeId: string | null = null;
+
+  for (const item of source) {
+    const el = item.dom;
+    if (!el || !(el instanceof HTMLElement)) continue;
+
+    const relativeTop = el.getBoundingClientRect().top - containerRect.top;
+    if (relativeTop <= getOutlineScrollOffset(scrollParent)) {
+      activeId = item.id;
+    }
+  }
+
+  return activeId;
+}
+
+function applyActiveState(source: OutlineItem[], activeId: string | null): OutlineItem[] {
+  if (!activeId) return source;
+  return source.map((item) => ({
+    ...item,
+    isActive: item.id === activeId,
+  }));
+}
 
 function syncItems() {
   const e = editor.value;
@@ -73,8 +146,28 @@ function syncItems() {
   }
 
   const storage = e.storage as { tableOfContents?: { content?: OutlineItem[] } };
-  items.value = [...(storage.tableOfContents?.content ?? [])];
+  let nextItems: OutlineItem[] = (storage.tableOfContents?.content ?? []).map((item) => ({
+    ...item,
+    originalLevel: clampHeadingLevel(item.originalLevel ?? item.level),
+  }));
+
+  const scrollParent = props.scrollParent();
+  if (scrollParent) {
+    const scrollActiveId = resolveActiveIdByScroll(scrollParent, nextItems);
+    if (scrollActiveId) {
+      nextItems = applyActiveState(nextItems, scrollActiveId);
+    }
+  }
+
+  const selectionActiveId = resolveHeadingIdAtSelection(e);
+  if (selectionActiveId) {
+    nextItems = applyActiveState(nextItems, selectionActiveId);
+  }
+
+  items.value = nextItems;
 }
+
+const debouncedSyncItems = debounce(syncItems, 50);
 
 function scrollToHeading(item: OutlineItem) {
   const e = editor.value;
@@ -83,8 +176,26 @@ function scrollToHeading(item: OutlineItem) {
   e.chain()
     .focus()
     .setTextSelection(item.pos + 1)
-    .scrollIntoView()
     .run();
+
+  const scrollParent = props.scrollParent();
+  if (!scrollToOutlineHeading(scrollParent, item.dom)) {
+    e.commands.scrollIntoView();
+  }
+}
+
+let boundScrollParent: HTMLElement | null = null;
+
+function bindScrollParent(element: HTMLElement | null) {
+  if (boundScrollParent) {
+    boundScrollParent.removeEventListener("scroll", debouncedSyncItems);
+    boundScrollParent = null;
+  }
+
+  if (!element) return;
+
+  element.addEventListener("scroll", debouncedSyncItems, { passive: true });
+  boundScrollParent = element;
 }
 
 function attachEditorListeners(e: Editor | null) {
@@ -92,6 +203,7 @@ function attachEditorListeners(e: Editor | null) {
 
   e.on("transaction", syncItems);
   e.on("update", syncItems);
+  e.on("selectionUpdate", syncItems);
   syncItems();
 }
 
@@ -100,6 +212,7 @@ function detachEditorListeners(e: Editor | null) {
 
   e.off("transaction", syncItems);
   e.off("update", syncItems);
+  e.off("selectionUpdate", syncItems);
 }
 
 watch(
@@ -111,114 +224,31 @@ watch(
   { immediate: true },
 );
 
-onMounted(syncItems);
+watch(
+  () => props.scrollParent(),
+  (element) => {
+    bindScrollParent(element);
+    syncItems();
+  },
+  { immediate: true },
+);
+
+watch(
+  () => props.zoomLevel,
+  () => {
+    syncItems();
+  },
+);
+
+watch(activeItemId, (id, prevId) => {
+  if (!id || id === prevId || !listRef.value) return;
+
+  const activeButton = listRef.value.querySelector<HTMLElement>(`[data-outline-id="${id}"]`);
+  activeButton?.scrollIntoView({ block: "nearest" });
+});
 
 onBeforeUnmount(() => {
   detachEditorListeners(editor.value);
+  bindScrollParent(null);
 });
 </script>
-
-<style scoped lang="scss">
-.outline-panel {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px;
-  height: 100%;
-  background: var(--ye-bg);
-  border-right: 1px solid var(--ye-border);
-}
-
-.outline-panel__header {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--ye-border);
-}
-
-.outline-panel__title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ye-text);
-}
-
-.outline-panel__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  color: var(--ye-text-secondary);
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: var(--ye-radius-sm);
-  transition: background var(--ye-transition-normal);
-
-  &:hover {
-    background: var(--ye-bg-hover);
-  }
-}
-
-.outline-panel__empty {
-  padding: 16px 12px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ye-text-muted);
-}
-
-.outline-panel__list {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  min-height: 0;
-  padding: 8px 0;
-  overflow-y: auto;
-}
-
-.outline-panel__item {
-  display: flex;
-  gap: 4px;
-  align-items: flex-start;
-  width: 100%;
-  padding: 6px 12px 6px 0;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--ye-text-secondary);
-  text-align: left;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  transition:
-    color var(--ye-transition-normal),
-    background var(--ye-transition-normal);
-
-  &:hover {
-    color: var(--ye-primary);
-    background: var(--ye-bg-hover);
-  }
-
-  &.is-active {
-    color: var(--ye-primary);
-    background: var(--ye-primary-light);
-  }
-}
-
-.outline-panel__index {
-  flex-shrink: 0;
-  opacity: 0.65;
-}
-
-.outline-panel__text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>
