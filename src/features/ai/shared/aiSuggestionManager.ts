@@ -168,7 +168,7 @@ class AiSuggestionManager {
           this.isExecutingRef.value = false;
           this.hide();
           notification.error({
-            message: t("editor.customAi"),
+            message: t("messages.customAiFailed"),
             description: error.message,
             duration: 3,
             placement: "topRight",

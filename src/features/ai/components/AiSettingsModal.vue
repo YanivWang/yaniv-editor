@@ -98,7 +98,7 @@
 
       <!-- 操作按钮 -->
       <div class="ai-settings__actions">
-        <a-button danger @click="handleClear">{{ t("aiSettings.clear") }}</a-button>
+        <a-button danger @click="handleClear">{{ t("aiSettings.clearConfig") }}</a-button>
         <div class="ai-settings__actions-right">
           <a-button @click="handleClose">{{ t("aiSettings.cancel") }}</a-button>
           <a-button type="primary" :disabled="!canSave" @click="handleSave">

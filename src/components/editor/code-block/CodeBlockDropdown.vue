@@ -2,7 +2,7 @@
   <ToolbarGroup>
     <ToolbarDropdownButton
       :icon="CodeOutlined"
-      :title="t('toolbar.insertCodeBlock')"
+      :title="t('editor.insertCodeBlock')"
       :active="isCodeOrBlockActive"
       :items="menuItems"
       placement="bottomLeft"

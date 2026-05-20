@@ -1,77 +1,6 @@
 import type { TiptapLocale } from "./types";
 
 export const enUS: TiptapLocale = {
-  toolbar: {
-    // Text format
-    bold: "Bold",
-    italic: "Italic",
-    underline: "Underline",
-    strikethrough: "Strikethrough",
-    code: "Code",
-    subscript: "Subscript",
-    superscript: "Superscript",
-
-    // Clear format
-    clear: "Clear",
-    clearFormat: "Clear Format",
-    formatPainter: "Format Painter",
-
-    // Headings
-    heading: "Heading",
-    heading1: "Heading 1",
-    heading2: "Heading 2",
-    heading3: "Heading 3",
-    heading4: "Heading 4",
-    heading5: "Heading 5",
-    heading6: "Heading 6",
-    paragraph: "Paragraph",
-
-    // Font
-    fontFamily: "Font",
-    fontSize: "Font Size",
-    lineHeight: "Line Height",
-
-    // Colors
-    textColor: "Text Color",
-    backgroundColor: "Background Color",
-    highlightColor: "Highlight Color",
-
-    // Lists
-    bulletList: "Bullet List",
-    orderedList: "Numbered List",
-    taskList: "Task List",
-    indent: "Indent",
-    outdent: "Outdent",
-
-    // Alignment
-    alignLeft: "Align Left",
-    alignCenter: "Align Center",
-    alignRight: "Align Right",
-    alignJustify: "Justify",
-
-    // Insert
-    insertLink: "Insert Link",
-    insertImage: "Insert Image",
-    insertTable: "Insert Table",
-    insertCodeBlock: "Insert Code Block",
-    insertHorizontalRule: "Insert Horizontal Rule",
-
-    // Link
-    link: "Link",
-    linkUrl: "Link URL",
-    linkText: "Link Text",
-    openLink: "Open Link",
-    editLink: "Edit Link",
-    removeLink: "Remove Link",
-
-    // Undo/Redo
-    undo: "Undo",
-    redo: "Redo",
-
-    // More
-    more: "More",
-  },
-
   table: {
     insertTable: "Insert Table",
     deleteTable: "Delete Table",
@@ -91,12 +20,9 @@ export const enUS: TiptapLocale = {
   },
 
   dragMenu: {
-    delete: "Delete",
-    duplicate: "Duplicate",
-    copy: "Copy",
-    cut: "Cut",
-    moveUp: "Move Up",
-    moveDown: "Move Down",
+    duplicateBlock: "Duplicate Block",
+    deleteBlock: "Delete Block",
+    transformTo: "Transform to",
   },
 
   codeBlock: {
@@ -109,13 +35,11 @@ export const enUS: TiptapLocale = {
     characters: "Characters",
     words: "Words",
     pages: "Pages",
-    zoom: "Zoom",
-    reset: "Reset",
+    resetZoom: "Reset Zoom",
     total: "Total",
   },
 
   placeholder: {
-    default: "Type something...",
     heading: "Heading",
     paragraph: "Enter text or type '/' for commands",
     codeBlock: "Enter code",
@@ -130,90 +54,67 @@ export const enUS: TiptapLocale = {
     pasteCleanedUp: "Pasted content has been cleaned up",
     linkRequired: "Link URL is required",
     linkInvalid: "Invalid link URL",
-    // AI feature error messages
     translationFailed: "Translation failed",
     polishFailed: "Polish failed",
     summarizeFailed: "Summarize failed",
     continueWritingFailed: "Continue writing failed",
     customAiFailed: "Custom AI failed",
+    wordImportSuccess: "Word file imported successfully",
+    wordExportSuccess: "Word file exported successfully",
+    wordImportFailed: "Word file import failed",
+    wordExportFailed: "Word file export failed",
   },
 
   editor: {
-    // Heading shortcuts
+    paragraph: "Paragraph",
+    heading: "Heading",
     h1: "Heading 1",
     h2: "Heading 2",
     h3: "Heading 3",
     h4: "Heading 4",
     h5: "Heading 5",
     h6: "Heading 6",
-    paragraph: "Paragraph",
-    heading: "Heading",
-    heading1: "Heading 1",
-    heading2: "Heading 2",
-    heading3: "Heading 3",
-    heading4: "Heading 4",
-    heading5: "Heading 5",
-    heading6: "Heading 6",
 
-    // Text format
     bold: "Bold",
     italic: "Italic",
     underline: "Underline",
-    strike: "Strikethrough",
+    strikethrough: "Strikethrough",
     inlineCode: "Code",
     superscript: "Superscript",
     subscript: "Subscript",
 
-    // Lists
     bulletList: "Bullet List",
     orderedList: "Numbered List",
     taskList: "Task List",
 
-    // Alignment
     align: "Align",
     alignLeft: "Align Left",
     alignCenter: "Align Center",
     alignRight: "Align Right",
     alignJustify: "Justify",
 
-    // Indent
-    indent: "Indent",
-    outdent: "Outdent",
-    indentAndAlign: "Indent and Align",
-
-    // Colors
     colors: "Colors",
-    text: "Text",
-    highlight: "Highlight",
     textColor: "Text Color",
     backgroundColor: "Background Color",
     defaultColors: "Default Colors",
     standardColors: "Standard Colors",
     showAdvanced: "Advanced Picker",
-    hideAdvanced: "Hide",
+    hideAdvanced: "Hide Advanced Options",
     clearColor: "Clear Color",
 
-    // Actions
-    actions: "Actions",
-    cut: "Cut",
-    copy: "Copy",
-    delete: "Delete",
-
-    // Basic operations
     undo: "Undo",
     redo: "Redo",
     clearFormat: "Clear Format",
     formatPainter: "Format Painter",
 
-    // Font
-    font: "Font",
+    fontFamily: "Font",
     fontSize: "Font Size",
     lineHeight: "Line Height",
 
-    // Insert
     insertLink: "Insert Link",
     insertImage: "Insert Image",
     insertTable: "Insert Table",
+    insertCodeBlock: "Insert Code Block",
     image: "Image",
     link: "Link",
     editLink: "Edit Link",
@@ -222,23 +123,18 @@ export const enUS: TiptapLocale = {
     linkPlaceholder: "Enter link URL",
     imagePlaceholder: "Enter image URL",
 
-    // Table
     deleteTable: "Delete Table",
     includeHeader: "Include Header",
 
-    // Upload
     localUpload: "Local Upload",
     localUploadImage: "Upload Image from Local",
     webUpload: "Web Upload",
     clickOrDragUpload: "Click or drag file to this area to upload",
     onlySupportImage: "Only image formats are supported",
-    video: "Video",
     localUploadVideo: "Upload Video from Local",
     uploadVideo: "Upload Video",
     onlySupportVideo: "Only video formats are supported",
-    supportImageAndVideo: "Image and video formats are supported",
 
-    // Word Import/Export
     word: "Word",
     importWord: "Import Word",
     exportWord: "Export Word",
@@ -247,27 +143,18 @@ export const enUS: TiptapLocale = {
     importing: "Importing...",
     exporting: "Exporting...",
     exportFilenamePlaceholder: "Enter file name",
-    importSuccess: "Word file imported successfully",
-    exportSuccess: "Word file exported successfully",
-    importFailed: "Word file import failed",
-    exportFailed: "Word file export failed",
 
-    // More
-    more: "More",
-    aiTool: "AI Tool",
     ai: "AI",
 
-    // Format painter related
-    pleaseSelectTextToSample: "Please select text to sample first",
-    pleaseSelectTextToSampleShort: "Please select text first",
-    pleaseSelectTextToSampleDouble: "Please double-click to select text to sample",
-    sampleSuccessSingle: "Format sampled successfully, click target text to apply format",
-    sampleSuccessContinuous:
+    formatPainterSelectTextFirst: "Please select text to sample first",
+    formatPainterSelectTextHint: "Please select text first",
+    formatPainterDoubleClickSelect: "Please double-click to select text to sample",
+    formatPainterAppliedOnce: "Format sampled successfully, click target text to apply format",
+    formatPainterAppliedMulti:
       "Format sampled successfully, you can click multiple target texts to apply format",
     formatPainterExited: "Format painter mode exited",
     formatPainterDisabled: "Format painter is currently disabled",
 
-    // Find & replace
     findReplace: "Find & Replace",
     findReplaceTitle: "Find & Replace",
     findPlaceholder: "Find",
@@ -276,16 +163,15 @@ export const enUS: TiptapLocale = {
     findPrev: "Previous match",
     replaceOnce: "Replace",
     replaceAll: "Replace all",
-    caseSensitiveShort: "Match case",
+    findReplaceMatchCase: "Match case",
 
-    // Outline
     outlineToggle: "Document outline",
     outlineTitle: "Outline",
     outlineEmpty: "No headings yet. Add H1–H6 to build an outline.",
     outlineClose: "Close outline",
 
     toolbarLabel: "Editor toolbar",
-    toolbarSectionHistory: "Edit",
+    toolbarSectionHistory: "History",
     toolbarSectionTypography: "Font",
     toolbarSectionParagraph: "Paragraph",
     toolbarSectionInsert: "Insert",
@@ -297,19 +183,16 @@ export const enUS: TiptapLocale = {
       "Shortcuts vary by OS: find, bold, italic, undo/redo — see tooltips in the toolbar.",
     officePasteImageTitle: "Paste from Office/WPS with images detected",
     officePasteImageBody:
-      "Inline images were replaced by placeholders while keeping styles from HTML where possible. To embed originals, upload via Insert Image or paste content with fewer images.",
+      "Inline images were replaced by placeholders while keeping HTML styles where possible. To embed originals, upload via Insert Image, or paste content with fewer images and try again.",
 
-    // Link related
     enterValidLink: "Please enter a valid link URL",
 
-    // Math
     math: "Math Formula",
     mathInline: "Inline Formula",
     mathBlock: "Block Formula",
     mathPlaceholder: "Enter LaTeX formula...",
     mathEmpty: "Click to edit formula",
 
-    // Template
     insertTemplate: "Insert Template",
     templateMeetingMinutes: "Meeting Minutes",
     templateMeetingMinutesDesc: "Meeting template with agenda, decisions, and action items",
@@ -322,14 +205,12 @@ export const enUS: TiptapLocale = {
     templateProductRequirement: "Product Requirement",
     templateProductRequirementDesc: "Product Requirement Document (PRD) template",
 
-    // Gallery
     imageGallery: "Image Gallery",
     galleryEmpty: "No Images",
     galleryEmptyHint: "No images have been inserted in this document yet",
     galleryCount: "{total} total, {selected} selected",
     galleryInsert: "Insert Selected",
 
-    // AI related
     continueWriting: "Continue Writing",
     polish: "Polish Text",
     summarize: "Summarize Content",
@@ -338,7 +219,6 @@ export const enUS: TiptapLocale = {
     customAi: "Custom AI",
     selectLanguage: "Select Language",
 
-    // AI suggestion related
     aiSuggestion: "AI Suggestion",
     aiContinueWriting: "AI Continue Writing:",
     originalText: "Original:",
@@ -346,16 +226,12 @@ export const enUS: TiptapLocale = {
     generatedContent: "Generated Content:",
     generating: "Generating...",
     selectedContent: "Selected Content:",
-    currentStatus: "Current Status",
-    noTextSelected: "No text selected, AI content will be inserted at cursor position",
-    // AI feature prompt messages
     pleaseSelectText: "Please select text first",
     continueWritingRequiresSelection: "Continue writing requires selecting text to continue",
     polishRequiresSelection: "Polish function requires selecting text to polish first",
     summarizeRequiresSelection: "Summarize function requires selecting text to summarize first",
     translateRequiresSelection: "Translation function requires selecting text to translate first",
     customAiRequiresSelection: "Custom AI function requires selecting text to process first",
-    aiPrompt: "AI Prompt",
     aiPromptPlaceholder: "Enter AI instruction, e.g.: Optimize this text, Translate to English...",
     customAiCommand: "Custom AI Command",
     execute: "Execute",
@@ -363,7 +239,6 @@ export const enUS: TiptapLocale = {
     reject: "Reject",
     accept: "Accept",
 
-    // Language codes
     lang: {
       "zh-CN": "Simplified Chinese",
       "zh-TW": "Traditional Chinese",
@@ -436,7 +311,7 @@ export const enUS: TiptapLocale = {
     viewDocs: "View Docs",
     save: "Save",
     cancel: "Cancel",
-    clear: "Clear Config",
+    clearConfig: "Clear Config",
   },
 };
 

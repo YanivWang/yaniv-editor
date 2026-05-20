@@ -57,6 +57,7 @@ import {
   ExportOutlined,
   InboxOutlined,
 } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
@@ -115,9 +116,11 @@ async function handleImport(options: any) {
     const { importWordFile } = await import("./wordImport");
     await importWordFile(e, file as File);
     importModalOpen.value = false;
+    message.success(t("messages.wordImportSuccess"));
     onSuccess?.({});
   } catch (err) {
     console.error("[WordButton] Import failed:", err);
+    message.error(t("messages.wordImportFailed"));
     onError?.(err);
   } finally {
     importing.value = false;
@@ -138,8 +141,10 @@ async function doExport() {
     const name = exportFilename.value.trim() || "document";
     await exportToWord(html, name);
     exportModalOpen.value = false;
+    message.success(t("messages.wordExportSuccess"));
   } catch (err) {
     console.error("[WordButton] Export failed:", err);
+    message.error(t("messages.wordExportFailed"));
   } finally {
     exporting.value = false;
   }

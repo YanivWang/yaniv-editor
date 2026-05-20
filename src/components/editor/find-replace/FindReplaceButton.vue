@@ -22,7 +22,7 @@
           :placeholder="t('editor.replacePlaceholder')"
           allow-clear
         />
-        <Checkbox v-model:checked="caseSens">{{ t("editor.caseSensitiveShort") }}</Checkbox>
+        <Checkbox v-model:checked="caseSens">{{ t("editor.findReplaceMatchCase") }}</Checkbox>
       </Space>
       <div class="find-replace-form__actions">
         <Button type="primary" size="small" @click="handleFindPrev">{{

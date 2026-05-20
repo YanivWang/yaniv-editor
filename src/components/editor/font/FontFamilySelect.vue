@@ -1,7 +1,7 @@
 <template>
   <a-select
     v-model:value="currentFont"
-    :placeholder="t('toolbar.fontFamily')"
+    :placeholder="t('editor.fontFamily')"
     class="font-family-select"
     style="width: 140px"
     @change="onFontChange"

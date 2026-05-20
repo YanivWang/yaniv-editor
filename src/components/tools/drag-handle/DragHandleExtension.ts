@@ -12,6 +12,8 @@ import {
 } from "@tiptap/pm/model";
 import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
+import { t } from "@/locales";
+
 import type { EditorView } from "@tiptap/pm/view";
 
 export interface DragInsertMenuContext {
@@ -385,66 +387,72 @@ function createTransformItems(view: EditorView, target: DragTarget): BlockMenuIt
   const { schema } = view.state;
   const text = target.node.textContent;
 
-  return [
+  const transforms: Array<{ id: string; slashKey: string; run: () => void }> = [
     {
       id: "paragraph",
-      label: "正文",
+      slashKey: "paragraph",
       run: () => replaceTargetNode(view, target, createParagraph(schema, text)),
     },
     {
       id: "heading1",
-      label: "标题 1",
+      slashKey: "heading1",
       run: () => replaceTargetNode(view, target, createHeading(schema, 1, text)),
     },
     {
       id: "heading2",
-      label: "标题 2",
+      slashKey: "heading2",
       run: () => replaceTargetNode(view, target, createHeading(schema, 2, text)),
     },
     {
       id: "heading3",
-      label: "标题 3",
+      slashKey: "heading3",
       run: () => replaceTargetNode(view, target, createHeading(schema, 3, text)),
     },
     {
       id: "blockquote",
-      label: "引用",
+      slashKey: "blockquote",
       run: () => replaceTargetNode(view, target, createBlockquote(schema, text)),
     },
     {
       id: "bulletList",
-      label: "无序列表",
+      slashKey: "bulletList",
       run: () => replaceTargetNode(view, target, createList(schema, "bulletList", text)),
     },
     {
       id: "orderedList",
-      label: "有序列表",
+      slashKey: "orderedList",
       run: () => replaceTargetNode(view, target, createList(schema, "orderedList", text)),
     },
     {
       id: "codeBlock",
-      label: "代码块",
+      slashKey: "codeBlock",
       run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
     },
   ];
+
+  return transforms.map(({ id, slashKey, run }) => ({
+    id,
+    label: t(`slashCommand.${slashKey}`),
+    run,
+  }));
 }
 
 function createActionItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
   return [
     {
       id: "duplicate",
-      label: "复制块",
+      label: t("dragMenu.duplicateBlock"),
       run: () => duplicateTargetNode(view, target),
     },
     {
       id: "delete",
-      label: "删除块",
+      label: t("dragMenu.deleteBlock"),
       danger: true,
       run: () => deleteTargetNode(view, target),
     },
     {
       id: "turnInto",
-      label: "转换",
+      label: t("dragMenu.transformTo"),
       dividerBefore: true,
       submenu: createTransformItems(view, target),
     },

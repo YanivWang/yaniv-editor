@@ -3,7 +3,7 @@
     <a-button size="small" @click="onZoomOut">-</a-button>
     <span class="zoom-level">{{ zoomLevel }}%</span>
     <a-button size="small" @click="onZoomIn">+</a-button>
-    <a-button size="small" @click="onReset">{{ t("stats.reset") }}</a-button>
+    <a-button size="small" @click="onReset">{{ t("stats.resetZoom") }}</a-button>
     <span class="page-info">{{ t("stats.total") }} {{ totalPages }} {{ t("stats.pages") }}</span>
     <span v-if="showCharCount && editor" class="char-count">
       {{ characterCount }} {{ t("stats.characters") }} / {{ wordCount }} {{ t("stats.words") }}

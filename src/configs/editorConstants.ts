@@ -76,16 +76,16 @@ export const LINE_HEIGHTS = [
 ] as const;
 
 /**
- * 段落样式选项
+ * 段落样式选项（label 由 i18n `editor.{value}` 提供）
  */
 export const HEADING_OPTIONS = [
-  { label: "正文", value: "paragraph" },
-  { label: "H1", value: "h1" },
-  { label: "H2", value: "h2" },
-  { label: "H3", value: "h3" },
-  { label: "H4", value: "h4" },
-  { label: "H5", value: "h5" },
-  { label: "H6", value: "h6" },
+  { value: "paragraph" },
+  { value: "h1" },
+  { value: "h2" },
+  { value: "h3" },
+  { value: "h4" },
+  { value: "h5" },
+  { value: "h6" },
 ] as const;
 
 /** 代码块默认语言 */

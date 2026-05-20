@@ -128,18 +128,18 @@ function toggleFormatPainter() {
     try {
       const selection = e.state.selection;
       if (!selection || selection.empty) {
-        message.warning(t("editor.pleaseSelectTextToSample"));
+        message.warning(t("editor.formatPainterSelectTextFirst"));
         return;
       }
     } catch (error) {
-      message.warning(t("editor.pleaseSelectTextToSampleShort"));
+      message.warning(t("editor.formatPainterSelectTextHint"));
       return;
     }
 
     // 采样格式并激活格式刷（单次模式）
     const success = e.commands.startFormatPainting();
     if (success) {
-      message.success(t("editor.sampleSuccessSingle"));
+      message.success(t("editor.formatPainterAppliedOnce"));
       updateFormatPainterActive();
     }
   } else {
@@ -171,18 +171,18 @@ function toggleFormatPainterContinuous() {
     try {
       const selection = e.state.selection;
       if (!selection || selection.empty) {
-        message.warning(t("editor.pleaseSelectTextToSampleDouble"));
+        message.warning(t("editor.formatPainterDoubleClickSelect"));
         return;
       }
     } catch (error) {
-      message.warning(t("editor.pleaseSelectTextToSampleShort"));
+      message.warning(t("editor.formatPainterSelectTextHint"));
       return;
     }
 
     // 采样格式并激活格式刷（连续模式）
     const success = e.commands.startContinuousFormatPainting();
     if (success) {
-      message.success(t("editor.sampleSuccessContinuous"));
+      message.success(t("editor.formatPainterAppliedMulti"));
       updateFormatPainterActive();
     }
   } else {

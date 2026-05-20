@@ -51,7 +51,7 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             selectedText,
             contextRange,
             insertPosition,
-            t("editor.continueWriting"),
+            t("messages.continueWritingFailed"),
           );
 
           return true;

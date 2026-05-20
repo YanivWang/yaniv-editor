@@ -1,5 +1,7 @@
 import { notification } from "ant-design-vue";
 
+import { t } from "@/locales";
+
 import { aiClient } from "../client";
 
 import { removeAiHighlight } from "./AiHighlightMark";
@@ -91,7 +93,7 @@ export const aiSuggestionStreams = {
       selectedText,
       selection,
       aiClient.polish.bind(aiClient),
-      "润色失败",
+      t("messages.polishFailed"),
     ),
   summarize: (editor: Editor, selectedText: string, selection: { from: number; to: number }) =>
     runAiSuggestionStream(
@@ -99,6 +101,6 @@ export const aiSuggestionStreams = {
       selectedText,
       selection,
       aiClient.summarize.bind(aiClient),
-      "总结失败",
+      t("messages.summarizeFailed"),
     ),
 };

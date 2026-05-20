@@ -1,7 +1,7 @@
 <template>
   <a-select
     v-model:value="currentFontSize"
-    :placeholder="t('toolbar.fontSize')"
+    :placeholder="t('editor.fontSize')"
     class="font-size-select"
     :dropdown-match-select-width="true"
     option-label-prop="label"

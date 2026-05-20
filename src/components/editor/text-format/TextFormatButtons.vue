@@ -74,7 +74,7 @@ const textFormats = computed<TextFormat[]>(() => [
   {
     name: "strike",
     icon: StrikethroughOutlined,
-    title: t("editor.strike"),
+    title: t("editor.strikethrough"),
     action: () => runCommand((chain) => chain.toggleStrike())(),
   },
 ]);

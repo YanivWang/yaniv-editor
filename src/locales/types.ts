@@ -1,83 +1,21 @@
 /**
  * Tiptap 编辑器多语言类型定义
+ *
+ * 命名约定：
+ * - editor.*       UI 标签、按钮、占位符、aria 文案
+ * - messages.*     Toast / 通知类反馈（成功、失败、警告）
+ * - placeholder.*  编辑器内容区占位符
+ * - stats.*        状态栏统计与缩放
+ * - table.*        表格上下文菜单
+ * - slashCommand.* 斜杠命令 / 块选择菜单
+ * - dragMenu.*     拖拽手柄块菜单
+ * - codeBlock.*    代码块控件
+ * - aiSettings.*   AI 设置弹窗
  */
 
 export type LocaleCode = "zh-CN" | "en-US";
 
 export interface TiptapLocale {
-  // 工具栏
-  toolbar: {
-    // 文本格式
-    bold: string;
-    italic: string;
-    underline: string;
-    strikethrough: string;
-    code: string;
-    subscript: string;
-    superscript: string;
-
-    // 清除格式
-    clear: string;
-    clearFormat: string;
-    formatPainter: string;
-
-    // 标题
-    heading: string;
-    heading1: string;
-    heading2: string;
-    heading3: string;
-    heading4: string;
-    heading5: string;
-    heading6: string;
-    paragraph: string;
-
-    // 字体
-    fontFamily: string;
-    fontSize: string;
-    lineHeight: string;
-
-    // 颜色
-    textColor: string;
-    backgroundColor: string;
-    highlightColor: string;
-
-    // 列表
-    bulletList: string;
-    orderedList: string;
-    taskList: string;
-    indent: string;
-    outdent: string;
-
-    // 对齐
-    alignLeft: string;
-    alignCenter: string;
-    alignRight: string;
-    alignJustify: string;
-
-    // 插入
-    insertLink: string;
-    insertImage: string;
-    insertTable: string;
-    insertCodeBlock: string;
-    insertHorizontalRule: string;
-
-    // 链接
-    link: string;
-    linkUrl: string;
-    linkText: string;
-    openLink: string;
-    editLink: string;
-    removeLink: string;
-
-    // 撤销重做
-    undo: string;
-    redo: string;
-
-    // 更多
-    more: string;
-  };
-
-  // 表格相关
   table: {
     insertTable: string;
     deleteTable: string;
@@ -96,42 +34,32 @@ export interface TiptapLocale {
     fixTables: string;
   };
 
-  // 拖拽菜单
   dragMenu: {
-    delete: string;
-    duplicate: string;
-    copy: string;
-    cut: string;
-    moveUp: string;
-    moveDown: string;
+    duplicateBlock: string;
+    deleteBlock: string;
+    transformTo: string;
   };
 
-  // 代码块
   codeBlock: {
     language: string;
     selectLanguage: string;
     exitCodeBlock: string;
   };
 
-  // 统计信息
   stats: {
     characters: string;
     words: string;
     pages: string;
-    zoom: string;
-    reset: string;
+    resetZoom: string;
     total: string;
   };
 
-  // 占位符
   placeholder: {
-    default: string;
     heading: string;
     paragraph: string;
     codeBlock: string;
   };
 
-  // 错误和提示
   messages: {
     imageUploadFailed: string;
     imageUploadSuccess: string;
@@ -141,62 +69,46 @@ export interface TiptapLocale {
     pasteCleanedUp: string;
     linkRequired: string;
     linkInvalid: string;
-    // AI 功能错误消息
     translationFailed: string;
     polishFailed: string;
     summarizeFailed: string;
     continueWritingFailed: string;
     customAiFailed: string;
+    wordImportSuccess: string;
+    wordExportSuccess: string;
+    wordImportFailed: string;
+    wordExportFailed: string;
   };
 
-  // 编辑器功能相关（用于 features 组件）
   editor: {
-    // 标题快捷方式
+    paragraph: string;
+    heading: string;
     h1: string;
     h2: string;
     h3: string;
     h4: string;
     h5: string;
     h6: string;
-    paragraph: string;
-    heading: string;
-    heading1: string;
-    heading2: string;
-    heading3: string;
-    heading4: string;
-    heading5: string;
-    heading6: string;
 
-    // 文本格式
     bold: string;
     italic: string;
     underline: string;
-    strike: string;
+    strikethrough: string;
     inlineCode: string;
     superscript: string;
     subscript: string;
 
-    // 列表
     bulletList: string;
     orderedList: string;
     taskList: string;
 
-    // 对齐
     align: string;
     alignLeft: string;
     alignCenter: string;
     alignRight: string;
     alignJustify: string;
 
-    // 缩进
-    indent: string;
-    outdent: string;
-    indentAndAlign: string;
-
-    // 颜色
     colors: string;
-    text: string;
-    highlight: string;
     textColor: string;
     backgroundColor: string;
     defaultColors: string;
@@ -205,27 +117,19 @@ export interface TiptapLocale {
     hideAdvanced: string;
     clearColor: string;
 
-    // 操作
-    actions: string;
-    cut: string;
-    copy: string;
-    delete: string;
-
-    // 基础操作
     undo: string;
     redo: string;
     clearFormat: string;
     formatPainter: string;
 
-    // 字体
-    font: string;
+    fontFamily: string;
     fontSize: string;
     lineHeight: string;
 
-    // 插入
     insertLink: string;
     insertImage: string;
     insertTable: string;
+    insertCodeBlock: string;
     image: string;
     link: string;
     editLink: string;
@@ -234,23 +138,18 @@ export interface TiptapLocale {
     linkPlaceholder: string;
     imagePlaceholder: string;
 
-    // 表格
     deleteTable: string;
     includeHeader: string;
 
-    // 上传
     localUpload: string;
     localUploadImage: string;
     webUpload: string;
     clickOrDragUpload: string;
     onlySupportImage: string;
-    video: string;
     localUploadVideo: string;
     uploadVideo: string;
     onlySupportVideo: string;
-    supportImageAndVideo: string;
 
-    // Word 导入/导出
     word: string;
     importWord: string;
     exportWord: string;
@@ -259,26 +158,17 @@ export interface TiptapLocale {
     importing: string;
     exporting: string;
     exportFilenamePlaceholder: string;
-    importSuccess: string;
-    exportSuccess: string;
-    importFailed: string;
-    exportFailed: string;
 
-    // 更多
-    more: string;
-    aiTool: string;
     ai: string;
 
-    // 格式刷相关
-    pleaseSelectTextToSample: string;
-    pleaseSelectTextToSampleShort: string;
-    pleaseSelectTextToSampleDouble: string;
-    sampleSuccessSingle: string;
-    sampleSuccessContinuous: string;
+    formatPainterSelectTextFirst: string;
+    formatPainterSelectTextHint: string;
+    formatPainterDoubleClickSelect: string;
+    formatPainterAppliedOnce: string;
+    formatPainterAppliedMulti: string;
     formatPainterExited: string;
     formatPainterDisabled: string;
 
-    // 查找替换
     findReplace: string;
     findReplaceTitle: string;
     findPlaceholder: string;
@@ -287,15 +177,13 @@ export interface TiptapLocale {
     findPrev: string;
     replaceOnce: string;
     replaceAll: string;
-    caseSensitiveShort: string;
+    findReplaceMatchCase: string;
 
-    // 大纲
     outlineToggle: string;
     outlineTitle: string;
     outlineEmpty: string;
     outlineClose: string;
 
-    // 工具栏分区（信息架构 / 可访问性）
     toolbarLabel: string;
     toolbarSectionHistory: string;
     toolbarSectionTypography: string;
@@ -306,21 +194,17 @@ export interface TiptapLocale {
     toolbarSectionAssistant: string;
     statusBarShortcutHints: string;
     statusBarShortcutHintsTitle: string;
-    // Office 粘贴提示
     officePasteImageTitle: string;
     officePasteImageBody: string;
 
-    // 链接相关
     enterValidLink: string;
 
-    // 数学公式
     math: string;
     mathInline: string;
     mathBlock: string;
     mathPlaceholder: string;
     mathEmpty: string;
 
-    // 模板插入
     insertTemplate: string;
     templateMeetingMinutes: string;
     templateMeetingMinutesDesc: string;
@@ -333,14 +217,12 @@ export interface TiptapLocale {
     templateProductRequirement: string;
     templateProductRequirementDesc: string;
 
-    // 图库
     imageGallery: string;
     galleryEmpty: string;
     galleryEmptyHint: string;
     galleryCount: string;
     galleryInsert: string;
 
-    // AI 相关
     continueWriting: string;
     polish: string;
     summarize: string;
@@ -349,7 +231,6 @@ export interface TiptapLocale {
     customAi: string;
     selectLanguage: string;
 
-    // AI 建议相关
     aiSuggestion: string;
     aiContinueWriting: string;
     originalText: string;
@@ -357,16 +238,12 @@ export interface TiptapLocale {
     generatedContent: string;
     generating: string;
     selectedContent: string;
-    currentStatus: string;
-    noTextSelected: string;
-    // AI 功能提示信息
     pleaseSelectText: string;
     continueWritingRequiresSelection: string;
     polishRequiresSelection: string;
     summarizeRequiresSelection: string;
     translateRequiresSelection: string;
     customAiRequiresSelection: string;
-    aiPrompt: string;
     aiPromptPlaceholder: string;
     customAiCommand: string;
     execute: string;
@@ -374,7 +251,6 @@ export interface TiptapLocale {
     reject: string;
     accept: string;
 
-    // 语言代码
     lang: {
       "zh-CN": string;
       "zh-TW": string;
@@ -395,7 +271,6 @@ export interface TiptapLocale {
     };
   };
 
-  // 斜杠命令菜单
   slashCommand: {
     noResults: string;
     basicBlocks: string;
@@ -433,7 +308,6 @@ export interface TiptapLocale {
     horizontalRuleDesc: string;
   };
 
-  // AI 设置
   aiSettings: {
     title: string;
     provider: string;
@@ -449,7 +323,7 @@ export interface TiptapLocale {
     viewDocs: string;
     save: string;
     cancel: string;
-    clear: string;
+    clearConfig: string;
   };
 }
 
