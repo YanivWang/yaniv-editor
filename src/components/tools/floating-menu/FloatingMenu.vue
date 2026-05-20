@@ -8,7 +8,7 @@
   >
     <div class="menu-content">
       <div class="menu-group">
-        <HeadingControl variant="buttons" />
+        <HeadingControl variant="dropdown" :editor="editor" />
       </div>
 
       <div class="menu-group">
@@ -24,7 +24,7 @@
           @select="setTextColor"
         />
         <ColorPicker
-          :icon="HighlightOutlined"
+          :icon="BackgroundColorIcon"
           type="background"
           :model-value="currentBgColor"
           :title="t('editor.backgroundColor')"
@@ -57,10 +57,10 @@
 /**
  * FloatingMenu - 选中文本时的浮动工具栏
  */
-import { HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { ThunderboltOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 
-import { ColorPicker, TextColorIcon } from "@/components/editor/color";
+import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
 import { HeadingControl } from "@/components/editor/heading";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";

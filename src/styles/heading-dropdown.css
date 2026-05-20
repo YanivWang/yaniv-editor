@@ -1,11 +1,21 @@
 /**
- * 标题/正文下拉菜单样式
+ * 标题/正文下拉菜单样式（顶栏 + 悬浮菜单共用）
  */
+
+/* 下拉触发按钮（显示「正文」「标题 1」等） */
+.heading-control-dropdown .ye-dropdown-btn {
+  min-width: 56px;
+  padding-inline: 8px;
+}
+
+.heading-control-dropdown .ye-dropdown-btn__label {
+  font-size: 14px;
+}
 
 .ye-heading-dropdown-overlay .ant-menu {
   min-width: 180px;
-  padding: 8px;
-  border-radius: 12px;
+  padding: 4px;
+  border-radius: 10px;
   box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
 }
 
@@ -15,11 +25,11 @@
   margin: 0;
   margin-block: 0;
   line-height: normal;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item + .ant-menu-item {
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item:not(.ant-menu-item-disabled):hover {
@@ -37,9 +47,11 @@
 }
 
 .ye-heading-dropdown-overlay .ye-dropdown-menu-item {
+  gap: 6px;
   width: 100%;
   min-width: 0;
-  padding: 10px 12px;
+  padding: 4px 10px;
+  font-size: 14px;
 }
 
 .ye-heading-dropdown-overlay .ye-dropdown-menu-item__check {

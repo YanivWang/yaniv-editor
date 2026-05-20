@@ -147,7 +147,9 @@
       >
         <!-- 如果提供了图标，显示图标；否则显示颜色预览 -->
         <template v-if="icon">
-          <component :is="icon" class="ye-color-icon" />
+          <span class="ye-color-icon-wrap">
+            <component :is="icon" />
+          </span>
           <span class="ye-color-indicator" :style="indicatorBarStyle" />
         </template>
         <div v-else class="ye-color-current-preview" />
@@ -514,12 +516,8 @@ $dark-selector: "[data-theme=" dark "] &";
   }
 
   &.has-icon {
-    overflow: hidden;
-  }
-
-  &.has-icon.is-text,
-  &.has-icon.is-background {
-    gap: 1px;
+    gap: 2px;
+    padding: 6px 0 5px;
   }
 
   &:hover {
@@ -538,37 +536,56 @@ $dark-selector: "[data-theme=" dark "] &";
   border-radius: 2px;
 }
 
-/* 图标样式 */
-.ye-color-icon {
-  font-size: 18px;
-  line-height: 1;
+/* 图标区域：固定尺寸，保证文字/背景色按钮上下对齐 */
+.ye-color-icon-wrap {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 16px;
+  line-height: 0;
   color: #262626;
-  transition: color 0.2s;
 
   #{$dark-selector} {
     color: #f0f0f0;
   }
+
+  :deep(.color-icon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 16px;
+    line-height: 0;
+  }
+
+  :deep(.color-icon--text) {
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  :deep(.color-icon--background .anticon) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 0;
+  }
+
+  :deep(.color-icon--background .anticon svg) {
+    display: block;
+  }
 }
 
-.is-text .ye-color-icon,
-.is-background .ye-color-icon {
-  font-size: 18px;
-}
-
-:deep(.color-icon--text) {
-  display: block;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1;
-}
-
-/* 背景颜色图标下方的当前色条 */
+/* 图标下方的当前色条 */
 .ye-color-indicator {
   display: block;
   flex-shrink: 0;
-  width: 14px;
+  width: 16px;
   height: 3px;
   border-radius: 1px;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);

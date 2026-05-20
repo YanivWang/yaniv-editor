@@ -44,7 +44,7 @@
                 @select="setTextColor"
               />
               <ColorPicker
-                :icon="HighlightOutlined"
+                :icon="BackgroundColorIcon"
                 type="background"
                 :model-value="currentBgColor"
                 :title="t('editor.backgroundColor')"
@@ -147,12 +147,12 @@
  * ToolbarNav - 公共工具栏组件
  * @description 自然换行工具带：编辑 → 字体 → 段落 → 插入 → 文档 → 工具 → 智能
  */
-import { HighlightOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { ThunderboltOutlined } from "@ant-design/icons-vue";
 import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
 
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
-import { ColorPicker, TextColorIcon } from "@/components/editor/color";
+import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
 import FindReplaceButton from "@/components/editor/find-replace/FindReplaceButton.vue";
 import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";

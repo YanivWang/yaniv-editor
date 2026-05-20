@@ -1,15 +1,14 @@
 <template>
-  <ToolbarGroup v-if="variant === 'buttons'">
+  <ToolbarGroup v-if="variant === 'buttons'" class="heading-control-buttons">
     <ToolbarButton
       v-for="heading in buttonHeadings"
       :key="heading.level"
       :title="heading.title"
       :active="isHeadingActive(heading.level)"
-      class="heading-btn"
       :data-level="heading.level"
       @click="heading.action"
     >
-      H{{ heading.level }}
+      <span class="ye-heading-btn-label">H{{ heading.level }}</span>
     </ToolbarButton>
   </ToolbarGroup>
 
@@ -103,21 +102,3 @@ const dropdownItems = computed<MenuItemConfig[]>(() => {
   }));
 });
 </script>
-
-<style scoped>
-.heading-btn {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-:deep(.heading-control-dropdown .ye-dropdown-btn) {
-  min-width: 56px;
-  padding-inline: 8px;
-}
-
-:deep(.heading-control-dropdown .ye-dropdown-btn__label) {
-  font-size: 13px;
-}
-</style>
