@@ -4,7 +4,8 @@
       <RouterLink class="demo-nav__brand" :to="{ name: 'full-editor' }">Yaniv Editor</RouterLink>
       <nav class="demo-nav__links">
         <RouterLink :to="{ name: 'full-editor' }">完整编辑器</RouterLink>
-        <RouterLink :to="{ name: 'inline-plugins' }">行内拼装</RouterLink>
+        <RouterLink :to="{ name: 'inline-editor' }">行内编辑器</RouterLink>
+        <RouterLink :to="{ name: 'inline-compose' }">行内自行拼装</RouterLink>
       </nav>
     </header>
     <RouterView />

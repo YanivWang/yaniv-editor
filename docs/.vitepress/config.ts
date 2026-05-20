@@ -51,6 +51,7 @@ export default defineConfig({
           text: "API",
           items: [
             { text: "YanivEditor", link: "/api/yaniv-editor" },
+            { text: "YanivInlineEditor", link: "/api/yaniv-inline-editor" },
             { text: "功能配置", link: "/api/features-config" },
             { text: "Composables", link: "/api/composables" },
           ],

@@ -7,7 +7,6 @@ import { CharacterCount } from "@tiptap/extension-character-count";
 import { Color } from "@tiptap/extension-color";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Highlight } from "@tiptap/extension-highlight";
-import { Link } from "@tiptap/extension-link";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Table } from "@tiptap/extension-table";
@@ -32,12 +31,12 @@ import {
   AiHighlightMark,
 } from "@/features/ai";
 import { t } from "@/locales";
-import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 import { codeBlockLowlightExtension } from "./codeBlockLowlight";
 import { FontSize } from "./fontSize";
 import { FormatPainter } from "./formatPainter";
 import { LineHeight } from "./lineHeight";
+import { createLinkExtension } from "./linkExtension";
 import { ListShortcuts } from "./listShortcuts";
 import { OfficePaste, type OfficePasteOptions } from "./office-paste";
 import { PasteImage } from "./pasteImage";
@@ -142,17 +141,7 @@ export async function buildEditorExtensions(options: ExtensionsOptions): Promise
   }
 
   // 链接扩展
-  extensions.push(
-    Link.configure({
-      openOnClick: true, // 允许点击链接跳转
-      protocols: ["http", "https", "mailto", "tel"],
-      isAllowedUri: (url) => normalizeSafeUrl(url) !== null,
-      HTMLAttributes: {
-        target: "_blank",
-        rel: "noopener noreferrer",
-      },
-    }),
-  );
+  extensions.push(createLinkExtension());
 
   // 列表扩展
   extensions.push(TaskList);

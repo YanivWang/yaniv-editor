@@ -25,3 +25,32 @@
 
 /* Inline content area typography and focus reset. */
 @import "./inline-content.css";
+
+/* Inline shell + toolbar layout (YanivInlineEditor). */
+.yaniv-inline-editor {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inline-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--ye-toolbar-bg);
+  border-bottom: 1px solid var(--ye-border);
+}
+
+.yaniv-inline-editor__content {
+  min-height: 120px;
+  padding: 12px 16px;
+}
+
+.yaniv-inline-editor__status {
+  min-height: 120px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--ye-text-muted, #64748b);
+}

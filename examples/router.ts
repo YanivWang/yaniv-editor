@@ -11,9 +11,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import("./pages/FullEditorExample.vue"),
   },
   {
-    path: "/inline-plugins",
-    name: "inline-plugins",
-    component: () => import("./pages/InlinePluginsExample.vue"),
+    path: "/inline-editor",
+    name: "inline-editor",
+    component: () => import("./pages/InlineEditorExample.vue"),
+  },
+  {
+    path: "/inline-compose",
+    name: "inline-compose",
+    component: () => import("./pages/InlineComposeExample.vue"),
   },
   {
     path: "/:pathMatch(.*)*",
