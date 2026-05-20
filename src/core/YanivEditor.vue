@@ -234,6 +234,16 @@ const getInitialContent = (): string | JSONContent => {
   return normalizeInitialContent(props.initialContent);
 };
 
+/** localeEpoch 在 whenLocaleReady 后会重挂载模板，需多等几帧再取 document-container */
+const resolveScrollContainer = async (): Promise<HTMLElement | null> => {
+  if (containerRef.value) return containerRef.value;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    await nextTick();
+    if (containerRef.value) return containerRef.value;
+  }
+  return null;
+};
+
 const initEditor = async () => {
   if (isInitializing.value) return;
 
@@ -248,11 +258,7 @@ const initEditor = async () => {
       isFirstInit.value = false;
     }
 
-    if (!containerRef.value) {
-      await nextTick();
-    }
-
-    const scrollContainer = containerRef.value;
+    const scrollContainer = await resolveScrollContainer();
     if (!scrollContainer) {
       console.warn("[YanivEditor] document-container not ready; outline scroll sync disabled.");
     }
