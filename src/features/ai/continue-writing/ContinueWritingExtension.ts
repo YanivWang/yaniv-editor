@@ -6,6 +6,14 @@ import { t } from "@/locales";
 
 export type ContinueWritingOptions = Record<string, never>;
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    continueWriting: {
+      continueWriting: () => ReturnType;
+    };
+  }
+}
+
 export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>({
   name: "continueWriting",
 

@@ -19,6 +19,14 @@ YanivEditor
 
 扩展注册由 `buildEditorExtensions()` 完成，UI 显示由 `useEditorFeatures()` 与 `features` 门控对齐。
 
+## 样式接入
+
+Full Editor 使用完整主题入口：
+
+- **组件入口**：`import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor"`
+- **样式入口**：`import "@yanivjs/yaniv-editor/style.css"`
+- **禁止**拆片 import `src/styles/` 内单个 CSS 文件
+
 ## 基础用法
 
 ```vue
@@ -126,7 +134,7 @@ examples 中的 Full Editor 演示页额外包含：
 - 多主题切换 UI
 - 自动演示脚本
 
-这些属于 Demo 壳层，**不是** `YanivEditor` 内置能力。生产集成只需引入组件与样式即可。
+这些属于 Demo 壳层，**不是** `YanivEditor` 内置能力。生产集成需要引入组件，并显式引入一行完整主题 `style.css`。
 
 ## 下一步
 

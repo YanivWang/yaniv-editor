@@ -8,6 +8,3 @@ export * from "./AiHighlightMark";
 
 // Export AI Suggestion Manager (used by summarize, translation, etc.)
 export * from "./aiSuggestionManager";
-
-// Import styles
-import "./ai-highlight.css";

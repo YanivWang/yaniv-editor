@@ -1,0 +1,24 @@
+/**
+ * Yaniv Editor - Inline Stylesheet Entry
+ *
+ * Inline CSS is a lightweight aggregate for toolbar composition. Keep concrete
+ * styles in feature modules and only list the modules needed by the inline
+ * entry here.
+ */
+
+/* CSS variables must be loaded first. */
+@import "./variables.css";
+
+/* Base editor and content primitives. */
+@import "./base.css";
+
+/* Toolbar primitives used by inline controls. */
+@import "./toolbar.css";
+@import "./toolbar-dropdown.css";
+@import "./heading-dropdown.css";
+@import "./floating-menu-toolbar.css";
+
+/* Content features required by the first inline entry surface. */
+@import "./task-list.css";
+@import "./placeholder.css";
+@import "./code-block.css";

@@ -31,8 +31,6 @@ import { t } from "@/locales";
 
 import type { Editor } from "@tiptap/core";
 
-import "@/styles/zoom-toolbar.css";
-
 const props = withDefaults(
   defineProps<{
     zoomLevel: number;

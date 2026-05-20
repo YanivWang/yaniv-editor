@@ -29,6 +29,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@yanivjs/yaniv-editor": ["src/index.ts"],
+      "@yanivjs/yaniv-editor/inline": ["src/inline.ts"],
+      "@yanivjs/yaniv-editor/style.css": ["src/styles/index.css"],
+      "@yanivjs/yaniv-editor/inline.css": ["src/styles/inline.css"],
       "vue-types": ["node_modules/vue-types"]
     },
 

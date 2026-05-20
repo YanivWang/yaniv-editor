@@ -1,9 +1,15 @@
 /**
- * Yaniv Editor - Main Stylesheet Entry
- * Import this file to get all styles
+ * Yaniv Editor - Main Stylesheet Entry（唯一全量主题入口）
+ *
+ * 对外契约：
+ * - npm: import '@yanivjs/yaniv-editor/style.css'
+ * - 源码/monorepo: import '@/styles/index.css'
+ *
+ * 禁止引入方按本目录内单个文件拆片 import（如 toolbar-dropdown.css）。
+ * 新增全局功能样式只在此文件增加 @import。
  */
 
-/* CSS Variables (Light + Dark themes) */
+/* CSS Variables (Light + Dark themes) — 必须最先 */
 @import "./variables.css";
 
 /* Base editor styles */
@@ -26,3 +32,13 @@
 /* Features */
 @import "./table.css";
 @import "./image-toolbar.css";
+@import "./block-picker.css";
+@import "./drag-handle.css";
+@import "./placeholder.css";
+@import "./code-block.css";
+@import "./outline.css";
+@import "./zoom-toolbar.css";
+
+/* Tool chrome（原组件内零散 import，统一纳入全量包） */
+@import "../components/tools/footer-nav/footer-nav.css";
+@import "../features/ai/shared/ai-highlight.css";

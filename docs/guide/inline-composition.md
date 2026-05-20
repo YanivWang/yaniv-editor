@@ -1,6 +1,6 @@
 # Inline 按需拼装
 
-当 Full Editor 过重时，可以不使用 `YanivEditor`，而是**直接用 Tiptap `Editor` + 零散工具栏组件**组装轻量编辑器。examples 中的 `/inline-plugins` 演示了这一模式。
+当 Full Editor 过重时，可以不使用 `YanivEditor`，而是直接用 Tiptap `Editor` + Inline 工具栏组件组装轻量编辑器。examples 中的 `/inline-plugins` 演示了这一模式。
 
 ## 适用场景
 
@@ -14,10 +14,28 @@
 ```text
 new Editor({ extensions: [...] })
   + EditorContent
-  + 按需渲染 Toolbar 组件（UndoRedoButton、HeadingDropdown、TextFormatButtons ...）
+  + 按需渲染 Inline 工具栏组件（UndoRedoButton、HeadingControl、TextFormatButtons ...）
 ```
 
-工具栏组件从 `@/components/editor` 路径导入（对外集成可参考 examples 或按需 re-export）。
+Inline 模式下，业务方负责创建和销毁 Tiptap `Editor`，并决定注册哪些 Tiptap extensions。Yaniv Editor 只提供可复用的工具栏组件与 `inline.css` 样式入口。
+
+## 样式接入
+
+Inline 使用独立入口：
+
+```ts
+import { UndoRedoButton, HeadingControl, TextFormatButtons } from "@yanivjs/yaniv-editor/inline";
+import "@yanivjs/yaniv-editor/inline.css";
+```
+
+`inline.css` 由 `src/styles/inline.css` 聚合构建，第一版只包含 Inline 工具栏基础样式。不要单独 import `src/styles/toolbar.css`、`src/styles/toolbar-dropdown.css` 等内部文件。
+
+Full Editor 仍使用：
+
+```ts
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
+```
 
 ## 示例结构
 
@@ -25,22 +43,28 @@ new Editor({ extensions: [...] })
 <script setup lang="ts">
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { onMounted, onBeforeUnmount, ref } from "vue";
 
 import {
   UndoRedoButton,
-  HeadingDropdown,
+  HeadingControl,
   TextFormatButtons,
-  LinkButton,
-} from "@/components/editor";
+  ListTools,
+} from "@yanivjs/yaniv-editor/inline";
+import "@yanivjs/yaniv-editor/inline.css";
 
 const editor = ref<Editor | null>(null);
 
 onMounted(() => {
   editor.value = new Editor({
     content: "<p>Start typing...</p>",
-    extensions: [StarterKit.configure({ underline: false }), Underline],
+    extensions: [
+      StarterKit.configure({ underline: false }),
+      Underline,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
     editorProps: {
       attributes: { class: "inline-prose" },
     },
@@ -56,66 +80,65 @@ onBeforeUnmount(() => {
   <div class="inline-editor-card">
     <div v-if="editor" class="inline-toolbar">
       <UndoRedoButton :editor="editor" />
-      <HeadingDropdown :editor="editor" />
+      <HeadingControl variant="dropdown" :editor="editor" />
       <TextFormatButtons :editor="editor" />
-      <LinkButton :editor="editor" />
+      <ListTools :editor="editor" />
     </div>
     <EditorContent v-if="editor" :editor="editor" />
   </div>
 </template>
 ```
 
-完整可参考仓库 `examples/components/InlinePluginDemo.vue`。
+完整可参考仓库 `examples/pages/InlinePluginsExample.vue`。
 
-## 可复用的工具栏组件
+## 组件与扩展对应关系
 
-| 组件                | 功能                                |
-| ------------------- | ----------------------------------- |
-| `UndoRedoButton`    | 撤销 / 重做                         |
-| `HeadingDropdown`   | H1–H6 标题                          |
-| `TextFormatButtons` | 粗体、斜体、下划线、删除线          |
-| `FontSizeSelect`    | 字号                                |
-| `ListTools`         | 有序 / 无序 / 任务列表              |
-| `AlignDropdown`     | 对齐                                |
-| `LinkButton`        | 插入链接                            |
-| `CodeBlockDropdown` | 代码块                              |
-| `ClearFormatButton` | 清除格式                            |
-| `ImageUpload`       | 图片上传（支持 `uploadImage` 回调） |
+Inline 组件只负责 UI 与命令触发，不会替业务方自动注册 Tiptap extension。按钮能否生效，取决于 `new Editor({ extensions })` 中是否注册了对应能力。
 
-## 动态插件面板
+| Inline 组件         | 依赖的 Tiptap 能力 / extension                                                |
+| ------------------- | ----------------------------------------------------------------------------- |
+| `UndoRedoButton`    | `StarterKit` 中的 history                                                     |
+| `HeadingControl`    | `StarterKit` 中的 heading / paragraph                                         |
+| `TextFormatButtons` | `StarterKit` 中的 bold、italic、strike；下划线需 `Underline`                  |
+| `ListTools`         | `StarterKit` 中的 bulletList、orderedList；任务列表需 `TaskList` / `TaskItem` |
+| `AlignDropdown`     | `TextAlign.configure({ types: ["heading", "paragraph"] })`                    |
+| `LinkButton`        | `Link`                                                                        |
+| `ClearFormatButton` | `StarterKit` 中的基础 marks / nodes                                           |
+| `FontSizeSelect`    | Yaniv `FontSize` extension                                                    |
+| `FontFamilySelect`  | `@tiptap/extension-font-family`                                               |
+| `CodeBlockDropdown` | `StarterKit` 中的 codeBlock，或自定义 codeBlock / lowlight                    |
 
-Inline Demo 的实现要点：
+## 第一版导出范围
 
-1. 用 reactive 数组维护插件定义（id、enabled、对应组件）
-2. `v-for` 渲染已启用插件的工具栏按钮
-3. 扩展层保持**稳定注册**（StarterKit + 常用扩展一次注册），仅 UI 层热插拔
+`@yanivjs/yaniv-editor/inline` 第一版只导出轻量工具栏组件：
 
-::: tip
-仅隐藏工具栏按钮不会移除底层扩展能力；若需真正裁剪能力，应同步调整 `extensions` 数组。
-:::
+| 组件                | 功能                                 |
+| ------------------- | ------------------------------------ |
+| `UndoRedoButton`    | 撤销 / 重做                          |
+| `HeadingControl`    | 正文 + H1-H6（`variant="dropdown"`） |
+| `TextFormatButtons` | 粗体、斜体、下划线、删除线           |
+| `ListTools`         | 有序 / 无序 / 任务列表               |
+| `AlignDropdown`     | 对齐                                 |
+| `LinkButton`        | 插入链接                             |
+| `ClearFormatButton` | 清除格式                             |
+| `FontSizeSelect`    | 字号                                 |
+| `FontFamilySelect`  | 字体                                 |
+| `CodeBlockDropdown` | 代码块                               |
 
-## 预设组合
-
-Demo 内置四套预设，可作为产品配置参考：
-
-| 预设     | 包含插件           |
-| -------- | ------------------ |
-| Minimal  | 撤销、文本格式     |
-| Writer   | + 标题、列表       |
-| Standard | + 字号、对齐、链接 |
-| Full     | + 代码块、清除格式 |
+`YanivEditor`、`editorPresets`、AI、Word、模板、图库、缩放、大纲等完整编辑器或重功能不从 `/inline` 导出。
 
 ## Full vs Inline 对比
 
-|                  | Full Editor        | Inline 拼装            |
-| ---------------- | ------------------ | ---------------------- |
-| 组件             | `YanivEditor`      | 自建 `Editor` + 工具栏 |
-| 体积             | 较大               | 可按需裁剪             |
-| 分页/缩放        | ✅                 | ❌                     |
-| AI / Word / 模板 | ✅                 | 需自行组合             |
-| 动态工具栏       | 通过 features 配置 | 运行时 UI 热插拔更灵活 |
+|                  | Full Editor                       | Inline 拼装                        |
+| ---------------- | --------------------------------- | ---------------------------------- |
+| 入口             | `@yanivjs/yaniv-editor`           | `@yanivjs/yaniv-editor/inline`     |
+| 样式             | `@yanivjs/yaniv-editor/style.css` | `@yanivjs/yaniv-editor/inline.css` |
+| 组件             | `YanivEditor`                     | 自建 `Editor` + 工具栏组件         |
+| 扩展注册         | 由 `YanivEditor` 根据 props 处理  | 业务方自己注册                     |
+| 分页/缩放        | 内置                              | 不内置                             |
+| AI / Word / 模板 | 内置完整入口                      | 不从第一版 Inline 入口导出         |
 
 ## 下一步
 
-- [媒体与图片上传](/features/media)
+- [Full Editor 集成指南](/guide/full-editor)
 - [YanivEditor API](/api/yaniv-editor)

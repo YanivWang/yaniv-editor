@@ -1,18 +1,6 @@
-.demo-app {
-  --demo-bg: #f4f7fb;
-  --demo-surface: #ffffff;
-  --demo-border: #e8edf3;
-  --demo-text: #1e293b;
-  --demo-text-muted: #64748b;
-  --demo-accent: #0ea5e9;
-  --demo-accent-hover: #0284c7;
-  --demo-accent-soft: #e0f2fe;
-  --demo-control-bg: #f1f5f9;
-  --demo-control-hover: #e2e8f0;
-  --demo-control-active: #ffffff;
-  --demo-control-active-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-  --demo-card-bg: #ffffff;
+/* Demo 壳层：仅布局与导航，编辑器能力均由 @yanivjs/yaniv-editor 提供 */
 
+.demo-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -21,244 +9,99 @@
     -apple-system,
     BlinkMacSystemFont,
     sans-serif;
-  color: var(--demo-text);
-  background: var(--demo-bg);
-  transition:
-    background 0.3s ease,
-    color 0.3s ease;
+  background: #f4f7fb;
 }
 
-.demo-app.editor-mode {
-  height: 100vh;
+.demo-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-page--full {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
-.demo-app.inline-mode {
-  height: auto;
-  min-height: 100vh;
-  overflow: auto;
+.demo-page--full > :deep(.yaniv-editor) {
+  flex: 1;
+  min-height: 0;
 }
 
-.demo-app[data-theme="dark"] {
-  --demo-bg: #0f172a;
-  --demo-surface: #1e293b;
-  --demo-border: #334155;
-  --demo-text: #f1f5f9;
-  --demo-text-muted: #94a3b8;
-  --demo-accent: #38bdf8;
-  --demo-accent-hover: #7dd3fc;
-  --demo-accent-soft: #0c4a6e;
-  --demo-control-bg: #334155;
-  --demo-control-hover: #475569;
-  --demo-control-active: #1e293b;
-  --demo-control-active-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --demo-card-bg: #1e1e1e;
-}
-
-.demo-header {
+.demo-nav {
   display: flex;
+  gap: 16px;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px;
-  background: var(--demo-surface);
-  border-bottom: 1px solid var(--demo-border);
+  padding: 12px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e8edf3;
 }
 
-.demo-header__content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.demo-nav__brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  text-decoration: none;
 }
 
-.demo-header__title {
+.demo-nav__links {
   display: flex;
   gap: 8px;
-  align-items: center;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--demo-text);
+}
+
+.demo-nav__links a {
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #64748b;
   text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.demo-header__title:hover {
-  color: var(--demo-accent);
-}
-
-.demo-header__icon {
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--demo-accent);
-  background: var(--demo-accent-soft);
   border-radius: 8px;
 }
 
-.demo-header__subtitle {
-  font-size: 14px;
-  color: var(--demo-text-muted);
+.demo-nav__links a:hover {
+  color: #1e293b;
+  background: #f1f5f9;
 }
 
-.demo-header__actions {
-  --demo-header-control-height: 36px;
-
-  display: flex;
-  gap: 12px;
-  align-items: center;
+.demo-nav__links a.router-link-active {
+  color: #1e293b;
+  background: #e0f2fe;
 }
 
-.demo-mode-switcher {
-  box-sizing: border-box;
-  display: flex;
-  gap: 2px;
-  height: var(--demo-header-control-height);
-  padding: 3px;
-  background: var(--demo-control-bg);
-  border-radius: 10px;
-}
-
-.demo-mode-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 14px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--demo-text-muted);
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.demo-mode-btn:hover {
-  color: var(--demo-text);
-  background: var(--demo-control-hover);
-}
-
-.demo-mode-btn.router-link-active {
-  color: var(--demo-text);
-  background: var(--demo-control-active);
-  box-shadow: var(--demo-control-active-shadow);
-}
-
-.demo-header-select {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  height: var(--demo-header-control-height);
-  padding: 0 12px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--demo-text);
-  white-space: nowrap;
-  cursor: pointer;
-  background: var(--demo-control-bg);
-  border: none;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.demo-header-select:hover {
-  background: var(--demo-control-hover);
-}
-
-.demo-header-select__arrow {
-  font-size: 10px;
-  opacity: 0.85;
-}
-
-.demo-main {
-  display: flex;
+.demo-page--inline {
   flex: 1;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
+  align-items: center;
+  padding: 24px;
+}
+
+.demo-inline {
   width: 100%;
-  min-height: 0;
-  padding: 0;
+  max-width: 720px;
   overflow: hidden;
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 6%);
 }
 
-.demo-main--inline {
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0;
-  overflow: auto;
-}
-
-.demo-card {
+.demo-inline__toolbar {
   display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  background: var(--demo-card-bg);
-  border-radius: 0;
-  box-shadow: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e8edf3;
 }
 
-/* 与 Tiptap-UI-Kit DeviceFrame PC 模式一致：编辑器撑满 main，滚动条在视口最右侧 */
-.demo-app.editor-mode .demo-card :deep(.yaniv-editor.document-layout) {
-  flex: 1;
-  min-height: 0;
+.demo-inline__content {
+  min-height: 200px;
+  padding: 16px 20px;
 }
 
-.theme-notion .demo-main {
-  padding: 0;
-  background: #ffffff;
+.demo-inline__content :deep(.ProseMirror) {
+  outline: none;
 }
 
-.theme-notion[data-theme="dark"] .demo-main {
-  background: #191919;
-}
-
-.theme-notion .demo-card {
-  background: #ffffff;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.theme-notion[data-theme="dark"] .demo-card {
-  background: #191919;
-}
-
-.theme-notion .document-toolbar {
-  position: fixed;
-  top: 60px;
-  right: 24px;
-  left: auto;
-  z-index: 100;
-  width: auto;
-  padding: 8px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none;
-}
-
-@media (width <= 768px) {
-  .demo-header {
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px 20px;
-  }
-
-  .demo-header__actions {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .demo-main {
-    padding: 20px;
-  }
+.demo-inline__content :deep(.ProseMirror p) {
+  margin: 0.5em 0;
 }

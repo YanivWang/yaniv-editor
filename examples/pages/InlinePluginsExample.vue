@@ -1,59 +1,45 @@
 <template>
-  <a-config-provider :theme="antdTheme">
-    <div
-      class="demo-app inline-mode"
-      :class="[`theme-${themePreset}`]"
-      :data-theme="resolvedShellTheme"
-    >
-      <DemoAppHeader
-        subtitle-key="demo.subtitle.inlinePlugins"
-        :theme-mode="themeMode"
-        :theme-preset="themePreset"
-        show-theme-mode
-        show-theme-preset
-        @update:theme-mode="themeMode = $event"
-        @update:theme-preset="themePreset = $event"
-      />
-
-      <main class="demo-main demo-main--inline">
-        <InlinePluginDemo :theme-preset="themePreset" :theme-mode="themeMode" />
-      </main>
+  <div class="demo-page demo-page--inline">
+    <div class="yaniv-editor demo-inline">
+      <div v-if="editor" class="demo-inline__toolbar">
+        <UndoRedoButton :editor="editor" />
+        <HeadingControl variant="dropdown" :editor="editor" />
+        <TextFormatButtons :editor="editor" />
+        <ListTools :editor="editor" />
+      </div>
+      <EditorContent v-if="editor" :editor="editor" class="demo-inline__content" />
     </div>
-  </a-config-provider>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { theme as antTheme } from "ant-design-vue";
-import { computed, onMounted, ref } from "vue";
+import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
+import StarterKit from "@tiptap/starter-kit";
+import { EditorContent, useEditor } from "@tiptap/vue-3";
+import { onBeforeUnmount } from "vue";
 
-import { registerTheme, useResolvedThemeMode } from "../../src/themes";
-import DemoAppHeader from "../components/DemoAppHeader.vue";
-import InlinePluginDemo from "../components/InlinePluginDemo.vue";
+import {
+  HeadingControl,
+  ListTools,
+  TextFormatButtons,
+  UndoRedoButton,
+} from "@yanivjs/yaniv-editor/inline";
+import "@yanivjs/yaniv-editor/inline.css";
 
-import type { ThemeMode, ThemePreset } from "../../src/configs/editorConfig";
+const editor = useEditor({
+  content: "<h2>行内拼装</h2><p>不包 <code>YanivEditor</code> 壳，按需挂载工具栏组件即可。</p>",
+  extensions: [
+    StarterKit.configure({ underline: false }),
+    Underline,
+    TextAlign.configure({ types: ["heading", "paragraph"] }),
+  ],
+  editorProps: {
+    attributes: { class: "inline-prose" },
+  },
+});
 
-const themeMode = ref<ThemeMode>("light");
-const themePreset = ref<ThemePreset>("default");
-
-const resolvedShellTheme = useResolvedThemeMode(themeMode);
-
-const antdTheme = computed(() => ({
-  algorithm:
-    resolvedShellTheme.value === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
-}));
-
-onMounted(() => {
-  registerTheme("custom", {
-    "--ye-primary": "#6366f1",
-    "--ye-primary-hover": "#4f46e5",
-    "--ye-bg": "#faf5ff",
-    "--ye-bg-secondary": "#f3e8ff",
-    "--ye-text": "#1e1b4b",
-    "--ye-border": "#c4b5fd",
-  });
+onBeforeUnmount(() => {
+  editor.value?.destroy();
 });
 </script>
-
-<style scoped>
-@import "../styles/example-shell.css";
-</style>

@@ -10,6 +10,8 @@ import type { YanivEditorProps, YanivEditorExpose } from "@yanivjs/yaniv-editor"
 import "@yanivjs/yaniv-editor/style.css";
 ```
 
+样式契约见 [主题与样式](/guide/theming)：一次全量 `style.css`，禁止拆片引 `src/styles/` 内单个文件。
+
 ## Props
 
 | Prop                | 类型                          | 默认值             | 说明                                                      |
@@ -59,6 +61,7 @@ interface YanivEditorExpose {
 <script setup lang="ts">
 import { ref } from "vue";
 import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
+import "@yanivjs/yaniv-editor/style.css";
 
 const editorRef = ref<InstanceType<typeof YanivEditor> | null>(null);
 

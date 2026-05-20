@@ -11,6 +11,7 @@ export * from "./configs/editorConfig";
 export { editorPresets, mergeEditorPreset } from "./configs/editorPresets";
 export type { EditorPresetName, EditorPresetProps } from "./configs/editorPresets";
 export { applyExtensionGatesToToolbarConfig } from "./configs/editorCapabilityMap";
+export { buildEditorExtensions } from "./extensions";
 
 // Themes
 export * from "./themes";
@@ -30,6 +31,3 @@ export type {
 
 // Composables（快捷键、滚动等与 UI 框架解耦的横切能力）
 export * from "./composables";
-
-// Styles - users import separately:
-// import '@yanivjs/yaniv-editor/style.css'

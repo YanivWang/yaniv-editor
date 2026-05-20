@@ -20,17 +20,7 @@
 
 在 `features.headerNav: true` 且完整工具栏时，会出现 Word 按钮。
 
-也可单独使用底层 API：
-
-```ts
-import { importWordFile, convertWordToHtml, exportToWord } from "@yanivjs/yaniv-editor";
-
-// 导入
-const html = await convertWordToHtml(file);
-
-// 导出
-await exportToWord(editor.getHTML(), "my-document");
-```
+Word 导入导出属于 Full Editor 完整工具栏能力。`@yanivjs/yaniv-editor` 根入口不会把 Word 底层转换函数作为推荐公共 API 导出，避免只接入基础编辑器时额外带入 `mammoth`、`docx`、`file-saver` 等重依赖。
 
 ## 限制
 

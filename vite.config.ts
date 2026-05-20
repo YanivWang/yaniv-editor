@@ -1,26 +1,56 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import dts from "vite-plugin-dts";
+import { existsSync, unlinkSync } from "fs";
 import { resolve } from "path";
-import type { OutputAsset, OutputBundle } from "rollup";
+import type { OutputAsset, OutputBundle, OutputChunk } from "rollup";
 import type { Plugin } from "vite";
 
 // Production build uses obfuscation
 const isProduction = process.env.NODE_ENV === "production";
 
-/** 将核心 CSS 稳定输出为 style.css，KaTeX 样式保留在 math 异步 chunk。 */
-function coreCssAssetPlugin(): Plugin {
+/** 将公开 CSS 入口稳定输出为 style.css / inline.css，KaTeX 样式保留在 math 异步 chunk。 */
+function publicCssAssetPlugin(): Plugin {
   return {
-    name: "yaniv-core-css-asset",
+    name: "yaniv-public-css-asset",
     generateBundle(_, bundle: OutputBundle) {
-      for (const asset of Object.values(bundle)) {
+      for (const [key, asset] of Object.entries(bundle)) {
+        if (asset.type === "chunk" && isCssOnlyEntryChunk(asset)) {
+          delete bundle[key];
+          continue;
+        }
+
         if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) continue;
-        if (!asset.fileName.startsWith("assets/index-")) continue;
 
         const source = typeof (asset as OutputAsset).source === "string" ? asset.source : "";
         if (source.includes("font-family:KaTeX")) continue;
 
-        asset.fileName = "style.css";
+        if (asset.fileName.startsWith("assets/style-")) {
+          asset.fileName = "style.css";
+        }
+
+        if (asset.fileName.startsWith("assets/inline-style-")) {
+          asset.fileName = "inline.css";
+        }
+      }
+    },
+  };
+}
+
+function isCssOnlyEntryChunk(chunk: OutputChunk) {
+  if (!chunk.isEntry) return false;
+  if (chunk.name !== "style" && chunk.name !== "inline-style") return false;
+  return chunk.code.trim() === "";
+}
+
+/** vite-plugin-dts may emit declarations for CSS-only entries; they are not public API. */
+function removeCssEntryDeclarationsPlugin(): Plugin {
+  return {
+    name: "yaniv-remove-css-entry-declarations",
+    closeBundle() {
+      for (const fileName of ["style.d.ts", "inline-style.d.ts"]) {
+        const filePath = resolve(__dirname, "dist", fileName);
+        if (existsSync(filePath)) unlinkSync(filePath);
       }
     },
   };
@@ -45,11 +75,16 @@ export default defineConfig({
         return { filePath, content };
       },
     }),
-    coreCssAssetPlugin(),
+    publicCssAssetPlugin(),
+    removeCssEntryDeclarationsPlugin(),
   ],
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
+      "@yanivjs/yaniv-editor/style.css": resolve(__dirname, "src/styles/index.css"),
+      "@yanivjs/yaniv-editor/inline.css": resolve(__dirname, "src/styles/inline.css"),
+      "@yanivjs/yaniv-editor/inline": resolve(__dirname, "src/inline.ts"),
+      "@yanivjs/yaniv-editor": resolve(__dirname, "src/index.ts"),
     },
   },
   server: {
@@ -59,10 +94,19 @@ export default defineConfig({
     // Modern browsers that support CSS nesting
     target: ["es2022", "chrome105", "safari16", "firefox110", "edge105"],
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: {
+        index: resolve(__dirname, "src/index.ts"),
+        inline: resolve(__dirname, "src/inline.ts"),
+        style: resolve(__dirname, "src/styles/index.css"),
+        "inline-style": resolve(__dirname, "src/styles/inline.css"),
+      },
       name: "YanivEditor",
       formats: ["es", "cjs"],
-      fileName: (format) => (format === "es" ? "index.esm.js" : "index.js"),
+      fileName: (format, entryName) => {
+        if (entryName === "index") return format === "es" ? "index.esm.js" : "index.js";
+        if (entryName === "inline") return format === "es" ? "inline.esm.js" : "inline.js";
+        return `${entryName}.js`;
+      },
     },
     minify: isProduction ? "terser" : false,
     terserOptions: isProduction

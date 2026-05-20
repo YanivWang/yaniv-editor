@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -16,7 +19,13 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js"
     },
-    "./style.css": "./dist/style.css"
+    "./inline": {
+      "types": "./dist/inline.d.ts",
+      "import": "./dist/inline.esm.js",
+      "require": "./dist/inline.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./inline.css": "./dist/inline.css"
   },
   "files": [
     "dist",

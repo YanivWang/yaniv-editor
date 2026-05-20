@@ -25,6 +25,17 @@ npm install @yanivjs/yaniv-editor
 
 完整工具栏还会用到若干 `@tiptap/extension-*` 包，请以 `package.json` 的 `peerDependencies` 为准。
 
+## 样式（一次全量，与 Element Plus 相同）
+
+| 方式            | 写法                                        | 说明                      |
+| --------------- | ------------------------------------------- | ------------------------- |
+| **完整编辑器**  | `import "@yanivjs/yaniv-editor/style.css"`  | Full Editor 完整主题入口  |
+| **Inline 拼装** | `import "@yanivjs/yaniv-editor/inline.css"` | Inline 工具栏基础样式入口 |
+
+::: danger 禁止拆片引入
+不要单独 import `toolbar.css`、`toolbar-dropdown.css` 等 `src/styles/` 内部文件；Full Editor 使用 `style.css`，Inline 拼装使用 `inline.css`。
+:::
+
 ## 最小示例
 
 ```vue

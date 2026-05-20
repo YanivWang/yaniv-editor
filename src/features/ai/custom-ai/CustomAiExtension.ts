@@ -6,6 +6,14 @@ import { t } from "@/locales";
 
 export type CustomAiOptions = Record<string, never>;
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    customAi: {
+      customAi: () => ReturnType;
+    };
+  }
+}
+
 export const CustomAiExtension = Extension.create<CustomAiOptions>({
   name: "customAi",
 

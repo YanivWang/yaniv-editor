@@ -47,7 +47,7 @@
 .ye-dropdown-btn__content {
   display: inline-flex !important;
   flex-flow: row nowrap !important;
-  gap: 2px;
+  gap: 5px;
   align-items: center !important;
   justify-content: center;
   height: 100%;
@@ -78,7 +78,6 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  margin-left: 0;
   font-size: 10px;
   line-height: 1;
   opacity: 0.65;

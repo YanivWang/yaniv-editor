@@ -34,7 +34,6 @@ import { ref, watch } from "vue";
 import { ZoomBar } from "@/components/editor/zoom";
 
 import type { Editor } from "@tiptap/vue-3";
-import "./footer-nav.css";
 
 // ===== Props =====
 interface Props {

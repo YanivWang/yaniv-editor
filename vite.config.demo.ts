@@ -28,6 +28,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
+      "@yanivjs/yaniv-editor/style.css": resolve(__dirname, "src/styles/index.css"),
+      "@yanivjs/yaniv-editor/inline.css": resolve(__dirname, "src/styles/inline.css"),
+      "@yanivjs/yaniv-editor/inline": resolve(__dirname, "src/inline.ts"),
+      "@yanivjs/yaniv-editor": resolve(__dirname, "src/index.ts"),
     },
   },
   server: {

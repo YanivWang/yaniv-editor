@@ -4,11 +4,26 @@ Yaniv Editor 通过 **单一 Design Token 文件** + **按需加载的预设 CSS
 
 ## 引入样式
 
-最低要求（含全部功能模块样式与 token）：
+Yaniv Editor 对外提供两个样式入口：Full Editor 使用完整主题 `style.css`，Inline 拼装使用轻量工具栏主题 `inline.css`。入口文件只负责聚合内部 CSS 模块，业务代码不要拆片引入内部文件。
+
+### Full Editor
 
 ```ts
+import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 ```
+
+### Inline 拼装
+
+```ts
+import { HeadingControl } from "@yanivjs/yaniv-editor/inline";
+import "@yanivjs/yaniv-editor/inline.css";
+```
+
+`style.css` ≡ 源码 `src/styles/index.css`，聚合 Full Editor 所需的完整功能样式与 Design Token。
+`inline.css` ≡ 源码 `src/styles/inline.css`，聚合 Inline 工具栏组件第一版所需的轻量基础样式。
+
+**无需**再手动 import `toolbar-dropdown.css`、`heading-dropdown.css` 等 `src/styles/` 内单个文件——这些仅供库内部聚合，**不是**对外 API。
 
 **无需**再手动 import 各 `presets/*.css`——由 `YanivEditor` 根据 `themePreset` 自动按需加载。
 
