@@ -12,14 +12,14 @@ const PLACEHOLDER_ON_FOCUS_TYPES = new Set(["paragraph"]);
 
 export const YanivPlaceholder = Placeholder.extend({
   addProseMirrorPlugins() {
-    const extension = this;
+    const { editor, options } = this;
 
     return [
       new Plugin({
         key: new PluginKey("placeholder"),
         props: {
           decorations: ({ doc, selection }) => {
-            const active = extension.editor.isEditable || !extension.options.showOnlyWhenEditable;
+            const active = editor.isEditable || !options.showOnlyWhenEditable;
             const { anchor } = selection;
             const decorations: Decoration[] = [];
 
@@ -27,7 +27,7 @@ export const YanivPlaceholder = Placeholder.extend({
               return null;
             }
 
-            const isEmptyDoc = extension.editor.isEmpty;
+            const isEmptyDoc = editor.isEmpty;
 
             doc.descendants((node, pos) => {
               const hasAnchor = anchor >= pos && anchor <= pos + node.nodeSize;
@@ -36,29 +36,29 @@ export const YanivPlaceholder = Placeholder.extend({
               const shouldShow = isEmpty && (needsFocus ? hasAnchor : true);
 
               if (shouldShow) {
-                const classes = [extension.options.emptyNodeClass];
+                const classes = [options.emptyNodeClass];
 
                 if (isEmptyDoc) {
-                  classes.push(extension.options.emptyEditorClass);
+                  classes.push(options.emptyEditorClass);
                 }
 
                 const decoration = Decoration.node(pos, pos + node.nodeSize, {
                   class: classes.join(" "),
                   "data-placeholder":
-                    typeof extension.options.placeholder === "function"
-                      ? extension.options.placeholder({
-                          editor: extension.editor,
+                    typeof options.placeholder === "function"
+                      ? options.placeholder({
+                          editor,
                           node,
                           pos,
                           hasAnchor,
                         })
-                      : extension.options.placeholder,
+                      : options.placeholder,
                 });
 
                 decorations.push(decoration);
               }
 
-              return extension.options.includeChildren;
+              return options.includeChildren;
             });
 
             return DecorationSet.create(doc, decorations);

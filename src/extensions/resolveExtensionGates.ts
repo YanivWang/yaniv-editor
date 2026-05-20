@@ -9,6 +9,7 @@ import type { FeatureConfig } from "@/core/editorTypes";
 export interface ResolvedExtensionGates {
   table: boolean;
   image: boolean;
+  video: boolean;
   math: boolean;
   ai: boolean;
   formatPainter: boolean;
@@ -51,6 +52,7 @@ export function resolveExtensionGates(
   return {
     table: isFeatureEnabled(f, "table"),
     image: isFeatureEnabled(f, "image"),
+    video: isFeatureEnabled(f, "video"),
     math: isFeatureEnabled(f, "math"),
     ai: isFeatureEnabled(f, "ai"),
     formatPainter: isFeatureEnabled(f, "formatPainter"),

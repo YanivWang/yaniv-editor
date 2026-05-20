@@ -41,7 +41,7 @@ function initConfig(): void {
 /**
  * 测试 API 连接
  */
-async function testConnection(config: AiUserConfig): Promise<ConnectionTestResult> {
+async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestResult> {
   const providerInfo = getProviderInfo(config.provider);
   if (!providerInfo) {
     return { success: false, message: "未知的提供商" };
@@ -176,8 +176,8 @@ export function useAiConfig() {
   /**
    * 测试连接
    */
-  async function testConnectionAsync(): Promise<ConnectionTestResult> {
-    const currentConfig = state.value.config;
+  async function testConnectionAsync(configOverride?: AiUserConfig): Promise<ConnectionTestResult> {
+    const currentConfig = configOverride ?? state.value.config;
     if (!currentConfig) {
       return { success: false, message: "请先配置 AI 设置" };
     }
@@ -185,7 +185,7 @@ export function useAiConfig() {
     state.value.testStatus = "testing";
     state.value.testError = null;
 
-    const result = await testConnection(currentConfig);
+    const result = await testAiConnection(currentConfig);
 
     state.value.testStatus = result.success ? "success" : "error";
     state.value.testError = result.success ? null : result.message;

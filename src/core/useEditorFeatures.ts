@@ -37,6 +37,7 @@ export function useEditorFeatures(props: YanivEditorProps) {
     linkBubbleMenu: isFeatureEnabled(features.value, "linkBubbleMenu"),
     tableToolbar: isFeatureEnabled(features.value, "tableToolbar"),
     image: isFeatureEnabled(features.value, "image"),
+    video: isFeatureEnabled(features.value, "video"),
     floatingMenu: isFeatureEnabled(features.value, "floatingMenu"),
   }));
 

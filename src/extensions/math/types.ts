@@ -25,7 +25,7 @@ export interface KatexRenderOptions {
   /** 错误颜色 */
   errorColor?: string;
   /** 是否使用严格模式 */
-  strict?: boolean | string;
+  strict?: boolean | "error" | "ignore" | "warn";
   /** 是否信任输入 */
   trust?: boolean;
   /** 宏定义 */

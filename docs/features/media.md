@@ -38,7 +38,11 @@ async function uploadImage(file: File): Promise<string> {
 }
 ```
 
-在 Full Editor 中，`ImageUpload` 内置于 `ToolbarNav`，上传回调需通过扩展 ToolbarNav 或 fork 组件接入。Inline 模式可直接传 prop。
+在 Full Editor 中可直接传入 `uploadImage`：
+
+```vue
+<YanivEditor v-bind="editorPresets.production" :upload-image="uploadImage" />
+```
 
 ### 图片能力
 
@@ -56,14 +60,15 @@ async function uploadImage(file: File): Promise<string> {
 ## 视频
 
 - 扩展：`Video`
-- 与 `features.image` 同门控
-- 支持本地上传（Base64）与 URL
+- 由 `features.video` 独立门控
+- 支持本地上传；未提供上传回调时回退为 Base64
 - 块级显示（`inline: false`）
 - 工具栏：`VideoUpload` + `VideoToolbar`
+- Full Editor 可通过 `uploadVideo(file) => Promise<string>` 透传上传逻辑
 
 ## 图库
 
-`GalleryButton` 提供内置示例图库，便于 Demo 快速插图。生产环境可替换为自有素材库组件。
+`GalleryButton` 默认从当前文档提取图片，也可通过 Full Editor 的 `galleryImages` prop 传入外部图库。
 
 ## 粘贴 Office 图片
 
@@ -75,8 +80,11 @@ async function uploadImage(file: File): Promise<string> {
 <YanivEditor
   :features="{
     image: true,
+    video: true,
     tableToolbar: true,
   }"
+  :upload-image="uploadImage"
+  :upload-video="uploadVideo"
 />
 ```
 

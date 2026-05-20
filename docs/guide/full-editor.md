@@ -42,8 +42,11 @@ import "@yanivjs/yaniv-editor/style.css";
       linkBubbleMenu: true,
       tableToolbar: true,
       image: true,
+      video: true,
       dragHandle: true,
     }"
+    :upload-image="uploadImage"
+    :upload-video="uploadVideo"
     @update="onUpdate"
   />
 </template>
@@ -72,7 +75,8 @@ import "@yanivjs/yaniv-editor/style.css";
 | `slashCommand`   | `/` 唤起 `BlockPickerMenu`（块类型选择）                | `false`               |
 | `linkBubbleMenu` | 链接编辑气泡                                            | `false`               |
 | `tableToolbar`   | 表格上下文工具栏                                        | `false`               |
-| `image`          | 图片/视频扩展与上下文工具栏                             | `false`               |
+| `image`          | 图片扩展、粘贴图片与上下文工具栏                        | `false`               |
+| `video`          | 视频扩展与上下文工具栏                                  | `false`               |
 | `table`          | 注册表格扩展                                            | `false`               |
 | `ai`             | 注册 AI 扩展                                            | `false`               |
 | `dragHandle`     | 块左侧 `+` / 六点柄与拖拽（`+` 共用 `BlockPickerMenu`） | `false`               |

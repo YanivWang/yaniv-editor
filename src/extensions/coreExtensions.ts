@@ -185,8 +185,8 @@ export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[
   // 字数统计扩展
   extensions.push(CharacterCount);
 
-  // 视频扩展（与图片/媒体能力一起走）
-  if (gates.image) {
+  // 视频扩展
+  if (gates.video) {
     extensions.push(
       Video.configure({
         inline: false,

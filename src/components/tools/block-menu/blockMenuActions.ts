@@ -9,18 +9,22 @@ function createInlineContent(schema: Schema, text: string): Fragment | null {
 }
 
 function createParagraph(schema: Schema, text = ""): ProseMirrorNode {
+  if (!schema.nodes.paragraph) throw new Error("paragraph node is not registered");
   return schema.nodes.paragraph.create(null, createInlineContent(schema, text));
 }
 
 function createHeading(schema: Schema, level: 1 | 2 | 3, text = ""): ProseMirrorNode {
+  if (!schema.nodes.heading) throw new Error("heading node is not registered");
   return schema.nodes.heading.create({ level }, createInlineContent(schema, text));
 }
 
 function createCodeBlock(schema: Schema, text = ""): ProseMirrorNode {
+  if (!schema.nodes.codeBlock) throw new Error("codeBlock node is not registered");
   return schema.nodes.codeBlock.create(null, createInlineContent(schema, text));
 }
 
 function createBlockquote(schema: Schema, text = ""): ProseMirrorNode {
+  if (!schema.nodes.blockquote) throw new Error("blockquote node is not registered");
   return schema.nodes.blockquote.create(null, createParagraph(schema, text));
 }
 
@@ -31,6 +35,7 @@ function createList(
 ): ProseMirrorNode {
   const listType = schema.nodes[type];
   const itemType = type === "taskList" ? schema.nodes.taskItem : schema.nodes.listItem;
+  if (!listType || !itemType) throw new Error(`${type} node is not registered`);
   const attrs = type === "taskList" ? { checked: false } : null;
 
   return listType.create(null, itemType.create(attrs, createParagraph(schema, text)));
@@ -120,6 +125,7 @@ export function insertBlockMediaAt(
   blockId: MediaBlockId,
   src: string,
 ): void {
+  if (!editor.state.schema.nodes[blockId]) return;
   editor.chain().insertContentAt(insertPos, { type: blockId, attrs: { src } }).focus().run();
 }
 
@@ -155,9 +161,11 @@ export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): v
       chain.toggleCodeBlock().run();
       return;
     case "table":
+      if (!editor.state.schema.nodes.table) return;
       chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
       return;
     case "math":
+      if (!editor.state.schema.nodes.math) return;
       chain.insertBlockMath().run();
       return;
     case "horizontalRule":
@@ -178,10 +186,12 @@ export function applyBlockInsert(
 
   switch (blockId) {
     case "table":
+      if (!schema.nodes.table) return;
       focusInsertPos(editor, insertPos);
       editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
       return;
     case "math":
+      if (!schema.nodes.math) return;
       focusInsertPos(editor, insertPos);
       editor.chain().focus().insertBlockMath().run();
       return;

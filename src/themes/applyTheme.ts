@@ -15,6 +15,7 @@ const THEME_CLASS_NAMES = [
 ] as const;
 
 const customThemes = new Map<string, Record<string, string>>();
+let activeCustomThemeName = "custom";
 
 export function resolveThemeMode(mode: ThemeMode): ResolvedThemeMode {
   if (mode === "auto") return getSystemTheme();
@@ -35,7 +36,7 @@ export function applyThemeToElement(
   target.setAttribute("data-theme", resolved);
 
   if (preset === "custom") {
-    const vars = customThemes.get("custom");
+    const vars = customThemes.get("custom") ?? customThemes.get(activeCustomThemeName);
     if (vars) applyCustomThemeToElement(target, vars);
   } else {
     clearCustomThemeInlineVars(target);
@@ -45,6 +46,7 @@ export function applyThemeToElement(
 }
 
 export function registerTheme(name: string, variables: Record<string, string>): void {
+  activeCustomThemeName = name;
   customThemes.set(name, variables);
 }
 
@@ -58,10 +60,10 @@ export function applyCustomThemeToElement(
 }
 
 function clearCustomThemeInlineVars(target: HTMLElement): void {
-  const vars = customThemes.get("custom");
-  if (!vars) return;
-  for (const key of Object.keys(vars)) {
-    target.style.removeProperty(key);
+  for (const vars of customThemes.values()) {
+    for (const key of Object.keys(vars)) {
+      target.style.removeProperty(key);
+    }
   }
 }
 

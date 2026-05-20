@@ -29,7 +29,7 @@ import { computed, ref, watch } from "vue";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
-import type { Editor } from "@tiptap/vue-3";
+import type { Editor } from "@tiptap/core";
 
 import "@/styles/zoom-toolbar.css";
 
@@ -137,28 +137,31 @@ const updateCounts = () => {
   }
 };
 
-// 监听编辑器内容变化
+function attachEditorListeners(ed: Editor) {
+  updateCounts();
+  ed.on("update", updateCounts);
+  ed.on("selectionUpdate", updateCounts);
+}
+
+function detachEditorListeners(ed: Editor) {
+  ed.off("update", updateCounts);
+  ed.off("selectionUpdate", updateCounts);
+}
+
+// 监听编辑器实例变化
 watch(
   editor,
-  (ed) => {
-    if (ed) {
-      // 初始化时更新一次
-      updateCounts();
+  (ed, oldEditor) => {
+    if (oldEditor) {
+      detachEditorListeners(oldEditor);
+    }
 
-      // 监听编辑器更新事件
-      ed.on("update", updateCounts);
-      ed.on("selectionUpdate", updateCounts);
+    if (ed) {
+      attachEditorListeners(ed);
+    } else {
+      updateCounts();
     }
   },
   { immediate: true },
 );
-
-// 监听编辑器销毁
-watch(editor, (ed, oldEditor) => {
-  if (oldEditor && !ed) {
-    // 编辑器被销毁时清理监听
-    oldEditor.off("update", updateCounts);
-    oldEditor.off("selectionUpdate", updateCounts);
-  }
-});
 </script>

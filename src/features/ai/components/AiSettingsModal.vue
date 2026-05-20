@@ -225,14 +225,12 @@ async function handleTest() {
   testError.value = null;
   testLatency.value = null;
 
-  // 临时保存以进行测试
   const tempConfig: AiUserConfig = {
     ...formData,
     updatedAt: Date.now(),
   };
-  saveConfig(tempConfig);
 
-  const result = await testConnection();
+  const result = await testConnection(tempConfig);
   testStatus.value = result.success ? "success" : "error";
   testError.value = result.success ? null : result.message;
   testLatency.value = result.latency ?? null;

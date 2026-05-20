@@ -64,6 +64,7 @@ export class OllamaAdapter implements AiAdapter {
     try {
       const response = await fetch(`${config.baseUrl}/chat`, {
         method: "POST",
+        signal: callbacks.signal,
         headers: {
           "Content-Type": "application/json",
         },

@@ -14,6 +14,8 @@ export function applyExtensionGatesToToolbarConfig(
     ...base,
     table: !!(base.table && gates.table),
     image: !!(base.image && gates.image),
+    video: !!(base.video && gates.video),
+    gallery: !!(base.gallery && gates.image),
     math: !!(base.math && gates.math),
     formatPainter: !!(base.formatPainter && gates.formatPainter),
     ai: !!(base.ai && gates.ai),

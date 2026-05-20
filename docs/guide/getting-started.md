@@ -19,11 +19,11 @@ npm install @yanivjs/yaniv-editor
 - `@tiptap/vue-3` ^3.0
 - `@tiptap/starter-kit` ^3.0
 - `@tiptap/pm` ^3.0
+- `ant-design-vue` ^4.0
+- `@ant-design/icons-vue` ^7.0
+- `lowlight` ^3.0
 
-可选（完整 UI 体验推荐安装）：
-
-- `ant-design-vue`
-- `@ant-design/icons-vue`
+完整工具栏还会用到若干 `@tiptap/extension-*` 包，请以 `package.json` 的 `peerDependencies` 为准。
 
 ## 最小示例
 

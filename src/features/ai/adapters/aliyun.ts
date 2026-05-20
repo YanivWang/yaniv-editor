@@ -71,6 +71,7 @@ export class AliyunAdapter implements AiAdapter {
     try {
       const response = await fetch(`${config.baseUrl}/services/aigc/text-generation/generation`, {
         method: "POST",
+        signal: callbacks.signal,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${config.apiKey}`,

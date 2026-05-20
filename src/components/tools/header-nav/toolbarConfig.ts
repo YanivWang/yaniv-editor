@@ -19,6 +19,8 @@ export interface ToolbarToolsConfig {
   align?: boolean;
   /** 是否显示图片上传工具 */
   image?: boolean;
+  /** 是否显示视频上传工具 */
+  video?: boolean;
   /** 是否显示代码块工具 */
   codeBlock?: boolean;
   /** 是否显示链接工具 */
@@ -61,6 +63,7 @@ export const COMPACT_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   list: true,
   align: true,
   image: true,
+  video: false,
   codeBlock: false,
   link: false,
   table: false,
@@ -82,6 +85,7 @@ export const FULL_TOOLBAR_CONFIG: ToolbarToolsConfig = {
   list: true,
   align: true,
   image: true,
+  video: true,
   codeBlock: true,
   link: true,
   table: true,

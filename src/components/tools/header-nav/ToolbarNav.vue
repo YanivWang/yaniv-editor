@@ -92,11 +92,14 @@
           role="group"
           :aria-label="t('editor.toolbarSectionInsert')"
         >
-          <div v-if="config.link || config.table || config.image" class="tool-group">
+          <div
+            v-if="config.link || config.table || config.image || config.video"
+            class="tool-group"
+          >
             <LinkButton v-if="config.link" />
             <TableButton v-if="config.table" />
-            <ImageUpload v-if="config.image" />
-            <VideoUpload v-if="config.image" />
+            <ImageUpload v-if="config.image" :upload-image="uploadImage" />
+            <VideoUpload v-if="config.video" :upload-video="uploadVideo" />
           </div>
 
           <div v-if="config.subscriptSuperscript || config.math" class="tool-group">
@@ -109,8 +112,8 @@
           </div>
 
           <div v-if="config.template || config.gallery" class="tool-group">
-            <TemplateButton v-if="config.template" />
-            <GalleryButton v-if="config.gallery" />
+            <TemplateButton v-if="config.template" :custom-templates="customTemplates" />
+            <GalleryButton v-if="config.gallery" :images="galleryImages" />
           </div>
         </div>
 
@@ -172,12 +175,14 @@ import { OutlineToggleButton } from "@/components/editor/outline";
 import { SubscriptSuperscriptButton } from "@/components/editor/subscript-superscript";
 import { TableButton } from "@/components/editor/table";
 import { TemplateButton } from "@/components/editor/template";
+import type { TemplateItem } from "@/components/editor/template/templates";
 import { TextFormatButtons } from "@/components/editor/text-format";
 import { UndoRedoButton } from "@/components/editor/undo-redo";
 import { VideoUpload } from "@/components/editor/video";
 import { WordButton } from "@/components/editor/word";
 import { useEditorColorState } from "@/composables/useEditorColorState";
 import { useYanivEditor } from "@/core/editorContext";
+import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";
 import { AiMenuButton } from "@/features/ai";
 import { t } from "@/locales";
 
@@ -192,6 +197,14 @@ interface Props {
   editor?: Editor | null;
   /** 工具栏配置，控制显示哪些工具 */
   config?: ToolbarToolsConfig;
+  /** 图片上传函数 */
+  uploadImage?: MediaUploadHandler;
+  /** 视频上传函数 */
+  uploadVideo?: MediaUploadHandler;
+  /** 外部图库图片源 */
+  galleryImages?: GalleryImage[];
+  /** 自定义模板列表 */
+  customTemplates?: TemplateItem[];
 }
 
 const props = defineProps<Props>();
@@ -215,6 +228,7 @@ const showSection = computed(() => {
       c.link ||
       c.table ||
       c.image ||
+      c.video ||
       c.subscriptSuperscript ||
       c.math ||
       c.word ||

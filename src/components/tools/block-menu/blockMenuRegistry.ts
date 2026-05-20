@@ -13,10 +13,16 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons-vue";
 
+import type { ResolvedExtensionGates } from "@/extensions/resolveExtensionGates";
 import { t } from "@/locales";
 
 import type { BlockMenuGroupDef, BlockMenuGroupId, BlockMenuItemId } from "./types";
 import type { Component } from "vue";
+
+export type BlockMenuFeatureGates = Pick<
+  ResolvedExtensionGates,
+  "table" | "image" | "video" | "math"
+>;
 
 interface BlockMenuItemSource {
   id: BlockMenuItemId;
@@ -150,11 +156,25 @@ const GROUP_TITLE_KEYS: Record<BlockMenuGroupId, () => string> = {
   advanced: () => t("slashCommand.advanced"),
 };
 
-export function getBlockMenuGroups(): BlockMenuGroupDef[] {
+const FEATURE_REQUIREMENTS: Partial<Record<BlockMenuItemId, keyof BlockMenuFeatureGates>> = {
+  table: "table",
+  image: "image",
+  video: "video",
+  math: "math",
+};
+
+function isBlockMenuItemAvailable(item: BlockMenuItemSource, gates?: BlockMenuFeatureGates) {
+  const requiredFeature = FEATURE_REQUIREMENTS[item.id];
+  return !requiredFeature || gates?.[requiredFeature] === true;
+}
+
+export function getBlockMenuGroups(gates?: BlockMenuFeatureGates): BlockMenuGroupDef[] {
   return GROUP_ORDER.map((groupId) => ({
     id: groupId,
     title: GROUP_TITLE_KEYS[groupId](),
-    items: BLOCK_MENU_ITEMS.filter((item) => item.group === groupId).map((item) => ({
+    items: BLOCK_MENU_ITEMS.filter(
+      (item) => item.group === groupId && isBlockMenuItemAvailable(item, gates),
+    ).map((item) => ({
       id: item.id,
       group: item.group,
       title: t(`slashCommand.${item.titleKey}`),

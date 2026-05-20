@@ -8,6 +8,10 @@
     <ToolbarNav
       v-if="editor && !isPreviewMode && shouldShowHeaderNav"
       :config="toolbarConfig"
+      :upload-image="props.uploadImage"
+      :upload-video="props.uploadVideo"
+      :gallery-images="props.galleryImages"
+      :custom-templates="props.customTemplates"
       class="document-toolbar"
     />
 
@@ -28,15 +32,20 @@
     <ImageToolbar v-if="editor && !isPreviewMode && uiFlags.image" :readonly="readonly" />
 
     <!-- 功能模块：视频工具栏（预览模式下禁用） -->
-    <VideoToolbar v-if="editor && !isPreviewMode && uiFlags.image" :readonly="readonly" />
+    <VideoToolbar v-if="editor && !isPreviewMode && uiFlags.video" :readonly="readonly" />
 
     <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
-    <FloatingMenu v-if="editor && !isPreviewMode && uiFlags.floatingMenu" :readonly="readonly" />
+    <FloatingMenu
+      v-if="editor && !isPreviewMode && uiFlags.floatingMenu"
+      :readonly="readonly"
+      :show-ai="resolvedExtensionGates.ai"
+    />
 
     <!-- 功能模块：Notion 风格块选择菜单（/ 转换当前块，+ 在下方插入新块） -->
     <BlockPickerMenu
       v-if="editor && !isPreviewMode && showBlockPickerMenu"
       ref="blockPickerMenuRef"
+      :features="resolvedExtensionGates"
     />
 
     <!-- Word 文档区域容器 -->

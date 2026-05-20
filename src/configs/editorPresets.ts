@@ -14,6 +14,7 @@ const compactFeatures = {
   toolbar: "compact",
   headerNav: true,
   image: true,
+  video: false,
   ai: true,
 } as const satisfies FeatureConfig;
 
@@ -26,6 +27,7 @@ const productionFeatures = {
   linkBubbleMenu: true,
   tableToolbar: true,
   image: true,
+  video: true,
   table: true,
   math: true,
   ai: true,

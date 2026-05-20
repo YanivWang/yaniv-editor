@@ -46,7 +46,6 @@ import { SearchOutlined } from "@ant-design/icons-vue";
 import { Modal, Input, Button, Checkbox, Space } from "ant-design-vue";
 import { ref, watch } from "vue";
 
-
 import { ToolbarButton } from "@/components/base";
 import { useFindReplaceHotkey } from "@/composables/useFindReplaceHotkey";
 import { useYanivEditor } from "@/core/editorContext";

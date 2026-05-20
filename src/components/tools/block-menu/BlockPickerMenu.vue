@@ -58,6 +58,7 @@ import {
 } from "./blockMenuActions";
 import { getBlockMenuGroups } from "./blockMenuRegistry";
 
+import type { BlockMenuFeatureGates } from "./blockMenuRegistry";
 import type {
   BlockInsertContext,
   BlockMenuItemDef,
@@ -68,6 +69,7 @@ import type { Editor } from "@tiptap/core";
 
 const props = defineProps<{
   editor?: Editor | null;
+  features?: BlockMenuFeatureGates;
 }>();
 
 const editor = useYanivEditor(() => props.editor);
@@ -80,7 +82,7 @@ const selectedIndex = ref(0);
 const menuRef = ref<HTMLElement | null>(null);
 const insertContext = ref<BlockInsertContext | null>(null);
 
-const commandGroups = computed(() => getBlockMenuGroups());
+const commandGroups = computed(() => getBlockMenuGroups(props.features));
 
 const filteredGroups = computed<BlockMenuGroupDef[]>(() => {
   const q = query.value.toLowerCase();

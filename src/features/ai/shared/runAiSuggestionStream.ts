@@ -21,7 +21,10 @@ function runStream(
   } = {},
 ): void {
   const sysPrompt = buildDocumentContextPrompt(editor);
+  const abortController = new AbortController();
   let accumulatedContent = "";
+
+  aiSuggestionManager.setAbortController(abortController);
 
   stream(content, sysPrompt, {
     onStart: () => {
@@ -35,8 +38,11 @@ function runStream(
     onComplete: () => {
       aiSuggestionManager.stopStreaming();
       aiSuggestionManager.updateSuggestion(accumulatedContent);
+      aiSuggestionManager.setAbortController(null);
     },
     onError: (error: Error) => {
+      aiSuggestionManager.setAbortController(null);
+      if (error.name === "AbortError") return;
       console.error(`[${errorTitle}]`, error);
       handlers.onError?.(error);
       aiSuggestionManager.hide();
@@ -47,6 +53,7 @@ function runStream(
         placement: "topRight",
       });
     },
+    signal: abortController.signal,
   });
 }
 

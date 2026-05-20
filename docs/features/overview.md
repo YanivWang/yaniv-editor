@@ -38,7 +38,7 @@ UI 模块  = isFeatureEnabled(features, key)
 | 链接                  |     ✅     |   —   | Link + 可选 linkBubbleMenu |
 | 表格                  |     ✅     |   —   | `features.table`           |
 | 图片（上传/URL/缩放） |     ✅     |  ✅   | `features.image`           |
-| 视频                  |     ✅     |   —   | 与 `features.image` 同门控 |
+| 视频                  |     ✅     |   —   | `features.video`           |
 | 代码块                |     ✅     |   —   | CodeBlockLowlight          |
 | 数学公式              |     ✅     |  ✅   | `features.math`            |
 | 分隔线                |     ✅     |  ✅   | StarterKit HorizontalRule  |
@@ -54,7 +54,8 @@ UI 模块  = isFeatureEnabled(features, key)
 | 斜杠命令 `/`        | `features.slashCommand: true`                   |
 | 链接气泡菜单        | `features.linkBubbleMenu: true`                 |
 | 表格工具栏          | `features.tableToolbar: true`                   |
-| 图片/视频工具栏     | `features.image: true`                          |
+| 图片工具栏          | `features.image: true`                          |
+| 视频工具栏          | `features.video: true`                          |
 | 块添加/菜单/拖拽    | `features.dragHandle: true`                     |
 | Office/WPS 粘贴增强 | `features.officePaste: true`                    |
 | 标题大纲/锚点       | `features.outline: true`                        |

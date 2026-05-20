@@ -54,7 +54,7 @@
 | -------- | ----------------------------------------------------------------------- |
 | 核心     | Vue 3、TypeScript、Tiptap 3、ProseMirror                                |
 | 构建     | Vite 6、`vite-plugin-dts`、Vue SFC                                      |
-| UI       | Ant Design Vue（可选 peer）、Lucide Icons                               |
+| UI       | Ant Design Vue、Ant Design Icons、Lucide Icons                          |
 | 文档     | VitePress                                                               |
 | 工程化   | ESLint 9 flat、Prettier、Stylelint、Husky、lint-staged、Commitlint      |
 | 依赖能力 | KaTeX（数学）、Lowlight（代码高亮）、docx / mammoth（Word）、hotkeys-js |
@@ -101,8 +101,11 @@ pnpm add @yanivjs/yaniv-editor
 | `@tiptap/pm` ^3.0                          | ProseMirror 依赖 |
 | `@tiptap/extension-table-of-contents` ^3.0 | 大纲 / 目录      |
 | `@tiptap/extension-unique-id` ^3.0         | 块级唯一 ID      |
+| `ant-design-vue` ^4.0                      | 内置 UI 组件     |
+| `@ant-design/icons-vue` ^7.0               | 内置图标         |
+| `lowlight` ^3.0                            | 代码高亮         |
 
-**推荐同时安装**（完整 UI 体验）：`ant-design-vue`、`@ant-design/icons-vue`（optional peer）。
+完整依赖列表以 `package.json` 的 `peerDependencies` 为准。
 
 ### 最小示例
 
@@ -268,7 +271,7 @@ pnpm docs:build  # 构建静态站点
 复制 [`.env.example`](.env.example) 为 `.env` 并填写 API Key：
 
 ```bash
-# Provider: openai | deepseek | anthropic | aliyun | ollama | custom
+# Provider: openai | deepseek | aliyun | ollama | custom
 VITE_AI_PROVIDER=openai
 VITE_AI_API_KEY=sk-...
 # VITE_AI_BASE_URL=

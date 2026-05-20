@@ -7,7 +7,11 @@ import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 
 import { applyThemeToElement } from "./applyTheme";
 import { loadThemePreset } from "./loadPreset";
-import { editorThemeInjectionKey, type EditorThemeContext , ResolvedThemeMode } from "./themeContext";
+import {
+  editorThemeInjectionKey,
+  type EditorThemeContext,
+  ResolvedThemeMode,
+} from "./themeContext";
 import { useResolvedThemeMode } from "./useResolvedThemeMode";
 
 export interface UseEditorThemeOptions {

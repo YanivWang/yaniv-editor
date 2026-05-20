@@ -10,9 +10,7 @@ import { resolveThemeMode, watchSystemTheme } from "./applyTheme";
 
 import type { ResolvedThemeMode } from "./themeContext";
 
-export function useResolvedThemeMode(
-  mode: Ref<ThemeMode>,
-): ComputedRef<ResolvedThemeMode> {
+export function useResolvedThemeMode(mode: Ref<ThemeMode>): ComputedRef<ResolvedThemeMode> {
   const systemTick = ref(0);
   let stopSystemWatch: (() => void) | undefined;
 

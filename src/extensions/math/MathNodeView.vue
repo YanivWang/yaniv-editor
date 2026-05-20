@@ -51,6 +51,10 @@ import { ref, computed, watch, nextTick, onMounted } from "vue";
 import "katex/dist/katex.min.css";
 import { t } from "@/locales";
 
+import { DEFAULT_KATEX_OPTIONS } from "./types";
+
+import type { MathExtensionOptions } from "./types";
+
 const props = defineProps(nodeViewProps);
 
 const isEditing = ref(false);
@@ -66,12 +70,12 @@ function renderLatex(latex: string, displayMode: boolean): string {
 
   try {
     renderError.value = null;
+    const extensionOptions = (props.extension?.options as MathExtensionOptions | undefined)
+      ?.katexOptions;
     return katex.renderToString(latex, {
+      ...DEFAULT_KATEX_OPTIONS,
+      ...extensionOptions,
       displayMode,
-      throwOnError: false,
-      errorColor: "#cc0000",
-      strict: false,
-      trust: false,
     });
   } catch (e) {
     renderError.value = e instanceof Error ? e.message : "Render error";

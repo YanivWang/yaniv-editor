@@ -64,6 +64,7 @@ export class OpenAiAdapter implements AiAdapter {
     try {
       const response = await fetch(`${config.baseUrl}/chat/completions`, {
         method: "POST",
+        signal: callbacks.signal,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${config.apiKey}`,

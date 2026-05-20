@@ -2,10 +2,20 @@
  * Yaniv Editor Types
  * @description 功能开关（features）驱动扩展注册与 UI
  */
+import type { TemplateItem } from "@/components/editor/template/templates";
 import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
 
 import type { JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
+
+export interface GalleryImage {
+  src: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
+export type MediaUploadHandler = (file: File) => Promise<string>;
 
 /**
  * 编辑器功能配置
@@ -34,8 +44,10 @@ export interface FeatureConfig {
   dragHandle?: boolean;
   /** 是否启用悬浮框功能 */
   floatingMenu?: boolean;
-  /** 是否启用图片/视频扩展与上下文工具栏 */
+  /** 是否启用图片扩展、粘贴图片与上下文工具栏 */
   image?: boolean;
+  /** 是否启用视频扩展与上下文工具栏 */
+  video?: boolean;
   /** 是否启用链接悬浮框功能 */
   linkBubbleMenu?: boolean;
   /** 是否启用头部导航 */
@@ -64,6 +76,14 @@ export interface YanivEditorProps {
   tableMenuShowMode?: 1 | 2;
   /** 功能开关：控制扩展注册与 UI 显隐 */
   features?: FeatureConfig;
+  /** 图片上传函数；未传时本地上传回退为 DataURL */
+  uploadImage?: MediaUploadHandler;
+  /** 视频上传函数；未传时本地上传回退为 DataURL */
+  uploadVideo?: MediaUploadHandler;
+  /** 外部图库图片源；未传时图库从当前文档收集图片 */
+  galleryImages?: GalleryImage[];
+  /** 自定义模板列表，会追加到内置模板后面 */
+  customTemplates?: TemplateItem[];
   /** 语言设置 */
   locale?: string;
   /**

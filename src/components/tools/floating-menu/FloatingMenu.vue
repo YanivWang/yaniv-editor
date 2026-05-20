@@ -40,9 +40,8 @@
         <ListTools :show-task-list="true" />
       </div>
 
-      <div class="menu-group">
+      <div v-if="showAi" class="menu-group">
         <AiMenuButton
-          v-if="editor"
           :editor="editor"
           :icon="ThunderboltOutlined"
           :label="t('editor.ai')"
@@ -75,9 +74,11 @@ import { t } from "@/locales";
 const props = withDefaults(
   defineProps<{
     readonly?: boolean;
+    showAi?: boolean;
   }>(),
   {
     readonly: false,
+    showAi: true,
   },
 );
 

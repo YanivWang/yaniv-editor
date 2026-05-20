@@ -44,6 +44,7 @@ class AiSuggestionManager {
   private positionAnchor: { from: number; to: number } = { from: 0, to: 0 };
   private userContextRange: { from: number; to: number } | null = null;
   private isTemporarilyHidden = false;
+  private abortController: AbortController | null = null;
 
   private state: AiSuggestionState = {
     visible: false,
@@ -134,6 +135,8 @@ class AiSuggestionManager {
   executeCustomPrompt(prompt: string): void {
     if (!this.editor || this.mode !== "custom") return;
 
+    const abortController = new AbortController();
+    this.setAbortController(abortController);
     this.isExecutingRef.value = true;
     this.isStreamingRef.value = true;
 
@@ -156,8 +159,11 @@ class AiSuggestionManager {
           this.stopStreaming();
           this.updateSuggestion(accumulated);
           this.isExecutingRef.value = false;
+          this.clearAbortController(abortController);
         },
         onError: (error) => {
+          this.clearAbortController(abortController);
+          if (error.name === "AbortError") return;
           console.error("[Custom AI]", error);
           this.isExecutingRef.value = false;
           this.hide();
@@ -168,8 +174,13 @@ class AiSuggestionManager {
             placement: "topRight",
           });
         },
+        signal: abortController.signal,
       },
     );
+  }
+
+  setAbortController(abortController: AbortController | null): void {
+    this.abortController = abortController;
   }
 
   updateSuggestion(text: string): void {
@@ -220,6 +231,8 @@ class AiSuggestionManager {
   }
 
   cancel(): void {
+    this.abortActiveStream();
+
     if (this.mode === "custom") {
       this.hide();
       return;
@@ -233,6 +246,7 @@ class AiSuggestionManager {
   hide(): void {
     if (!this.editor) return;
 
+    this.abortActiveStream();
     this.visibleRef.value = false;
     this.isTemporarilyHidden = false;
     removeAiHighlight(this.editor);
@@ -271,6 +285,20 @@ class AiSuggestionManager {
     } else {
       this.editor = editor;
     }
+  }
+
+  private clearAbortController(abortController: AbortController): void {
+    if (this.abortController === abortController) {
+      this.abortController = null;
+    }
+  }
+
+  private abortActiveStream(): void {
+    if (!this.abortController) return;
+    this.abortController.abort();
+    this.abortController = null;
+    this.stopStreaming();
+    this.isExecutingRef.value = false;
   }
 
   private beginSession(
