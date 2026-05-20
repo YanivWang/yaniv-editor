@@ -1,6 +1,7 @@
 <template>
   <div
     ref="rootRef"
+    :key="localeEpoch"
     class="yaniv-editor document-layout"
     :class="{ 'is-preview-mode': isPreviewMode }"
   >
@@ -201,7 +202,7 @@ const showOutlinePanel = computed(
     toolbarConfig.value.outline,
 );
 
-useEditorI18n(props);
+const { localeEpoch, whenLocaleReady } = useEditorI18n(props);
 
 const getEditorContent = (): JSONContent | null => {
   try {
@@ -245,6 +246,7 @@ const initEditor = async () => {
 
   try {
     isInitializing.value = true;
+    await whenLocaleReady();
 
     const initialContentToUse = getInitialContent();
     const gates = resolvedExtensionGates.value;

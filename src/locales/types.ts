@@ -2,7 +2,7 @@
  * Tiptap 编辑器多语言类型定义
  */
 
-export type LocaleCode = "zh-CN" | "zh-TW" | "en-US";
+export type LocaleCode = "zh-CN" | "en-US";
 
 export interface TiptapLocale {
   // 工具栏

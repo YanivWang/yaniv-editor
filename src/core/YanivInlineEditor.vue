@@ -1,5 +1,5 @@
 <template>
-  <div class="yaniv-editor yaniv-inline-editor">
+  <div :key="localeEpoch" class="yaniv-editor yaniv-inline-editor">
     <slot name="toolbar" :editor="editor" :config="toolbarConfig">
       <InlineToolbar v-if="editor && showToolbar" :editor="editor" :config="toolbarConfig" />
     </slot>
@@ -47,7 +47,7 @@ const toolbarConfig = computed(() => props.toolbar ?? DEFAULT_INLINE_TOOLBAR);
 const showToolbar = computed(() => hasInlineToolbarItems(toolbarConfig.value));
 const isEditable = computed(() => !props.readonly);
 
-useEditorLocale(toRef(props, "locale"));
+const { localeEpoch, whenLocaleReady } = useEditorLocale(toRef(props, "locale"));
 
 function mergeEditorProps(userProps?: Record<string, unknown>) {
   const userAttrs = (userProps?.attributes as Record<string, string> | undefined) ?? {};
@@ -68,6 +68,7 @@ const initEditor = async () => {
   try {
     isInitializing.value = true;
     editorError.value = null;
+    await whenLocaleReady();
 
     const gates = resolveInlineExtensionGates({ toolbar: toolbarConfig.value });
     const extensions = buildInlineExtensions({

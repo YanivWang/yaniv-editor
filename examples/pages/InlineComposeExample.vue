@@ -50,3 +50,38 @@ onBeforeUnmount(() => {
   editor.value?.destroy();
 });
 </script>
+
+<style scoped>
+/* 居中展示行内编辑器，模拟评论框场景 */
+.demo-page--inline {
+  flex: 1;
+  align-items: center;
+  min-height: 0;
+  padding: 24px;
+  overflow: auto;
+}
+
+.demo-inline {
+  width: 100%;
+  max-width: 720px;
+  overflow: hidden;
+  background: var(--ye-bg);
+  border: 1px solid var(--ye-border);
+  border-radius: var(--ye-radius-lg);
+}
+
+.demo-inline__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--ye-toolbar-bg);
+  border-bottom: 1px solid var(--ye-border);
+}
+
+.demo-inline__content {
+  min-height: 160px;
+  padding: 12px 16px;
+}
+</style>

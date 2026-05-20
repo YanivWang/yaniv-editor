@@ -1,5 +1,11 @@
-/* Demo 壳层：仅布局与导航，编辑器能力均由 @yanivjs/yaniv-editor 提供 */
+/**
+ * examples 演示应用的全局壳层样式（视口 + 应用根容器 + 顶部导航）
+ *
+ * 引入位置：examples/App.vue
+ * 页面专用样式见各 examples/pages/*.vue
+ */
 
+/* 视口占满高度，禁止 body 滚动（滚动交给各示例页） */
 html,
 body,
 #app {
@@ -7,6 +13,7 @@ body,
   overflow: hidden;
 }
 
+/* App.vue：纵向 flex，上方导航 + 下方 RouterView */
 .demo-app {
   display: flex;
   flex-direction: column;
@@ -21,22 +28,13 @@ body,
   background: #f4f7fb;
 }
 
+/* 各示例页公共容器（RouterView 根元素） */
 .demo-page {
   display: flex;
   flex-direction: column;
 }
 
-.demo-page--full {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.demo-page--full > .yaniv-editor {
-  flex: 1;
-  min-height: 0;
-}
-
+/* App.vue：顶部导航 */
 .demo-nav {
   display: flex;
   flex-shrink: 0;
@@ -76,36 +74,4 @@ body,
 .demo-nav__links a.router-link-active {
   color: #1e293b;
   background: #e0f2fe;
-}
-
-.demo-page--inline {
-  flex: 1;
-  align-items: center;
-  min-height: 0;
-  padding: 24px;
-  overflow: auto;
-}
-
-.demo-inline {
-  width: 100%;
-  max-width: 720px;
-  overflow: hidden;
-  background: var(--ye-bg);
-  border: 1px solid var(--ye-border);
-  border-radius: var(--ye-radius-lg);
-}
-
-.demo-inline__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--ye-toolbar-bg);
-  border-bottom: 1px solid var(--ye-border);
-}
-
-.demo-inline__content {
-  min-height: 160px;
-  padding: 12px 16px;
 }

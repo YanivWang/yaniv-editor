@@ -60,7 +60,7 @@ import { createI18n, useI18n, t } from "@yanivjs/yaniv-editor";
 createI18n({ locale: "zh-CN", fallbackLocale: "en-US" });
 
 const i18n = useI18n();
-i18n.setLocale("en-US");
+await i18n.setLocale("en-US");
 
 const label = t("editor.bold");
 ```
