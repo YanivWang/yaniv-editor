@@ -48,7 +48,7 @@ async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestRes
   }
 
   // 检查必要参数
-  if (providerInfo.requiresApiKey && !config.apiKey) {
+  if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
     return { success: false, message: "请输入 API Key" };
   }
 
@@ -82,7 +82,9 @@ async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestRes
       return { success: true, message: "连接成功", latency };
     }
 
-    headers["Authorization"] = `Bearer ${config.apiKey}`;
+    if (config.apiKey) {
+      headers["Authorization"] = `Bearer ${config.apiKey}`;
+    }
     testUrl = endpoint.replace(/\/$/, "") + "/chat/completions";
     const testBody = JSON.stringify({
       model: config.model || providerInfo.defaultModel,
@@ -242,7 +244,7 @@ export function getAiRequestConfig(): {
   if (!providerInfo) return null;
 
   // 检查必要条件
-  if (providerInfo.requiresApiKey && !config.apiKey) {
+  if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
     return null;
   }
 

@@ -191,6 +191,9 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
       }
 
       // 拖拽调整大小（等比例缩放）- 仅在启用增强功能时
+      let cleanupResize: (() => void) | null = null;
+      let handleResizeMouseDown: ((e: MouseEvent) => void) | null = null;
+
       if (enableResize && resizeHandle) {
         let isResizing = false;
         let startX = 0;
@@ -246,6 +249,13 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
           img.style.height = `${newHeight}px`;
         };
 
+        cleanupResize = () => {
+          document.removeEventListener("mousemove", handleMouseMove);
+          document.removeEventListener("mouseup", handleMouseUp);
+          dom.classList.remove("resizing");
+          img.draggable = true;
+        };
+
         const handleMouseUp = () => {
           if (!isResizing) return;
           isResizing = false;
@@ -270,13 +280,10 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
             }
           }
 
-          document.removeEventListener("mousemove", handleMouseMove);
-          document.removeEventListener("mouseup", handleMouseUp);
-          dom.classList.remove("resizing");
-          // 恢复拖拽功能
-          img.draggable = true;
+          cleanupResize?.();
         };
 
+        handleResizeMouseDown = handleMouseDown;
         resizeHandle.addEventListener("mousedown", handleMouseDown);
       }
 
@@ -322,7 +329,10 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
           return true;
         },
         destroy: () => {
-          // 清理工作（如果需要）
+          cleanupResize?.();
+          if (resizeHandle && handleResizeMouseDown) {
+            resizeHandle.removeEventListener("mousedown", handleResizeMouseDown);
+          }
         },
       };
     };

@@ -179,7 +179,7 @@ import type { TemplateItem } from "@/components/editor/template/templates";
 import { TextFormatButtons } from "@/components/editor/text-format";
 import { UndoRedoButton } from "@/components/editor/undo-redo";
 import { VideoUpload } from "@/components/editor/video";
-import { WordButton } from "@/components/editor/word";
+import WordButton from "@/components/editor/word/WordButton.vue";
 import { useEditorColorState } from "@/composables/useEditorColorState";
 import { useYanivEditor } from "@/core/editorContext";
 import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";

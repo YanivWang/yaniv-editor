@@ -46,6 +46,8 @@
       v-if="editor && !isPreviewMode && showBlockPickerMenu"
       ref="blockPickerMenuRef"
       :features="resolvedExtensionGates"
+      :upload-image="props.uploadImage"
+      :upload-video="props.uploadVideo"
     />
 
     <!-- Word 文档区域容器 -->
@@ -136,6 +138,7 @@ const props = withDefaults(defineProps<YanivEditorProps>(), {
 });
 
 const isPreviewMode = computed(() => props.previewMode);
+const isEditable = computed(() => !props.readonly && !isPreviewMode.value);
 
 const emit = defineEmits<{
   update: [content: JSONContent];
@@ -176,6 +179,7 @@ const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
   useEditorPagination(containerRef);
 const isFirstInit = ref(true);
 const isInitializing = ref(false);
+const lastEmittedContentSignature = ref<string | null>(null);
 
 const { visible: outlinePanelVisible } = provideOutlinePanel();
 
@@ -197,6 +201,16 @@ const getEditorContent = (): JSONContent | null => {
 };
 
 const EMPTY_DOC: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+
+const getContentSignature = (content: string | JSONContent | null | undefined): string => {
+  if (!content) return "";
+  if (typeof content === "string") return content;
+  try {
+    return JSON.stringify(content);
+  } catch {
+    return "";
+  }
+};
 
 const normalizeInitialContent = (
   content: string | JSONContent | undefined,
@@ -242,7 +256,7 @@ const initEditor = async () => {
       },
     });
 
-    if (!props.readonly && !isPreviewMode.value && gates.dragHandle) {
+    if (isEditable.value && gates.dragHandle) {
       extensions.push(
         DragHandleExtension.configure({
           onOpenInsertMenu: (context) => blockPickerMenuRef.value?.openInsert(context),
@@ -269,13 +283,14 @@ const initEditor = async () => {
     await nextTick();
 
     editor.value = new Editor({
-      editable: !props.readonly && !isPreviewMode.value,
+      editable: isEditable.value,
       extensions,
       content: initialContentToUse,
       editorProps: {
         attributes: { class: "document-editor-content" },
       },
       onUpdate: ({ editor }) => {
+        lastEmittedContentSignature.value = getContentSignature(editor.getJSON());
         calculatePages();
         emit("update", editor.getJSON());
       },
@@ -308,12 +323,43 @@ onBeforeUnmount(async () => {
   await destroyEditor();
 });
 
-watch(resolvedExtensionGates, async (next, prev) => {
-  if (prev === undefined || !editor.value || isInitializing.value) return;
-  if (JSON.stringify(next) === JSON.stringify(prev)) return;
+watch([resolvedExtensionGates, isEditable], async ([nextGates, nextEditable], [prevGates]) => {
+  if (!editor.value || isInitializing.value) return;
+
+  const gatesChanged = JSON.stringify(nextGates) !== JSON.stringify(prevGates);
+  const dragHandleRegistrationChanged =
+    nextGates.dragHandle && nextEditable !== editor.value.isEditable;
+
+  if (!gatesChanged && !dragHandleRegistrationChanged) {
+    editor.value.setEditable(nextEditable);
+    await nextTick();
+    calculatePages();
+    return;
+  }
+
   await nextTick();
   await initEditor();
 });
+
+watch(
+  () => props.initialContent,
+  async (content) => {
+    const e = editor.value;
+    if (!e || isInitializing.value) return;
+
+    const normalized = normalizeInitialContent(content);
+    const incomingSignature = getContentSignature(normalized);
+    if (!incomingSignature || incomingSignature === lastEmittedContentSignature.value) return;
+
+    const currentSignature =
+      typeof normalized === "string" ? e.getHTML() : getContentSignature(getEditorContent());
+    if (incomingSignature === currentSignature) return;
+
+    e.commands.setContent(normalized, { emitUpdate: false });
+    await nextTick();
+    calculatePages();
+  },
+);
 
 defineExpose({
   getEditor: () => editor.value,

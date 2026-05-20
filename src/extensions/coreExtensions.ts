@@ -32,6 +32,7 @@ import {
   AiHighlightMark,
 } from "@/features/ai";
 import { t } from "@/locales";
+import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 import { codeBlockLowlightExtension } from "./codeBlockLowlight";
 import { FontSize } from "./fontSize";
@@ -144,6 +145,8 @@ export function buildEditorExtensions(options: ExtensionsOptions): AnyExtension[
   extensions.push(
     Link.configure({
       openOnClick: true, // 允许点击链接跳转
+      protocols: ["http", "https", "mailto", "tel"],
+      isAllowedUri: (url) => normalizeSafeUrl(url) !== null,
       HTMLAttributes: {
         target: "_blank",
         rel: "noopener noreferrer",

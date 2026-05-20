@@ -33,7 +33,11 @@ VITE_AI_API_KEY=sk-...
 
 ### 方式二：编辑器内设置（用户级）
 
-工具栏 AI 按钮 → 设置面板，配置 Provider、API Key、模型等。配置存储在浏览器 localStorage。
+工具栏 AI 按钮 → 设置面板，配置 Provider、API Key、模型等。API Key 支持三种模式：
+
+- `memory`：仅本次页面会话保存，默认推荐用于前端直连调试
+- `proxy`：由后端代理保管密钥，生产环境推荐
+- `local`：浏览器 localStorage + 简单混淆，仅适合 Demo / 本地调试
 
 ```ts
 import { useAiConfig } from "@yanivjs/yaniv-editor";
@@ -74,6 +78,7 @@ PolishExtension / SummarizeExtension / …
 
 - API Key 不应提交到前端公开仓库
 - 生产环境建议通过**后端代理**转发 AI 请求，避免 Key 暴露
+- `local` 模式只是混淆存储，不是加密；不要把它当作安全边界
 - 当前实现支持前端直连（Demo 友好），集成时需评估安全策略
 
 ## 相关导出

@@ -4,6 +4,8 @@
  */
 import mammoth from "mammoth";
 
+import { normalizeSafeUrl } from "@/utils/safeUrl";
+
 import type { Editor } from "@tiptap/core";
 
 export interface WordImportResult {
@@ -33,9 +35,28 @@ export async function convertWordToHtml(file: File): Promise<WordImportResult> {
   );
 
   return {
-    html: result.value,
+    html: sanitizeImportedHtml(result.value),
     messages: result.messages.map((m) => m.message),
   };
+}
+
+function sanitizeImportedHtml(html: string): string {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  doc.querySelectorAll("a[href]").forEach((link) => {
+    const safeHref = normalizeSafeUrl(link.getAttribute("href") ?? "");
+    if (!safeHref) {
+      link.removeAttribute("href");
+      return;
+    }
+
+    link.setAttribute("href", safeHref);
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener noreferrer");
+  });
+
+  return doc.body.innerHTML;
 }
 
 /**

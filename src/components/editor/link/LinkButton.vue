@@ -37,6 +37,7 @@ import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
+import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -75,18 +76,6 @@ function handleClick() {
 }
 
 /**
- * 验证 URL 是否有效
- */
-function isValidUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-/**
  * 构建链接属性
  */
 function buildLinkAttrs(href: string) {
@@ -113,8 +102,8 @@ function applyLink() {
     return;
   }
 
-  // 验证 URL
-  if (!isValidUrl(rawUrl)) {
+  const safeUrl = normalizeSafeUrl(rawUrl);
+  if (!safeUrl) {
     message.warning(t("editor.enterValidLink"));
     return;
   }
@@ -123,14 +112,14 @@ function applyLink() {
   const chain = e.chain().focus();
 
   if (hasSelection) {
-    chain.extendMarkRange("link").setLink(buildLinkAttrs(rawUrl)).run();
+    chain.extendMarkRange("link").setLink(buildLinkAttrs(safeUrl)).run();
   } else {
     chain
       .insertContent([
         {
           type: "text",
-          text: rawUrl,
-          marks: [{ type: "link", attrs: buildLinkAttrs(rawUrl) }],
+          text: safeUrl,
+          marks: [{ type: "link", attrs: buildLinkAttrs(safeUrl) }],
         },
       ])
       .run();

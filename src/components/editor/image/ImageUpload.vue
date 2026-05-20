@@ -48,6 +48,7 @@ import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
+import { resolveMediaUrl } from "@/utils/mediaUpload";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -105,24 +106,11 @@ function applyImage() {
 async function handleLocalUpload(options: any) {
   const { file, onSuccess, onError } = options || {};
   try {
-    let url: string;
-    if (props.uploadImage) {
-      url = await props.uploadImage(file as File);
-    } else {
-      // 使用 Base64 编码
-      url = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to read image as data URL"));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file as File);
-      });
-    }
+    const url = await resolveMediaUrl({
+      file: file as File,
+      kind: "image",
+      upload: props.uploadImage,
+    });
     // 插入图片
     runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: url } }))();
     localUploadOpen.value = false;

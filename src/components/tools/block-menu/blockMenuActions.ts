@@ -1,6 +1,9 @@
 import { Fragment, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/model";
 import { TextSelection } from "@tiptap/pm/state";
 
+import type { MediaUploadHandler } from "@/core/editorTypes";
+import { resolveMediaUrl, type MediaKind } from "@/utils/mediaUpload";
+
 import type { BlockInsertContext, BlockMenuItemId } from "./types";
 import type { Editor } from "@tiptap/core";
 
@@ -90,8 +93,12 @@ export function isMediaBlockId(blockId: BlockMenuItemId): blockId is MediaBlockI
   return MEDIA_BLOCK_IDS.has(blockId as MediaBlockId);
 }
 
-/** 打开系统文件选择器，返回 Data URL */
-export function pickMediaFile(accept: string): Promise<string | null> {
+/** 打开系统文件选择器，上传或按策略读取为可插入 URL */
+export function pickMediaUrl(
+  accept: string,
+  kind: MediaKind,
+  upload?: MediaUploadHandler,
+): Promise<string | null> {
   return new Promise((resolve) => {
     const input = document.createElement("input");
     input.type = "file";
@@ -107,10 +114,9 @@ export function pickMediaFile(accept: string): Promise<string | null> {
         resolve(null);
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
+      void resolveMediaUrl({ file, kind, upload })
+        .then(resolve)
+        .catch(() => resolve(null));
     });
 
     document.body.appendChild(input);

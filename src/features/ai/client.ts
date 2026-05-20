@@ -114,10 +114,23 @@ async function simulateAiStream(callbacks: AiStreamCallbacks, demoType: AiDemoTy
     callbacks.onStart?.();
 
     let index = 0;
-    const streamInterval = setInterval(() => {
-      if (signal?.aborted) {
+    let streamInterval: ReturnType<typeof setInterval> | null = null;
+    let settled = false;
+    const finish = (message: string) => {
+      if (settled) return;
+      settled = true;
+      if (streamInterval) {
         clearInterval(streamInterval);
-        callbacks.onComplete?.("");
+        streamInterval = null;
+      }
+      signal?.removeEventListener("abort", onExternalAbort);
+      callbacks.onComplete?.(message);
+    };
+    const onExternalAbort = () => finish("");
+
+    streamInterval = setInterval(() => {
+      if (signal?.aborted) {
+        finish("");
         return;
       }
       if (index < message.length) {
@@ -126,15 +139,9 @@ async function simulateAiStream(callbacks: AiStreamCallbacks, demoType: AiDemoTy
         callbacks.onToken?.(chunk);
         index += chunkSize;
       } else {
-        clearInterval(streamInterval);
-        callbacks.onComplete?.(message);
+        finish(message);
       }
     }, 50);
-
-    const onExternalAbort = () => {
-      clearInterval(streamInterval);
-      callbacks.onComplete?.("");
-    };
     signal?.addEventListener("abort", onExternalAbort, { once: true });
   } catch (error) {
     callbacks.onError?.(normalizeAiError(error));

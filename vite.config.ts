@@ -67,6 +67,11 @@ export default defineConfig({
         /^@tiptap\/.*/,
         "ant-design-vue",
         "@ant-design/icons-vue",
+        "docx",
+        "file-saver",
+        "hotkeys-js",
+        "katex",
+        "mammoth",
         /^#\/.*/, // Internal APIs
         "lowlight",
         /^prosemirror-.*/,

@@ -10,6 +10,7 @@ import type { AiUserConfig, AiConfigStore } from "./types";
 /** 存储键 */
 const STORAGE_KEY = "yaniv-ai-config";
 const API_KEY_STORAGE_KEY = "yaniv-ai-apikey";
+let memoryApiKey = "";
 
 /**
  * 简单的混淆编码（非加密，仅防止明文存储）
@@ -81,6 +82,10 @@ function getStoredConfig(): Omit<AiUserConfig, "apiKey"> | null {
         model: parsed.model || "",
         timeout: parsed.timeout || DEFAULT_CONFIG.timeout,
         enabled: parsed.enabled !== false,
+        storageMode:
+          parsed.storageMode === "memory" || parsed.storageMode === "proxy"
+            ? parsed.storageMode
+            : "local",
         updatedAt: parsed.updatedAt || Date.now(),
         translateTargetLang:
           typeof parsed.translateTargetLang === "string" ? parsed.translateTargetLang : undefined,
@@ -111,7 +116,7 @@ export function createAiConfigStore(): AiConfigStore {
 
       return {
         ...stored,
-        apiKey: getStoredApiKey(),
+        apiKey: stored.storageMode === "local" ? getStoredApiKey() : memoryApiKey,
       };
     },
 
@@ -125,10 +130,10 @@ export function createAiConfigStore(): AiConfigStore {
 
       safeSetItem(STORAGE_KEY, JSON.stringify(configToStore));
 
-      // API Key 单独混淆存储
-      if (apiKey) {
+      if (config.storageMode === "local" && apiKey) {
         safeSetItem(API_KEY_STORAGE_KEY, obfuscate(apiKey));
       } else {
+        memoryApiKey = config.storageMode === "memory" ? apiKey : "";
         safeRemoveItem(API_KEY_STORAGE_KEY);
       }
     },
@@ -136,10 +141,12 @@ export function createAiConfigStore(): AiConfigStore {
     clearConfig(): void {
       safeRemoveItem(STORAGE_KEY);
       safeRemoveItem(API_KEY_STORAGE_KEY);
+      memoryApiKey = "";
     },
 
     getApiKey(): string | null {
-      const key = getStoredApiKey();
+      const config = getStoredConfig();
+      const key = config?.storageMode === "local" ? getStoredApiKey() : memoryApiKey;
       return key || null;
     },
 
@@ -151,7 +158,7 @@ export function createAiConfigStore(): AiConfigStore {
       if (!providerInfo) return false;
 
       // 检查必要条件
-      if (providerInfo.requiresApiKey && !config.apiKey) {
+      if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
         return false;
       }
 

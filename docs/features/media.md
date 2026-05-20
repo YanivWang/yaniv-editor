@@ -20,10 +20,10 @@ Yaniv Editor 支持图片与视频的插入、缩放及上下文工具栏。
 | 情况                                        | 行为                         |
 | ------------------------------------------- | ---------------------------- |
 | 提供 `uploadImage(file) => Promise<string>` | 使用返回的 URL 插入          |
-| 未提供回调                                  | **Base64 Data URL** 嵌入文档 |
+| 未提供回调                                  | 小图可回退为 Base64 Data URL |
 
 ::: warning 生产环境
-默认 Base64 会导致文档体积膨胀，**务必**实现 `uploadImage` 上传到 OSS/CDN。
+Base64 会导致文档体积膨胀；大图会被拦截，生产环境应实现 `uploadImage` 上传到 OSS/CDN。
 :::
 
 ### 示例：OSS 上传
@@ -61,7 +61,7 @@ async function uploadImage(file: File): Promise<string> {
 
 - 扩展：`Video`
 - 由 `features.video` 独立门控
-- 支持本地上传；未提供上传回调时回退为 Base64
+- 支持本地上传；必须提供 `uploadVideo(file) => Promise<string>`，不再回退为 Base64
 - 块级显示（`inline: false`）
 - 工具栏：`VideoUpload` + `VideoToolbar`
 - Full Editor 可通过 `uploadVideo(file) => Promise<string>` 透传上传逻辑

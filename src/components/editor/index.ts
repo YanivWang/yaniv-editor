@@ -22,7 +22,7 @@ export { SubscriptSuperscriptButton } from "./subscript-superscript";
 export * from "./table";
 export * from "./zoom";
 export { MathButton } from "./math";
-export { WordButton, importWordFile, convertWordToHtml, exportToWord } from "./word";
+export { WordButton } from "./word";
 export { TemplateButton, builtinTemplates } from "./template";
 export type { TemplateItem } from "./template";
 export { GalleryButton } from "./gallery";

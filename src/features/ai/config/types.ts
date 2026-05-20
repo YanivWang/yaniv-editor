@@ -6,6 +6,9 @@
 /** 支持的 AI 提供商 */
 export type AiProvider = "openai" | "deepseek" | "aliyun" | "ollama" | "custom";
 
+/** API Key 存储方式：生产推荐使用 proxy，由后端保管密钥 */
+export type AiStorageMode = "local" | "memory" | "proxy";
+
 /** AI 提供商信息 */
 export interface AiProviderInfo {
   /** 提供商 ID */
@@ -28,8 +31,10 @@ export interface AiProviderInfo {
 export interface AiUserConfig {
   /** 选择的提供商 */
   provider: AiProvider;
-  /** API Key（加密存储） */
+  /** API Key；local 仅适合 demo/本地调试，生产推荐 proxy */
   apiKey: string;
+  /** API Key 存储方式 */
+  storageMode: AiStorageMode;
   /** API 端点（可选，用于自定义或代理） */
   endpoint?: string;
   /** 模型名称 */
@@ -84,6 +89,7 @@ export const DEFAULT_CONFIG: Omit<AiUserConfig, "apiKey" | "updatedAt"> = {
   model: "gpt-4o-mini",
   timeout: 60000,
   enabled: true,
+  storageMode: "memory",
 };
 
 /** 提供商列表 */

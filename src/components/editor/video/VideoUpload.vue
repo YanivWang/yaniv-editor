@@ -36,6 +36,7 @@ import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
+import { resolveMediaUrl } from "@/utils/mediaUpload";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -56,30 +57,16 @@ const videoUploadOpen = ref(false);
 
 /**
  * 处理本地视频上传（自定义上传逻辑）
- * - 若父组件提供 uploadVideo(file) 回调则使用其返回的 URL
- * - 否则回退为本地 DataURL 直接插入
+ * - 视频必须由 uploadVideo(file) 上传并返回 URL，避免把大文件写入文档内容
  */
 async function handleVideoUpload(options: any) {
   const { file, onSuccess, onError } = options || {};
   try {
-    let url: string;
-    if (props.uploadVideo) {
-      url = await props.uploadVideo(file as File);
-    } else {
-      // 使用 Base64 编码
-      url = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Failed to read video as data URL"));
-          }
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file as File);
-      });
-    }
+    const url = await resolveMediaUrl({
+      file: file as File,
+      kind: "video",
+      upload: props.uploadVideo,
+    });
     // 插入视频
     runCommand((chain) => chain.insertContent({ type: "video", attrs: { src: url } }))();
     videoUploadOpen.value = false;

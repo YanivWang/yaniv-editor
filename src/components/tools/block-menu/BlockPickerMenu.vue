@@ -47,6 +47,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
 import { useYanivEditor } from "@/core/editorContext";
+import type { MediaUploadHandler } from "@/core/editorTypes";
 import { t } from "@/locales";
 
 import {
@@ -54,7 +55,7 @@ import {
   applyBlockTransform,
   insertBlockMediaAt,
   isMediaBlockId,
-  pickMediaFile,
+  pickMediaUrl,
 } from "./blockMenuActions";
 import { getBlockMenuGroups } from "./blockMenuRegistry";
 
@@ -70,6 +71,8 @@ import type { Editor } from "@tiptap/core";
 const props = defineProps<{
   editor?: Editor | null;
   features?: BlockMenuFeatureGates;
+  uploadImage?: MediaUploadHandler;
+  uploadVideo?: MediaUploadHandler;
 }>();
 
 const editor = useYanivEditor(() => props.editor);
@@ -131,6 +134,7 @@ function selectItem(item: BlockMenuItemDef) {
   const blockId = item.id;
   if (isMediaBlockId(blockId)) {
     const accept = blockId === "image" ? "image/*" : "video/*";
+    const upload = blockId === "image" ? props.uploadImage : props.uploadVideo;
     const currentMode = mode.value;
     const context = insertContext.value;
 
@@ -146,7 +150,7 @@ function selectItem(item: BlockMenuItemDef) {
 
       hide();
 
-      void pickMediaFile(accept).then((src) => {
+      void pickMediaUrl(accept, blockId, upload).then((src) => {
         if (!src) return;
         insertBlockMediaAt(e, insertPos, blockId, src);
       });
@@ -156,7 +160,7 @@ function selectItem(item: BlockMenuItemDef) {
 
     hide();
 
-    void pickMediaFile(accept).then((src) => {
+    void pickMediaUrl(accept, blockId, upload).then((src) => {
       if (!src) return;
       if (context) {
         insertBlockMediaAt(e, context.insertPos, blockId, src);

@@ -64,9 +64,6 @@ import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 
-import { exportToWord } from "./wordExport";
-import { importWordFile } from "./wordImport";
-
 import type { Editor } from "@tiptap/vue-3";
 
 // ===== Props =====
@@ -115,6 +112,7 @@ async function handleImport(options: any) {
 
   importing.value = true;
   try {
+    const { importWordFile } = await import("./wordImport");
     await importWordFile(e, file as File);
     importModalOpen.value = false;
     onSuccess?.({});
@@ -135,6 +133,7 @@ async function doExport() {
 
   exporting.value = true;
   try {
+    const { exportToWord } = await import("./wordExport");
     const html = e.getHTML();
     const name = exportFilename.value.trim() || "document";
     await exportToWord(html, name);

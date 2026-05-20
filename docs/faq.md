@@ -39,7 +39,7 @@ GET /api/documents/:id → :initial-content="data.content"
 
 ### 图片上传后文档很大？
 
-默认本地上传使用 Base64。生产环境请实现 `uploadImage` 回调上传至 OSS，返回 URL。参见 [媒体](/features/media)。
+图片未配置上传回调时，小图可回退为 Base64；大图会被拦截。生产环境请实现 `uploadImage` 回调上传至 OSS，返回 URL。参见 [媒体](/features/media)。
 
 ### 如何关闭某个功能？
 

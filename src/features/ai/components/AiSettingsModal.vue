@@ -24,8 +24,21 @@
         </p>
       </div>
 
+      <div class="ai-settings__section">
+        <label class="ai-settings__label">API Key 存储方式</label>
+        <a-select
+          v-model:value="formData.storageMode"
+          :options="storageModeOptions"
+          class="ai-settings__select"
+        />
+        <p class="ai-settings__hint">生产环境推荐使用后端代理，避免在浏览器长期保存密钥。</p>
+      </div>
+
       <!-- API Key -->
-      <div v-if="currentProviderInfo?.requiresApiKey" class="ai-settings__section">
+      <div
+        v-if="currentProviderInfo?.requiresApiKey && formData.storageMode !== 'proxy'"
+        class="ai-settings__section"
+      >
         <label class="ai-settings__label">API Key</label>
         <a-input-password
           v-model:value="formData.apiKey"
@@ -113,6 +126,7 @@ import { t } from "@/locales";
 import {
   type AiProvider,
   type AiUserConfig,
+  type AiStorageMode,
   AI_PROVIDERS,
   getProviderInfo,
   DEFAULT_CONFIG,
@@ -149,6 +163,7 @@ const formData = reactive<Omit<AiUserConfig, "updatedAt">>({
   model: "",
   timeout: DEFAULT_CONFIG.timeout,
   enabled: true,
+  storageMode: DEFAULT_CONFIG.storageMode,
 });
 
 // 测试状态
@@ -164,12 +179,18 @@ const providerOptions = computed(() =>
   })),
 );
 
+const storageModeOptions: { value: AiStorageMode; label: string }[] = [
+  { value: "memory", label: "仅本次会话" },
+  { value: "proxy", label: "后端代理" },
+  { value: "local", label: "本地存储（仅调试）" },
+];
+
 const currentProviderInfo = computed(() => getProviderInfo(formData.provider));
 
 const canSave = computed(() => {
   const info = currentProviderInfo.value;
   if (!info) return false;
-  if (info.requiresApiKey && !formData.apiKey) return false;
+  if (info.requiresApiKey && formData.storageMode !== "proxy" && !formData.apiKey) return false;
   if (formData.provider === "custom" && !formData.endpoint) return false;
   return true;
 });
@@ -199,6 +220,7 @@ watch(
         model: config.value.model,
         timeout: config.value.timeout,
         enabled: config.value.enabled,
+        storageMode: config.value.storageMode,
       });
       testStatus.value = "idle";
       testError.value = null;
@@ -257,6 +279,7 @@ function handleClear() {
     model: "",
     timeout: DEFAULT_CONFIG.timeout,
     enabled: true,
+    storageMode: DEFAULT_CONFIG.storageMode,
   });
   testStatus.value = "idle";
   testError.value = null;

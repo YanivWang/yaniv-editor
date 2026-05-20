@@ -74,6 +74,7 @@ import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner } from "@/utils/editorCommands";
+import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 const props = withDefaults(
   defineProps<{
@@ -165,18 +166,8 @@ function applyLink() {
   const finalUrl = linkUrl.value.trim();
 
   if (finalUrl) {
-    // 验证URL格式
-    let urlToSet = finalUrl;
-    try {
-      const url = new URL(finalUrl);
-      if (url.protocol !== "http:" && url.protocol !== "https:") {
-        throw new Error("Invalid protocol");
-      }
-      urlToSet = finalUrl;
-    } catch {
-      // 如果不是完整URL，尝试添加https://
-      urlToSet = finalUrl.startsWith("http") ? finalUrl : `https://${finalUrl}`;
-    }
+    const urlToSet = normalizeSafeUrl(finalUrl);
+    if (!urlToSet) return;
 
     // 更新链接 - 直接使用编辑器实例确保状态同步
     if (e) {
