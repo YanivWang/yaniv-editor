@@ -46,7 +46,7 @@ body,
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  width: 560px;
+  width: 460px;
   min-height: 0;
   background: #fff;
   border-right: 1px solid #e8edf3;
