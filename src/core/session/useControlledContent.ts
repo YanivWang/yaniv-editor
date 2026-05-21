@@ -45,8 +45,11 @@ export function useControlledContent(options: {
 
   watch(
     editor,
-    (e, _prev, onCleanup) => {
-      if (!e) return;
+    (e, prev, onCleanup) => {
+      if (!e) {
+        if (prev) lastEmittedSignature.value = null;
+        return;
+      }
       const handler = () => {
         const payload = host === "inline" ? e.getHTML() : e.getJSON();
         lastEmittedSignature.value = computeSignature(payload, host);
@@ -60,19 +63,25 @@ export function useControlledContent(options: {
 
   const controlledSource = content ?? initialContent;
 
-  watch(controlledSource, (next) => {
+  function applyControlledContent(next: string | JSONContent | undefined): void {
     if (!editor.value || !sessionReady.value) return;
     const incoming = computeSignature(next, host);
     if (!incoming) return;
     if (incoming === lastEmittedSignature.value) return;
-    if (
-      incoming ===
-      computeSignature(host === "inline" ? editor.value.getHTML() : editor.value.getJSON(), host)
-    ) {
-      return;
-    }
+    const current = computeSignature(
+      host === "inline" ? editor.value.getHTML() : editor.value.getJSON(),
+      host,
+    );
+    if (incoming === current) return;
     const normalized = normalizeInitialContent(next);
     ContentAdapter.setContent(editor.value, normalized, { source: "external" });
+    lastEmittedSignature.value = incoming;
+  }
+
+  watch(controlledSource, (next) => applyControlledContent(next));
+
+  watch(sessionReady, (ready) => {
+    if (ready) applyControlledContent(controlledSource.value);
   });
 
   return { lastEmittedSignature };

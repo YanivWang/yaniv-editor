@@ -3,6 +3,7 @@
     <div v-show="sessionStatus !== 'loading'" class="yaniv-editor__chrome">
       <template v-if="isFull && fullChrome?.showEditChrome">
         <EditorEditChrome
+          :key="sessionKey"
           :chrome="fullChrome!"
           :upload-image="fullProps?.uploadImage"
           :upload-video="fullProps?.uploadVideo"
@@ -15,6 +16,7 @@
 
       <EditorWorkspace
         v-if="isFull && fullChrome"
+        :key="sessionKey"
         ref="workspaceRef"
         :chrome="fullChrome"
         :zoom-level="zoomLevel"

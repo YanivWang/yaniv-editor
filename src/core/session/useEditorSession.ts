@@ -1,5 +1,5 @@
 import { Editor } from "@tiptap/vue-3";
-import { computed, onScopeDispose, ref, shallowRef, watch, type ComputedRef } from "vue";
+import { computed, nextTick, onScopeDispose, ref, shallowRef, watch, type ComputedRef } from "vue";
 
 import { buildExtensions } from "@/capabilities/buildExtensions";
 import type { BuildExtensionsCtx } from "@/capabilities/types";
@@ -77,6 +77,12 @@ export function useEditorSession(options: UseEditorSessionOptions) {
     status.value = "loading";
     sessionError.value = null;
 
+    const previousEditor = editor.value;
+    editor.value = null;
+    await nextTick();
+    if (disposed || myGen !== generation) return;
+    previousEditor?.destroy();
+
     try {
       const ctx: BuildExtensionsCtx = {
         locale: locale.value,
@@ -140,19 +146,19 @@ export function useEditorSession(options: UseEditorSessionOptions) {
     void rebuild();
   }
 
-  watch(
-    sessionKey,
-    (newKey, oldKey) => {
-      if (!oldKey || !newKey || newKey === oldKey) return;
-      if (editor.value) {
-        contentSnapshot = host === "inline" ? editor.value.getHTML() : editor.value.getJSON();
-      }
-      editor.value?.destroy();
-      editor.value = null;
-      void rebuild();
-    },
-    { flush: "pre" },
-  );
+  watch(sessionKey, async (newKey, oldKey) => {
+    if (!oldKey || !newKey || newKey === oldKey) return;
+    if (editor.value) {
+      contentSnapshot = host === "inline" ? editor.value.getHTML() : editor.value.getJSON();
+    }
+    const oldEditor = editor.value;
+    editor.value = null;
+    status.value = "loading";
+    await nextTick();
+    if (disposed) return;
+    oldEditor?.destroy();
+    void rebuild();
+  });
 
   watch(
     () => profile.value.mode,
