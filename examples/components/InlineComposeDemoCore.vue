@@ -22,6 +22,7 @@ import { resolveColorMode, watchSystemColorMode } from "@/appearance/applyAppear
 import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import type { EditorMode } from "@/core/editorTypes";
+import { createI18n } from "@/locales";
 
 import {
   AlignDropdown,
@@ -41,6 +42,8 @@ const props = defineProps<{
   mode: EditorMode;
   colorMode?: EditorColorMode;
 }>();
+
+createI18n();
 
 const rootRef = ref<HTMLElement | null>(null);
 
