@@ -1,34 +1,42 @@
 <template>
-  <div ref="rootRef" class="yaniv-editor demo-inline">
-    <div v-if="editor && !isPreviewMode" class="demo-inline__toolbar">
-      <UndoRedoButton :editor="editor" />
-      <HeadingControl variant="dropdown" :editor="editor" />
-      <TextFormatButtons :editor="editor" />
-      <ListTools :editor="editor" :show-task-list="true" />
-      <AlignDropdown v-if="toolbar.align" :editor="editor" />
-      <LinkButton v-if="toolbar.link" :editor="editor" />
-      <ClearFormatButton v-if="toolbar.clearFormat" :editor="editor" />
-      <CodeBlockDropdown v-if="toolbar.codeBlock" :editor="editor" />
+  <div
+    ref="rootRef"
+    class="yaniv-editor yaniv-inline-editor demo-inline"
+    :data-phase="profile.mode"
+  >
+    <div v-show="sessionStatus !== 'loading'">
+      <div v-if="editor && inlineChrome?.showInlineToolbar" class="demo-inline__toolbar">
+        <UndoRedoButton :editor="editor" />
+        <HeadingControl variant="dropdown" :editor="editor" />
+        <TextFormatButtons :editor="editor" />
+        <ListTools :editor="editor" :show-task-list="true" />
+        <AlignDropdown v-if="toolbar.align" :editor="editor" />
+        <LinkButton v-if="toolbar.link" :editor="editor" />
+        <ClearFormatButton v-if="toolbar.clearFormat" :editor="editor" />
+        <CodeBlockDropdown v-if="toolbar.codeBlock" :editor="editor" />
+      </div>
+      <EditorContent v-if="editor" :editor="editor" class="demo-inline__content" />
     </div>
-    <EditorContent v-if="editor" :editor="editor" class="demo-inline__content" />
+    <div v-if="sessionStatus === 'loading'" class="demo-inline__skeleton">正在加载编辑器…</div>
+    <div v-if="sessionStatus === 'error'" class="demo-inline__error">
+      {{ sessionError }}
+      <button type="button" @click="retrySession">重试</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Editor, EditorContent } from "@tiptap/vue-3";
+import { EditorContent } from "@tiptap/vue-3";
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
 
-import {
-  buildExtensions,
-  CAPABILITIES,
-  createI18n,
-  loadLocale,
-  resolveColorMode,
-  watchSystemColorMode,
-  type BuildExtensionsCtx,
-  type EditorColorMode,
-  type EditorMode,
-} from "@yanivjs/yaniv-editor";
+import { useEditorAppearance } from "@/appearance";
+import { provideEditorLocale, resolveLocaleMessages } from "@/core/infra/useEditorLocale";
+import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
+import { useControlledContent } from "@/core/session/useControlledContent";
+import { useEditorSession } from "@/core/session/useEditorSession";
+import { provideBlockMenuHost } from "@/core/shell/useBlockMenuHost";
+import type { TiptapLocale } from "@/locales/types";
+
 import {
   AlignDropdown,
   ClearFormatButton,
@@ -36,11 +44,12 @@ import {
   HeadingControl,
   LinkButton,
   ListTools,
-  resolveInlineGates,
   TextFormatButtons,
   UndoRedoButton,
   type InlineToolbarConfig,
 } from "@yanivjs/yaniv-editor/inline";
+
+import type { EditorColorMode, EditorMode } from "@yanivjs/yaniv-editor";
 
 const props = defineProps<{
   toolbar: InlineToolbarConfig;
@@ -49,93 +58,81 @@ const props = defineProps<{
 }>();
 
 const content = defineModel<string>("content", { required: true });
-const isPreviewMode = computed(() => props.mode === "preview");
-const isEditable = computed(() => props.mode === "edit");
-
-createI18n();
 
 const rootRef = ref<HTMLElement | null>(null);
-const editor = shallowRef<Editor | null>(null);
+const localeCode = ref<"zh-CN" | "en-US">("zh-CN");
+const localeMessages = shallowRef<TiptapLocale | null>(null);
 
-const blockMenuHost: BuildExtensionsCtx["blockMenuHost"] = {
-  registerInstance: () => {},
-  activate: () => {},
-  openInsert: () => {},
-  hide: () => {},
-  updateQuery: () => {},
-};
+provideEditorLocale(computed(() => localeCode.value));
 
-function applyColorMode() {
-  if (!rootRef.value) return;
-  const resolved = resolveColorMode(props.colorMode ?? "light");
-  rootRef.value.setAttribute("data-color-mode", resolved);
-}
-
-watch(() => props.colorMode, applyColorMode, { immediate: true });
-
-let cleanupSystemWatch: (() => void) | undefined;
 watch(
-  () => props.colorMode,
-  (mode) => {
-    cleanupSystemWatch?.();
-    if (mode === "auto") {
-      cleanupSystemWatch = watchSystemColorMode(() => applyColorMode());
-    }
+  localeCode,
+  async (code) => {
+    localeMessages.value = await resolveLocaleMessages(code);
   },
   { immediate: true },
 );
 
-async function initEditor() {
-  const locale = await loadLocale("zh-CN");
-  const gates = resolveInlineGates(props.toolbar, CAPABILITIES);
-  const extensions = await buildExtensions("inline", {
-    locale,
-    gates,
-    isEditable,
-    blockMenuHost,
+useEditorAppearance({
+  rootRef,
+  appearance: ref("default"),
+  colorMode: computed(() => props.colorMode ?? "light"),
+});
+
+const blockMenuHost = provideBlockMenuHost();
+
+const { profile, chrome, sessionKey } = useEditorRuntime({
+  host: "inline",
+  mode: computed(() => props.mode),
+  toolbar: computed(() => props.toolbar),
+  locale: localeCode,
+});
+
+const inlineChrome = computed(() => (chrome.value.host === "inline" ? chrome.value : null));
+
+const {
+  editor,
+  status: sessionStatus,
+  sessionError,
+  onPhaseChange,
+  retrySession,
+} = useEditorSession({
+  host: "inline",
+  profile,
+  sessionKey,
+  locale: computed(() => localeMessages.value!),
+  blockMenuHost,
+  editorProps: { attributes: { class: "inline-prose" } },
+  buildCtx: () => ({
     upload: { image: () => undefined, video: () => undefined },
     galleryImages: () => [],
     officePaste: { onPasteFromOfficeWithImages: () => undefined },
     outline: { scrollParent: () => null, bindScrollParent: () => {} },
     aiConfig: () => undefined,
     inlinePlaceholder: "写点什么…",
-  });
+  }),
+});
 
-  editor.value?.destroy();
-  editor.value = new Editor({
-    content: content.value,
-    editable: props.mode === "edit",
-    extensions,
-    editorProps: { attributes: { class: "inline-prose" } },
-    onUpdate: ({ editor: ed }) => {
-      content.value = ed.getHTML();
-    },
-  });
-}
+const sessionReady = computed(() => sessionStatus.value === "ready");
 
-watch(
-  () => [props.toolbar, props.mode],
-  () => void initEditor(),
-  { deep: true, immediate: true },
-);
-
-watch(
-  () => props.mode,
-  (next) => {
-    editor.value?.setEditable(next === "edit");
+useControlledContent({
+  host: "inline",
+  editor,
+  initialContent: content,
+  content,
+  sessionReady,
+  onUpdate: (payload) => {
+    content.value = payload as string;
   },
-);
+});
 
-watch(content, (next) => {
-  const ed = editor.value;
-  if (!ed || next === ed.getHTML()) return;
-  ed.commands.setContent(next, { emitUpdate: false });
+const offPhaseChange = onPhaseChange(({ to, reason }) => {
+  if (reason === "ready") return;
+  if (to === "preview") blockMenuHost.hide();
 });
 
 onBeforeUnmount(() => {
-  cleanupSystemWatch?.();
-  editor.value?.destroy();
-  editor.value = null;
+  offPhaseChange();
 });
 </script>
 
@@ -162,5 +159,23 @@ onBeforeUnmount(() => {
 .demo-inline__content {
   min-height: 160px;
   padding: 12px 16px;
+}
+
+.demo-inline__skeleton {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--ye-text-muted, #64748b);
+  text-align: center;
+}
+
+.demo-inline__error {
+  padding: 16px;
+  font-size: 13px;
+  color: #b91c1c;
+  text-align: center;
+}
+
+.demo-inline__error button {
+  margin-left: 8px;
 }
 </style>
