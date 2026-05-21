@@ -15,6 +15,7 @@
     <main class="demo-main demo-main--centered">
       <InlineComposeDemoCore
         :key="composeKey"
+        v-model:content="html"
         :toolbar="toolbar"
         :mode="inlineMode"
         :color-mode="colorMode"
@@ -40,11 +41,14 @@ import { inlineToolbarKey, INLINE_FULL_TOOLBAR } from "../config/demoInline";
 
 const entry = getDemoEntry("inline-compose");
 
+const html = ref(
+  "<h2>行内自行拼装</h2><p>自管 <code>Editor</code> 生命周期，按需挂载工具栏组件；扩展由 <code>buildInlineExtensions</code> 与 toolbar 同步。</p>",
+);
 const inlineMode = ref<EditorMode>("edit");
 const toolbar = ref<InlineToolbarConfig>({ ...INLINE_FULL_TOOLBAR });
 const colorMode = ref<EditorColorMode>("light");
 
-const composeKey = computed(() => inlineToolbarKey(toolbar.value, inlineMode.value));
+const composeKey = computed(() => inlineToolbarKey(toolbar.value));
 </script>
 
 <style scoped>

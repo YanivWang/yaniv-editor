@@ -74,6 +74,6 @@ export function buildInlineToolbar(
   return toolbar;
 }
 
-export function inlineToolbarKey(toolbar: InlineToolbarConfig, mode: EditorMode): string {
-  return `${mode}-${INLINE_TOOLBAR_TOGGLES.map((t) => (toolbar[t.key] ? "1" : "0")).join("")}`;
+export function inlineToolbarKey(toolbar: InlineToolbarConfig): string {
+  return INLINE_TOOLBAR_TOGGLES.map((t) => (toolbar[t.key] ? "1" : "0")).join("");
 }

@@ -52,7 +52,7 @@ const inlineMode = ref<EditorMode>("edit");
 const toolbar = ref<InlineToolbarConfig>({ ...INLINE_FULL_TOOLBAR });
 const colorMode = ref<EditorColorMode>("light");
 
-const inlineKey = computed(() => inlineToolbarKey(toolbar.value, inlineMode.value));
+const inlineKey = computed(() => inlineToolbarKey(toolbar.value));
 </script>
 
 <style scoped>

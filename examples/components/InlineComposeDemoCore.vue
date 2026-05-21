@@ -1,6 +1,6 @@
 <template>
   <div ref="rootRef" class="yaniv-editor demo-inline">
-    <div v-if="editor" class="demo-inline__toolbar">
+    <div v-if="editor && !isPreviewMode" class="demo-inline__toolbar">
       <UndoRedoButton :editor="editor" />
       <HeadingControl variant="dropdown" :editor="editor" />
       <TextFormatButtons :editor="editor" />
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { EditorContent, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { resolveColorMode, watchSystemColorMode } from "@/appearance/applyAppearance";
 import type { EditorColorMode } from "@/configs/editorConfig";
@@ -42,6 +42,9 @@ const props = defineProps<{
   mode: EditorMode;
   colorMode?: EditorColorMode;
 }>();
+
+const content = defineModel<string>("content", { required: true });
+const isPreviewMode = computed(() => props.mode === "preview");
 
 createI18n();
 
@@ -72,14 +75,16 @@ onBeforeUnmount(() => {
 });
 
 const editor = useEditor({
-  content:
-    "<h2>行内自行拼装</h2><p>自管 <code>Editor</code> 生命周期，按需挂载工具栏组件；扩展由 <code>buildInlineExtensions</code> 与 toolbar 同步。</p>",
+  content: content.value,
   editable: props.mode === "edit",
   extensions: buildInlineExtensions({
     gates: resolveInlineExtensionGates({ toolbar: props.toolbar }),
   }),
   editorProps: {
     attributes: { class: "inline-prose" },
+  },
+  onUpdate: ({ editor: ed }) => {
+    content.value = ed.getHTML();
   },
 });
 
@@ -90,6 +95,12 @@ watch(
   },
   { immediate: true },
 );
+
+watch(content, (next) => {
+  const ed = editor.value;
+  if (!ed || next === ed.getHTML()) return;
+  ed.commands.setContent(next, { emitUpdate: false });
+});
 
 onBeforeUnmount(() => {
   editor.value?.destroy();

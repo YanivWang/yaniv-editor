@@ -102,7 +102,7 @@ const initialContent = computed(() => getSampleContent(preset.value));
 const featuresProp = computed(() => buildFeatureConfig(featureOverrides.value));
 const editorKey = computed(
   () =>
-    `${preset.value}-${mode.value}-${integrationKey(integration.value)}-${overridesKey(featureOverrides.value)}`,
+    `${preset.value}-${integrationKey(integration.value)}-${overridesKey(featureOverrides.value)}`,
 );
 const activePropsSnippet = computed(() => buildActivePropsSnippet(integration.value));
 
