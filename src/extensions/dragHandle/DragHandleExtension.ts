@@ -616,6 +616,21 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             storage.isDragging = dragging;
           };
 
+          const deactivateInteractive = () => {
+            closeMenu();
+            closeInsertMenu();
+            if (isDragging) {
+              setDraggingState(false);
+              handle.classList.remove("is-dragging");
+              document.querySelectorAll(".drag-handle__drag-image").forEach((element) => {
+                element.remove();
+              });
+            }
+            currentTarget = null;
+            plusButton.classList.remove("is-visible");
+            handle.classList.remove("is-visible");
+          };
+
           const closeMenu = () => {
             activeMenuKind = null;
             menu.classList.remove("is-visible", "is-actions-menu");
@@ -652,6 +667,11 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           };
 
           const handleMouseMove = (event: MouseEvent) => {
+            if (!view.editable) {
+              deactivateInteractive();
+              return;
+            }
+
             if (isDragging) return;
 
             const target = findTargetFromCoords(view, event);
@@ -690,7 +710,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           };
 
           const openActionsMenu = () => {
-            if (!currentTarget) return;
+            if (!view.editable || !currentTarget) return;
 
             const target = currentTarget;
             activeMenuKind = "actions";
@@ -715,7 +735,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           };
 
           const openInsertMenu = () => {
-            if (!currentTarget || !extensionOptions.onOpenInsertMenu) return;
+            if (!view.editable || !currentTarget || !extensionOptions.onOpenInsertMenu) return;
 
             const target = currentTarget;
             if (storage.insertMenuOpen) {
@@ -762,7 +782,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           });
 
           handle.addEventListener("dragstart", (event: DragEvent) => {
-            if (!currentTarget || !event.dataTransfer) {
+            if (!view.editable || !currentTarget || !event.dataTransfer) {
               event.preventDefault();
               return;
             }
@@ -839,6 +859,11 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
           return {
             update(updatedView) {
+              if (!updatedView.editable) {
+                deactivateInteractive();
+                return;
+              }
+
               if (!currentTarget) return;
 
               const node = updatedView.state.doc.nodeAt(currentTarget.pos);
