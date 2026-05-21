@@ -3,7 +3,8 @@ import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-rou
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: { name: "full-editor" },
+    name: "home",
+    component: () => import("./pages/DemoHome.vue"),
   },
   {
     path: "/full-editor",
@@ -22,7 +23,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/:pathMatch(.*)*",
-    redirect: { name: "full-editor" },
+    redirect: { name: "home" },
   },
 ];
 

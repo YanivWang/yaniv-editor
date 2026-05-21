@@ -1,8 +1,9 @@
 <template>
   <div class="demo-app">
     <header class="demo-nav">
-      <RouterLink class="demo-nav__brand" :to="{ name: 'full-editor' }">Yaniv Editor</RouterLink>
+      <RouterLink class="demo-nav__brand" :to="{ name: 'home' }">Yaniv Editor</RouterLink>
       <nav class="demo-nav__links">
+        <RouterLink :to="{ name: 'home' }">示例总览</RouterLink>
         <RouterLink :to="{ name: 'full-editor' }">完整编辑器</RouterLink>
         <RouterLink :to="{ name: 'inline-editor' }">行内编辑器</RouterLink>
         <RouterLink :to="{ name: 'inline-compose' }">行内自行拼装</RouterLink>
