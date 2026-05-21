@@ -63,6 +63,10 @@ export const enUS: TiptapLocale = {
     wordExportSuccess: "Word file exported successfully",
     wordImportFailed: "Word file import failed",
     wordExportFailed: "Word file export failed",
+    imageUploadNotConfigured:
+      "Image upload handler is not configured. Currently using local preview. Please implement your own upload logic for production.",
+    videoUploadNotConfigured:
+      "Video upload handler is not configured. Currently using local preview. Please implement your own upload logic for production.",
   },
 
   editor: {

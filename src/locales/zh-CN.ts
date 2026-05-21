@@ -63,6 +63,8 @@ export const zhCN: TiptapLocale = {
     wordExportSuccess: "Word 文件导出成功",
     wordImportFailed: "Word 文件导入失败",
     wordExportFailed: "Word 文件导出失败",
+    imageUploadNotConfigured: "未配置图片上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
+    videoUploadNotConfigured: "未配置视频上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
   },
 
   editor: {

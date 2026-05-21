@@ -78,6 +78,8 @@ export interface TiptapLocale {
     wordExportSuccess: string;
     wordImportFailed: string;
     wordExportFailed: string;
+    imageUploadNotConfigured: string;
+    videoUploadNotConfigured: string;
   };
 
   editor: {
