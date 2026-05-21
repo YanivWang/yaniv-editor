@@ -3,7 +3,8 @@
     <header class="demo-home__header">
       <h1 class="demo-home__title">Yaniv Editor 示例</h1>
       <p class="demo-home__lead">
-        选择一种接入方式进入演示。各示例独立路由，互不加载其他编辑器实例。
+        选择一种接入方式进入演示。「多实例隔离」页并排两个编辑器，用于验收 locale / appearance
+        互不影响。
       </p>
     </header>
     <div class="demo-home__grid">

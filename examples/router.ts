@@ -22,6 +22,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import("./pages/InlineComposeExample.vue"),
   },
   {
+    path: "/multi-instance",
+    name: "multi-instance",
+    component: () => import("./pages/MultiInstanceExample.vue"),
+  },
+  {
     path: "/:pathMatch(.*)*",
     redirect: { name: "home" },
   },

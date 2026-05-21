@@ -174,6 +174,7 @@ export default defineConfig({
       "@yanivjs/yaniv-editor/style.css": resolve(__dirname, "src/styles/index.css"),
       "@yanivjs/yaniv-editor/inline.css": resolve(__dirname, "src/styles/inline.css"),
       "@yanivjs/yaniv-editor/inline": resolve(__dirname, "src/inline.ts"),
+      "@yanivjs/yaniv-editor/ai": resolve(__dirname, "src/ai.ts"),
       "@yanivjs/yaniv-editor": resolve(__dirname, "src/index.ts"),
     },
   },
@@ -187,6 +188,7 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, "src/index.ts"),
         inline: resolve(__dirname, "src/inline.ts"),
+        ai: resolve(__dirname, "src/ai.ts"),
         style: resolve(__dirname, "src/styles/index.css"),
         "inline-style": resolve(__dirname, "src/styles/inline.css"),
       },
@@ -195,6 +197,7 @@ export default defineConfig({
       fileName: (format, entryName) => {
         if (entryName === "index") return format === "es" ? "index.esm.js" : "index.js";
         if (entryName === "inline") return format === "es" ? "inline.esm.js" : "inline.js";
+        if (entryName === "ai") return format === "es" ? "ai.esm.js" : "ai.js";
         return `${entryName}.js`;
       },
     },

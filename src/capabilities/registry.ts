@@ -16,10 +16,8 @@ import { Underline } from "@tiptap/extension-underline";
 import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 
-import { TableCellWithBackground } from "@/components/editor/table/TableCellWithBackground";
-import { DragHandleExtension } from "@/components/tools/drag-handle";
-import { SlashCommandExtension } from "@/components/tools/slash-command";
 import { codeBlockLowlightExtension } from "@/extensions/codeBlockLowlight";
+import { DragHandleExtension } from "@/extensions/dragHandle";
 import { FontSize } from "@/extensions/fontSize";
 import { FormatPainter } from "@/extensions/formatPainter";
 import { LineHeight } from "@/extensions/lineHeight";
@@ -33,6 +31,8 @@ import {
 import { PasteImage } from "@/extensions/pasteImage";
 import { ResizableImage } from "@/extensions/resizableImage";
 import { SearchReplace } from "@/extensions/search-replace";
+import { SlashCommandExtension } from "@/extensions/slashCommand";
+import { TableCellWithBackground } from "@/extensions/table/TableCellWithBackground";
 import { Video } from "@/extensions/video";
 import { YanivPlaceholder } from "@/extensions/yanivPlaceholder";
 import {
@@ -269,6 +269,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
     tier: "core",
     order: 0,
     inlineAlways: true,
+    inlineToolbarSlugs: ["undoRedo", "heading", "clearFormat"],
     extensions: (ctx) => {
       const g = ctx.gates;
       return [

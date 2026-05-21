@@ -3,5 +3,4 @@ export {
   dragHandleKey,
   type DragHandleOptions,
   type DragInsertMenuContext,
-} from "@/extensions/dragHandle";
-export { isBlockDragging } from "./isBlockDragging";
+} from "./DragHandleExtension";

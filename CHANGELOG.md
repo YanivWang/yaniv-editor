@@ -56,6 +56,40 @@ editorRef.value?.appearance.registerCustom("mybrand", {
 
 能力门控逻辑统一收入 Capability Registry，不再对外暴露独立函数。
 
+**迁移**：
+
+```ts
+// 旧
+import { applyExtensionGatesToToolbarConfig } from "@yanivjs/yaniv-editor";
+
+// 新
+import { applyGatesToToolbarConfig } from "@yanivjs/yaniv-editor";
+```
+
+#### 5b. `hasInlineToolbarItems` 删除
+
+Inline 工具栏显隐改由 Registry 推导。
+
+**迁移**：
+
+```ts
+// 旧
+import { hasInlineToolbarItems } from "@yanivjs/yaniv-editor/inline";
+
+// 新
+import { resolveShowInlineToolbar, CAPABILITIES } from "@yanivjs/yaniv-editor/inline";
+
+resolveShowInlineToolbar(toolbar, CAPABILITIES);
+```
+
+#### 5c. AI 模块独立入口
+
+AI 功能从主包拆出，按需引入：
+
+```ts
+import { AiMenuButton, useAiConfig } from "@yanivjs/yaniv-editor/ai";
+```
+
 #### 6. `localeGeneration` 不再 export
 
 旧的 `:key="localeEpoch"` 强制重渲方案已废弃，locale 切换通过 scoped locale + session rebuild 处理。

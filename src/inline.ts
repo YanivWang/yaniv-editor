@@ -16,7 +16,6 @@ export { FontSizeSelect, FontFamilySelect } from "./components/editor/font";
 export { CodeBlockDropdown } from "./components/editor/code-block";
 
 export { DEFAULT_INLINE_TOOLBAR } from "./configs/inlineToolbar";
-export { hasInlineToolbarItems } from "./configs/inlineToolbarUtils";
 export type {
   InlineToolbarConfig,
   YanivInlineEditorProps,
@@ -25,6 +24,7 @@ export type {
 
 export { provideYanivEditor, useYanivEditor } from "./core/editorContext";
 export { resolveInlineGates } from "./core/runtime/resolveInlineGates";
+export { resolveShowInlineToolbar } from "./capabilities/resolveShowInlineToolbar";
 export { buildExtensions } from "./capabilities/buildExtensions";
 export type { EditorShellHost, ExtensionGates } from "./core/runtime/types";
 

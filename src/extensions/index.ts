@@ -12,3 +12,6 @@ export { ResizableImage } from "./resizableImage";
 export type { ResizableImageOptions } from "./resizableImage";
 export * from "./pageConstants";
 export { OutlineScrollParentBinder } from "./outlineScrollParentBinder";
+export { TableCellWithBackground } from "./table";
+export { DragHandleExtension, dragHandleKey } from "./dragHandle";
+export { SlashCommandExtension, slashCommandKey } from "./slashCommand";

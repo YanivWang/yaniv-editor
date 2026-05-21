@@ -7,6 +7,7 @@
         <RouterLink :to="{ name: 'full-editor' }">完整编辑器</RouterLink>
         <RouterLink :to="{ name: 'inline-editor' }">行内编辑器</RouterLink>
         <RouterLink :to="{ name: 'inline-compose' }">行内自行拼装</RouterLink>
+        <RouterLink :to="{ name: 'multi-instance' }">多实例隔离</RouterLink>
       </nav>
     </header>
     <RouterView />

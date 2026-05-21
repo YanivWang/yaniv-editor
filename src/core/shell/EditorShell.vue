@@ -48,7 +48,6 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch, type Ref } from "vue
 
 import { getAppearanceClassName, useEditorAppearance } from "@/appearance";
 import { provideOutlinePanel } from "@/components/editor/outline";
-import { hasInlineToolbarItems } from "@/configs/inlineToolbarUtils";
 import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideYanivEditor } from "@/core/editorContext";
 import type { YanivEditorProps, YanivEditorExpose } from "@/core/editorTypes";
@@ -123,8 +122,6 @@ useYanivAiConfig(fullProps);
 provideOutlinePanel();
 const blockMenuHost = provideBlockMenuHost();
 
-const showInlineToolbar = computed(() => hasInlineToolbarItems(inlineProps.value?.toolbar));
-
 const runtime = isFull.value
   ? useEditorRuntime({
       host: "full",
@@ -136,7 +133,6 @@ const runtime = isFull.value
       mode: computed(() => inlineProps.value?.mode ?? "edit"),
       toolbar: computed(() => inlineProps.value?.toolbar),
       locale: localeCode,
-      showInlineToolbar,
     });
 
 const { profile, chrome, sessionKey, toolbarConfig } = runtime;

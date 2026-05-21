@@ -1,7 +1,8 @@
 import { computed, type ComputedRef, type Ref } from "vue";
 
+import { applyGatesToToolbarConfig } from "@/capabilities/applyGatesToToolbarConfig";
 import { CAPABILITIES } from "@/capabilities/registry";
-import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
+import { resolveShowInlineToolbar } from "@/capabilities/resolveShowInlineToolbar";
 import { fullEditorPresetConfig } from "@/configs/editorPreset";
 import { DEFAULT_INLINE_TOOLBAR } from "@/configs/inlineToolbar";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
@@ -27,7 +28,6 @@ export interface UseEditorRuntimeInlineOptions {
   mode: Ref<"edit" | "preview">;
   toolbar: Ref<InlineToolbarConfig | undefined>;
   locale: Ref<LocaleCode>;
-  showInlineToolbar: Ref<boolean>;
 }
 
 export function useEditorRuntime(
@@ -95,8 +95,14 @@ export function useEditorRuntime(
       return options.toolbar.value ?? DEFAULT_INLINE_TOOLBAR;
     }
     const base = fullEditorPresetConfig[options.props.value.preset ?? "basic"].toolbar;
-    return applyExtensionGatesToToolbarConfig(base, profile.value.gates);
+    return applyGatesToToolbarConfig(base, profile.value.gates);
   });
+
+  const showInlineToolbar = computed(() =>
+    host === "inline"
+      ? resolveShowInlineToolbar(options.toolbar.value ?? DEFAULT_INLINE_TOOLBAR, CAPABILITIES)
+      : false,
+  );
 
   const chrome = computed(() =>
     resolveChromePolicy({
@@ -105,7 +111,7 @@ export function useEditorRuntime(
       gates: profile.value.gates,
       uiFlags: uiFlags.value,
       host,
-      showInlineToolbar: host === "inline" ? options.showInlineToolbar.value : false,
+      showInlineToolbar: showInlineToolbar.value,
     }),
   );
 

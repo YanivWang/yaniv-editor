@@ -24,6 +24,11 @@
       "import": "./dist/inline.esm.js",
       "require": "./dist/inline.js"
     },
+    "./ai": {
+      "types": "./dist/ai.d.ts",
+      "import": "./dist/ai.esm.js",
+      "require": "./dist/ai.js"
+    },
     "./style.css": "./dist/style.css",
     "./inline.css": "./dist/inline.css"
   },

@@ -2,7 +2,7 @@ export interface DemoEntry {
   id: string;
   title: string;
   description: string;
-  routeName: "full-editor" | "inline-editor" | "inline-compose";
+  routeName: "full-editor" | "inline-editor" | "inline-compose" | "multi-instance";
   tags: string[];
   highlights: string[];
 }
@@ -43,6 +43,19 @@ export const DEMO_ENTRIES: DemoEntry[] = [
       "按需挂载工具栏组件（含 Align / Link 等）",
       "toolbar 开关驱动 resolveInlineGates + buildExtensions",
       "编辑/预览与 Full 行内能力对齐",
+    ],
+  },
+  {
+    id: "multi-instance",
+    title: "多实例隔离",
+    description:
+      "同页并排两个 YanivEditor，分别切换 locale / appearance / colorMode，验证实例级 i18n 与外观互不影响。",
+    routeName: "multi-instance",
+    tags: ["locale", "appearance", "isolation"],
+    highlights: [
+      "A 中文 + 亮色 Custom，B English + 暗色 Custom",
+      "实时探测 data-color-mode 与 --ye-primary",
+      "架构验收：scoped locale + useEditorAppearance 实例 Map",
     ],
   },
 ];

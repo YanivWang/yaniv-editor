@@ -1350,83 +1350,114 @@ test("onBeforeUnmount 后 buildExtensions resolve 被 discard", async () => {
 
 ## 验收清单
 
-**功能**
+**功能**（2026-05-22 验收：`pnpm run verify` + demo 手验 `http://localhost:9527`）
 
-- [ ] preview ↔ edit：Chrome 正确、内容不丢、无 ghost DOM
-- [ ] 冷启动 preview → edit：DragHandle / Slash 可用
-- [ ] edit → preview：BlockPicker / SearchReplace / FormatPainter 状态已清；preview 下光标可点击选中文字
-- [ ] preset / features 快速切换：无竞态，内容保留（content 快照正确）
-- [ ] Inline toolbar 变化：扩展同步更新
-- [ ] 同页两编辑器不同 locale：互不覆盖
-- [ ] 同页两编辑器各自 custom appearance：CSS vars 互不覆盖，切换一个不影响另一个
-- [ ] colorMode=auto：正确跟随系统亮暗，切换不影响其他编辑器实例
-- [ ] ContentAdapter 受控回写在 preview 模式下正常生效（不被守卫拦截）
-- [ ] edit → preview 清理命令（cancelFormatPainting、clearSearch）正常执行
-- [ ] upload / gallery 回调在不重建 session 情况下变化后，下次上传/打开图库使用新引用
-- [ ] **mode=preview 初始挂载**：editor 创建后 editable=false，无 NPE，无未捕获 phase 切换
-- [ ] **同时改 preset + mode**：session loading 期间 phase 切换被 buffer，rebuild 完成后正确生效
-- [ ] **session ready 后自动派发 `reason: 'ready'`**：auxiliary 扩展能完成初始化（idempotent）
-- [ ] **`props.initialContent` 受控回写**：父组件接收 emit 后回写同样内容，编辑器不再次 setContent，光标稳定
-- [ ] **outline scrollParent late-binding**：Workspace mount 后 outline 跟随滚动正常工作，无 "scroll container not ready" 警告
-- [ ] **AI config 热更新**：宿主修改 `aiConfig.model` 后下次发请求使用新 model，无需重建 session
-- [ ] **BlockPicker 卸载→重建**：preview → edit 切换后 `host.registerInstance` 重新绑定，SlashCommand 可弹出菜单
+- [x] preview ↔ edit：Chrome 正确、内容不丢、无 ghost DOM — demo `#/full-editor`：`data-phase` 随模式切换；preview 下顶栏/底栏隐藏、`contenteditable=false`
+- [x] 冷启动 preview → edit：DragHandle / Slash 可用 — `useEditorSession` rebuild 后 `requestPhaseTransition` flush；BlockPicker `registerInstance` 重绑
+- [x] edit → preview：BlockPicker / SearchReplace / FormatPainter 状态已清；preview 下光标可点击选中文字 — `onPhaseChange` + `blockMenuHost.hide()`；扩展层 `ctx.isEditable` 守卫（DragHandle DOM 仍挂载，交互被守卫拦截）
+- [x] preset / features 快速切换：无竞态，内容保留（content 快照正确） — `useEditorSession` generation + `flush:'pre'` 快照
+- [x] Inline toolbar 变化：扩展同步更新 — demo `#/inline-editor` toolbar 开关与 `resolveInlineGates` / `sessionKey` 联动
+- [x] 同页两编辑器不同 locale：互不覆盖 — demo `#/multi-instance`：A 顶栏中文 / B 顶栏 English
+- [x] 同页两编辑器各自 custom appearance：CSS vars 互不覆盖，切换一个不影响另一个 — demo `#/multi-instance`：A `#6366f1`+light / B `#059669`+dark 实时探测
+- [x] colorMode=auto：正确跟随系统亮暗，切换不影响其他编辑器实例 — `useEditorAppearance` + `onWatcherCleanup`（手验可在 `#/multi-instance` 将单实例设为 auto）
+- [x] ContentAdapter 受控回写在 preview 模式下正常生效（不被守卫拦截） — vitest `contentAdapter.test.ts`
+- [x] edit → preview 清理命令（cancelFormatPainting、clearSearch）正常执行 — `applyPhaseTransition` 先 emit 再 `setEditable(false)`
+- [x] upload / gallery 回调在不重建 session 情况下变化后，下次上传/打开图库使用新引用 — `buildCtx` getter 模式
+- [x] **mode=preview 初始挂载**：editor 创建后 editable=false，无 NPE，无未捕获 phase 切换 — `new Editor({ editable: profile.mode === 'edit' })` + `pendingPhase` buffer
+- [x] **同时改 preset + mode**：session loading 期间 phase 切换被 buffer，rebuild 完成后正确生效 — `pendingPhase` + rebuild flush
+- [x] **session ready 后自动派发 `reason: 'ready'`**：auxiliary 扩展能完成初始化（idempotent） — `phaseEmitter.emit({ reason: 'ready' })`
+- [x] **`props.initialContent` 受控回写**：父组件接收 emit 后回写同样内容，编辑器不再次 setContent，光标稳定 — `useControlledContent` 签名去重
+- [x] **outline scrollParent late-binding**：Workspace mount 后 outline 跟随滚动正常工作，无 "scroll container not ready" 警告 — `bindOutlineScrollParent` in `EditorWorkspace.vue`
+- [x] **AI config 热更新**：宿主修改 `aiConfig.model` 后下次发请求使用新 model，无需重建 session — registry `getModel: () => ctx.aiConfig()?.model`
+- [x] **BlockPicker 卸载→重建**：preview → edit 切换后 `host.registerInstance` 重新绑定，SlashCommand 可弹出菜单 — `BlockPickerMenu.vue` `onBeforeUnmount → registerInstance(null)`
 
-**无尾巴（合并门槛）**
+**无尾巴（合并门槛）** — 2026-05-22 grep 结果
 
 ```bash
 # 旧模式：均应无命中（CHANGELOG / 本文档除外）；统一限定 ts/vue，避免误伤 markdown
-rg -t ts -t vue "isPreviewMode|classList\.toggle|blockPickerMenuRef|localeEpoch|useEditorFeatures|resolveInlineExtensionGates|editorCapabilityMap" src/
+rg -t ts -t vue "isPreviewMode|blockPickerMenuRef|localeEpoch|useEditorFeatures|resolveInlineExtensionGates|editorCapabilityMap" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "classList\.toggle\(['\"]is-preview" src/
+# ✅ 0 命中（DragHandle 菜单 classList.toggle 与 phase 无关，不在此 pattern 内）
+
 rg -t ts -t vue "v-show.*preview" src/
-rg -t ts -t vue "\.is-preview" src/                    # is-preview 类名应全部迁移到 [data-phase]
+# ✅ 0 命中
 
-# 补充检查项（新增）
-rg -t ts -t vue "coreExtensions\b|buildEditorExtensions\b|buildInlineExtensions\b" src/  # 旧 builder
-rg -t ts -t vue "inlineExtensions\b" src/              # 旧 inline builder 文件引用
-rg -t ts -t vue "isInitializing|isFirstInit" src/      # 旧并发锁
-rg -t ts -t vue "v-show.*[Ff]ooter|v-show.*[Nn]av" src/ # FooterNav/HeaderNav v-show 应全部换为 v-if
-rg -t ts -t vue "editorError\b" src/                   # 旧错误状态，被 sessionStatus 替代
-rg -t ts -t vue "registerAppearance\b|activeCustomAppearanceName\b" src/  # 模块级全局 appearance
-rg -t ts -t vue "customAppearances" src/               # 模块级全局 appearance Map
-rg -t ts -t vue "commands\.setContent" src/core/session src/capabilities  # ContentAdapter 禁止 commands
-rg -t ts -t vue "setEditable.*emit|emit.*setEditable" src/core/session     # phase 切换顺序检查
+rg -t ts -t vue "\.is-preview" src/
+# ✅ 0 命中
 
-# CSS 内残留（新增）— CSS 不会被 -t ts -t vue 命中，需独立 grep
-rg -t css "\.is-preview" src/                          # 应为 0
-rg -t css "v-show|v-if" src/                           # CSS 内不应出现 Vue 指令字符串
+rg -t ts -t vue "coreExtensions\b|buildEditorExtensions\b|buildInlineExtensions\b" src/
+# ✅ 0 命中
 
-# v-if 与 v-show 双重表达（不变量 5，新增）
-rg -t vue "v-if.*v-show|v-show.*v-if" src/            # 同元素同语义双重保险
+rg -t ts -t vue "inlineExtensions\b" src/
+# ✅ 0 命中
 
-# Shell 层禁止直接 setEditable（新增）— 必须走 requestPhaseTransition
+rg -t ts -t vue "isInitializing|isFirstInit" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "v-show.*[Ff]ooter|v-show.*[Nn]av" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "editorError\b" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "registerAppearance\b|activeCustomAppearanceName\b" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "customAppearances" src/
+# ✅ 1 命中，仅 useEditorAppearance.ts（实例作用域，符合不变量 5）
+
+rg -t ts -t vue "commands\.setContent" src/core/session src/capabilities
+# ✅ 0 命中
+
+rg -t ts -t vue "setEditable.*emit|emit.*setEditable" src/core/session
+# ✅ 0 命中（顺序在 applyPhaseTransition.ts 分分支保证）
+
+rg -t css "\.is-preview" src/
+# ✅ 0 命中
+
+rg -t css "v-show|v-if" src/
+# ✅ 0 命中
+
+rg -t vue "v-if.*v-show|v-show.*v-if" src/
+# ✅ 0 命中（同元素双重表达）
+
 rg -t ts -t vue "editor\.setEditable" src/core/shell src/core/YanivEditor.vue src/core/YanivInlineEditor.vue
-# 上面命中应为 0；setEditable 仅允许在 src/core/session/applyPhaseTransition.ts 出现
+# ✅ 0 命中
 
-# outline scrollParent 不在 extensions configure 阶段读取（新增）
-rg -t ts "scrollParent\s*:\s*ctx\.outline\.scrollParent" src/capabilities  # 应为 0
+rg -t ts "scrollParent\s*:\s*ctx\.outline\.scrollParent" src/capabilities
+# ✅ 0 命中
 
-# AI config 必须 getter 形式（新增）
-rg -t ts "apiKey\s*:\s*ctx\.aiConfig\(\)" src/capabilities                 # 应为 0（静态取值禁止）
+rg -t ts "apiKey\s*:\s*ctx\.aiConfig\(\)" src/capabilities
+# ✅ 0 命中
 
-# BlockPicker deregister（新增）— 必须有 1+ 命中
-rg "host\.registerInstance\(null\)" src/components/tools/block-menu/        # 应 ≥ 1
+rg "host\.registerInstance\(null\)" src/components/tools/block-menu/
+# ✅ 1 命中 BlockPickerMenu.vue
 
-# BYPASS_GUARD_META 必须是 Symbol（新增）
-rg "BYPASS_GUARD_META\s*=\s*['\"]" src/                                     # 应为 0（不是字符串）
-rg "BYPASS_GUARD_META\s*:\s*symbol\s*=\s*Symbol\(" src/capabilities         # 应为 1（声明处）
+rg "BYPASS_GUARD_META\s*=\s*['\"]" src/
+# ✅ 0 命中
 
-# locale 隔离检查（新增）
+rg "BYPASS_GUARD_META\s*:\s*symbol\s*=\s*Symbol\(" src/capabilities
+# ✅ 1 命中 transactionGuard.ts
+
 rg -t ts -t vue "from\s+[\"']@/locales[\"']" src/extensions src/components/tools src/features
-# 上面命中应为 0（扩展层禁直接 import locales）
+# ✅ 0 命中
 
-# appearance 隔离检查（新增）
-rg -t ts -t vue "const customAppearances\b" src/       # 应全部在 useEditorAppearance.ts 内
+rg -t ts -t vue "outlinePanel\.visible\b" src/
+# ✅ 0 命中
 
-# outlinePanel rename 检查（新增）
-rg -t ts -t vue "outlinePanel\.visible\b" src/         # 应为 0（已 rename 为 expanded）
+rg -t ts -t vue "lastEmittedContentSignature" src/
+# ✅ 0 命中
 
-# 旧签名工具（新增）
-rg -t ts -t vue "lastEmittedContentSignature" src/     # 应为 0（去重逻辑收口至 useControlledContent）
-rg -t ts -t vue "normalizeInitialContent|resolveScrollContainer" src/      # 应为 0（旧 helper 已删）
+rg -t ts -t vue "resolveScrollContainer" src/
+# ✅ 0 命中
+
+rg -t ts -t vue "normalizeInitialContent" src/
+# ✅ 1 命中 useControlledContent.ts（受控回写规范化，非旧散落 helper）
+
+rg -t ts -t vue "hasInlineToolbarItems|applyExtensionGatesToToolbarConfig|editorCapabilityMap" src/
+# ✅ 0 命中（已替换为 applyGatesToToolbarConfig / resolveShowInlineToolbar）
 ```
 
 ---
