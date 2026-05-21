@@ -15,7 +15,7 @@ import { CAPABILITIES } from "@yanivjs/yaniv-editor";
 const gates = resolveInlineGates({ link: true, heading: true }, CAPABILITIES);
 // buildExtensions("inline", { gates, locale, ... })`;
 
-export const SNIPPET_REGISTER_APPEARANCE = `<YanivEditor
+export const SNIPPET_CUSTOM_APPEARANCE = `<YanivEditor
   appearance="custom"
   :custom-appearance-vars="{ '--ye-primary': '#6366f1' }"
 />`;

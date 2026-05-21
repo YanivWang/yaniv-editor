@@ -28,10 +28,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import type { EditorColorMode } from "@/configs/editorConfig";
-import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import type { EditorMode } from "@/core/editorTypes";
-
 import { YanivInlineEditor } from "@yanivjs/yaniv-editor/inline";
 
 import "@yanivjs/yaniv-editor/inline.css";
@@ -40,6 +36,9 @@ import DemoInlinePanel from "../components/DemoInlinePanel.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { getDemoEntry } from "../config/demoCatalog";
 import { INLINE_FULL_TOOLBAR } from "../config/demoInline";
+
+import type { EditorColorMode, EditorMode } from "@yanivjs/yaniv-editor";
+import type { InlineToolbarConfig } from "@yanivjs/yaniv-editor/inline";
 
 const entry = getDemoEntry("inline-editor");
 

@@ -18,16 +18,17 @@
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
 
-import { resolveColorMode, watchSystemColorMode } from "@/appearance/applyAppearance";
-import { buildExtensions } from "@/capabilities/buildExtensions";
-import { CAPABILITIES } from "@/capabilities/registry";
-import type { EditorColorMode } from "@/configs/editorConfig";
-import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import type { EditorMode } from "@/core/editorTypes";
-import { resolveInlineGates } from "@/core/runtime/resolveInlineGates";
-import { provideBlockMenuHost } from "@/core/shell/useBlockMenuHost";
-import { createI18n, loadLocale } from "@/locales";
-
+import {
+  buildExtensions,
+  CAPABILITIES,
+  createI18n,
+  loadLocale,
+  resolveColorMode,
+  watchSystemColorMode,
+  type BuildExtensionsCtx,
+  type EditorColorMode,
+  type EditorMode,
+} from "@yanivjs/yaniv-editor";
 import {
   AlignDropdown,
   ClearFormatButton,
@@ -35,8 +36,10 @@ import {
   HeadingControl,
   LinkButton,
   ListTools,
+  resolveInlineGates,
   TextFormatButtons,
   UndoRedoButton,
+  type InlineToolbarConfig,
 } from "@yanivjs/yaniv-editor/inline";
 
 const props = defineProps<{
@@ -53,7 +56,14 @@ createI18n();
 
 const rootRef = ref<HTMLElement | null>(null);
 const editor = shallowRef<Editor | null>(null);
-const blockMenuHost = provideBlockMenuHost();
+
+const blockMenuHost: BuildExtensionsCtx["blockMenuHost"] = {
+  registerInstance: () => {},
+  activate: () => {},
+  openInsert: () => {},
+  hide: () => {},
+  updateQuery: () => {},
+};
 
 function applyColorMode() {
   if (!rootRef.value) return;

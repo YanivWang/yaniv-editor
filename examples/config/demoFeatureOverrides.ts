@@ -1,4 +1,4 @@
-import type { FeatureConfig } from "@/core/editorTypes";
+import type { FeatureConfig } from "@yanivjs/yaniv-editor";
 
 export type FeatureOverrideMode = "default" | "on" | "off";
 

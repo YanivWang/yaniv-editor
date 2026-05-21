@@ -21,9 +21,9 @@
 import { Collapse } from "ant-design-vue";
 import { computed, ref, watch } from "vue";
 
-import type { EditorPreset } from "@/core/editorTypes";
-
 import { getHintGroupsForPreset, type FeatureHintGroup } from "../config/demoFullEditor";
+
+import type { EditorPreset } from "@yanivjs/yaniv-editor";
 
 const props = defineProps<{
   preset: EditorPreset;

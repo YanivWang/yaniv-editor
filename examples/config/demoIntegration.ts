@@ -1,5 +1,11 @@
-import type { TemplateItem } from "@/components/editor/template/templates";
-import type { GalleryImage, MediaUploadHandler, YanivEditorAiConfig } from "@/core/editorTypes";
+import type {
+  GalleryImage,
+  MediaUploadHandler,
+  YanivEditorAiConfig,
+  YanivEditorProps,
+} from "@yanivjs/yaniv-editor";
+
+type TemplateItem = NonNullable<YanivEditorProps["customTemplates"]>[number];
 
 export interface DemoIntegrationFlags {
   customUpload: boolean;

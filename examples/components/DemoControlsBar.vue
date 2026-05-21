@@ -42,15 +42,19 @@
 <script setup lang="ts">
 import { Segmented, Select } from "ant-design-vue";
 
-import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
-import type { EditorMode, EditorPreset } from "@/core/editorTypes";
-
 import {
   APPEARANCE_OPTIONS,
   COLOR_MODE_OPTIONS,
   MODE_OPTIONS,
   PRESET_OPTIONS,
 } from "../config/demoFullEditor";
+
+import type {
+  EditorAppearance,
+  EditorColorMode,
+  EditorMode,
+  EditorPreset,
+} from "@yanivjs/yaniv-editor";
 
 const mode = defineModel<EditorMode>("mode", { required: true });
 const preset = defineModel<EditorPreset>("preset", { required: true });

@@ -33,10 +33,6 @@
 import { Checkbox, Segmented } from "ant-design-vue";
 import { reactive, watch } from "vue";
 
-import type { EditorColorMode } from "@/configs/editorConfig";
-import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import type { EditorMode } from "@/core/editorTypes";
-
 import { COLOR_MODE_OPTIONS } from "../config/demoFullEditor";
 import {
   buildInlineToolbar,
@@ -44,6 +40,9 @@ import {
   INLINE_MODE_OPTIONS,
   INLINE_TOOLBAR_TOGGLES,
 } from "../config/demoInline";
+
+import type { EditorColorMode, EditorMode } from "@yanivjs/yaniv-editor";
+import type { InlineToolbarConfig } from "@yanivjs/yaniv-editor/inline";
 
 const mode = defineModel<EditorMode>("mode", { required: true });
 const toolbar = defineModel<InlineToolbarConfig>("toolbar", { required: true });

@@ -14,7 +14,6 @@
     </aside>
     <main class="demo-main demo-main--centered">
       <InlineComposeDemoCore
-        :key="composeKey"
         v-model:content="html"
         :toolbar="toolbar"
         :mode="inlineMode"
@@ -25,11 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-
-import type { EditorColorMode } from "@/configs/editorConfig";
-import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import type { EditorMode } from "@/core/editorTypes";
+import { ref } from "vue";
 
 import "@yanivjs/yaniv-editor/inline.css";
 
@@ -37,18 +32,19 @@ import DemoInlinePanel from "../components/DemoInlinePanel.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import InlineComposeDemoCore from "../components/InlineComposeDemoCore.vue";
 import { getDemoEntry } from "../config/demoCatalog";
-import { inlineToolbarKey, INLINE_FULL_TOOLBAR } from "../config/demoInline";
+import { INLINE_FULL_TOOLBAR } from "../config/demoInline";
+
+import type { EditorColorMode, EditorMode } from "@yanivjs/yaniv-editor";
+import type { InlineToolbarConfig } from "@yanivjs/yaniv-editor/inline";
 
 const entry = getDemoEntry("inline-compose");
 
 const html = ref(
-  "<h2>行内自行拼装</h2><p>自管 <code>Editor</code> 生命周期，按需挂载工具栏组件；扩展由 <code>buildInlineExtensions</code> 与 toolbar 同步。</p>",
+  '<h2>行内自行拼装</h2><p>自管 <code>Editor</code> 生命周期，按需挂载工具栏组件；扩展由 <code>buildExtensions("inline", ctx)</code> 与 toolbar 同步。</p>',
 );
 const inlineMode = ref<EditorMode>("edit");
 const toolbar = ref<InlineToolbarConfig>({ ...INLINE_FULL_TOOLBAR });
 const colorMode = ref<EditorColorMode>("light");
-
-const composeKey = computed(() => inlineToolbarKey(toolbar.value));
 </script>
 
 <style scoped>

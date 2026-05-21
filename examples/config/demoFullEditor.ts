@@ -1,5 +1,9 @@
-import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
-import type { EditorMode, EditorPreset } from "@/core/editorTypes";
+import type {
+  EditorAppearance,
+  EditorColorMode,
+  EditorMode,
+  EditorPreset,
+} from "@yanivjs/yaniv-editor";
 
 export interface SelectOption<T extends string> {
   label: string;
@@ -145,7 +149,7 @@ export const FEATURE_HINTS: FeatureHint[] = [
     label: "视频",
     hint: "顶栏插入视频；选中后上下文条可预览播放",
     hintNotion: "输入 / 或悬浮菜单插入视频",
-    presets: ["basic", "full", "notion"],
+    presets: ["full"],
   },
   {
     id: "imageToolbar",
@@ -159,22 +163,22 @@ export const FEATURE_HINTS: FeatureHint[] = [
     group: "媒体",
     label: "视频上下文条",
     hint: "选中视频后可预览播放",
-    presets: ["basic", "full", "notion"],
+    presets: ["full"],
   },
   {
     id: "table",
     group: "文档",
     label: "表格",
     hint: "顶栏选择行列插入表格；光标在表格内出现表格条",
-    hintNotion: "输入 / 插入表格；单元格内出现表格操作条",
-    presets: ["basic", "full", "notion"],
+    hintNotion: "输入 / 或悬浮菜单插入表格；单元格内出现表格操作条",
+    presets: ["full", "notion"],
   },
   {
     id: "tableTools",
     group: "文档",
     label: "表格上下文条",
     hint: "在表格内选中单元格后使用表格操作条",
-    presets: ["basic", "full", "notion"],
+    presets: ["full", "notion"],
   },
   {
     id: "math",
@@ -279,7 +283,7 @@ export const FEATURE_HINTS: FeatureHint[] = [
     id: "appearanceCustom",
     group: "布局",
     label: "Custom 外观",
-    hint: "appearance 选 Custom 时示例会 registerAppearance 注入玫红主题 CSS 变量",
+    hint: "appearance 选 Custom 时通过 :custom-appearance-vars 注入演示 CSS 变量",
     presets: ["basic", "full", "notion"],
   },
   {
@@ -354,13 +358,13 @@ export function getHintGroupsForPreset(
 
 const SAMPLE_BASIC = `
 <h1>Yaniv Editor — Basic</h1>
-<p>轻量写作方案：顶栏 + 底栏，常用排版与媒体能力。</p>
+<p>轻量写作方案：顶栏 + 底栏，常用排版与图片能力。</p>
 <h2>列表示例</h2>
 <ul>
   <li>有序与无序列表</li>
   <li>任务列表可在工具栏开启</li>
 </ul>
-<p>可尝试插入链接、图片与表格。</p>
+<p>可尝试插入链接与图片；表格、视频等需切换 full preset 或在「features 覆盖」中开启。</p>
 `;
 
 const SAMPLE_FULL = `

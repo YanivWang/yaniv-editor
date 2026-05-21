@@ -1,5 +1,5 @@
-import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import type { EditorMode } from "@/core/editorTypes";
+import type { EditorMode } from "@yanivjs/yaniv-editor";
+import type { InlineToolbarConfig } from "@yanivjs/yaniv-editor/inline";
 
 export interface InlineToolbarToggle {
   key: keyof InlineToolbarConfig;
@@ -60,7 +60,7 @@ export const INLINE_HINTS: InlineHint[] = [
   {
     id: "compose",
     label: "自行拼装",
-    hint: "见「行内自行拼装」：useEditor + buildInlineExtensions",
+    hint: '见「行内自行拼装」：Editor + buildExtensions("inline", ctx)',
   },
 ];
 
@@ -72,8 +72,4 @@ export function buildInlineToolbar(
     if (enabled[key]) toolbar[key] = true;
   }
   return toolbar;
-}
-
-export function inlineToolbarKey(toolbar: InlineToolbarConfig): string {
-  return INLINE_TOOLBAR_TOGGLES.map((t) => (toolbar[t.key] ? "1" : "0")).join("");
 }

@@ -40,16 +40,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import type { TemplateItem } from "@/components/editor/template/templates";
-import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
-import type {
-  EditorMode,
-  EditorPreset,
-  GalleryImage,
-  MediaUploadHandler,
-  YanivEditorAiConfig,
-} from "@/core/editorTypes";
-
 import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
@@ -72,6 +62,19 @@ import {
   demoUploadVideo,
   type DemoIntegrationFlags,
 } from "../config/demoIntegration";
+
+import type {
+  EditorAppearance,
+  EditorColorMode,
+  EditorMode,
+  EditorPreset,
+  GalleryImage,
+  MediaUploadHandler,
+  YanivEditorAiConfig,
+  YanivEditorProps,
+} from "@yanivjs/yaniv-editor";
+
+type TemplateItem = NonNullable<YanivEditorProps["customTemplates"]>[number];
 
 const fullEntry = getDemoEntry("full-editor");
 
