@@ -1,10 +1,16 @@
 <template>
-  <div class="demo-page demo-page--inline">
-    <DemoSubnav title="行内自行拼装" :description="entry?.description" />
-    <div class="demo-page--inline__panel">
-      <DemoInlinePanel v-model:mode="inlineMode" v-model:toolbar="toolbar" />
-    </div>
-    <InlineComposeDemoCore :key="composeKey" :toolbar="toolbar" :mode="inlineMode" />
+  <div class="demo-page demo-page--split">
+    <aside class="demo-sidebar">
+      <DemoSubnav title="行内自行拼装" :description="entry?.description" />
+      <div class="demo-sidebar__body">
+        <div class="demo-inline-panel-wrapper">
+          <DemoInlinePanel v-model:mode="inlineMode" v-model:toolbar="toolbar" />
+        </div>
+      </div>
+    </aside>
+    <main class="demo-main demo-main--centered">
+      <InlineComposeDemoCore :key="composeKey" :toolbar="toolbar" :mode="inlineMode" />
+    </main>
   </div>
 </template>
 
@@ -31,18 +37,13 @@ const composeKey = computed(() => inlineToolbarKey(toolbar.value, inlineMode.val
 </script>
 
 <style scoped>
-.demo-page--inline {
-  flex: 1;
+.demo-main--centered {
   align-items: center;
-  min-height: 0;
+  justify-content: center;
   padding: 24px;
-  overflow: auto;
 }
 
-.demo-page--inline :deep(.demo-subnav),
-.demo-page--inline__panel {
-  align-self: stretch;
-  width: 100%;
-  max-width: 720px;
+.demo-inline-panel-wrapper {
+  padding: 12px;
 }
 </style>

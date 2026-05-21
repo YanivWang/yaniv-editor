@@ -1,35 +1,39 @@
 <template>
-  <div class="demo-page demo-page--full yaniv-editor-host">
-    <DemoSubnav title="完整编辑器" :description="fullEntry?.description" />
-    <div class="demo-page--full__chrome">
-      <DemoControlsBar
-        v-model:mode="mode"
-        v-model:preset="preset"
-        v-model:appearance="appearance"
-        v-model:color-mode="colorMode"
+  <div class="demo-page demo-page--split">
+    <aside class="demo-sidebar">
+      <DemoSubnav title="完整编辑器" :description="fullEntry?.description" />
+      <div class="demo-sidebar__body">
+        <DemoControlsBar
+          v-model:mode="mode"
+          v-model:preset="preset"
+          v-model:appearance="appearance"
+          v-model:color-mode="colorMode"
+        />
+        <DemoFeatureOverrides v-model:state="featureOverrides" />
+        <DemoIntegrationPanel
+          v-model:flags="integration"
+          :upload-status="uploadStatus"
+          :active-props-snippet="activePropsSnippet"
+        />
+        <DemoFeatureHints :preset="preset" />
+      </div>
+    </aside>
+    <main class="demo-main yaniv-editor-host">
+      <YanivEditor
+        :key="editorKey"
+        :mode="mode"
+        :preset="preset"
+        :appearance="appearance"
+        :color-mode="colorMode"
+        :features="featuresProp"
+        :initial-content="initialContent"
+        :upload-image="uploadImageHandler"
+        :upload-video="uploadVideoHandler"
+        :gallery-images="galleryImagesProp"
+        :custom-templates="customTemplatesProp"
+        :ai-config="aiConfigProp"
       />
-      <DemoFeatureOverrides v-model:state="featureOverrides" />
-      <DemoIntegrationPanel
-        v-model:flags="integration"
-        :upload-status="uploadStatus"
-        :active-props-snippet="activePropsSnippet"
-      />
-      <DemoFeatureHints :preset="preset" />
-    </div>
-    <YanivEditor
-      :key="editorKey"
-      :mode="mode"
-      :preset="preset"
-      :appearance="appearance"
-      :color-mode="colorMode"
-      :features="featuresProp"
-      :initial-content="initialContent"
-      :upload-image="uploadImageHandler"
-      :upload-video="uploadVideoHandler"
-      :gallery-images="galleryImagesProp"
-      :custom-templates="customTemplatesProp"
-      :ai-config="aiConfigProp"
-    />
+    </main>
   </div>
 </template>
 
@@ -142,23 +146,3 @@ async function handleUploadVideo(file: File): Promise<string> {
   }
 }
 </script>
-
-<style scoped>
-.demo-page--full {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.demo-page--full__chrome {
-  flex-shrink: 0;
-  max-height: 52vh;
-  overflow: auto;
-  border-bottom: 1px solid #e8edf3;
-}
-
-.demo-page--full :deep(.yaniv-editor) {
-  flex: 1;
-  min-height: 0;
-}
-</style>

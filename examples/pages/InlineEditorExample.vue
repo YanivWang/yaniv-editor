@@ -1,17 +1,23 @@
 <template>
-  <div class="demo-page demo-page--inline">
-    <DemoSubnav title="行内编辑器" :description="entry?.description" />
-    <div class="demo-page--inline__panel">
-      <DemoInlinePanel v-model:mode="inlineMode" v-model:toolbar="toolbar" />
-    </div>
-    <YanivInlineEditor
-      :key="inlineKey"
-      v-model:content="html"
-      :mode="inlineMode"
-      :toolbar="toolbar"
-      class="demo-inline"
-      placeholder="写一条评论…"
-    />
+  <div class="demo-page demo-page--split">
+    <aside class="demo-sidebar">
+      <DemoSubnav title="行内编辑器" :description="entry?.description" />
+      <div class="demo-sidebar__body">
+        <div class="demo-inline-panel-wrapper">
+          <DemoInlinePanel v-model:mode="inlineMode" v-model:toolbar="toolbar" />
+        </div>
+      </div>
+    </aside>
+    <main class="demo-main demo-main--centered">
+      <YanivInlineEditor
+        :key="inlineKey"
+        v-model:content="html"
+        :mode="inlineMode"
+        :toolbar="toolbar"
+        class="demo-inline"
+        placeholder="写一条评论…"
+      />
+    </main>
   </div>
 </template>
 
@@ -43,22 +49,17 @@ const inlineKey = computed(() => inlineToolbarKey(toolbar.value, inlineMode.valu
 </script>
 
 <style scoped>
-.demo-page--inline {
-  flex: 1;
+.demo-main--centered {
   align-items: center;
-  min-height: 0;
+  justify-content: center;
   padding: 24px;
-  overflow: auto;
 }
 
-.demo-page--inline :deep(.demo-subnav),
-.demo-page--inline__panel {
-  align-self: stretch;
-  width: 100%;
-  max-width: 720px;
+.demo-inline-panel-wrapper {
+  padding: 12px;
 }
 
-.demo-page--inline :deep(.demo-inline) {
+.demo-main :deep(.demo-inline) {
   width: 100%;
   max-width: 720px;
   overflow: hidden;
