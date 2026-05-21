@@ -19,6 +19,21 @@
   outline-offset: 2px;
 }
 
+/* 预览/只读模式：禁用图片编辑态视觉与交互 */
+.ProseMirror[contenteditable="false"] img {
+  cursor: default;
+}
+
+.ProseMirror[contenteditable="false"] img:hover,
+.ProseMirror[contenteditable="false"] img[data-selected] {
+  outline: none;
+}
+
+.ProseMirror[contenteditable="false"] .resizable-image-wrapper .resize-handle {
+  display: none;
+  pointer-events: none;
+}
+
 .ProseMirror .video-wrapper {
   position: relative;
   display: block;

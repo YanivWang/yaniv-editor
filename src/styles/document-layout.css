@@ -355,6 +355,14 @@
   resize: none;
 }
 
+.yaniv-editor[data-phase="preview"] .ProseMirror img:hover,
+.yaniv-editor[data-phase="preview"] .ProseMirror img[data-selected],
+.yaniv-editor[data-phase="preview"] .ProseMirror .video-wrapper:hover video,
+.yaniv-editor[data-phase="preview"] .ProseMirror .video-wrapper.ProseMirror-selectednode video,
+.yaniv-editor[data-phase="preview"] .ProseMirror .video-wrapper video[data-selected] {
+  outline: none;
+}
+
 /* ===== 查找 / 替换命中高亮 ===== */
 .ProseMirror .search-result {
   background: rgb(255 235 59 / 42%);

@@ -83,11 +83,20 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
       img.alt = node.attrs.alt || "";
       img.title = node.attrs.title || "";
 
-      // 根据配置决定是否启用拖拽功能
-      if (enableResize) {
-        img.draggable = true;
-        img.style.cursor = "move";
-      }
+      const canInteract = () => enableResize && editor.isEditable;
+
+      const syncInteractionState = () => {
+        const interactive = canInteract();
+        img.draggable = interactive;
+        if (interactive) {
+          img.style.cursor = "move";
+        } else {
+          img.style.removeProperty("cursor");
+        }
+        if (resizeHandle) {
+          resizeHandle.hidden = !interactive;
+        }
+      };
 
       // 设置图片大小
       const updateImageSize = () => {
@@ -137,11 +146,17 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
       }
 
       dom.appendChild(img);
+      syncInteractionState();
+
+      const onEditorUpdate = () => {
+        syncInteractionState();
+      };
+      editor.on("update", onEditorUpdate);
 
       // 图片点击事件，选中图片节点
       dom.addEventListener("click", (e) => {
+        if (!canInteract()) return;
         if (
-          enableResize &&
           resizeHandle &&
           (e.target === resizeHandle || resizeHandle.contains(e.target as HTMLElement))
         ) {
@@ -157,6 +172,10 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
       // 图片拖拽功能：支持在文字之间移动（仅在启用增强功能时）
       if (enableResize) {
         img.addEventListener("dragstart", (e: DragEvent) => {
+          if (!canInteract()) {
+            e.preventDefault();
+            return;
+          }
           const pos = typeof getPos === "function" ? getPos() : null;
           if (pos !== null && pos !== undefined) {
             const { state } = editor;
@@ -203,6 +222,7 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
         let aspectRatio = 1;
 
         const handleMouseDown = (e: MouseEvent) => {
+          if (!canInteract()) return;
           // 阻止调整手柄触发图片拖拽，但允许调整大小
           e.preventDefault();
           e.stopPropagation();
@@ -232,6 +252,12 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
 
         const handleMouseMove = (e: MouseEvent) => {
           if (!isResizing) return;
+          if (!editor.isEditable) {
+            isResizing = false;
+            updateImageSize();
+            cleanupResize?.();
+            return;
+          }
 
           // 计算鼠标移动的距离（使用对角线距离，保持等比例）
           const deltaX = e.clientX - startX;
@@ -253,12 +279,18 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
           document.removeEventListener("mousemove", handleMouseMove);
           document.removeEventListener("mouseup", handleMouseUp);
           dom.classList.remove("resizing");
-          img.draggable = true;
+          syncInteractionState();
         };
 
         const handleMouseUp = () => {
           if (!isResizing) return;
           isResizing = false;
+
+          if (!editor.isEditable) {
+            updateImageSize();
+            cleanupResize?.();
+            return;
+          }
 
           const finalWidth = parseInt(img.style.width, 10);
           const finalHeight = parseInt(img.style.height, 10);
@@ -329,6 +361,7 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
           return true;
         },
         destroy: () => {
+          editor.off("update", onEditorUpdate);
           cleanupResize?.();
           if (resizeHandle && handleResizeMouseDown) {
             resizeHandle.removeEventListener("mousedown", handleResizeMouseDown);
