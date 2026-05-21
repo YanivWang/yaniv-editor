@@ -25,6 +25,12 @@ import { YanivInlineEditor } from "@yanivjs/yaniv-editor/inline";
 import "@yanivjs/yaniv-editor/inline.css";
 ```
 
+AI extensions and UI (optional):
+
+```ts
+import { ContinueWritingExtension, AiMenuButton } from "@yanivjs/yaniv-editor/ai";
+```
+
 ## Full Editor API
 
 Full Editor is defined by four independent axes:
@@ -51,18 +57,30 @@ resolvedFeatures = {
 Example:
 
 ```vue
-<YanivEditor preset="full" :features="{ ai: false }" />
+<YanivEditor preset="full" :features="{ table: false }" />
 ```
 
-This keeps the full preset but removes AI extension registration and AI UI entry points.
+This keeps the full preset but removes table extension registration and table UI entry points.
 
 ## Presets
 
-`basic` is the default recommendation. It enables common authoring abilities such as text formatting, links, image, video, and table. It does not enable AI, Office paste, math, outline, find/replace, format painter, slash command, or drag handle by default.
+Preset default abilities are resolved by `resolveEditorProfile` in runtime. Toolbar buttons are further filtered by active gates.
 
-`full` enables advanced abilities such as AI, Office paste, math, outline, find/replace, and format painter.
+`basic` is the default recommendation. It enables image only. Text formatting, links, and other core editing remain available. It does not enable video, table, AI, Office paste, math, outline, find/replace, format painter, slash command, or drag handle by default.
 
-`notion` focuses on block editing. It uses floating/block interactions, slash command, and drag handle, and does not show the fixed top toolbar or footer.
+To keep the old basic behavior with table and video:
+
+```vue
+<YanivEditor preset="basic" :features="{ table: true, video: true }" />
+```
+
+`full` enables advanced document abilities such as table, video, math, Office paste, outline, find/replace, format painter, slash command, and drag handle. AI is not enabled by default:
+
+```vue
+<YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
+```
+
+`notion` focuses on block editing with table, image, slash command, and drag handle. It uses floating/block interactions and does not show the fixed top toolbar or footer.
 
 ## Preview Behavior
 

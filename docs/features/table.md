@@ -3,7 +3,8 @@
 Tables are controlled by `features.table`.
 
 ```vue
-<YanivEditor preset="basic" />
+<YanivEditor preset="full" />
+<YanivEditor preset="basic" :features="{ table: true }" />
 <YanivEditor preset="full" :features="{ table: false }" />
 ```
 

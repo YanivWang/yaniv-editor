@@ -13,9 +13,15 @@ import "@yanivjs/yaniv-editor/style.css";
 </template>
 ```
 
-Use `preset="full"` when the page needs advanced abilities such as AI, Office paste, math, outline, find/replace, and format painter.
+Use `preset="full"` when the page needs advanced document abilities such as table, video, math, Office paste, outline, find/replace, format painter, slash command, and drag handle.
 
 Use `preset="notion"` when the page needs a block editing workflow.
+
+Enable AI explicitly when needed:
+
+```vue
+<YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
+```
 
 ## Inline Editor
 
@@ -31,4 +37,10 @@ const html = ref("<p>Hello Yaniv</p>");
 <template>
   <YanivInlineEditor v-model:content="html" mode="edit" />
 </template>
+```
+
+## AI Subpackage
+
+```ts
+import { ContinueWritingExtension, AiMenuButton } from "@yanivjs/yaniv-editor/ai";
 ```

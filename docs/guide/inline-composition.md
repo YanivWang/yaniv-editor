@@ -20,16 +20,23 @@ For detailed control, pass `toolbar`.
 />
 ```
 
-The toolbar config is also the ability source for Inline Editor extension registration. For example, `toolbar.link !== true` means the link button is hidden and the link extension is not registered by the default inline builder.
+The toolbar config is also the ability source for Inline Editor extension registration. For example, `toolbar.link !== true` means the link button is hidden and the link extension is not registered.
 
 You can also build your own inline shell:
 
 ```ts
-import { buildInlineExtensions, resolveInlineExtensionGates } from "@yanivjs/yaniv-editor/inline";
+import { buildExtensions, resolveInlineGates, CAPABILITIES } from "@yanivjs/yaniv-editor/inline";
 
 const toolbar = { undoRedo: true, textFormat: true, link: true };
+const gates = resolveInlineGates(toolbar, CAPABILITIES);
 
-const extensions = buildInlineExtensions({
-  gates: resolveInlineExtensionGates({ toolbar }),
+const extensions = await buildExtensions("inline", {
+  gates,
+  locale: {
+    /* resolved locale messages */
+  },
+  isEditable: () => true,
 });
 ```
+
+`buildExtensions` and `resolveInlineGates` are the single source of truth for Inline extension registration. Do not use the removed `buildInlineExtensions` or `resolveInlineExtensionGates` APIs.

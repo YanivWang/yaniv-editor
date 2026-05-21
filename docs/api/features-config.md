@@ -39,10 +39,24 @@ Turning off an ability removes its extension registration and all matching inter
 
 ## Preset Defaults
 
-| Preset   | Default abilities                                                                                              | Layout strategy                                        |
-| -------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `basic`  | image, video, table                                                                                            | fixed header and footer, no floating menu              |
-| `full`   | image, video, table, math, AI, format painter, outline, find/replace, Office paste, slash command, drag handle | fixed header and footer, floating menu                 |
-| `notion` | image, video, table, AI, format painter, outline, slash command, drag handle                                   | no fixed header or footer, floating/block interactions |
+Preset default abilities come from `resolveEditorProfile`. Toolbar buttons are filtered again by active gates.
+
+| Preset   | Default abilities                                                                                          | Layout strategy                                        |
+| -------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `basic`  | image                                                                                                      | fixed header and footer, no floating menu              |
+| `full`   | image, video, table, math, format painter, outline, find/replace, Office paste, slash command, drag handle | fixed header and footer, floating menu                 |
+| `notion` | image, table, slash command, drag handle                                                                   | no fixed header or footer, floating/block interactions |
+
+AI is disabled in all presets by default. Enable it explicitly:
+
+```vue
+<YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
+```
+
+`basic` no longer enables table or video by default. Restore the old behavior with:
+
+```vue
+<YanivEditor preset="basic" :features="{ table: true, video: true }" />
+```
 
 `preset` owns layout strategy. `features` only overrides abilities, so it cannot re-enable public layout switches such as header, footer, floating menu, or shortcut hints.

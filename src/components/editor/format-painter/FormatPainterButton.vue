@@ -71,7 +71,7 @@ function updateFormatPainterActive() {
  * 设置格式刷事件订阅
  */
 function setupFormatPainterSubscriptions() {
-  // 先清理旧订阅
+  // 清理已有订阅，避免重复绑定
   cleanupFormatPainterSubscriptions();
   const e = editor.value;
   if (!e) return;

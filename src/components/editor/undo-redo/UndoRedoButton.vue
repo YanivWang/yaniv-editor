@@ -110,7 +110,7 @@ function handleUpdate() {
  * @description 监听编辑器状态变化，实时更新撤销/重做按钮状态
  */
 function setupEditorSubscriptions() {
-  // 先清理旧订阅
+  // 清理已有订阅，避免重复绑定
   cleanupEditorSubscriptions();
   const e = editor.value;
   if (!e) return;

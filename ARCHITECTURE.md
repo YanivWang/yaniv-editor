@@ -2,6 +2,8 @@
 
 Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
 
+> **状态**：本文档描述的重构已于 v0.1.0 完成并落地。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文保留的「删除清单」「实施顺序」等内容作为历史验收依据，不再表示待办事项。
+
 ## 实施约定
 
 - **本文档（仓库根目录 `ARCHITECTURE.md`）是重构的唯一实施依据。**
@@ -1163,9 +1165,9 @@ src/appearance/
 
 ---
 
-## 必须删除的旧实现
+## 必须删除的旧实现（验收清单，已完成）
 
-合并前 `src/` 中以下模式 **grep 为零**：
+合并前 `src/` 中以下模式 **grep 为零**（当前仓库已满足）：
 
 | 删除项                                                                           | 替代                                                                     |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -1213,19 +1215,19 @@ src/appearance/
 
 ---
 
-## 实施顺序（单 branch）
+## 实施顺序（单 branch，已完成）
 
-1. **创建 `CHANGELOG.md`**，写入 BREAKING CHANGES 占位（preset 能力变更、`.is-preview` → `[data-phase]`、`registerAppearance` 删除、Inline schema 容错变更、outlinePanel rename、phaseChange reason 字段）
-2. **runtime pure 函数先行（零 Vue 依赖）**：`resolveEditorProfile` + `mergeFeatures` + `resolveChromePolicy` + `computeSessionKey` + `resolveInlineGates`。单文件、可独立 import，给步骤 3 的单测和步骤 4 的 registry 联调做基础。
-3. **vitest + 纯函数单测**（锁死行为，见最小测试集）；此步与步骤 2 同 commit 入库
-4. `capabilities/registry` + `buildExtensions`（删旧 gates / builders；含 `withTransactionGuard` 注入 `ctx.isEditable`）
-5. `runtime/` 的 composable 层 `useEditorRuntime` + `session/`（含 ContentAdapter raw dispatch、applyPhaseTransition 顺序修正、`requestPhaseTransition` buffer、`flush: 'pre'` snapshot）
-6. `shell/` + `useBlockMenuHost`（含 `registerInstance(null)` on unmount 约定）
-7. 重写 YanivEditor / YanivInlineEditor（薄壳；Inline 走 `resolveInlineGates`）
-8. scoped i18n + appearance 统一（删模块级全局状态）；AI 扩展改 getter 形式 config
-9. outline scrollParent late-binding（`editor.commands.bindOutlineScrollParent`）；Workspace 注入
-10. breaking exports + docs + examples 重写（demo 移除 `:key="editorKey"` / `inlineKey`）
-11. verify-no-tails grep + 验收清单
+1. ~~创建 `CHANGELOG.md`~~
+2. ~~runtime pure 函数先行~~
+3. ~~vitest + 纯函数单测~~
+4. ~~`capabilities/registry` + `buildExtensions`~~
+5. ~~`runtime/` composable + `session/`~~
+6. ~~`shell/` + `useBlockMenuHost`~~
+7. ~~重写 YanivEditor / YanivInlineEditor~~
+8. ~~scoped i18n + appearance 统一~~
+9. ~~outline scrollParent late-binding~~
+10. ~~breaking exports + docs + examples 重写~~
+11. ~~verify-no-tails grep + 验收清单~~
 
 ### 最小测试集（步骤 3 必须覆盖）
 
@@ -1283,10 +1285,10 @@ test("不同 locale 产生不同 sessionKey", () => {
 
 // 4. mergeFeatures：undefined 不覆盖
 test("features[key]=undefined 不覆盖 preset 默认值", () => {
-  expect(mergeFeatures({ ...fullFeatures }, { table: undefined }).table).toBe(true);
+  expect(mergeFeatures({ ...PRESET_DEFAULT_FEATURES.full }, { table: undefined }).table).toBe(true);
 });
 test("features[key]=false 覆盖 preset 默认值", () => {
-  expect(mergeFeatures({ ...fullFeatures }, { table: false }).table).toBe(false);
+  expect(mergeFeatures({ ...PRESET_DEFAULT_FEATURES.full }, { table: false }).table).toBe(false);
 });
 
 // 5. resolveInlineGates：toolbar 推导 gate

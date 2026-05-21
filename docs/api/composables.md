@@ -1,6 +1,6 @@
 # Composables
 
-Public composables are exported from the root package for advanced integration.
+Public composables and advanced runtime helpers are exported from the root package.
 
 ## Editor Context
 
@@ -14,7 +14,10 @@ Use these when custom tool components need access to the active editor instance.
 
 ```ts
 import {
-  registerAppearance,
+  loadAppearance,
+  preloadAppearances,
+  applyCustomAppearanceToElement,
+  applyAppearanceToElement,
   resolveColorMode,
   useResolvedColorMode,
   watchSystemColorMode,
@@ -23,4 +26,65 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-`YanivEditor` drives visual state with `appearance` and `colorMode`.
+`YanivEditor` drives visual state with `appearance`, `colorMode`, and optional `customAppearanceVars`.
+
+## Bubble Menu Helpers
+
+```ts
+import {
+  isBubbleMenuBlocked,
+  shouldShowFloatingTextToolbar,
+  shouldShowImageBubbleMenu,
+  shouldShowLinkBubbleMenu,
+  shouldShowTableBubbleMenu,
+  shouldShowVideoBubbleMenu,
+  scrollEditorSelectionIntoView,
+} from "@yanivjs/yaniv-editor";
+```
+
+## Editor State Helpers
+
+```ts
+import { useEditorColorState, useFindReplaceHotkey } from "@yanivjs/yaniv-editor";
+```
+
+## Runtime And Capabilities
+
+Advanced integration can compose the same runtime pipeline used by the built-in components:
+
+```ts
+import {
+  resolveEditorProfile,
+  mergeFeatures,
+  resolveChromePolicy,
+  computeSessionKey,
+  resolveInlineGates,
+  buildExtensions,
+  CAPABILITIES,
+  applyGatesToToolbarConfig,
+  resolveShowInlineToolbar,
+  ContentAdapter,
+  applyPhaseTransition,
+} from "@yanivjs/yaniv-editor";
+```
+
+## Locales
+
+```ts
+import {
+  createI18n,
+  useI18n,
+  t,
+  loadLocale,
+  normalizeLocaleCode,
+  ensureLocalesLoaded,
+} from "@yanivjs/yaniv-editor";
+```
+
+## AI Subpackage
+
+AI extensions and UI are exported from `@yanivjs/yaniv-editor/ai`, not the root package:
+
+```ts
+import { ContinueWritingExtension, AiMenuButton, useAiConfig } from "@yanivjs/yaniv-editor/ai";
+```

@@ -17,13 +17,27 @@ Visual configuration is split into two props:
 <YanivEditor preset="notion" appearance="notion" />
 ```
 
+## Custom Appearance
+
+Use `appearance="custom"` with `customAppearanceVars` on the editor instance:
+
+```vue
+<YanivEditor
+  appearance="custom"
+  :custom-appearance-vars="{
+    '--ye-primary': '#6366f1',
+    '--ye-bg': '#f8fafc',
+  }"
+/>
+```
+
 ## Utilities
 
 ```ts
 import {
   loadAppearance,
   preloadAppearances,
-  registerAppearance,
+  applyCustomAppearanceToElement,
   resolveColorMode,
   useResolvedColorMode,
   watchSystemColorMode,
