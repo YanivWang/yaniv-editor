@@ -1,5 +1,5 @@
 /**
- * Yaniv Editor - Main Stylesheet Entry（唯一全量主题入口）
+ * Yaniv Editor - Main Stylesheet Entry（完整外观与功能样式入口）
  *
  * 对外契约：
  * - npm: import '@yanivjs/yaniv-editor/style.css'
@@ -9,7 +9,7 @@
  * 新增全局功能样式只在此文件增加 @import。
  */
 
-/* CSS Variables (Light + Dark themes) — 必须最先 */
+/* CSS Variables (Light + Dark color modes) — 必须最先 */
 @import "./variables.css";
 
 /* Base editor styles */
@@ -43,9 +43,9 @@
 @import "../components/tools/footer-nav/footer-nav.css";
 @import "../features/ai/shared/ai-highlight.css";
 
-/* Theme presets（npm 全量打入 style.css；loadThemePreset 仅切换 class） */
-@import "../themes/presets/default.css";
-@import "../themes/presets/word.css";
-@import "../themes/presets/notion.css";
-@import "../themes/presets/github.css";
-@import "../themes/presets/typora.css";
+/* Visual appearances（npm 全量打入 style.css；loadAppearance 仅切换 class） */
+@import "../appearance/styles/default.css";
+@import "../appearance/styles/word.css";
+@import "../appearance/styles/notion.css";
+@import "../appearance/styles/github.css";
+@import "../appearance/styles/typora.css";

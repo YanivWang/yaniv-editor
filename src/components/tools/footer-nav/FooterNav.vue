@@ -8,7 +8,7 @@
       :min="min"
       :max="max"
       :step="step"
-      :placement="zoomBarPlacement"
+      :placement="placement"
       @update:zoom-level="handleZoomUpdate"
       @change="handleZoomChange"
       @reset="handleZoomReset"
@@ -54,7 +54,7 @@ interface Props {
   /** 缩放步长 */
   step?: number;
   /** 缩放条位置 */
-  zoomBarPlacement?: "bottom" | "belowToolbar";
+  placement?: "bottom" | "belowToolbar";
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,7 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
   step: 10,
   showCharCount: true,
   showShortcutHints: false,
-  zoomBarPlacement: "bottom",
+  placement: "bottom",
 });
 
 // ===== Emits =====

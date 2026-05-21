@@ -32,10 +32,10 @@ export interface BubbleMenuShowProps {
 
 const MEDIA_NODE_TYPES = ["image", "video"] as const;
 
-/** 通用前置：编辑器存在且非只读/拖拽拦截 */
-export function isBubbleMenuVisible(props: BubbleMenuShowProps, readonly: boolean): boolean {
+/** 通用前置：编辑器存在且未被禁用，也不处于块拖拽拦截中 */
+export function isBubbleMenuVisible(props: BubbleMenuShowProps, disabled: boolean): boolean {
   if (!props.editor) return false;
-  if (isBubbleMenuBlocked(props.editor, readonly)) return false;
+  if (isBubbleMenuBlocked(props.editor, disabled)) return false;
   return true;
 }
 
@@ -75,9 +75,9 @@ function selectionTouchesMedia(state: BubbleMenuShowProps["state"]): boolean {
 /** 选中文本时的浮动格式化工具栏 */
 export function shouldShowFloatingTextToolbar(
   props: BubbleMenuShowProps,
-  readonly: boolean,
+  disabled: boolean,
 ): boolean {
-  if (!isBubbleMenuVisible(props, readonly)) return false;
+  if (!isBubbleMenuVisible(props, disabled)) return false;
   if (props.state.selection instanceof NodeSelection) return false;
   if (!hasTextSelection(props)) return false;
 
@@ -92,22 +92,22 @@ export function shouldShowFloatingTextToolbar(
   return true;
 }
 
-export function shouldShowImageBubbleMenu(props: BubbleMenuShowProps, readonly: boolean): boolean {
-  if (!isBubbleMenuVisible(props, readonly)) return false;
+export function shouldShowImageBubbleMenu(props: BubbleMenuShowProps, disabled: boolean): boolean {
+  if (!isBubbleMenuVisible(props, disabled)) return false;
   return props.editor.isActive("image");
 }
 
-export function shouldShowVideoBubbleMenu(props: BubbleMenuShowProps, readonly: boolean): boolean {
-  if (!isBubbleMenuVisible(props, readonly)) return false;
+export function shouldShowVideoBubbleMenu(props: BubbleMenuShowProps, disabled: boolean): boolean {
+  if (!isBubbleMenuVisible(props, disabled)) return false;
   return props.editor.isActive("video");
 }
 
 export function shouldShowTableBubbleMenu(
   props: BubbleMenuShowProps,
-  readonly: boolean,
+  disabled: boolean,
   showMode: 1 | 2,
 ): boolean {
-  if (!isBubbleMenuVisible(props, readonly)) return false;
+  if (!isBubbleMenuVisible(props, disabled)) return false;
 
   if (showMode === 1) {
     return props.editor.isActive("table");
@@ -185,10 +185,10 @@ export function findLinkHrefInSelection(
 
 export function shouldShowLinkBubbleMenu(
   props: BubbleMenuShowProps,
-  readonly: boolean,
+  disabled: boolean,
   onLinkFound?: (href: string) => void,
 ): boolean {
-  if (!isBubbleMenuVisible(props, readonly)) return false;
+  if (!isBubbleMenuVisible(props, disabled)) return false;
   if (!hasTextSelection(props)) return false;
 
   const href = findLinkHrefInSelection(props.state, props.from, props.to);

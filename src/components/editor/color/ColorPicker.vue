@@ -209,7 +209,7 @@ const emit = defineEmits<{
 }>();
 
 /**
- * 默认颜色列表（50个常用颜色，按主题颜色模式排列，无重复）
+ * 默认颜色列表（50个常用颜色，按色彩用途分组，无重复）
  * @description 参考 Office 颜色选择器，每个主色一列，每列有多个色阶（从浅到深）
  * 数组按行优先排列：第1行（各列的第1个颜色）→ 第2行（各列的第2个颜色）→ ...
  *
@@ -490,8 +490,8 @@ watch(normalizedColor, (newColor) => {
 </script>
 
 <style lang="scss" scoped>
-// Dark 模式选择器变量（用于统一管理暗色主题样式）
-$dark-selector: "[data-theme=" dark "] &";
+// Dark 模式选择器变量（用于统一管理暗色样式）
+$dark-selector: "[data-color-mode=" dark "] &";
 
 /* ===== 颜色选择按钮 ===== */
 .ye-color-current-btn {

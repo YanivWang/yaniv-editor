@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "Yaniv Editor",
-  description: "Vue 3 + Tiptap 3 富文本编辑器 UI 套件",
+  description: "Vue 3 + Tiptap 3 富文本编辑器组件库",
   lang: "zh-CN",
   cleanUrls: true,
   lastUpdated: true,
@@ -28,7 +28,7 @@ export default defineConfig({
             { text: "快速开始", link: "/guide/getting-started" },
             { text: "Full Editor", link: "/guide/full-editor" },
             { text: "Inline 按需拼装", link: "/guide/inline-composition" },
-            { text: "主题与样式", link: "/guide/theming" },
+            { text: "外观与颜色", link: "/guide/appearance" },
           ],
         },
       ],

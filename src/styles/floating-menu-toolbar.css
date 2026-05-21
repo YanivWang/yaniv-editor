@@ -52,11 +52,11 @@
   }
 }
 
-[data-theme="dark"] .floating-menu {
+[data-color-mode="dark"] .floating-menu {
   background: var(--ye-bubble-bg);
   box-shadow: var(--ye-bubble-shadow);
 }
 
-[data-theme="dark"] .menu-group {
+[data-color-mode="dark"] .menu-group {
   border-right-color: var(--ye-border);
 }

@@ -1,23 +1,18 @@
 <template>
   <div class="demo-page demo-page--full yaniv-editor-host">
-    <!-- 集成方可通过 :ai-config 注入（默认隐藏「AI 设置」、不写 localStorage），例如：
     <YanivEditor
-      v-bind="editorPresets.production"
-      :ai-config="{ provider: 'openai', apiKey: '...', model: 'gpt-4o-mini' }"
-    />
-    -->
-    <YanivEditor
-      v-bind="editorPresets.production"
       locale="zh-CN"
-      theme-preset="default"
-      theme-mode="light"
+      mode="edit"
+      preset="full"
+      appearance="default"
+      color-mode="light"
       :initial-content="sampleContent"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { YanivEditor, editorPresets } from "@yanivjs/yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 const sampleContent = `

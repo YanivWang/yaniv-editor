@@ -1,12 +1,12 @@
 @import "./_shared.css";
 
 /**
- * Notion Theme Preset
+ * Notion Visual Appearance
  * 仿 Tiptap 官方 Notion-like 模板的视觉样式
  */
 
-/* ===== Notion 主题变量 ===== */
-.yaniv-editor.theme-notion {
+/* ===== Notion visual variables ===== */
+.yaniv-editor.appearance-notion {
   --ye-doc-page-width: 900px;
   --ye-doc-page-padding: 0 96px;
   --ye-doc-padding-top: 32px;
@@ -42,23 +42,23 @@
 }
 
 /* ===== Notion 风格 - 全宽无纸张边框布局 ===== */
-.yaniv-editor.theme-notion.document-layout {
+.yaniv-editor.appearance-notion.document-layout {
   background: #ffffff;
 }
 
-.yaniv-editor.theme-notion .document-container {
+.yaniv-editor.appearance-notion .document-container {
   background: var(--ye-bg);
 }
 
 /* 隐藏纸张阴影和边框 */
-.yaniv-editor.theme-notion .continuous-pages {
+.yaniv-editor.appearance-notion .continuous-pages {
   background: var(--ye-bg);
   border-radius: 0;
   box-shadow: none;
 }
 
 /* ===== Notion 风格 - 极简工具栏 ===== */
-.yaniv-editor.theme-notion .document-toolbar {
+.yaniv-editor.appearance-notion .document-toolbar {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -72,8 +72,8 @@
 }
 
 /* 工具栏按钮 */
-.yaniv-editor.theme-notion .ye-toolbar-button,
-.yaniv-editor.theme-notion .ye-dropdown-btn {
+.yaniv-editor.appearance-notion .ye-toolbar-button,
+.yaniv-editor.appearance-notion .ye-dropdown-btn {
   min-width: 28px;
   height: 28px;
   padding: 0 6px;
@@ -83,26 +83,26 @@
   border-radius: 4px;
 }
 
-.yaniv-editor.theme-notion .ye-toolbar-button:hover,
-.yaniv-editor.theme-notion .ye-dropdown-btn:hover {
+.yaniv-editor.appearance-notion .ye-toolbar-button:hover,
+.yaniv-editor.appearance-notion .ye-dropdown-btn:hover {
   color: #37352f;
   background: rgba(55, 53, 47, 0.08);
 }
 
-.yaniv-editor.theme-notion .ye-toolbar-button.is-active,
-.yaniv-editor.theme-notion .ye-dropdown-btn.is-active {
+.yaniv-editor.appearance-notion .ye-toolbar-button.is-active,
+.yaniv-editor.appearance-notion .ye-dropdown-btn.is-active {
   color: rgb(35, 131, 226);
   background: rgba(35, 131, 226, 0.12);
 }
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
-.yaniv-editor.theme-notion .document-content .ProseMirror {
+.yaniv-editor.appearance-notion .document-content .ProseMirror {
   color: var(--ye-text);
   background: var(--ye-bg);
 }
 
 /* ===== Notion 风格 - 大标题 ===== */
-.yaniv-editor.theme-notion .ProseMirror h1 {
+.yaniv-editor.appearance-notion .ProseMirror h1 {
   margin-top: 2rem;
   margin-bottom: 4px;
   font-size: 1.875rem;
@@ -110,13 +110,13 @@
   color: #37352f;
 }
 
-.yaniv-editor.theme-notion .ProseMirror h1:first-child {
+.yaniv-editor.appearance-notion .ProseMirror h1:first-child {
   margin-top: 0;
   font-size: 2.5rem;
   font-weight: 700;
 }
 
-.yaniv-editor.theme-notion .ProseMirror h2 {
+.yaniv-editor.appearance-notion .ProseMirror h2 {
   margin-top: 1.5rem;
   margin-bottom: 4px;
   font-size: 1.5rem;
@@ -124,7 +124,7 @@
   color: #37352f;
 }
 
-.yaniv-editor.theme-notion .ProseMirror h3 {
+.yaniv-editor.appearance-notion .ProseMirror h3 {
   margin-top: 1rem;
   margin-bottom: 4px;
   font-size: 1.25rem;
@@ -133,41 +133,41 @@
 }
 
 /* ===== Notion 风格 - 段落 ===== */
-.yaniv-editor.theme-notion .ProseMirror p {
+.yaniv-editor.appearance-notion .ProseMirror p {
   padding: 3px 0;
   margin: 0;
 }
 
-.yaniv-editor.theme-notion .ProseMirror p + p {
+.yaniv-editor.appearance-notion .ProseMirror p + p {
   margin-top: 0;
 }
 
 /* ===== Notion 风格 - 列表 ===== */
-.yaniv-editor.theme-notion .ProseMirror ul,
-.yaniv-editor.theme-notion .ProseMirror ol {
+.yaniv-editor.appearance-notion .ProseMirror ul,
+.yaniv-editor.appearance-notion .ProseMirror ol {
   padding-left: 1.5rem;
   margin: 0;
 }
 
-.yaniv-editor.theme-notion .ProseMirror li {
+.yaniv-editor.appearance-notion .ProseMirror li {
   padding: 3px 0;
 }
 
-.yaniv-editor.theme-notion .ProseMirror li::marker {
+.yaniv-editor.appearance-notion .ProseMirror li::marker {
   color: var(--ye-text);
 }
 
 /* 任务列表：与 Notion 列表项保持相同行距 */
-.yaniv-editor.theme-notion .ProseMirror ul[data-type="taskList"] > li {
+.yaniv-editor.appearance-notion .ProseMirror ul[data-type="taskList"] > li {
   padding: 3px 0;
 }
 
-.yaniv-editor.theme-notion .ProseMirror ul[data-type="taskList"] > li > div > p {
+.yaniv-editor.appearance-notion .ProseMirror ul[data-type="taskList"] > li > div > p {
   padding: 0;
 }
 
 /* ===== Notion 风格 - 代码 ===== */
-.yaniv-editor.theme-notion .ProseMirror code {
+.yaniv-editor.appearance-notion .ProseMirror code {
   padding: 0.2em 0.4em;
   font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
   font-size: 85%;
@@ -179,7 +179,7 @@
 /* 代码块样式由 src/styles/code-block.css 统一提供 */
 
 /* ===== Notion 风格 - 引用 ===== */
-.yaniv-editor.theme-notion .ProseMirror blockquote {
+.yaniv-editor.appearance-notion .ProseMirror blockquote {
   padding-left: 14px;
   margin: 8px 0;
   color: var(--ye-text);
@@ -187,50 +187,50 @@
 }
 
 /* ===== Notion 风格 - 链接 ===== */
-.yaniv-editor.theme-notion .ProseMirror a {
+.yaniv-editor.appearance-notion .ProseMirror a {
   color: var(--ye-link);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.yaniv-editor.theme-notion .ProseMirror a:hover {
+.yaniv-editor.appearance-notion .ProseMirror a:hover {
   opacity: 0.8;
 }
 
 /* ===== Notion 风格 - 分割线 ===== */
-.yaniv-editor.theme-notion .ProseMirror hr {
+.yaniv-editor.appearance-notion .ProseMirror hr {
   margin: 24px 0;
   border: none;
   border-top: 1px solid rgba(55, 53, 47, 0.09);
 }
 
 /* ===== Notion 风格 - 表格 ===== */
-.yaniv-editor.theme-notion .ProseMirror table {
+.yaniv-editor.appearance-notion .ProseMirror table {
   width: 100%;
   margin: 8px 0;
   border-collapse: collapse;
 }
 
-.yaniv-editor.theme-notion .ProseMirror th,
-.yaniv-editor.theme-notion .ProseMirror td {
+.yaniv-editor.appearance-notion .ProseMirror th,
+.yaniv-editor.appearance-notion .ProseMirror td {
   padding: 8px 12px;
   text-align: left;
   border: 1px solid rgba(55, 53, 47, 0.09);
 }
 
-.yaniv-editor.theme-notion .ProseMirror th {
+.yaniv-editor.appearance-notion .ProseMirror th {
   font-weight: 600;
   background: rgba(55, 53, 47, 0.04);
 }
 
 /* ===== Notion 风格 - 图片 ===== */
-.yaniv-editor.theme-notion .ProseMirror img {
+.yaniv-editor.appearance-notion .ProseMirror img {
   max-width: 100%;
   border-radius: 4px;
 }
 
 /* ===== Notion 深色模式 ===== */
-.yaniv-editor.theme-notion[data-theme="dark"] {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] {
   --ye-bg: #191919;
   --ye-bg-secondary: #191919;
   --ye-bg-hover: rgba(255, 255, 255, 0.055);
@@ -246,54 +246,54 @@
   --ye-link: rgb(82, 156, 202);
 }
 
-.yaniv-editor.theme-notion.document-layout[data-theme="dark"],
-.yaniv-editor.theme-notion[data-theme="dark"] .document-container,
-.yaniv-editor.theme-notion[data-theme="dark"] .continuous-pages {
+.yaniv-editor.appearance-notion.document-layout[data-color-mode="dark"],
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .document-container,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .continuous-pages {
   background: #191919;
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .document-toolbar {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .document-toolbar {
   background: #191919 !important;
   border-bottom-color: rgba(255, 255, 255, 0.09) !important;
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .document-content .ProseMirror {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .document-content .ProseMirror {
   color: rgba(255, 255, 255, 0.9);
   background: #191919;
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h1,
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h2,
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror h3 {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror h1,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror h2,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror h3 {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ye-toolbar-button,
-.yaniv-editor.theme-notion[data-theme="dark"] .ye-dropdown-btn {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-toolbar-button,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-dropdown-btn {
   color: rgba(255, 255, 255, 0.65);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ye-toolbar-button:hover,
-.yaniv-editor.theme-notion[data-theme="dark"] .ye-dropdown-btn:hover {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-toolbar-button:hover,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-dropdown-btn:hover {
   color: rgba(255, 255, 255, 0.9);
   background: rgba(255, 255, 255, 0.055);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror th {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror th {
   background: rgba(255, 255, 255, 0.04);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror th,
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror td {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror th,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror td {
   border-color: rgba(255, 255, 255, 0.09);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .ProseMirror hr {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror hr {
   border-top-color: rgba(255, 255, 255, 0.09);
 }
 
 /* ===== Notion 拖拽手柄与块菜单（自 drag-handle.css 收拢） ===== */
-.yaniv-editor.theme-notion .drag-handle-plus {
+.yaniv-editor.appearance-notion .drag-handle-plus {
   width: 24px;
   height: 24px;
   color: #cfcfcf;
@@ -306,7 +306,7 @@
     box-shadow 0.12s ease;
 }
 
-.yaniv-editor.theme-notion .drag-handle {
+.yaniv-editor.appearance-notion .drag-handle {
   left: max(12px, var(--drag-handle-left, 0px));
   width: 24px;
   height: 24px;
@@ -319,23 +319,23 @@
     box-shadow 0.12s ease;
 }
 
-.yaniv-editor.theme-notion .drag-handle:hover,
-.yaniv-editor.theme-notion .drag-handle-plus:hover,
-.yaniv-editor.theme-notion .drag-handle.is-dragging {
+.yaniv-editor.appearance-notion .drag-handle:hover,
+.yaniv-editor.appearance-notion .drag-handle-plus:hover,
+.yaniv-editor.appearance-notion .drag-handle.is-dragging {
   background: rgb(55 53 47 / 8%);
   border-color: transparent;
   box-shadow: none;
 }
 
-.yaniv-editor.theme-notion .drag-handle__dot {
+.yaniv-editor.appearance-notion .drag-handle__dot {
   background: #c4c4c4;
 }
 
-.yaniv-editor.theme-notion .drag-handle.is-dragging .drag-handle__dot {
+.yaniv-editor.appearance-notion .drag-handle.is-dragging .drag-handle__dot {
   background: #c4c4c4;
 }
 
-.drag-handle-menu.theme-notion-menu {
+.drag-handle-menu.appearance-notion-menu {
   color: rgb(55 53 47);
   border-color: rgb(55 53 47 / 9%);
   border-radius: 6px;
@@ -345,22 +345,22 @@
     rgb(15 15 15 / 20%) 0 9px 24px;
 }
 
-.drag-handle-menu.theme-notion-menu .drag-handle-menu__item {
+.drag-handle-menu.appearance-notion-menu .drag-handle-menu__item {
   color: rgb(55 53 47);
   border-radius: 4px;
 }
 
-.drag-handle-menu.theme-notion-menu .drag-handle-menu__description {
+.drag-handle-menu.appearance-notion-menu .drag-handle-menu__description {
   color: rgb(120 119 116);
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle-plus:hover,
-.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle:hover,
-.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle.is-dragging {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle-plus:hover,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle:hover,
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle.is-dragging {
   background: rgb(255 255 255 / 10%);
   border-color: transparent;
 }
 
-.yaniv-editor.theme-notion[data-theme="dark"] .drag-handle__dot {
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle__dot {
   background: #c4c4c4;
 }

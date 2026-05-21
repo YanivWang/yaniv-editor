@@ -29,12 +29,10 @@ export interface ResolveExtensionGatesInput {
   features?: FeatureConfig;
 }
 
-type BooleanFeatureKey = Exclude<keyof FeatureConfig, "toolbar">;
-
 /** 判断 features 中某项是否显式开启 */
 export function isFeatureEnabled(
   features: FeatureConfig | undefined,
-  key: BooleanFeatureKey,
+  key: keyof FeatureConfig,
 ): boolean {
   return features?.[key] === true;
 }
@@ -42,7 +40,7 @@ export function isFeatureEnabled(
 /**
  * 解析扩展层应注册的能力
  *
- * 规则：所有能力均为 opt-in，须显式 `true` 才开启。
+ * 规则：传入值应为 preset 与 features 覆盖后的最终能力。
  */
 export function resolveExtensionGates(
   input: ResolveExtensionGatesInput = {},

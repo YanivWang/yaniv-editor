@@ -1,11 +1,11 @@
 @import "./_shared.css";
 
 /**
- * Typora Theme Preset
+ * Typora Visual Appearance
  * 类似 Typora 的极简写作风格
  */
 
-.yaniv-editor.theme-typora {
+.yaniv-editor.appearance-typora {
   --ye-doc-page-width: 860px;
   --ye-doc-page-min-height: 480px;
   --ye-doc-padding-top: 48px;
@@ -37,25 +37,25 @@
 }
 
 /* Typora 风格 - 隐藏/极简工具栏 */
-.yaniv-editor.theme-typora .document-toolbar {
+.yaniv-editor.appearance-typora .document-toolbar {
   background: transparent !important;
   border-bottom: none !important;
   opacity: 0.6;
   transition: opacity 0.2s;
 }
 
-.yaniv-editor.theme-typora .document-toolbar:hover {
+.yaniv-editor.appearance-typora .document-toolbar:hover {
   opacity: 1;
 }
 
 /* Typora 风格 - 无边框纸张 */
-.yaniv-editor.theme-typora .continuous-pages {
+.yaniv-editor.appearance-typora .continuous-pages {
   border-radius: 0;
   box-shadow: none;
 }
 
 /* Typora 风格 - 衬线标题 */
-.yaniv-editor.theme-typora .ProseMirror h1 {
+.yaniv-editor.appearance-typora .ProseMirror h1 {
   margin-top: 40px;
   margin-bottom: 24px;
   font-family: "PT Serif", Georgia, serif;
@@ -65,7 +65,7 @@
   letter-spacing: 0.5px;
 }
 
-.yaniv-editor.theme-typora .ProseMirror h2 {
+.yaniv-editor.appearance-typora .ProseMirror h2 {
   padding-bottom: 8px;
   margin-top: 32px;
   margin-bottom: 16px;
@@ -75,20 +75,20 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.yaniv-editor.theme-typora .ProseMirror h3 {
+.yaniv-editor.appearance-typora .ProseMirror h3 {
   margin-top: 24px;
   margin-bottom: 12px;
   font-size: 22px;
 }
 
 /* Typora 风格 - 高行高舒适阅读 */
-.yaniv-editor.theme-typora .ProseMirror p {
+.yaniv-editor.appearance-typora .ProseMirror p {
   margin-bottom: 16px;
   line-height: 1.8;
 }
 
 /* Typora 风格 - 优雅引用 */
-.yaniv-editor.theme-typora .ProseMirror blockquote {
+.yaniv-editor.appearance-typora .ProseMirror blockquote {
   padding: 8px 16px;
   margin: 16px 0;
   font-style: italic;
@@ -97,7 +97,7 @@
 }
 
 /* Typora 深色模式 */
-.yaniv-editor.theme-typora[data-theme="dark"] {
+.yaniv-editor.appearance-typora[data-color-mode="dark"] {
   --ye-bg: #1a1a1a;
   --ye-bg-secondary: #222222;
   --ye-bg-hover: #2a2a2a;
@@ -113,11 +113,11 @@
   --ye-link: #6cb6ff;
 }
 
-.yaniv-editor.theme-typora[data-theme="dark"] .ProseMirror h2 {
+.yaniv-editor.appearance-typora[data-color-mode="dark"] .ProseMirror h2 {
   border-bottom-color: #404040;
 }
 
-.yaniv-editor.theme-typora[data-theme="dark"] .ProseMirror blockquote {
+.yaniv-editor.appearance-typora[data-color-mode="dark"] .ProseMirror blockquote {
   color: #a0a0a0;
   border-left-color: #404040;
 }

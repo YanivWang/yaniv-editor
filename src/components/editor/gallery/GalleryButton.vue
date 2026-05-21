@@ -187,7 +187,7 @@ function insertSelected() {
   color: #d9d9d9;
 }
 
-[data-theme="dark"] .gallery-empty__icon {
+[data-color-mode="dark"] .gallery-empty__icon {
   color: #434343;
 }
 
@@ -197,7 +197,7 @@ function insertSelected() {
   color: #595959;
 }
 
-[data-theme="dark"] .gallery-empty__text {
+[data-color-mode="dark"] .gallery-empty__text {
   color: #a0a0a0;
 }
 
@@ -233,7 +233,7 @@ function insertSelected() {
   transition: all 0.2s;
 }
 
-[data-theme="dark"] .gallery-item {
+[data-color-mode="dark"] .gallery-item {
   background: #2a2a2a;
 }
 
@@ -262,7 +262,7 @@ function insertSelected() {
   border-radius: 50%;
 }
 
-[data-theme="dark"] .gallery-item__check {
+[data-color-mode="dark"] .gallery-item__check {
   color: #4fc3f7;
   background: #1a1a1a;
 }
@@ -277,7 +277,7 @@ function insertSelected() {
   border-top: 1px solid #f0f0f0;
 }
 
-[data-theme="dark"] .gallery-footer {
+[data-color-mode="dark"] .gallery-footer {
   border-top-color: #434343;
 }
 

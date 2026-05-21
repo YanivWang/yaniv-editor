@@ -107,11 +107,11 @@ function insertTemplate(tpl: TemplateItem) {
   border-color: var(--ye-primary);
 }
 
-[data-theme="dark"] .template-card {
+[data-color-mode="dark"] .template-card {
   border-color: #434343;
 }
 
-[data-theme="dark"] .template-card:hover {
+[data-color-mode="dark"] .template-card:hover {
   background: #1a3a4d;
   border-color: #4fc3f7;
 }
@@ -129,7 +129,7 @@ function insertTemplate(tpl: TemplateItem) {
   border-radius: 8px;
 }
 
-[data-theme="dark"] .template-card__icon {
+[data-color-mode="dark"] .template-card__icon {
   color: #4fc3f7;
   background: #1a4d6e;
 }
@@ -146,7 +146,7 @@ function insertTemplate(tpl: TemplateItem) {
   color: #262626;
 }
 
-[data-theme="dark"] .template-card__name {
+[data-color-mode="dark"] .template-card__name {
   color: #e0e0e0;
 }
 
@@ -156,7 +156,7 @@ function insertTemplate(tpl: TemplateItem) {
   color: #8c8c8c;
 }
 
-[data-theme="dark"] .template-card__desc {
+[data-color-mode="dark"] .template-card__desc {
   color: #8c8c8c;
 }
 

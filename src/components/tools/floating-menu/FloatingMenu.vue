@@ -1,14 +1,14 @@
 <template>
   <bubble-menu
-    v-if="editor"
-    :editor="editor"
+    v-if="floatingEditor"
+    :editor="floatingEditor!"
     :tippy-options="{ duration: 100, placement: 'top' }"
     :should-show="shouldShow"
     class="floating-menu"
   >
     <div class="menu-content">
       <div class="menu-group">
-        <HeadingControl variant="dropdown" :editor="editor" />
+        <HeadingControl variant="dropdown" :editor="floatingEditor!" />
       </div>
 
       <div class="menu-group">
@@ -42,7 +42,7 @@
 
       <div v-if="showAi" class="menu-group">
         <AiMenuButton
-          :editor="editor"
+          :editor="floatingEditor!"
           :icon="ThunderboltOutlined"
           :label="t('editor.ai')"
           :title="t('editor.ai')"
@@ -59,6 +59,7 @@
  */
 import { ThunderboltOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
+import { computed } from "vue";
 
 import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
 import { HeadingControl } from "@/components/editor/heading";
@@ -73,20 +74,23 @@ import { t } from "@/locales";
 
 const props = withDefaults(
   defineProps<{
-    readonly?: boolean;
+    disabled?: boolean;
     showAi?: boolean;
   }>(),
   {
-    readonly: false,
+    disabled: false,
     showAi: true,
   },
 );
 
 const editor = useYanivEditor();
+const floatingEditor = computed(
+  () => editor.value as unknown as import("@tiptap/vue-3").Editor | null,
+);
 
 const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
   useEditorColorState(editor);
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
-  shouldShowFloatingTextToolbar(bubbleProps, props.readonly);
+  shouldShowFloatingTextToolbar(bubbleProps, props.disabled);
 </script>

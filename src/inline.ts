@@ -2,7 +2,7 @@
  * Yaniv Editor Inline entry.
  *
  * Lightweight inline shell + toolbar building blocks for apps that want
- * preset-driven setup or full DIY composition.
+ * a default toolbar or full DIY composition.
  */
 
 export { default as YanivInlineEditor } from "./core/YanivInlineEditor.vue";
@@ -18,11 +18,9 @@ export { ClearFormatButton } from "./components/editor/format-clear";
 export { FontSizeSelect, FontFamilySelect } from "./components/editor/font";
 export { CodeBlockDropdown } from "./components/editor/code-block";
 
-export { inlinePresets, mergeInlinePreset, DEFAULT_INLINE_TOOLBAR } from "./configs/inlinePresets";
-export type { InlinePresetName } from "./configs/inlinePresets";
+export { DEFAULT_INLINE_TOOLBAR } from "./configs/inlineToolbar";
 export type {
   InlineToolbarConfig,
-  InlinePresetProps,
   YanivInlineEditorProps,
   YanivInlineEditorExpose,
 } from "./configs/inlineTypes";

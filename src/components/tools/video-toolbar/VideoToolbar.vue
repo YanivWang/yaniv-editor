@@ -54,10 +54,10 @@ import { useYanivEditor } from "@/core/editorContext";
 
 const props = withDefaults(
   defineProps<{
-    readonly?: boolean;
+    disabled?: boolean;
   }>(),
   {
-    readonly: false,
+    disabled: false,
   },
 );
 
@@ -99,7 +99,7 @@ function getCurrentVideoInfo() {
 }
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (!shouldShowVideoBubbleMenu(bubbleProps, props.readonly)) return false;
+  if (!shouldShowVideoBubbleMenu(bubbleProps, props.disabled)) return false;
 
   const { node } = getCurrentVideoInfo();
   if (node?.type.name !== "video") return false;
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
   }
@@ -181,7 +181,7 @@ onBeforeUnmount(() => {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   transition: all 0.2s;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
 .video-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #303030;
   }
 }
@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
 .video-menu-btn--danger {
   color: #ff4d4f;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #ff7875;
   }
 }
@@ -229,7 +229,7 @@ onBeforeUnmount(() => {
   color: #ff4d4f;
   background: #fff1f0;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #ff7875;
     background: #3a1a1a;
   }

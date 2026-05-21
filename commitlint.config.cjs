@@ -16,7 +16,7 @@ module.exports = {
         "ai",
         "locales",
         "styles",
-        "themes",
+        "appearance",
         "ui",
         "tests",
         "repo",

@@ -41,13 +41,14 @@ import { CloseOutlined } from "@ant-design/icons-vue";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { useYanivEditor } from "@/core/editorContext";
-import type { OutlinePlacement } from "@/core/editorTypes";
 import { t } from "@/locales";
 
 import { getOutlineScrollOffset, scrollToOutlineHeading } from "./scrollToOutlineHeading";
 import { useOutlinePanel } from "./useOutlinePanel";
 
 import type { Editor } from "@tiptap/core";
+
+type OutlineAnchor = "top-left" | "top-right";
 
 interface OutlineItem {
   id: string;
@@ -62,7 +63,7 @@ interface OutlineItem {
 
 interface Props {
   editor?: Editor | null;
-  placement?: OutlinePlacement;
+  placement?: OutlineAnchor;
   scrollParent?: () => HTMLElement | null;
   zoomLevel?: number;
 }

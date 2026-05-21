@@ -1,11 +1,11 @@
 @import "./_shared.css";
 
 /**
- * Word Theme Preset
+ * Word Visual Appearance
  * 类似 Microsoft Word 的专业文档风格
  */
 
-.yaniv-editor.theme-word {
+.yaniv-editor.appearance-word {
   /* A4 纸张（与 pageConstants / useEditorPagination 一致，运行时仍可覆盖） */
   --ye-doc-page-width: 794px;
   --ye-doc-page-min-height: 939px;
@@ -40,7 +40,7 @@
 }
 
 /* Word 风格 - 厚重工具栏 (sticky 定位) */
-.yaniv-editor.theme-word .document-toolbar {
+.yaniv-editor.appearance-word .document-toolbar {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -50,13 +50,13 @@
 }
 
 /* Word 风格 - A4 纸张 */
-.yaniv-editor.theme-word .continuous-pages {
+.yaniv-editor.appearance-word .continuous-pages {
   border-radius: 0;
   box-shadow: var(--ye-shadow-md);
 }
 
 /* Word 风格 - 专业标题 */
-.yaniv-editor.theme-word .ProseMirror h1 {
+.yaniv-editor.appearance-word .ProseMirror h1 {
   margin-top: 24px;
   margin-bottom: 12px;
   font-size: 26pt;
@@ -64,7 +64,7 @@
   color: var(--ye-text);
 }
 
-.yaniv-editor.theme-word .ProseMirror h2 {
+.yaniv-editor.appearance-word .ProseMirror h2 {
   margin-top: 18px;
   margin-bottom: 10px;
   font-size: 18pt;
@@ -72,7 +72,7 @@
   color: #2e74b5;
 }
 
-.yaniv-editor.theme-word .ProseMirror h3 {
+.yaniv-editor.appearance-word .ProseMirror h3 {
   margin-top: 14px;
   margin-bottom: 8px;
   font-size: 14pt;
@@ -81,13 +81,13 @@
 }
 
 /* Word 风格 - 段落缩进 */
-.yaniv-editor.theme-word .ProseMirror p {
+.yaniv-editor.appearance-word .ProseMirror p {
   margin-bottom: 8pt;
   text-indent: 0;
 }
 
 /* Word 深色模式 */
-.yaniv-editor.theme-word[data-theme="dark"] {
+.yaniv-editor.appearance-word[data-color-mode="dark"] {
   --ye-bg: #1e1e1e;
   --ye-bg-secondary: #252525;
   --ye-bg-hover: #3e3e3e;
@@ -102,12 +102,12 @@
   --ye-link: #4fc3f7;
 }
 
-.yaniv-editor.theme-word[data-theme="dark"] .document-toolbar {
+.yaniv-editor.appearance-word[data-color-mode="dark"] .document-toolbar {
   background: linear-gradient(180deg, #2d2d2d 0%, #252525 100%) !important;
   border-bottom-color: #3e3e3e !important;
 }
 
-.yaniv-editor.theme-word[data-theme="dark"] .ProseMirror h2,
-.yaniv-editor.theme-word[data-theme="dark"] .ProseMirror h3 {
+.yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h2,
+.yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h3 {
   color: #6db3f2;
 }

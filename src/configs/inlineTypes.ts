@@ -20,14 +20,10 @@ export type InlineToolbarConfig = Pick<
   | "codeBlock"
 >;
 
-export interface InlinePresetProps {
-  toolbar?: InlineToolbarConfig;
-}
-
 export interface YanivInlineEditorProps {
   /** v-model:content — HTML string */
   content?: string;
-  readonly?: boolean;
+  mode?: "edit" | "preview";
   locale?: string;
   toolbar?: InlineToolbarConfig;
   placeholder?: string;

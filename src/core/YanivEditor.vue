@@ -3,9 +3,8 @@
     ref="rootRef"
     :key="localeEpoch"
     class="yaniv-editor document-layout"
-    :class="{ 'is-preview-mode': isPreviewMode }"
+    :class="{ 'is-preview': isPreviewMode }"
   >
-    <!-- 工具栏（预览模式下隐藏） -->
     <ToolbarNav
       v-if="editor && !isPreviewMode && shouldShowHeaderNav"
       :config="toolbarConfig"
@@ -15,29 +14,24 @@
       :custom-templates="props.customTemplates"
     />
 
-    <!-- 功能模块：链接悬浮框（预览模式下禁用） -->
     <LinkBubbleMenu
-      v-if="editor && !isPreviewMode && uiFlags.linkBubbleMenu"
-      :readonly="readonly"
+      v-if="editor && !isPreviewMode && uiFlags.linkBubble"
+      :disabled="isPreviewMode"
     />
 
-    <!-- 功能模块：表格工具栏（预览模式下禁用） -->
     <TableToolbar
-      v-if="editor && !isPreviewMode && uiFlags.tableToolbar"
-      :readonly="readonly"
-      :show-mode="props.tableMenuShowMode ?? 2"
+      v-if="editor && !isPreviewMode && uiFlags.tableTools"
+      :disabled="isPreviewMode"
+      :show-mode="presetLayout.tableToolsShowMode"
     />
 
-    <!-- 功能模块：图片工具栏（预览模式下禁用） -->
-    <ImageToolbar v-if="editor && !isPreviewMode && uiFlags.image" :readonly="readonly" />
+    <ImageToolbar v-if="editor && !isPreviewMode && uiFlags.image" :disabled="isPreviewMode" />
 
-    <!-- 功能模块：视频工具栏（预览模式下禁用） -->
-    <VideoToolbar v-if="editor && !isPreviewMode && uiFlags.video" :readonly="readonly" />
+    <VideoToolbar v-if="editor && !isPreviewMode && uiFlags.video" :disabled="isPreviewMode" />
 
-    <!-- 功能模块：悬浮菜单（预览模式下禁用） -->
     <FloatingMenu
       v-if="editor && !isPreviewMode && uiFlags.floatingMenu"
-      :readonly="readonly"
+      :disabled="isPreviewMode"
       :show-ai="resolvedExtensionGates.ai"
     />
 
@@ -60,7 +54,7 @@
           <Transition name="outline-panel">
             <OutlinePanel
               v-if="showOutlinePanel"
-              :placement="props.outlinePlacement"
+              :placement="presetLayout.outlineAnchor"
               :scroll-parent="getScrollParent"
               :zoom-level="zoomLevel"
             />
@@ -88,7 +82,7 @@
       :total-pages="totalPages"
       :show-char-count="true"
       :show-shortcut-hints="showStatusShortcutHints"
-      :zoom-bar-placement="props.zoomBarPlacement"
+      :zoom-bar-placement="presetLayout.zoomPlacement"
     />
   </div>
 </template>
@@ -96,12 +90,13 @@
 <script setup lang="ts">
 /**
  * YanivEditor - 富文本编辑器
- * @description 由 features 门控扩展注册与 UI 显隐
+ * @description 由 mode、preset、appearance、colorMode 与 features 组成外部 API
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { Modal } from "ant-design-vue";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, watch } from "vue";
 
+import { useEditorAppearance } from "@/appearance";
 import { CodeBlockLanguageBadge } from "@/components/editor/code-block";
 import { OutlinePanel, provideOutlinePanel } from "@/components/editor/outline";
 import { BlockPickerMenu } from "@/components/tools/block-menu";
@@ -117,7 +112,6 @@ import { TableToolbar } from "@/components/tools/table-toolbar";
 import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { buildEditorExtensions } from "@/extensions/coreExtensions";
 import { t } from "@/locales";
-import { useEditorTheme } from "@/themes";
 
 import { provideYanivEditor } from "./editorContext";
 import { useEditorFeatures } from "./useEditorFeatures";
@@ -129,17 +123,15 @@ import type { YanivEditorProps } from "./editorTypes";
 import type { JSONContent } from "@tiptap/core";
 
 const props = withDefaults(defineProps<YanivEditorProps>(), {
-  zoomBarPlacement: "bottom",
-  readonly: false,
-  previewMode: false,
+  mode: "edit",
+  preset: "basic",
+  appearance: "default",
+  colorMode: "light",
   initialContent: "<p>开始编辑你的文档...</p>",
-  themePreset: "default",
-  themeMode: "light",
-  outlinePlacement: "top-left",
 });
 
-const isPreviewMode = computed(() => props.previewMode);
-const isEditable = computed(() => !props.readonly && !isPreviewMode.value);
+const isPreviewMode = computed(() => props.mode === "preview");
+const isEditable = computed(() => props.mode === "edit");
 
 const emit = defineEmits<{
   update: [content: JSONContent];
@@ -153,10 +145,10 @@ const containerRef = ref<HTMLElement | null>(null);
 
 const getScrollParent = () => containerRef.value;
 
-useEditorTheme({
+useEditorAppearance({
   rootRef,
-  preset: toRef(props, "themePreset"),
-  mode: toRef(props, "themeMode"),
+  appearance: toRef(props, "appearance"),
+  colorMode: toRef(props, "colorMode"),
 });
 
 type BlockPickerMenuInstance = {
@@ -178,6 +170,7 @@ const {
   showStatusShortcutHints,
   uiFlags,
   showBlockPickerMenu,
+  presetLayout,
 } = useEditorFeatures(props);
 
 const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
@@ -228,6 +221,7 @@ const normalizeInitialContent = (
 
 const getInitialContent = (): string | JSONContent => {
   if (!isFirstInit.value && editor.value) {
+    // 重建编辑器时优先保留当前内容，避免切换 preset/features 时覆盖用户输入。
     const currentContent = getEditorContent();
     if (currentContent) return currentContent;
   }
@@ -279,6 +273,7 @@ const initEditor = async () => {
       },
     });
 
+    // 块拖拽和斜杠菜单会改变文档结构，preview 下不要注册这些编辑态扩展。
     if (isEditable.value && gates.dragHandle) {
       extensions.push(
         DragHandleExtension.configure({
@@ -288,7 +283,7 @@ const initEditor = async () => {
       );
     }
 
-    if (gates.slashCommand) {
+    if (isEditable.value && gates.slashCommand) {
       extensions.push(
         SlashCommandExtension.configure({
           onActivate: (state: SlashCommandState) => blockPickerMenuRef.value?.activate(state),
@@ -350,6 +345,7 @@ watch([resolvedExtensionGates, isEditable], async ([nextGates, nextEditable], [p
   if (!editor.value || isInitializing.value) return;
 
   const gatesChanged = JSON.stringify(nextGates) !== JSON.stringify(prevGates);
+  // dragHandle 是额外 push 的编辑态扩展，edit/preview 切换时需要重建才能增删它。
   const dragHandleRegistrationChanged =
     nextGates.dragHandle && nextEditable !== editor.value.isEditable;
 
@@ -374,6 +370,7 @@ watch(
     const incomingSignature = getContentSignature(normalized);
     if (!incomingSignature || incomingSignature === lastEmittedContentSignature.value) return;
 
+    // 避免父组件回传刚 emit 的内容时再次 setContent，减少光标跳动和重复更新。
     const currentSignature =
       typeof normalized === "string" ? e.getHTML() : getContentSignature(getEditorContent());
     if (incomingSignature === currentSignature) return;

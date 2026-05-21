@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-
 import {
   InsertRowAboveOutlined,
   InsertRowBelowOutlined,
@@ -52,11 +51,11 @@ import type { Component } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    readonly?: boolean;
+    disabled?: boolean;
     showMode?: 1 | 2;
   }>(),
   {
-    readonly: false,
+    disabled: false,
     showMode: 2,
   },
 );
@@ -175,5 +174,5 @@ const menuTools: TableToolItem[] = [
 ];
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
-  shouldShowTableBubbleMenu(bubbleProps, props.readonly, props.showMode);
+  shouldShowTableBubbleMenu(bubbleProps, props.disabled, props.showMode);
 </script>

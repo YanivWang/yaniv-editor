@@ -249,7 +249,7 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 </script>
 
 <style lang="scss" scoped>
-$dark-selector: "[data-theme=" dark "] &";
+$dark-selector: "[data-color-mode=" dark "] &";
 
 .document-toolbar-container {
   z-index: 1000;

@@ -2,8 +2,8 @@
  * Yaniv Editor — Design Tokens（唯一变量源）
  *
  * - 浅色：:root
- * - 深色：[data-theme="dark"]（由 YanivEditor themeMode 设置在编辑器根节点）
- * - 设计 token 前缀：--ye-*（视觉预设见 src/themes/presets/）
+ * - 深色：[data-color-mode="dark"]（由 YanivEditor colorMode 设置在编辑器根节点）
+ * - 设计 token 前缀：--ye-*（视觉外观见 src/appearance/styles/）
  */
 
 :root {
@@ -121,7 +121,7 @@
   --ye-z-bubble: 200;
   --ye-z-modal: 300;
 
-  /* ===== Document Layout（默认 A4 / Word；各 theme preset 可覆盖） ===== */
+  /* ===== Document Layout（默认 A4 / Word；各 visual appearance 可覆盖） ===== */
   --ye-doc-page-width: 794px;
   --ye-doc-page-min-height: 939px;
   --ye-doc-padding-top: 96px;
@@ -132,8 +132,8 @@
   --ye-doc-container-padding-y: 20px;
 }
 
-/* ===== Dark Mode（唯一约定：data-theme="dark"） ===== */
-[data-theme="dark"] {
+/* ===== Dark Mode（唯一约定：data-color-mode="dark"） ===== */
+[data-color-mode="dark"] {
   --ye-primary: #60a5fa;
   --ye-primary-hover: #93c5fd;
   --ye-primary-light: rgba(96, 165, 250, 0.15);

@@ -9,7 +9,7 @@
 }
 
 /* 深色模式 */
-[data-theme="dark"] .document-toolbar {
+[data-color-mode="dark"] .document-toolbar {
   background: #1f1f1f;
   border-bottom-color: #434343;
 }

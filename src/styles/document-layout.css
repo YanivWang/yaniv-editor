@@ -49,7 +49,7 @@
   overflow: hidden;
 }
 
-[data-theme="dark"] .yaniv-editor.document-layout {
+[data-color-mode="dark"] .yaniv-editor.document-layout {
   background: var(--ye-bg-secondary);
 }
 
@@ -323,47 +323,31 @@
   background: var(--ye-bg);
 }
 
-/* ===== 预览模式样式 ===== */
-.yaniv-editor.document-layout.is-preview-mode {
-  /* 预览模式下禁止选中文本 */
-  user-select: none;
-}
-
-.yaniv-editor.document-layout.is-preview-mode .document-container {
-  /* 容器保持可滚动 */
+/* ===== 内容展示态样式 ===== */
+.yaniv-editor.document-layout.is-preview .document-container {
   overflow: auto;
   cursor: default;
 }
 
-.yaniv-editor.document-layout.is-preview-mode .ProseMirror {
-  /* 内容区域禁止点击交互，但不影响容器滚动 */
-  pointer-events: none;
-
-  /* 预览模式下隐藏光标 */
+.yaniv-editor.document-layout.is-preview .ProseMirror {
   caret-color: transparent;
 }
 
-.yaniv-editor.document-layout.is-preview-mode .ProseMirror * {
+.yaniv-editor.document-layout.is-preview .ProseMirror * {
   cursor: default !important;
-
-  /* 预览模式下禁止选中 */
-  user-select: none !important;
 }
 
-/* 预览模式下链接保持视觉样式但不可点击 */
-.yaniv-editor.document-layout.is-preview-mode .ProseMirror a {
-  pointer-events: none;
-  cursor: default;
+.yaniv-editor.document-layout.is-preview .ProseMirror a {
+  pointer-events: auto;
+  cursor: pointer !important;
 }
 
-/* 预览模式下图片不显示调整手柄 */
-.yaniv-editor.document-layout.is-preview-mode .ProseMirror img {
+.yaniv-editor.document-layout.is-preview .ProseMirror img {
   resize: none;
 }
 
-/* 预览模式下隐藏所有可调整大小的手柄 */
-.yaniv-editor.document-layout.is-preview-mode .resize-handle,
-.yaniv-editor.document-layout.is-preview-mode .image-resizer {
+.yaniv-editor.document-layout.is-preview .resize-handle,
+.yaniv-editor.document-layout.is-preview .image-resizer {
   display: none !important;
 }
 

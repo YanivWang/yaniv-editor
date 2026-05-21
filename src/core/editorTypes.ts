@@ -1,9 +1,9 @@
 /**
  * Yaniv Editor Types
- * @description 功能开关（features）驱动扩展注册与 UI
+ * @description Full Editor public API types
  */
 import type { TemplateItem } from "@/components/editor/template/templates";
-import type { ThemeMode, ThemePreset } from "@/configs/editorConfig";
+import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
 import type { AiProvider, AiStorageMode } from "@/features/ai/config/types";
 
 import type { JSONContent } from "@tiptap/core";
@@ -32,14 +32,18 @@ export interface GalleryImage {
 
 export type MediaUploadHandler = (file: File) => Promise<string>;
 
-/** 大纲悬浮面板锚点位置 */
-export type OutlinePlacement = "top-left" | "top-right";
+export type EditorMode = "edit" | "preview";
+export type EditorPreset = "basic" | "full" | "notion";
 
 /**
- * 编辑器功能配置
- * @description 所有布尔开关均为 opt-in，须显式 `true` 才开启；推荐使用 editorPresets
+ * 能力级功能覆盖。
+ * @description preset 提供默认能力，features 只负责显式覆盖能力开关。
  */
 export interface FeatureConfig {
+  /** 是否启用图片扩展、粘贴图片与上下文工具栏 */
+  image?: boolean;
+  /** 是否启用视频扩展与上下文工具栏 */
+  video?: boolean;
   /** 是否启用表格功能 */
   table?: boolean;
   /** 是否注册数学公式扩展 */
@@ -54,45 +58,27 @@ export interface FeatureConfig {
   searchReplace?: boolean;
   /** 强化 Office/WPS HTML 粘贴 */
   officePaste?: boolean;
-  /** 是否启用表格工具栏 */
-  tableToolbar?: boolean;
   /** 是否启用斜杠命令菜单（输入 / 弹出块类型选择） */
   slashCommand?: boolean;
   /** 是否启用左侧六点拖拽手柄（块添加、菜单与拖拽排序） */
   dragHandle?: boolean;
-  /** 是否启用悬浮框功能 */
-  floatingMenu?: boolean;
-  /** 是否启用图片扩展、粘贴图片与上下文工具栏 */
-  image?: boolean;
-  /** 是否启用视频扩展与上下文工具栏 */
-  video?: boolean;
-  /** 是否启用链接悬浮框功能 */
-  linkBubbleMenu?: boolean;
-  /** 是否启用头部导航 */
-  headerNav?: boolean;
-  /** 是否启用底部导航 */
-  footerNav?: boolean;
-  /** 底部状态栏是否显示常用快捷键说明（与缩放、字数并列） */
-  statusShortcutHints?: boolean;
-  /** 工具栏密度：compact 仅保留基础排版工具 */
-  toolbar?: "full" | "compact";
 }
 
 /**
  * 编辑器 Props
  */
 export interface YanivEditorProps {
-  /** 缩放条位置：底部固定或工具栏下方 */
-  zoomBarPlacement?: "bottom" | "belowToolbar";
-  /** 是否为只读模式 */
-  readonly?: boolean;
-  /** 是否为预览模式（无头部/底部导航，不可编辑，不可点击） */
-  previewMode?: boolean;
+  /** 运行状态：编辑或内容展示 */
+  mode?: EditorMode;
+  /** Full Editor 功能方案 */
+  preset?: EditorPreset;
+  /** 视觉外观 */
+  appearance?: EditorAppearance;
+  /** 亮色、暗色或跟随系统 */
+  colorMode?: EditorColorMode;
   /** 初始内容 — HTML 字符串或 ProseMirror JSON（type: doc） */
   initialContent?: string | JSONContent;
-  /** 表格悬浮框显示模式：1=聚焦显示；2=单元格选中显示 */
-  tableMenuShowMode?: 1 | 2;
-  /** 功能开关：控制扩展注册与 UI 显隐 */
+  /** 能力开关覆盖 */
   features?: FeatureConfig;
   /** 图片上传函数；未传时本地上传回退为 DataURL */
   uploadImage?: MediaUploadHandler;
@@ -104,21 +90,6 @@ export interface YanivEditorProps {
   customTemplates?: TemplateItem[];
   /** 语言设置 */
   locale?: string;
-  /**
-   * 视觉主题预设（皮肤 CSS，按需加载）
-   * @default 'default'
-   */
-  themePreset?: ThemePreset;
-  /**
-   * 明暗模式；`auto` 跟随系统（见 watchSystemTheme）
-   * @default 'light'
-   */
-  themeMode?: ThemeMode;
-  /**
-   * 大纲悬浮面板位置
-   * @default 'top-left'
-   */
-  outlinePlacement?: OutlinePlacement;
   /**
    * 集成方注入的 AI 配置；传入后完全托管（忽略 localStorage 与 .env），默认隐藏「AI 设置」
    */

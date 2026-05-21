@@ -1,9 +1,9 @@
 /**
- * 主题与 Demo 辅助类型（编辑器能力请使用 features / editorPresets）
+ * 视觉外观与颜色模式类型
  */
 
-/** Theme mode */
-export type ThemeMode = "light" | "dark" | "auto";
+/** 亮色、暗色或跟随系统 */
+export type EditorColorMode = "light" | "dark" | "auto";
 
-/** Theme preset */
-export type ThemePreset = "default" | "notion" | "typora" | "word" | "github" | "custom";
+/** 视觉外观 */
+export type EditorAppearance = "default" | "word" | "notion" | "github" | "typora" | "custom";

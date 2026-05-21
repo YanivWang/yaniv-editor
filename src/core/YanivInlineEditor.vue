@@ -1,6 +1,6 @@
 <template>
   <div :key="localeEpoch" class="yaniv-editor yaniv-inline-editor">
-    <slot name="toolbar" :editor="editor" :config="toolbarConfig">
+    <slot v-if="!isPreviewMode" name="toolbar" :editor="editor" :config="toolbarConfig">
       <InlineToolbar v-if="editor && showToolbar" :editor="editor" :config="toolbarConfig" />
     </slot>
     <EditorContent v-if="editor" :editor="editor" class="yaniv-inline-editor__content" />
@@ -10,13 +10,13 @@
 
 <script setup lang="ts">
 /**
- * YanivInlineEditor — lightweight inline shell with preset-driven toolbar + extensions
+ * YanivInlineEditor — lightweight inline shell with a default toolbar and custom toolbar config
  */
 import { Editor, EditorContent } from "@tiptap/vue-3";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, toRef, watch } from "vue";
 
 import { InlineToolbar } from "@/components/tools/inline-toolbar";
-import { DEFAULT_INLINE_TOOLBAR } from "@/configs/inlinePresets";
+import { DEFAULT_INLINE_TOOLBAR } from "@/configs/inlineToolbar";
 import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideYanivEditor } from "@/core/editorContext";
 import { useEditorLocale } from "@/core/useEditorLocale";
@@ -28,7 +28,7 @@ import {
 
 const props = withDefaults(defineProps<YanivInlineEditorProps>(), {
   content: "<p></p>",
-  readonly: false,
+  mode: "edit",
   locale: "zh-CN",
 });
 
@@ -45,7 +45,8 @@ const lastEmittedContentSignature = ref<string | null>(null);
 
 const toolbarConfig = computed(() => props.toolbar ?? DEFAULT_INLINE_TOOLBAR);
 const showToolbar = computed(() => hasInlineToolbarItems(toolbarConfig.value));
-const isEditable = computed(() => !props.readonly);
+const isPreviewMode = computed(() => props.mode === "preview");
+const isEditable = computed(() => props.mode === "edit");
 
 const { localeEpoch, whenLocaleReady } = useEditorLocale(toRef(props, "locale"));
 
@@ -70,6 +71,7 @@ const initEditor = async () => {
     editorError.value = null;
     await whenLocaleReady();
 
+    // Inline 的扩展集合跟 toolbar 强绑定：隐藏某类按钮时也不注册对应扩展。
     const gates = resolveInlineExtensionGates({ toolbar: toolbarConfig.value });
     const extensions = buildInlineExtensions({
       gates,
@@ -130,6 +132,7 @@ watch(
     if (!content || content === lastEmittedContentSignature.value) return;
     if (content === ed.getHTML()) return;
 
+    // 外部受控内容变化才同步进编辑器；组件自身 emit 的 HTML 会被上面的签名挡掉。
     ed.commands.setContent(content, { emitUpdate: false });
     lastEmittedContentSignature.value = content;
   },

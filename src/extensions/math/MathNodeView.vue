@@ -288,27 +288,27 @@ watch(
 }
 
 /* 深色模式 */
-[data-theme="dark"] .math-editor {
+[data-color-mode="dark"] .math-editor {
   background: #1f1f1f;
   border-color: #404040;
 }
 
-[data-theme="dark"] .math-editor__input {
+[data-color-mode="dark"] .math-editor__input {
   color: #e5e5e5;
   background: #2d2d2d;
   border-color: #404040;
 }
 
-[data-theme="dark"] .math-editor__preview {
+[data-color-mode="dark"] .math-editor__preview {
   background: #2d2d2d;
 }
 
-[data-theme="dark"] .math-btn--cancel {
+[data-color-mode="dark"] .math-btn--cancel {
   color: #e5e5e5;
   background: #2d2d2d;
 }
 
-[data-theme="dark"] .math-btn--cancel:hover {
+[data-color-mode="dark"] .math-btn--cancel:hover {
   background: #404040;
 }
 </style>

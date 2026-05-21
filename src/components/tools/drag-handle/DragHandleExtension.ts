@@ -686,8 +686,8 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             const target = currentTarget;
             activeMenuKind = "actions";
             menu.classList.toggle(
-              "theme-notion-menu",
-              Boolean(view.dom.closest(".yaniv-editor.theme-notion")),
+              "appearance-notion-menu",
+              Boolean(view.dom.closest(".yaniv-editor.appearance-notion")),
             );
             menu.classList.add("is-actions-menu");
 

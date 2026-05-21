@@ -10,7 +10,7 @@ import type { LocaleCode, TiptapLocale } from "./types";
 export type { LocaleCode } from "./types";
 export type LocaleMessages = TiptapLocale;
 
-export const BUILTIN_LOCALE_CODES = ["zh-CN", "en-US"] as const satisfies readonly LocaleCode[];
+export const BUILTIN_LOCALE_CODES = ["zh-CN", "en-US"] as const satisfies ReadonlyArray<LocaleCode>;
 
 const localeLoaders: Record<LocaleCode, () => Promise<LocaleMessages>> = {
   "zh-CN": async () => (await import("./zh-CN")).zhCN,
@@ -99,7 +99,7 @@ function getNestedValue(
  * Translate a key with optional interpolation
  */
 export function t(key: string, params?: Record<string, string | number>): string {
-  localeGeneration.value;
+  void localeGeneration.value;
 
   const locale = currentLocale.value;
   let result = key;

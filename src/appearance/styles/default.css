@@ -1,12 +1,12 @@
 @import "./_shared.css";
 
 /**
- * Default Theme Preset
+ * Default Visual Appearance
  * 通用 Web 编辑器风格（非 Word 分页纸张）
  * 依赖 variables.css 中的 CSS 变量，仅覆盖布局与少量视觉差异
  */
 
-.yaniv-editor.theme-default {
+.yaniv-editor.appearance-default {
   --ye-bg-secondary: #f5f5f5;
   --ye-doc-page-width: 960px;
   --ye-doc-page-min-height: 480px;
@@ -17,38 +17,38 @@
 }
 
 /* 浅灰画布，区别于 Word 的深灰纸张背景 */
-.yaniv-editor.theme-default.document-layout {
+.yaniv-editor.appearance-default.document-layout {
   background: var(--ye-bg-secondary);
 }
 
 /* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
-.yaniv-editor.theme-default .continuous-pages {
+.yaniv-editor.appearance-default .continuous-pages {
   border: 1px solid var(--ye-border);
   border-radius: var(--ye-radius-md);
   box-shadow: var(--ye-shadow-sm);
 }
 
-.yaniv-editor.theme-default .document-content .ProseMirror h1 {
+.yaniv-editor.appearance-default .document-content .ProseMirror h1 {
   margin: 0 0 16px;
   font-size: 1.875rem;
   font-weight: 700;
   color: var(--ye-text);
 }
 
-.yaniv-editor.theme-default .document-content .ProseMirror h2 {
+.yaniv-editor.appearance-default .document-content .ProseMirror h2 {
   margin: 24px 0 12px;
   font-size: 1.5rem;
   color: var(--ye-text);
 }
 
-.yaniv-editor.theme-default .document-content .ProseMirror h3 {
+.yaniv-editor.appearance-default .document-content .ProseMirror h3 {
   margin: 20px 0 8px;
   font-size: 1.25rem;
   color: var(--ye-text);
 }
 
 /* 扁平工具栏，无 Word 渐变 */
-.yaniv-editor.theme-default .document-toolbar {
+.yaniv-editor.appearance-default .document-toolbar {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -57,15 +57,15 @@
   border-bottom: 1px solid var(--ye-border) !important;
 }
 
-.yaniv-editor.theme-default[data-theme="dark"] {
+.yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-bg-secondary: #141414;
 }
 
-.yaniv-editor.theme-default.document-layout[data-theme="dark"] {
+.yaniv-editor.appearance-default.document-layout[data-color-mode="dark"] {
   background: var(--ye-bg-secondary);
 }
 
-.yaniv-editor.theme-default[data-theme="dark"] .continuous-pages {
+.yaniv-editor.appearance-default[data-color-mode="dark"] .continuous-pages {
   border-color: var(--ye-border);
   box-shadow: none;
 }

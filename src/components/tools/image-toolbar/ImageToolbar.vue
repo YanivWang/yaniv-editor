@@ -77,10 +77,10 @@ import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
 // ===== Props =====
 const props = withDefaults(
   defineProps<{
-    readonly?: boolean;
+    disabled?: boolean;
   }>(),
   {
-    readonly: false,
+    disabled: false,
   },
 );
 
@@ -180,7 +180,7 @@ function getImageAlign() {
  * 检查是否应该显示工具栏
  */
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
-  if (!shouldShowImageBubbleMenu(bubbleProps, props.readonly)) return false;
+  if (!shouldShowImageBubbleMenu(bubbleProps, props.disabled)) return false;
 
   const { node } = getCurrentImageInfo();
   if (node?.type.name === "image") {
@@ -253,7 +253,7 @@ function deleteImage() {
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #1f1f1f;
     border-color: #434343;
   }
@@ -266,7 +266,7 @@ function deleteImage() {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -289,7 +289,7 @@ function deleteImage() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -297,7 +297,7 @@ function deleteImage() {
 .image-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #303030;
   }
 }
@@ -311,7 +311,7 @@ function deleteImage() {
   color: #1677ff;
   background: #e6f4ff;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #4fc3f7;
     background: #15395b;
   }
@@ -320,7 +320,7 @@ function deleteImage() {
 .image-menu-btn--danger {
   color: #ff4d4f;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #ff7875;
   }
 }
@@ -329,7 +329,7 @@ function deleteImage() {
   color: #ff4d4f;
   background: #fff1f0;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #ff7875;
     background: #3a1a1a;
   }

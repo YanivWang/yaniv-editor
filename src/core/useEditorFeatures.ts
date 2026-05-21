@@ -1,20 +1,19 @@
 import { computed } from "vue";
 
-import {
-  COMPACT_TOOLBAR_CONFIG,
-  FULL_TOOLBAR_CONFIG,
-  type ToolbarToolsConfig,
-} from "@/components/tools/header-nav";
+import type { ToolbarToolsConfig } from "@/components/tools/header-nav";
 import { applyExtensionGatesToToolbarConfig } from "@/configs/editorCapabilityMap";
-import { isFeatureEnabled, resolveExtensionGates } from "@/extensions/resolveExtensionGates";
+import { fullEditorPresetConfig, resolvePresetFeatures } from "@/configs/editorPreset";
+import { resolveExtensionGates } from "@/extensions/resolveExtensionGates";
 
 import type { YanivEditorProps } from "./editorTypes";
 
 export function useEditorFeatures(props: YanivEditorProps) {
-  const features = computed(() => props.features);
+  const preset = computed(() => props.preset ?? "basic");
+  const presetConfig = computed(() => fullEditorPresetConfig[preset.value]);
+  const features = computed(() => resolvePresetFeatures(preset.value, props.features));
 
-  const shouldShowHeaderNav = computed(() => isFeatureEnabled(features.value, "headerNav"));
-  const shouldShowFooterNav = computed(() => isFeatureEnabled(features.value, "footerNav"));
+  const shouldShowHeaderNav = computed(() => presetConfig.value.layout.header);
+  const shouldShowFooterNav = computed(() => presetConfig.value.layout.footer);
 
   const resolvedExtensionGates = computed(() =>
     resolveExtensionGates({
@@ -23,22 +22,22 @@ export function useEditorFeatures(props: YanivEditorProps) {
   );
 
   const toolbarConfig = computed<ToolbarToolsConfig>(() => {
-    const base =
-      features.value?.toolbar === "compact" ? COMPACT_TOOLBAR_CONFIG : FULL_TOOLBAR_CONFIG;
-
-    return applyExtensionGatesToToolbarConfig(base, resolvedExtensionGates.value);
+    // 先取 preset 的工具栏方案，再用能力 gate 收口，避免出现按钮可见但扩展未注册。
+    return applyExtensionGatesToToolbarConfig(
+      presetConfig.value.toolbar,
+      resolvedExtensionGates.value,
+    );
   });
 
-  const showStatusShortcutHints = computed(() =>
-    isFeatureEnabled(features.value, "statusShortcutHints"),
-  );
+  const showStatusShortcutHints = computed(() => presetConfig.value.layout.shortcutHints);
 
   const uiFlags = computed(() => ({
-    linkBubbleMenu: isFeatureEnabled(features.value, "linkBubbleMenu"),
-    tableToolbar: isFeatureEnabled(features.value, "tableToolbar"),
-    image: isFeatureEnabled(features.value, "image"),
-    video: isFeatureEnabled(features.value, "video"),
-    floatingMenu: isFeatureEnabled(features.value, "floatingMenu"),
+    linkBubble: presetConfig.value.layout.linkBubble,
+    // 上下文工具栏既要遵守 preset 的布局策略，也要随 features 显式关闭对应能力。
+    tableTools: presetConfig.value.layout.tableTools && resolvedExtensionGates.value.table,
+    image: resolvedExtensionGates.value.image,
+    video: resolvedExtensionGates.value.video,
+    floatingMenu: presetConfig.value.layout.floatingMenu,
   }));
 
   const showBlockPickerMenu = computed(
@@ -53,5 +52,6 @@ export function useEditorFeatures(props: YanivEditorProps) {
     showStatusShortcutHints,
     uiFlags,
     showBlockPickerMenu,
+    presetLayout: computed(() => presetConfig.value.layout),
   };
 }

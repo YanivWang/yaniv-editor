@@ -1,7 +1,7 @@
 {
   "name": "@yanivjs/yaniv-editor",
   "version": "0.1.0",
-  "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor theme with AI support",
+  "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor appearance with AI support",
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -176,7 +176,7 @@
     "tiptap-editor",
     "tiptap-vue",
     "tiptap-template",
-    "tiptap-theme",
+    "tiptap-appearance",
     "vue3",
     "vue",
     "vue-component",
@@ -185,7 +185,7 @@
     "wysiwyg",
     "wysiwyg-editor",
     "editor",
-    "theme",
+    "appearance",
     "ui-kit",
     "ai",
     "ai-editor",

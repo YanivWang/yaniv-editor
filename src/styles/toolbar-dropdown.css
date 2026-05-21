@@ -114,7 +114,7 @@
   color: rgb(0 0 0 / 65%);
 }
 
-[data-theme="dark"] .ye-dropdown-menu-item__icon {
+[data-color-mode="dark"] .ye-dropdown-menu-item__icon {
   color: rgb(255 255 255 / 65%);
 }
 

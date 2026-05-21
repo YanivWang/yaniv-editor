@@ -320,7 +320,7 @@ function handleClose() {
   color: var(--text-color, #262626);
 }
 
-[data-theme="dark"] .ai-settings__label {
+[data-color-mode="dark"] .ai-settings__label {
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -359,7 +359,7 @@ function handleClose() {
   border-top: 1px solid var(--border-color, #f0f0f0);
 }
 
-[data-theme="dark"] .ai-settings__actions {
+[data-color-mode="dark"] .ai-settings__actions {
   border-color: rgba(255, 255, 255, 0.1);
 }
 

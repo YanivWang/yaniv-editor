@@ -18,7 +18,7 @@
 <script setup lang="ts">
 /**
  * InlineToolbar — maps InlineToolbarConfig to /inline toolbar components.
- * Child tools load via async import so disabled preset switches stay out of the initial chunk.
+ * Child tools load via async import so disabled toolbar switches stay out of the initial chunk.
  */
 import { defineAsyncComponent } from "vue";
 

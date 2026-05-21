@@ -235,7 +235,7 @@ const handleVisibleChange = (val: boolean) => {
 }
 
 /* 暗黑模式 */
-[data-theme="dark"] .ai-suggestion-popover .ant-popover-inner {
+[data-color-mode="dark"] .ai-suggestion-popover .ant-popover-inner {
   background: #1f1f1f;
   box-shadow:
     0 3px 6px -4px rgb(0 0 0 / 48%),
@@ -243,29 +243,29 @@ const handleVisibleChange = (val: boolean) => {
     0 9px 28px 8px rgb(0 0 0 / 20%);
 }
 
-[data-theme="dark"] .ai-suggestion-content .ai-suggestion-header {
+[data-color-mode="dark"] .ai-suggestion-content .ai-suggestion-header {
   border-bottom-color: #434343;
 }
 
-[data-theme="dark"] .ai-suggestion-content .original-text {
+[data-color-mode="dark"] .ai-suggestion-content .original-text {
   background-color: rgba(250, 173, 20, 0.15);
   border-color: rgba(250, 173, 20, 0.3);
 }
 
-[data-theme="dark"] .ai-suggestion-content .suggested-text {
+[data-color-mode="dark"] .ai-suggestion-content .suggested-text {
   background-color: rgba(24, 144, 255, 0.15);
   border-color: rgba(24, 144, 255, 0.3);
 }
 
-[data-theme="dark"] .ai-suggestion-content .text-label {
+[data-color-mode="dark"] .ai-suggestion-content .text-label {
   color: rgba(255, 255, 255, 0.45);
 }
 
-[data-theme="dark"] .ai-suggestion-content .text-content {
+[data-color-mode="dark"] .ai-suggestion-content .text-content {
   color: rgba(255, 255, 255, 0.85);
 }
 
-[data-theme="dark"] .ai-suggestion-content .ai-suggestion-footer {
+[data-color-mode="dark"] .ai-suggestion-content .ai-suggestion-footer {
   border-top-color: #434343;
 }
 </style>

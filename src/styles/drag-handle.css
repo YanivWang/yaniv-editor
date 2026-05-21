@@ -216,16 +216,16 @@
   background: rgb(15 23 42 / 8%);
 }
 
-[data-theme="dark"] .drag-handle:hover,
-[data-theme="dark"] .drag-handle-plus:hover {
+[data-color-mode="dark"] .drag-handle:hover,
+[data-color-mode="dark"] .drag-handle-plus:hover {
   background: rgb(255 255 255 / 12%);
 }
 
-[data-theme="dark"] .drag-handle__dot {
+[data-color-mode="dark"] .drag-handle__dot {
   background: #c4c4c4;
 }
 
-[data-theme="dark"] .drag-handle-menu {
+[data-color-mode="dark"] .drag-handle-menu {
   background: #1f1f1f;
   border-color: rgb(255 255 255 / 12%);
   box-shadow:
@@ -233,19 +233,19 @@
     0 2px 8px rgb(0 0 0 / 25%);
 }
 
-[data-theme="dark"] .drag-handle-menu__item {
+[data-color-mode="dark"] .drag-handle-menu__item {
   color: #f3f4f6;
 }
 
-[data-theme="dark"] .drag-handle-menu__item:hover {
+[data-color-mode="dark"] .drag-handle-menu__item:hover {
   background: rgb(255 255 255 / 10%);
 }
 
-[data-theme="dark"] .drag-handle-menu__description {
+[data-color-mode="dark"] .drag-handle-menu__description {
   color: #a3a3a3;
 }
 
-[data-theme="dark"] .drag-handle-menu__divider {
+[data-color-mode="dark"] .drag-handle-menu__divider {
   background: rgb(255 255 255 / 10%);
 }
 

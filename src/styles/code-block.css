@@ -6,7 +6,7 @@
   position: relative;
 }
 
-/* 代码块容器：始终深色，覆盖各主题 preset 中的浅色 pre */
+/* 代码块容器：始终深色，覆盖各 appearance 中的浅色 pre */
 .yaniv-editor .ProseMirror pre {
   position: relative;
   min-height: 4.5em;
@@ -34,7 +34,7 @@
   border-radius: 0;
 }
 
-/* GitHub Dark 语法 token（仅作用于代码块内，避免全量引入 highlight.js 主题） */
+/* GitHub Dark 语法 token（仅作用于代码块内，避免全量引入 highlight.js 样式包） */
 .yaniv-editor
   .ProseMirror
   pre

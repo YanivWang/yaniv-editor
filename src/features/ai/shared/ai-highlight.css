@@ -9,7 +9,7 @@
   transition: all 0.2s ease;
 }
 
-/* Hide AI highlights in readonly/preview mode */
+/* Hide AI highlights when editing is disabled */
 .ProseMirror[contenteditable="false"] .ai-highlight {
   padding: 0;
   cursor: default;

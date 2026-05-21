@@ -276,7 +276,7 @@ function deleteTable() {
   border-radius: 6px;
 }
 
-[data-theme="dark"] .grid {
+[data-color-mode="dark"] .grid {
   background: #262626;
   border-color: #434343;
 }
@@ -297,7 +297,7 @@ function deleteTable() {
   transition: all 0.15s;
 }
 
-[data-theme="dark"] .grid-cell {
+[data-color-mode="dark"] .grid-cell {
   background: #1f1f1f;
   border-color: #434343;
 }
@@ -306,7 +306,7 @@ function deleteTable() {
   border-color: #40a9ff;
 }
 
-[data-theme="dark"] .grid-cell:hover {
+[data-color-mode="dark"] .grid-cell:hover {
   border-color: #4fc3f7;
 }
 
@@ -315,7 +315,7 @@ function deleteTable() {
   border-color: #91caff;
 }
 
-[data-theme="dark"] .grid-cell.active {
+[data-color-mode="dark"] .grid-cell.active {
   background: #1a4d6e;
   border-color: #4fc3f7;
 }
@@ -339,7 +339,7 @@ function deleteTable() {
   border: 1px solid #e8e8e8;
   border-radius: 6px;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #262626;
     border-color: #434343;
   }
@@ -363,7 +363,7 @@ function deleteTable() {
   padding: 0 4px;
   border-right: 1px solid #e8e8e8;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     border-right-color: #434343;
   }
 }
@@ -386,7 +386,7 @@ function deleteTable() {
   border-radius: 4px;
   transition: all 0.2s;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     color: #f0f0f0;
   }
 }
@@ -394,7 +394,7 @@ function deleteTable() {
 .table-menu-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
-  [data-theme="dark"] & {
+  [data-color-mode="dark"] & {
     background: #303030;
   }
 }

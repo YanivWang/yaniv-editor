@@ -3,7 +3,7 @@
  * @description Vue Composable for AI 配置管理
  */
 
-import { ref, computed, readonly } from "vue";
+import { ref, computed, shallowReadonly } from "vue";
 
 import { getHostAiConfig, isHostAiManaged } from "./hostConfig";
 import { getAiConfigStore } from "./store";
@@ -208,13 +208,13 @@ export function useAiConfig() {
 
   return {
     // 状态
-    config: readonly(config),
-    isConfigured: readonly(isConfigured),
-    isEnabled: readonly(isEnabled),
-    currentProvider: readonly(currentProvider),
-    currentProviderInfo: readonly(currentProviderInfo),
-    testStatus: readonly(testStatus),
-    testError: readonly(testError),
+    config: shallowReadonly(config),
+    isConfigured: shallowReadonly(isConfigured),
+    isEnabled: shallowReadonly(isEnabled),
+    currentProvider: shallowReadonly(currentProvider),
+    currentProviderInfo: shallowReadonly(currentProviderInfo),
+    testStatus: shallowReadonly(testStatus),
+    testError: shallowReadonly(testError),
     providers: AI_PROVIDERS,
 
     // 方法
