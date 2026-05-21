@@ -134,6 +134,41 @@ function getContentProbePoint(view: EditorView, clientY: number): { left: number
   };
 }
 
+const HANDLE_ZONE_SLOP = 12;
+
+function isPointerInHandleZone(
+  handle: HTMLElement,
+  plusButton: HTMLElement,
+  target: DragTarget,
+  clientX: number,
+  clientY: number,
+): boolean {
+  const targetRect = target.dom.getBoundingClientRect();
+  const handleRect = handle.getBoundingClientRect();
+  const plusRect = plusButton.getBoundingClientRect();
+  const slop = HANDLE_ZONE_SLOP;
+
+  if (clientY < targetRect.top - slop || clientY > targetRect.bottom + slop) {
+    return false;
+  }
+
+  const zoneLeft = Math.min(handleRect.left, plusRect.left) - slop;
+  const zoneRight = targetRect.right + slop;
+
+  return clientX >= zoneLeft && clientX <= zoneRight;
+}
+
+function isPointerOverHandleControls(
+  handle: HTMLElement,
+  plusButton: HTMLElement,
+  menu: HTMLElement,
+  target: EventTarget | null,
+): boolean {
+  if (!(target instanceof Node)) return false;
+
+  return handle.contains(target) || plusButton.contains(target) || menu.contains(target);
+}
+
 function findMediaTarget(view: EditorView, event: MouseEvent): DragTarget | null {
   const target = event.target as HTMLElement | null;
   if (!target) return null;
@@ -666,6 +701,28 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             }
           };
 
+          const shouldTrackPointer = (event: MouseEvent): boolean => {
+            const { clientX, clientY } = event;
+            const eventTarget = event.target;
+
+            if (eventTarget instanceof Node && view.dom.contains(eventTarget)) {
+              return true;
+            }
+
+            if (isPointerOverHandleControls(handle, plusButton, menu, eventTarget)) {
+              return true;
+            }
+
+            if (
+              currentTarget &&
+              isPointerInHandleZone(handle, plusButton, currentTarget, clientX, clientY)
+            ) {
+              return true;
+            }
+
+            return false;
+          };
+
           const handleMouseMove = (event: MouseEvent) => {
             if (!view.editable) {
               deactivateInteractive();
@@ -674,7 +731,18 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
             if (isDragging) return;
 
-            const target = findTargetFromCoords(view, event);
+            if (!shouldTrackPointer(event)) {
+              hideHandle();
+              return;
+            }
+
+            const target =
+              findTargetFromCoords(view, event) ??
+              (currentTarget &&
+              isPointerInHandleZone(handle, plusButton, currentTarget, event.clientX, event.clientY)
+                ? currentTarget
+                : null);
+
             if (
               (activeMenuKind || storage.insertMenuOpen) &&
               (!target ||
@@ -699,14 +767,28 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             const relatedTarget = event.relatedTarget;
             if (
               relatedTarget instanceof Node &&
-              (view.dom.contains(relatedTarget) ||
+              (relatedTarget === handleRoot ||
+                handleRoot.contains(relatedTarget) ||
                 handle.contains(relatedTarget) ||
                 plusButton.contains(relatedTarget) ||
                 menu.contains(relatedTarget))
             ) {
               return;
             }
+
+            if (
+              currentTarget &&
+              isPointerInHandleZone(handle, plusButton, currentTarget, event.clientX, event.clientY)
+            ) {
+              return;
+            }
+
             hideHandle();
+          };
+
+          const keepHandleVisible = () => {
+            if (!currentTarget) return;
+            updateHandlePosition(currentTarget);
           };
 
           const openActionsMenu = () => {
@@ -852,8 +934,11 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           handleRoot.appendChild(plusButton);
           handleRoot.appendChild(handle);
           document.body.appendChild(menu);
-          view.dom.addEventListener("mousemove", handleMouseMove);
-          view.dom.addEventListener("mouseleave", handleMouseLeave);
+          handle.addEventListener("mouseenter", keepHandleVisible);
+          plusButton.addEventListener("mouseenter", keepHandleVisible);
+          handleRoot.addEventListener("mousemove", handleMouseMove);
+          handleRoot.addEventListener("mouseleave", handleMouseLeave);
+          document.addEventListener("mousemove", handleMouseMove);
           document.addEventListener("mousedown", handleDocumentPointerDown);
           document.addEventListener("keydown", handleDocumentKeyDown);
 
@@ -878,8 +963,11 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             },
 
             destroy() {
-              view.dom.removeEventListener("mousemove", handleMouseMove);
-              view.dom.removeEventListener("mouseleave", handleMouseLeave);
+              handle.removeEventListener("mouseenter", keepHandleVisible);
+              plusButton.removeEventListener("mouseenter", keepHandleVisible);
+              handleRoot.removeEventListener("mousemove", handleMouseMove);
+              handleRoot.removeEventListener("mouseleave", handleMouseLeave);
+              document.removeEventListener("mousemove", handleMouseMove);
               document.removeEventListener("mousedown", handleDocumentPointerDown);
               document.removeEventListener("keydown", handleDocumentKeyDown);
               plusButton.remove();
