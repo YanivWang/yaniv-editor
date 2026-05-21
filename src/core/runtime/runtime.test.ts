@@ -87,6 +87,41 @@ describe("resolveChromePolicy", () => {
     expect(policy.host === "full" && policy.showOutlineRail).toBe(true);
   });
 
+  test("inline preview 模式 showInlineToolbar=false", () => {
+    const gates = resolveInlineGates({ link: true, textFormat: true }, CAPABILITIES);
+    const profile = {
+      mode: "preview" as const,
+      preset: "basic" as const,
+      features: {} as never,
+      gates,
+    };
+    const policy = resolveChromePolicy({
+      profile,
+      layout: {
+        header: false,
+        footer: false,
+        floatingMenu: false,
+        linkBubble: false,
+        tableTools: false,
+        shortcutHints: false,
+        outlineAnchor: "top-left" as const,
+        zoomPlacement: "bottom" as const,
+        tableToolsShowMode: 2 as const,
+      },
+      gates,
+      uiFlags: {
+        linkBubble: true,
+        tableTools: false,
+        image: false,
+        video: false,
+        floatingMenu: false,
+      },
+      host: "inline",
+      showInlineToolbar: true,
+    });
+    expect(policy.host === "inline" && policy.showInlineToolbar).toBe(false);
+  });
+
   test("chromePolicy 不含 outlinePanelExpanded", () => {
     const profile = resolveEditorProfile({ preset: "full", mode: "edit" });
     const policy = resolveChromePolicy({

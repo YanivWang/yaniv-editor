@@ -12,7 +12,12 @@
         />
       </template>
 
-      <slot v-if="!isFull" name="toolbar" :editor="editor" :config="toolbarConfig" />
+      <slot
+        v-if="!isFull && inlineChrome?.showInlineToolbar"
+        name="toolbar"
+        :editor="editor"
+        :config="toolbarConfig"
+      />
 
       <EditorWorkspace
         v-if="isFull && fullChrome"
@@ -54,7 +59,7 @@ import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideYanivEditor } from "@/core/editorContext";
 import type { YanivEditorProps, YanivEditorExpose } from "@/core/editorTypes";
 import { provideEditorLocale, resolveLocaleMessages } from "@/core/infra/useEditorLocale";
-import type { EditorShellHost, FullChromePolicy } from "@/core/runtime/types";
+import type { EditorShellHost, FullChromePolicy, InlineChromePolicy } from "@/core/runtime/types";
 import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
 import { useControlledContent } from "@/core/session/useControlledContent";
 import { useEditorSession } from "@/core/session/useEditorSession";
@@ -141,6 +146,10 @@ const { profile, chrome, sessionKey, toolbarConfig } = runtime;
 
 const fullChrome = computed((): FullChromePolicy | null =>
   chrome.value.host === "full" ? chrome.value : null,
+);
+
+const inlineChrome = computed((): InlineChromePolicy | null =>
+  chrome.value.host === "inline" ? chrome.value : null,
 );
 
 const appearanceClass = computed(() =>
