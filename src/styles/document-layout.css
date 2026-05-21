@@ -33,14 +33,23 @@
   background: var(--ye-bg-secondary);
 }
 
+/* Chrome 壳层：占满编辑器高度并在内部纵向分配顶栏 / 工作区 / 底栏 */
+.yaniv-editor.document-layout > .yaniv-editor__chrome {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* 顶栏 / 底栏固定高度，不参与滚动 */
-.yaniv-editor.document-layout > .document-toolbar-container,
-.yaniv-editor.document-layout > .footer-nav-container {
+.yaniv-editor.document-layout .document-toolbar-container,
+.yaniv-editor.document-layout .footer-nav-container {
   flex-shrink: 0;
 }
 
 /* 工具栏与底栏之间的可滚动工作区 */
-.yaniv-editor.document-layout > .yaniv-editor__workspace {
+.yaniv-editor.document-layout .yaniv-editor__workspace {
   position: relative;
   display: flex;
   flex: 1;
