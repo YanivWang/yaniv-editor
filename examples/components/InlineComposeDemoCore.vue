@@ -23,7 +23,6 @@ import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import type { EditorMode } from "@/core/editorTypes";
 
-
 import {
   AlignDropdown,
   buildInlineExtensions,
@@ -72,6 +71,7 @@ onBeforeUnmount(() => {
 const editor = useEditor({
   content:
     "<h2>行内自行拼装</h2><p>自管 <code>Editor</code> 生命周期，按需挂载工具栏组件；扩展由 <code>buildInlineExtensions</code> 与 toolbar 同步。</p>",
+  editable: props.mode === "edit",
   extensions: buildInlineExtensions({
     gates: resolveInlineExtensionGates({ toolbar: props.toolbar }),
   }),
