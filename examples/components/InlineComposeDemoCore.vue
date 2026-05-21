@@ -1,5 +1,5 @@
 <template>
-  <div class="yaniv-editor demo-inline">
+  <div ref="rootRef" class="yaniv-editor demo-inline">
     <div v-if="editor" class="demo-inline__toolbar">
       <UndoRedoButton :editor="editor" />
       <HeadingControl variant="dropdown" :editor="editor" />
@@ -16,10 +16,13 @@
 
 <script setup lang="ts">
 import { EditorContent, useEditor } from "@tiptap/vue-3";
-import { onBeforeUnmount, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 
+import { resolveColorMode, watchSystemColorMode } from "@/appearance/applyAppearance";
+import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import type { EditorMode } from "@/core/editorTypes";
+
 
 import {
   AlignDropdown,
@@ -37,7 +40,34 @@ import {
 const props = defineProps<{
   toolbar: InlineToolbarConfig;
   mode: EditorMode;
+  colorMode?: EditorColorMode;
 }>();
+
+const rootRef = ref<HTMLElement | null>(null);
+
+function applyColorMode() {
+  if (!rootRef.value) return;
+  const resolved = resolveColorMode(props.colorMode ?? "light");
+  rootRef.value.setAttribute("data-color-mode", resolved);
+}
+
+watch(() => props.colorMode, applyColorMode, { immediate: true });
+
+let cleanupSystemWatch: (() => void) | undefined;
+watch(
+  () => props.colorMode,
+  (mode) => {
+    cleanupSystemWatch?.();
+    if (mode === "auto") {
+      cleanupSystemWatch = watchSystemColorMode(() => applyColorMode());
+    }
+  },
+  { immediate: true },
+);
+
+onBeforeUnmount(() => {
+  cleanupSystemWatch?.();
+});
 
 const editor = useEditor({
   content:

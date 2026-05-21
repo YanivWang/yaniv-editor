@@ -2,6 +2,7 @@
  * Inline Editor types — lightweight shell separate from Full Editor FeatureConfig
  */
 import type { ToolbarToolsConfig } from "@/components/tools/header-nav/toolbarConfig";
+import type { EditorColorMode } from "@/configs/editorConfig";
 
 import type { AnyExtension, JSONContent } from "@tiptap/core";
 import type { Editor } from "@tiptap/vue-3";
@@ -29,6 +30,7 @@ export interface YanivInlineEditorProps {
   placeholder?: string;
   extraExtensions?: AnyExtension[];
   editorProps?: Record<string, unknown>;
+  colorMode?: EditorColorMode;
 }
 
 export interface YanivInlineEditorExpose {

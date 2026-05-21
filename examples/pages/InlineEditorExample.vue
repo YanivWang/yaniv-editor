@@ -4,7 +4,11 @@
       <DemoSubnav title="行内编辑器" :description="entry?.description" />
       <div class="demo-sidebar__body">
         <div class="demo-inline-panel-wrapper">
-          <DemoInlinePanel v-model:mode="inlineMode" v-model:toolbar="toolbar" />
+          <DemoInlinePanel
+            v-model:mode="inlineMode"
+            v-model:toolbar="toolbar"
+            v-model:color-mode="colorMode"
+          />
         </div>
       </div>
     </aside>
@@ -14,6 +18,7 @@
         v-model:content="html"
         :mode="inlineMode"
         :toolbar="toolbar"
+        :color-mode="colorMode"
         class="demo-inline"
         placeholder="写一条评论…"
       />
@@ -24,6 +29,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
+import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import type { EditorMode } from "@/core/editorTypes";
 
@@ -44,6 +50,7 @@ const html = ref(
 
 const inlineMode = ref<EditorMode>("edit");
 const toolbar = ref<InlineToolbarConfig>({ ...INLINE_FULL_TOOLBAR });
+const colorMode = ref<EditorColorMode>("light");
 
 const inlineKey = computed(() => inlineToolbarKey(toolbar.value, inlineMode.value));
 </script>
