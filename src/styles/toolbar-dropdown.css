@@ -118,6 +118,41 @@
   color: rgb(255 255 255 / 65%);
 }
 
+/* Dark mode: dropdown container & menu */
+[data-color-mode="dark"] .ant-dropdown,
+[data-color-mode="dark"] .ant-dropdown-menu {
+  background-color: var(--ye-bubble-bg);
+}
+
+[data-color-mode="dark"] .ant-dropdown .ant-menu-item,
+[data-color-mode="dark"] .ant-dropdown-menu .ant-menu-item,
+[data-color-mode="dark"] .ant-dropdown .ant-dropdown-menu-item,
+[data-color-mode="dark"] .ant-dropdown-menu .ant-dropdown-menu-item {
+  color: var(--ye-text) !important;
+}
+
+[data-color-mode="dark"] .ant-dropdown .ant-menu-item:not(.ant-menu-item-disabled):hover,
+[data-color-mode="dark"] .ant-dropdown-menu .ant-menu-item:not(.ant-menu-item-disabled):hover,
+[data-color-mode="dark"]
+  .ant-dropdown
+  .ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):hover,
+[data-color-mode="dark"]
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):hover {
+  background-color: var(--ye-bg-hover);
+}
+
+[data-color-mode="dark"] .ant-dropdown .ant-menu-item-selected,
+[data-color-mode="dark"] .ant-dropdown-menu .ant-menu-item-selected,
+[data-color-mode="dark"] .ant-dropdown .ant-dropdown-menu-item-selected,
+[data-color-mode="dark"] .ant-dropdown-menu .ant-dropdown-menu-item-selected {
+  color: var(--ye-primary) !important;
+}
+
+[data-color-mode="dark"] .ye-dropdown-menu-item__label {
+  color: var(--ye-text);
+}
+
 .ye-dropdown-menu-item__label {
   flex: 1;
   min-width: 0;

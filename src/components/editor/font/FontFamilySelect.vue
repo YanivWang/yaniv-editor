@@ -1,32 +1,24 @@
 <template>
-  <a-select
-    v-model:value="currentFont"
-    :placeholder="t('editor.fontFamily')"
-    class="font-family-select"
-    style="width: 140px"
-    @change="onFontChange"
-  >
-    <a-select-option v-for="font in FONT_FAMILIES" :key="font.value" :value="font.value">
-      {{ font.label }}
-    </a-select-option>
-  </a-select>
+  <ToolbarDropdownButton
+    :label="currentFont"
+    :title="t('editor.fontFamily')"
+    :items="dropdownItems"
+    placement="bottomLeft"
+  />
 </template>
 
 <script setup lang="ts">
-/**
- * FontFamilySelect - 字体选择器组件
- * @description 可复用的字体选择器组件，支持选择字体系列
- */
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
+import { ToolbarDropdownButton } from "@/components/base";
 import { FONT_FAMILIES, DEFAULT_VALUES } from "@/configs/editorConstants";
+import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { t } from "@/locales";
 import { createCommandRunner, executeBatchCommands } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
 
-// ===== Props =====
 interface Props {
   editor?: Editor | null;
 }
@@ -34,30 +26,19 @@ interface Props {
 const props = defineProps<Props>();
 const editor = useYanivEditor(() => props.editor);
 
-// ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);
 
-// ===== 响应式状态 =====
 const currentFont = ref<string>(DEFAULT_VALUES.fontFamily);
 
-// ===== 监听编辑器状态，更新当前字体 =====
 watch(
   () => editor.value?.getAttributes("textStyle")?.fontFamily,
   (fontFamily) => {
-    if (fontFamily) {
-      currentFont.value = fontFamily;
-    } else {
-      currentFont.value = DEFAULT_VALUES.fontFamily;
-    }
+    currentFont.value = fontFamily || DEFAULT_VALUES.fontFamily;
   },
   { deep: true, immediate: true },
 );
 
-/**
- * 字体切换处理
- * @description 如果无选区则应用到整个段落，有选区则应用到选区
- */
-function onFontChange(val: string) {
+function applyFont(val: string) {
   const e = editor.value;
   if (!e) return;
 
@@ -65,7 +46,6 @@ function onFontChange(val: string) {
 
   const { from, to, empty } = e.state.selection;
   if (empty) {
-    // 无选区时：选中整个段落并应用字体
     const $from = e.state.selection.$from;
     const start = $from.start($from.depth);
     const end = $from.end($from.depth);
@@ -75,33 +55,16 @@ function onFontChange(val: string) {
       (chain) => chain.setTextSelection({ from, to }),
     ]);
   } else {
-    // 有选区时：直接应用到选区
     runCommand((chain) => chain.setFontFamily(val))();
   }
 }
+
+const dropdownItems = computed<MenuItemConfig[]>(() =>
+  FONT_FAMILIES.map((font) => ({
+    key: font.value,
+    label: font.label,
+    active: currentFont.value === font.value,
+    action: () => applyFont(font.value),
+  })),
+);
 </script>
-
-<style scoped>
-.font-family-select {
-  font-size: 12px;
-
-  :deep(.ant-select-selector) {
-    font-size: 12px;
-  }
-
-  :deep(.ant-select-selection-item),
-  :deep(.ant-select-selection-placeholder) {
-    font-size: 12px;
-  }
-
-  :deep(.ant-select-arrow) {
-    height: 10px;
-    margin-top: -5px;
-    font-size: 10px;
-
-    .anticon {
-      font-size: 10px;
-    }
-  }
-}
-</style>

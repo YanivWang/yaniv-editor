@@ -4,6 +4,7 @@
     :placement="placement"
     :trigger="['click']"
     :overlay-class-name="overlayClassName"
+    :get-popup-container="getPopupContainer"
     @open-change="handleOpenChange"
   >
     <a-tooltip :title="title" placement="top" :open="dropdownOpen ? false : undefined">
@@ -41,6 +42,7 @@
                   :trigger="hasSplitSelection(item) ? ['hover'] : []"
                   placement="rightTop"
                   :open="isSplitOverlayOpen(item)"
+                  :get-popup-container="getPopupContainer"
                   @open-change="(open: boolean) => onSplitOverlayOpenChange(item, open)"
                 >
                   <span
@@ -233,6 +235,14 @@ function handleOpenChange(open: boolean) {
     splitOverlayKey.value = null;
     cancelSplitClose();
   }
+}
+
+function getPopupContainer(triggerNode?: HTMLElement): HTMLElement {
+  if (triggerNode) {
+    const editor = triggerNode.closest(".yaniv-editor");
+    if (editor) return editor as HTMLElement;
+  }
+  return document.body;
 }
 
 function onMenuClick(info: { key: string }) {
