@@ -21,10 +21,12 @@ import { computed, ref, watch, onBeforeUnmount } from "vue";
 
 import { ToolbarButton } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import type { FormatPainterStorage } from "@/extensions/formatPainter";
-import { t } from "@/locales";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 // ===== Props =====
 interface Props {

@@ -23,9 +23,11 @@
 import { defineAsyncComponent } from "vue";
 
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 interface Props {
   editor: Editor;

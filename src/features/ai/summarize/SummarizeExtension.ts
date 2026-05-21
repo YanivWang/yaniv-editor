@@ -1,11 +1,15 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
+import {
+  createConfiguredAiClient,
+  localeText,
+  type AiExtensionConfigureOptions,
+} from "@/features/ai/shared/extensionOptions";
 import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
-import { aiSuggestionStreams } from "@/features/ai/shared/runAiSuggestionStream";
-import { t } from "@/locales";
+import { runAiSuggestionStream } from "@/features/ai/shared/runAiSuggestionStream";
 
-export type SummarizeOptions = Record<string, never>;
+export type SummarizeOptions = AiExtensionConfigureOptions;
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -36,8 +40,8 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
 
           if (!selectedText.trim()) {
             notification.warning({
-              message: t("editor.pleaseSelectText"),
-              description: t("editor.summarizeRequiresSelection"),
+              message: localeText(this.options, "editor.pleaseSelectText"),
+              description: localeText(this.options, "editor.summarizeRequiresSelection"),
               duration: 3,
               placement: "topRight",
             });
@@ -45,7 +49,14 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
           }
 
           preventCommandAutoDispatch(tr);
-          aiSuggestionStreams.summarize(editor, selectedText, summaryRange);
+          const client = createConfiguredAiClient(this.options);
+          runAiSuggestionStream(
+            editor,
+            selectedText,
+            summaryRange,
+            client.summarize.bind(client),
+            localeText(this.options, "messages.summarizeFailed"),
+          );
           return true;
         },
     };

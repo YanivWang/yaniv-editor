@@ -1,11 +1,15 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
+import {
+  createConfiguredAiClient,
+  localeText,
+  type AiExtensionConfigureOptions,
+} from "@/features/ai/shared/extensionOptions";
 import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
-import { aiSuggestionStreams } from "@/features/ai/shared/runAiSuggestionStream";
-import { t } from "@/locales";
+import { runAiSuggestionStream } from "@/features/ai/shared/runAiSuggestionStream";
 
-export type PolishOptions = Record<string, never>;
+export type PolishOptions = AiExtensionConfigureOptions;
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -29,8 +33,8 @@ export const PolishExtension = Extension.create<PolishOptions>({
 
           if (!selectedText.trim()) {
             notification.warning({
-              message: t("editor.pleaseSelectText"),
-              description: t("editor.polishRequiresSelection"),
+              message: localeText(this.options, "editor.pleaseSelectText"),
+              description: localeText(this.options, "editor.polishRequiresSelection"),
               duration: 2,
               placement: "topRight",
             });
@@ -38,7 +42,14 @@ export const PolishExtension = Extension.create<PolishOptions>({
           }
 
           preventCommandAutoDispatch(tr);
-          aiSuggestionStreams.polish(editor, selectedText, { from, to });
+          const client = createConfiguredAiClient(this.options);
+          runAiSuggestionStream(
+            editor,
+            selectedText,
+            { from, to },
+            client.polish.bind(client),
+            localeText(this.options, "messages.polishFailed"),
+          );
           return true;
         },
     };

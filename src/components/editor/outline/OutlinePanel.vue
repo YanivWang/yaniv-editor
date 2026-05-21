@@ -41,12 +41,14 @@ import { CloseOutlined } from "@ant-design/icons-vue";
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 
 import { getOutlineScrollOffset, scrollToOutlineHeading } from "./scrollToOutlineHeading";
 import { useOutlinePanel } from "./useOutlinePanel";
 
 import type { Editor } from "@tiptap/core";
+
+const t = useEditorT();
 
 type OutlineAnchor = "top-left" | "top-right";
 

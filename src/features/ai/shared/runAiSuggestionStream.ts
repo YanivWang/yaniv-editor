@@ -1,8 +1,6 @@
 import { notification } from "ant-design-vue";
 
-import { t } from "@/locales";
-
-import { aiClient } from "../client";
+import type { createAiClient } from "@/features/ai/client";
 
 import { removeAiHighlight } from "./AiHighlightMark";
 import { aiSuggestionManager } from "./aiSuggestionManager";
@@ -12,6 +10,7 @@ import type { AiStreamCallbacks } from "../types";
 import type { Editor } from "@tiptap/core";
 
 type StreamInvoker = (content: string, sysPrompt: string, callbacks: AiStreamCallbacks) => void;
+type AiClient = ReturnType<typeof createAiClient>;
 
 function runStream(
   editor: Editor,
@@ -59,9 +58,6 @@ function runStream(
   });
 }
 
-/**
- * 在选区上展示 AI 建议气泡，并以流式方式更新内容（润色 / 摘要 / 翻译等共用）
- */
 export function runAiSuggestionStream(
   editor: Editor,
   selectedText: string,
@@ -74,33 +70,14 @@ export function runAiSuggestionStream(
   runStream(editor, selectedText, stream, errorTitle);
 }
 
-/** 续写：在光标处插入流式建议 */
 export function runAiContinueWritingStream(
   editor: Editor,
   selectedText: string,
   userRange: { from: number; to: number },
   insertPosition: number,
   errorTitle: string,
+  client: AiClient,
 ): void {
   aiSuggestionManager.showContinueWriting(editor, selectedText, userRange, insertPosition);
-  runStream(editor, selectedText, aiClient.continueWriting.bind(aiClient), errorTitle);
+  runStream(editor, selectedText, client.continueWriting.bind(client), errorTitle);
 }
-
-export const aiSuggestionStreams = {
-  polish: (editor: Editor, selectedText: string, selection: { from: number; to: number }) =>
-    runAiSuggestionStream(
-      editor,
-      selectedText,
-      selection,
-      aiClient.polish.bind(aiClient),
-      t("messages.polishFailed"),
-    ),
-  summarize: (editor: Editor, selectedText: string, selection: { from: number; to: number }) =>
-    runAiSuggestionStream(
-      editor,
-      selectedText,
-      selection,
-      aiClient.summarize.bind(aiClient),
-      t("messages.summarizeFailed"),
-    ),
-};

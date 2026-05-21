@@ -2,10 +2,13 @@ import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
 import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
+import {
+  localeText,
+  type AiExtensionConfigureOptions,
+} from "@/features/ai/shared/extensionOptions";
 import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
-import { t } from "@/locales";
 
-export type CustomAiOptions = Record<string, never>;
+export type CustomAiOptions = AiExtensionConfigureOptions;
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -29,8 +32,8 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
 
           if (!selectedText.trim()) {
             notification.warning({
-              message: t("editor.pleaseSelectText"),
-              description: t("editor.customAiRequiresSelection"),
+              message: localeText(this.options, "editor.pleaseSelectText"),
+              description: localeText(this.options, "editor.customAiRequiresSelection"),
               duration: 2,
               placement: "topRight",
             });

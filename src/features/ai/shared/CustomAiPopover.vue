@@ -91,7 +91,9 @@ import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
 import { Popover, Button as AButton, Input as ATextarea } from "ant-design-vue";
 import { ref, computed, nextTick, watch } from "vue";
 
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
+
+const t = useEditorT();
 
 export interface CustomAiPopoverProps {
   visible?: boolean;

@@ -43,11 +43,13 @@ import { Tooltip as ATooltip } from "ant-design-vue";
 
 import { shouldShowTableBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
 import type { Component } from "vue";
+
+const t = useEditorT();
 
 const props = withDefaults(
   defineProps<{

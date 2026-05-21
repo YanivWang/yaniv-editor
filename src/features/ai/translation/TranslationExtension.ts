@@ -1,14 +1,17 @@
 import { Extension } from "@tiptap/core";
 import { notification } from "ant-design-vue";
 
-import { aiClient } from "@/features/ai/client";
+import {
+  createConfiguredAiClient,
+  localeText,
+  type AiExtensionConfigureOptions,
+} from "@/features/ai/shared/extensionOptions";
 import { preventCommandAutoDispatch } from "@/features/ai/shared/preventCommandAutoDispatch";
 import { runAiSuggestionStream } from "@/features/ai/shared/runAiSuggestionStream";
-import { t } from "@/locales";
 
 import { currentTranslateLang } from "./translateStore";
 
-export interface TranslationOptions {
+export interface TranslationOptions extends AiExtensionConfigureOptions {
   defaultTargetLang?: string;
 }
 
@@ -40,8 +43,8 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
 
           if (!selectedText.trim()) {
             notification.warning({
-              message: t("editor.pleaseSelectText"),
-              description: t("editor.translateRequiresSelection"),
+              message: localeText(this.options, "editor.pleaseSelectText"),
+              description: localeText(this.options, "editor.translateRequiresSelection"),
               duration: 3,
               placement: "topRight",
             });
@@ -52,13 +55,14 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
             targetLang || currentTranslateLang.value || this.options.defaultTargetLang || "英文";
 
           preventCommandAutoDispatch(tr);
+          const client = createConfiguredAiClient(this.options);
           runAiSuggestionStream(
             editor,
             selectedText,
             { from, to },
             (content, sysPrompt, callbacks) =>
-              aiClient.translate(content, lang, sysPrompt, callbacks),
-            t("messages.translationFailed"),
+              client.translate(content, lang, sysPrompt, callbacks),
+            localeText(this.options, "messages.translationFailed"),
           );
 
           return true;

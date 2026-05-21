@@ -1,55 +1,36 @@
 /**
- * 将视觉外观应用到 DOM 节点（仅作用于传入的 target，通常为 .yaniv-editor 根节点）
+ * 将视觉外观应用到 DOM 节点（纯函数，无模块级单例）
  */
 import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
 
 import type { ResolvedColorMode } from "./appearanceContext";
-
-const APPEARANCE_CLASS_NAMES = [
-  "appearance-default",
-  "appearance-notion",
-  "appearance-github",
-  "appearance-typora",
-  "appearance-word",
-  "appearance-custom",
-] as const;
-
-const customAppearances = new Map<string, Record<string, string>>();
-let activeCustomAppearanceName = "custom";
 
 export function resolveColorMode(mode: EditorColorMode): ResolvedColorMode {
   if (mode === "auto") return getSystemColorMode();
   return mode;
 }
 
+export function getAppearanceClassName(appearance: EditorAppearance): string {
+  const classPreset = appearance === "custom" ? "custom" : appearance;
+  return `appearance-${classPreset}`;
+}
+
 export function applyAppearanceToElement(
   target: HTMLElement,
   appearance: EditorAppearance,
   mode: EditorColorMode = "light",
+  customVars?: Record<string, string>,
 ): ResolvedColorMode {
-  APPEARANCE_CLASS_NAMES.forEach((name) => target.classList.remove(name));
-
-  const classPreset = appearance === "custom" ? "custom" : appearance;
-  target.classList.add(`appearance-${classPreset}`);
-
   const resolved = resolveColorMode(mode);
   target.setAttribute("data-color-mode", resolved);
 
-  if (appearance === "custom") {
-    const vars =
-      customAppearances.get("custom") ?? customAppearances.get(activeCustomAppearanceName);
-    if (vars) applyCustomAppearanceToElement(target, vars);
-  } else {
-    // 从 custom 切回内置外观时，清掉曾经写入根节点的 CSS 变量。
-    clearCustomAppearanceInlineVars(target);
+  if (appearance === "custom" && customVars) {
+    applyCustomAppearanceToElement(target, customVars);
+  } else if (appearance !== "custom") {
+    clearCustomAppearanceInlineVars(target, customVars);
   }
 
   return resolved;
-}
-
-export function registerAppearance(name: string, variables: Record<string, string>): void {
-  activeCustomAppearanceName = name;
-  customAppearances.set(name, variables);
 }
 
 export function applyCustomAppearanceToElement(
@@ -61,11 +42,10 @@ export function applyCustomAppearanceToElement(
   }
 }
 
-function clearCustomAppearanceInlineVars(target: HTMLElement): void {
-  for (const vars of customAppearances.values()) {
-    for (const key of Object.keys(vars)) {
-      target.style.removeProperty(key);
-    }
+function clearCustomAppearanceInlineVars(target: HTMLElement, vars?: Record<string, string>): void {
+  if (!vars) return;
+  for (const key of Object.keys(vars)) {
+    target.style.removeProperty(key);
   }
 }
 

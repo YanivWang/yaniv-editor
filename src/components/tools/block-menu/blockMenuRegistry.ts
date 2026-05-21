@@ -13,16 +13,12 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons-vue";
 
-import type { ResolvedExtensionGates } from "@/extensions/resolveExtensionGates";
-import { t } from "@/locales";
+import type { ExtensionGates } from "@/core/runtime/types";
 
 import type { BlockMenuGroupDef, BlockMenuGroupId, BlockMenuItemId } from "./types";
 import type { Component } from "vue";
 
-export type BlockMenuFeatureGates = Pick<
-  ResolvedExtensionGates,
-  "table" | "image" | "video" | "math"
->;
+export type BlockMenuFeatureGates = Pick<ExtensionGates, "table" | "image" | "video" | "math">;
 
 interface BlockMenuItemSource {
   id: BlockMenuItemId;
@@ -150,10 +146,10 @@ const BLOCK_MENU_ITEMS: BlockMenuItemSource[] = [
 
 const GROUP_ORDER: BlockMenuGroupId[] = ["basicBlocks", "lists", "advanced"];
 
-const GROUP_TITLE_KEYS: Record<BlockMenuGroupId, () => string> = {
-  basicBlocks: () => t("slashCommand.basicBlocks"),
-  lists: () => t("slashCommand.lists"),
-  advanced: () => t("slashCommand.advanced"),
+const GROUP_TITLE_KEYS: Record<BlockMenuGroupId, string> = {
+  basicBlocks: "slashCommand.basicBlocks",
+  lists: "slashCommand.lists",
+  advanced: "slashCommand.advanced",
 };
 
 const FEATURE_REQUIREMENTS: Partial<Record<BlockMenuItemId, keyof BlockMenuFeatureGates>> = {
@@ -168,17 +164,20 @@ function isBlockMenuItemAvailable(item: BlockMenuItemSource, gates?: BlockMenuFe
   return !requiredFeature || gates?.[requiredFeature] === true;
 }
 
-export function getBlockMenuGroups(gates?: BlockMenuFeatureGates): BlockMenuGroupDef[] {
+export function getBlockMenuGroups(
+  gates: BlockMenuFeatureGates | undefined,
+  translate: (key: string) => string,
+): BlockMenuGroupDef[] {
   return GROUP_ORDER.map((groupId) => ({
     id: groupId,
-    title: GROUP_TITLE_KEYS[groupId](),
+    title: translate(GROUP_TITLE_KEYS[groupId]),
     items: BLOCK_MENU_ITEMS.filter(
       (item) => item.group === groupId && isBlockMenuItemAvailable(item, gates),
     ).map((item) => ({
       id: item.id,
       group: item.group,
-      title: t(`slashCommand.${item.titleKey}`),
-      description: t(`slashCommand.${item.descKey}`),
+      title: translate(`slashCommand.${item.titleKey}`),
+      description: translate(`slashCommand.${item.descKey}`),
       icon: item.icon,
       keywords: [...item.keywords],
     })),

@@ -12,8 +12,6 @@ import {
 } from "@tiptap/pm/model";
 import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
-import { t } from "@/locales";
-
 import type { EditorView } from "@tiptap/pm/view";
 
 export interface DragInsertMenuContext {
@@ -27,6 +25,7 @@ export interface DragInsertMenuContext {
 export interface DragHandleOptions {
   onOpenInsertMenu?: (context: DragInsertMenuContext) => void;
   onCloseInsertMenu?: () => void;
+  getMenuLabel?: (key: string) => string;
 }
 
 declare module "@tiptap/core" {
@@ -383,7 +382,11 @@ function duplicateTargetNode(view: EditorView, target: DragTarget): void {
   insertNodeAfter(view, target, target.node.copy(target.node.content));
 }
 
-function createTransformItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
+function createTransformItems(
+  view: EditorView,
+  target: DragTarget,
+  getMenuLabel: (key: string) => string,
+): BlockMenuItem[] {
   const { schema } = view.state;
   const text = target.node.textContent;
 
@@ -432,29 +435,33 @@ function createTransformItems(view: EditorView, target: DragTarget): BlockMenuIt
 
   return transforms.map(({ id, slashKey, run }) => ({
     id,
-    label: t(`slashCommand.${slashKey}`),
+    label: getMenuLabel(`slashCommand.${slashKey}`),
     run,
   }));
 }
 
-function createActionItems(view: EditorView, target: DragTarget): BlockMenuItem[] {
+function createActionItems(
+  view: EditorView,
+  target: DragTarget,
+  getMenuLabel: (key: string) => string,
+): BlockMenuItem[] {
   return [
     {
       id: "duplicate",
-      label: t("dragMenu.duplicateBlock"),
+      label: getMenuLabel("dragMenu.duplicateBlock"),
       run: () => duplicateTargetNode(view, target),
     },
     {
       id: "delete",
-      label: t("dragMenu.deleteBlock"),
+      label: getMenuLabel("dragMenu.deleteBlock"),
       danger: true,
       run: () => deleteTargetNode(view, target),
     },
     {
       id: "turnInto",
-      label: t("dragMenu.transformTo"),
+      label: getMenuLabel("dragMenu.transformTo"),
       dividerBefore: true,
-      submenu: createTransformItems(view, target),
+      submenu: createTransformItems(view, target, getMenuLabel),
     },
   ];
 }
@@ -575,6 +582,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
     return {
       onOpenInsertMenu: undefined,
       onCloseInsertMenu: undefined,
+      getMenuLabel: undefined,
     };
   },
 
@@ -588,6 +596,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
   addProseMirrorPlugins() {
     const extensionOptions = this.options;
     const storage = this.storage;
+    const getMenuLabel = extensionOptions.getMenuLabel ?? ((key: string) => key);
 
     return [
       new Plugin({
@@ -691,7 +700,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             );
             menu.classList.add("is-actions-menu");
 
-            renderBlockMenu(menu, createActionItems(view, target), closeMenu);
+            renderBlockMenu(menu, createActionItems(view, target, getMenuLabel), closeMenu);
             positionBlockMenu(menu, target, handle);
             menu.classList.add("is-visible");
           };

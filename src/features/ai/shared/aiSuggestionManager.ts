@@ -1,9 +1,10 @@
 import { notification } from "ant-design-vue";
-import { createApp, h, ref } from "vue";
+import { createApp, h, provide, ref } from "vue";
 
+import { editorLocaleKey } from "@/core/infra/useEditorLocale";
 import { aiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
-import { t } from "@/locales";
+import type { LocaleCode } from "@/locales/manager";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import {
@@ -33,6 +34,12 @@ export interface AiSuggestionState {
 const editorClickHandlers = new WeakMap<HTMLElement, (event: MouseEvent) => void>();
 
 class AiSuggestionManager {
+  private getLocaleText: (key: string) => string = (key) => key;
+
+  /** 由 capability registry 在构建 AI 扩展时注入实例 locale 文案 */
+  bindLocale(getLocaleText: (key: string) => string): void {
+    this.getLocaleText = getLocaleText;
+  }
   private editor: Editor | null = null;
   private popoverApp: App | null = null;
   private container: HTMLElement | null = null;
@@ -164,7 +171,7 @@ class AiSuggestionManager {
           this.isExecutingRef.value = false;
           this.hide();
           notification.error({
-            message: t("messages.customAiFailed"),
+            message: this.getLocaleText("messages.customAiFailed"),
             description: error.message,
             duration: 3,
             placement: "topRight",
@@ -463,8 +470,16 @@ class AiSuggestionManager {
 
     const position = this.calculatePopoverPosition();
     const isCustom = this.mode === "custom";
+    const translate = this.getLocaleText.bind(this);
 
     this.popoverApp = createApp({
+      setup() {
+        provide(editorLocaleKey, {
+          locale: ref("zh-CN" as LocaleCode),
+          messages: ref(null),
+          t: translate,
+        });
+      },
       render: () => {
         if (isCustom) {
           return h(CustomAiPopover, {

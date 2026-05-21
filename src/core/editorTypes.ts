@@ -74,6 +74,8 @@ export interface YanivEditorProps {
   preset?: EditorPreset;
   /** 视觉外观 */
   appearance?: EditorAppearance;
+  /** custom 外观的 CSS 变量（实例级，不污染全局） */
+  customAppearanceVars?: Record<string, string>;
   /** 亮色、暗色或跟随系统 */
   colorMode?: EditorColorMode;
   /** 初始内容 — HTML 字符串或 ProseMirror JSON（type: doc） */

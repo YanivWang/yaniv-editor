@@ -14,7 +14,6 @@
     </aside>
     <main class="demo-main demo-main--centered">
       <YanivInlineEditor
-        :key="inlineKey"
         v-model:content="html"
         :mode="inlineMode"
         :toolbar="toolbar"
@@ -27,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
@@ -40,7 +39,7 @@ import "@yanivjs/yaniv-editor/inline.css";
 import DemoInlinePanel from "../components/DemoInlinePanel.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { getDemoEntry } from "../config/demoCatalog";
-import { inlineToolbarKey, INLINE_FULL_TOOLBAR } from "../config/demoInline";
+import { INLINE_FULL_TOOLBAR } from "../config/demoInline";
 
 const entry = getDemoEntry("inline-editor");
 
@@ -51,8 +50,6 @@ const html = ref(
 const inlineMode = ref<EditorMode>("edit");
 const toolbar = ref<InlineToolbarConfig>({ ...INLINE_FULL_TOOLBAR });
 const colorMode = ref<EditorColorMode>("light");
-
-const inlineKey = computed(() => inlineToolbarKey(toolbar.value));
 </script>
 
 <style scoped>

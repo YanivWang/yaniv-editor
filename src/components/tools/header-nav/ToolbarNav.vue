@@ -175,13 +175,15 @@ import WordButton from "@/components/editor/word/WordButton.vue";
 import { useEditorColorState } from "@/composables/useEditorColorState";
 import { useYanivEditor } from "@/core/editorContext";
 import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
-import { t } from "@/locales";
 
 import { COMPACT_TOOLBAR_CONFIG, FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 
 import type { ToolbarToolsConfig } from "./toolbarConfig";
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 interface Props {
   editor?: Editor | null;

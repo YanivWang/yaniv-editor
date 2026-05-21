@@ -38,6 +38,7 @@ export default tseslint.config(
       "commitlint.config.cjs",
       "docs/.vitepress/cache/**",
       "docs/.vitepress/dist/**",
+      "vitest.config.ts",
     ],
   },
   {

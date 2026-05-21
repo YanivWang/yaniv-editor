@@ -32,13 +32,15 @@ import { computed, ref, watch } from "vue";
 import { ToolbarButton, ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { HeadingLevel, MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { getCurrentParagraphStyle } from "@/utils/editorState";
 
 import { HEADING_ITEM_ICONS } from "./HeadingIcons";
 import { useHeadingActions } from "./useHeadingActions";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 type HeadingVariant = "buttons" | "dropdown";
 

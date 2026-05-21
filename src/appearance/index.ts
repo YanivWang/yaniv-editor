@@ -8,7 +8,7 @@ export type { LoadableAppearance } from "./loadAppearance";
 export {
   applyCustomAppearanceToElement,
   applyAppearanceToElement,
-  registerAppearance,
+  getAppearanceClassName,
   resolveColorMode,
   watchSystemColorMode,
 } from "./applyAppearance";
@@ -18,5 +18,4 @@ export type { EditorAppearanceContext, ResolvedColorMode } from "./appearanceCon
 export { useEditorAppearance } from "./useEditorAppearance";
 export { useResolvedColorMode } from "./useResolvedColorMode";
 
-/** 可切换的视觉外观（不含 custom） */
 export const EDITOR_APPEARANCES = ["default", "notion", "github", "typora", "word"] as const;

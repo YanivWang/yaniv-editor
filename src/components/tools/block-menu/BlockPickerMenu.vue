@@ -43,12 +43,22 @@
  * BlockPickerMenu - Notion 风格统一块选择菜单
  * @description 供斜杠命令（transform）与拖拽柄 + 号（insert）共用
  */
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
 
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
 import { useYanivEditor } from "@/core/editorContext";
 import type { MediaUploadHandler } from "@/core/editorTypes";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
+import { blockMenuHostKey } from "@/core/shell/useBlockMenuHost";
 
 import {
   applyBlockInsert,
@@ -68,6 +78,8 @@ import type {
 } from "./types";
 import type { Editor } from "@tiptap/core";
 
+const t = useEditorT();
+
 const props = defineProps<{
   editor?: Editor | null;
   features?: BlockMenuFeatureGates;
@@ -85,7 +97,7 @@ const selectedIndex = ref(0);
 const menuRef = ref<HTMLElement | null>(null);
 const insertContext = ref<BlockInsertContext | null>(null);
 
-const commandGroups = computed(() => getBlockMenuGroups(props.features));
+const commandGroups = computed(() => getBlockMenuGroups(props.features, t));
 
 const filteredGroups = computed<BlockMenuGroupDef[]>(() => {
   const q = query.value.toLowerCase();
@@ -150,7 +162,7 @@ function selectItem(item: BlockMenuItemDef) {
 
       hide();
 
-      void pickMediaUrl(accept, blockId, upload).then((src) => {
+      void pickMediaUrl(accept, blockId, upload, t).then((src) => {
         if (!src) return;
         insertBlockMediaAt(e, insertPos, blockId, src);
       });
@@ -160,7 +172,7 @@ function selectItem(item: BlockMenuItemDef) {
 
     hide();
 
-    void pickMediaUrl(accept, blockId, upload).then((src) => {
+    void pickMediaUrl(accept, blockId, upload, t).then((src) => {
       if (!src) return;
       if (context) {
         insertBlockMediaAt(e, context.insertPos, blockId, src);
@@ -310,8 +322,20 @@ function scrollToSelected() {
   });
 }
 
+const host = inject(blockMenuHostKey, null);
+
 onMounted(() => {
   document.addEventListener("keydown", handleKeyDown, true);
+  host?.registerInstance({
+    activate,
+    openInsert,
+    hide,
+    updateQuery,
+  });
+});
+
+onBeforeUnmount(() => {
+  host?.registerInstance(null);
 });
 
 onUnmounted(() => {

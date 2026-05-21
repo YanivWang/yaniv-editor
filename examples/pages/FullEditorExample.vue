@@ -20,7 +20,6 @@
     </aside>
     <main class="demo-main yaniv-editor-host">
       <YanivEditor
-        :key="editorKey"
         :mode="mode"
         :preset="preset"
         :appearance="appearance"
@@ -32,13 +31,14 @@
         :gallery-images="galleryImagesProp"
         :custom-templates="customTemplatesProp"
         :ai-config="aiConfigProp"
+        :custom-appearance-vars="customAppearanceVarsProp"
       />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import type { TemplateItem } from "@/components/editor/template/templates";
 import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
@@ -50,7 +50,7 @@ import type {
   YanivEditorAiConfig,
 } from "@/core/editorTypes";
 
-import { registerAppearance, YanivEditor } from "@yanivjs/yaniv-editor";
+import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 import DemoControlsBar from "../components/DemoControlsBar.vue";
@@ -60,11 +60,7 @@ import DemoIntegrationPanel from "../components/DemoIntegrationPanel.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { DEMO_CUSTOM_APPEARANCE_VARS } from "../config/demoAdvanced";
 import { getDemoEntry } from "../config/demoCatalog";
-import {
-  buildFeatureConfig,
-  createDefaultOverrideState,
-  overridesKey,
-} from "../config/demoFeatureOverrides";
+import { buildFeatureConfig, createDefaultOverrideState } from "../config/demoFeatureOverrides";
 import { getSampleContent } from "../config/demoFullEditor";
 import {
   buildActivePropsSnippet,
@@ -74,7 +70,6 @@ import {
   DEMO_HOST_AI_CONFIG,
   demoUploadImage,
   demoUploadVideo,
-  integrationKey,
   type DemoIntegrationFlags,
 } from "../config/demoIntegration";
 
@@ -88,21 +83,10 @@ const integration = ref<DemoIntegrationFlags>({ ...DEFAULT_INTEGRATION_FLAGS });
 const featureOverrides = ref(createDefaultOverrideState());
 const uploadStatus = ref("");
 
-watch(
-  appearance,
-  (value) => {
-    if (value === "custom") {
-      registerAppearance("custom", DEMO_CUSTOM_APPEARANCE_VARS);
-    }
-  },
-  { immediate: true },
-);
-
 const initialContent = computed(() => getSampleContent(preset.value));
 const featuresProp = computed(() => buildFeatureConfig(featureOverrides.value));
-const editorKey = computed(
-  () =>
-    `${preset.value}-${integrationKey(integration.value)}-${overridesKey(featureOverrides.value)}`,
+const customAppearanceVarsProp = computed(() =>
+  appearance.value === "custom" ? DEMO_CUSTOM_APPEARANCE_VARS : undefined,
 );
 const activePropsSnippet = computed(() => buildActivePropsSnippet(integration.value));
 

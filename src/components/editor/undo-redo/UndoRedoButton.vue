@@ -25,10 +25,12 @@ import { nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 // ===== Props =====
 interface Props {

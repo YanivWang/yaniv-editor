@@ -72,9 +72,11 @@ import { nextTick, ref, watch } from "vue";
 
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
+
+const t = useEditorT();
 
 const props = withDefaults(
   defineProps<{

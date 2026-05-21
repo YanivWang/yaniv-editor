@@ -20,12 +20,14 @@ import { computed } from "vue";
 import { ToolbarDropdownButton, ToolbarGroup } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createStateCheckers } from "@/utils/editorState";
 
 import { SubscriptIcon, SuperscriptIcon } from "./ScriptIcons";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 interface Props {
   editor?: Editor | null;

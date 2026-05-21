@@ -46,11 +46,13 @@ import { computed, ref } from "vue";
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { resolveMediaUrl } from "@/utils/mediaUpload";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 // ===== Props =====
 interface Props {
@@ -110,6 +112,7 @@ async function handleLocalUpload(options: any) {
       file: file as File,
       kind: "image",
       upload: props.uploadImage,
+      translate: t,
     });
     // 插入图片
     runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: url } }))();

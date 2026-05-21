@@ -12,6 +12,7 @@ export interface EditorAppearanceContext {
   appearance: Ref<EditorAppearance>;
   colorMode: Ref<EditorColorMode>;
   resolvedMode: ComputedRef<ResolvedColorMode>;
+  registerCustom?: (name: string, vars: Record<string, string>) => void;
 }
 
 export const editorAppearanceInjectionKey: InjectionKey<EditorAppearanceContext> =

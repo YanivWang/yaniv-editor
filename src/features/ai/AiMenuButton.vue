@@ -29,7 +29,7 @@ import { computed, nextTick, ref } from "vue";
 import { ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivAiShowSettings } from "@/core/aiContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import AiSettingsModal from "./components/AiSettingsModal.vue";
@@ -38,6 +38,7 @@ import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./transl
 import type { Editor } from "@tiptap/core";
 import type { Component } from "vue";
 
+const t = useEditorT();
 const showAiSettingsEntry = useYanivAiShowSettings();
 const settingsModalOpen = ref(false);
 const savedSelection = ref<{ from: number; to: number } | null>(null);
@@ -202,7 +203,7 @@ const menuItems = computed((): MenuItemConfig[] => {
     {
       key: "translate",
       label: currentTranslateLang.value
-        ? t("editor.translateTo", { lang: currentTranslateLang.value })
+        ? t("editor.translateTo").replace("{lang}", currentTranslateLang.value)
         : t("editor.translate"),
       icon: TranslationOutlined,
       submenuMode: "split-hover",

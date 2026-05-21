@@ -2,7 +2,7 @@
   <ToolbarButton
     :icon="ApartmentOutlined"
     :title="t('editor.outlineToggle')"
-    :active="visible"
+    :active="expanded"
     @click="toggle"
   />
 </template>
@@ -11,9 +11,11 @@
 import { ApartmentOutlined } from "@ant-design/icons-vue";
 
 import { ToolbarButton } from "@/components/base";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 
 import { useOutlinePanel } from "./useOutlinePanel";
 
-const { visible, toggle } = useOutlinePanel();
+const t = useEditorT();
+
+const { expanded, toggle } = useOutlinePanel();
 </script>

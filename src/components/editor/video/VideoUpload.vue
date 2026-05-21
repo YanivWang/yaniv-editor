@@ -34,11 +34,13 @@ import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { resolveMediaUrl } from "@/utils/mediaUpload";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 interface Props {
   editor?: Editor | null;
@@ -66,6 +68,7 @@ async function handleVideoUpload(options: any) {
       file: file as File,
       kind: "video",
       upload: props.uploadVideo,
+      translate: t,
     });
     // 插入视频
     runCommand((chain) => chain.insertContent({ type: "video", attrs: { src: url } }))();

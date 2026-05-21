@@ -69,8 +69,10 @@ import { TextFormatButtons } from "@/components/editor/text-format";
 import { shouldShowFloatingTextToolbar } from "@/composables/bubbleMenuShouldShow";
 import { useEditorColorState } from "@/composables/useEditorColorState";
 import { useYanivEditor } from "@/core/editorContext";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
-import { t } from "@/locales";
+
+const t = useEditorT();
 
 const props = withDefaults(
   defineProps<{

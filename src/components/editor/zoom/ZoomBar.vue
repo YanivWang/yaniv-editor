@@ -27,9 +27,11 @@ import { Button as AButton } from "ant-design-vue";
 import { computed, ref, watch } from "vue";
 
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 
 import type { Editor } from "@tiptap/core";
+
+const t = useEditorT();
 
 const props = withDefaults(
   defineProps<{

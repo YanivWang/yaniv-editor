@@ -15,6 +15,8 @@ import type { AiAdapter, AiMessage, AiStreamCallbacks } from "./types";
 export interface CreateAiClientOptions {
   /** 传入时始终使用该 adapter，不走全局配置 / demo */
   adapter?: AiAdapter;
+  /** 扩展 configure getter：每次请求时现取最新 aiConfig */
+  resolveConfig?: () => (Partial<ResolvedAiConfig> & { endpoint?: string }) | null;
 }
 
 type AiDemoType = "continue" | "polish" | "summarize" | "translate" | "custom";
@@ -40,7 +42,25 @@ export function normalizeAiError(error: unknown): Error {
   return new Error("AI 请求失败");
 }
 
-function getAiConfig(): ResolvedAiConfig {
+function getAiConfig(resolveOverride?: () => Partial<ResolvedAiConfig> | null): ResolvedAiConfig {
+  const runtime = resolveOverride?.();
+  if (runtime?.provider) {
+    const providerInfo = getProviderInfo(runtime.provider);
+    const endpoint =
+      "endpoint" in runtime && typeof runtime.endpoint === "string" ? runtime.endpoint : undefined;
+    return {
+      provider: runtime.provider,
+      apiKey: typeof runtime.apiKey === "string" ? runtime.apiKey : "",
+      baseUrl:
+        (typeof runtime.baseUrl === "string" ? runtime.baseUrl : undefined) ??
+        endpoint ??
+        providerInfo?.defaultEndpoint ??
+        "",
+      model: runtime.model ?? providerInfo?.defaultModel ?? "gpt-4o-mini",
+      timeout: runtime.timeout ?? DEFAULT_TIMEOUT,
+    };
+  }
+
   const userConfig = getAiRequestConfig();
   if (userConfig) {
     return {
@@ -90,10 +110,13 @@ function isAiConfigured(config: ResolvedAiConfig): boolean {
   return true;
 }
 
-function resolveAdapter(explicit?: AiAdapter): AiAdapter {
+function resolveAdapter(
+  explicit?: AiAdapter,
+  resolveOverride?: () => Partial<ResolvedAiConfig> | null,
+): AiAdapter {
   if (explicit) return explicit;
 
-  const config = getAiConfig();
+  const config = getAiConfig(resolveOverride);
   return createAiAdapter({
     provider: config.provider,
     apiKey: config.apiKey,
@@ -176,7 +199,7 @@ function translateTargetLabel(targetLang: string): string {
 }
 
 export function createAiClient(options: CreateAiClientOptions = {}) {
-  const { adapter: fixedAdapter } = options;
+  const { adapter: fixedAdapter, resolveConfig } = options;
 
   async function sendStreamingRequest(
     systemPrompt: string,
@@ -184,7 +207,7 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
     callbacks: AiStreamCallbacks,
     demoType: AiDemoType = "custom",
   ): Promise<void> {
-    if (!fixedAdapter && !isAiConfigured(getAiConfig())) {
+    if (!fixedAdapter && !isAiConfigured(getAiConfig(resolveConfig))) {
       if (isAiDemoMode()) {
         await simulateAiStream(callbacks, demoType);
       } else {
@@ -207,7 +230,7 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
       { role: "user", content },
     ];
 
-    const adapter = resolveAdapter(fixedAdapter);
+    const adapter = resolveAdapter(fixedAdapter, resolveConfig);
 
     try {
       await adapter.chatStream(messages, callbacks);

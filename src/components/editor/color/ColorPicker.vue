@@ -163,10 +163,12 @@ import { StopOutlined } from "@ant-design/icons-vue";
 import { Popover, Tooltip } from "ant-design-vue";
 import { ref, computed, watch } from "vue";
 
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { normalizeColor } from "@/utils/color";
 
 import type { Component } from "vue";
+
+const t = useEditorT();
 
 /**
  * 组件 Props 接口定义

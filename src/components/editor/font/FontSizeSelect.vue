@@ -14,10 +14,12 @@ import { ToolbarDropdownButton } from "@/components/base";
 import { FONT_SIZES, DEFAULT_VALUES } from "@/configs/editorConstants";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner, executeBatchCommands } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 interface Props {
   editor?: Editor | null;

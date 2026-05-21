@@ -25,11 +25,13 @@ import { computed } from "vue";
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { AlignValue, MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
 import type { Editor } from "@tiptap/vue-3";
+
+const t = useEditorT();
 
 // ===== Props =====
 interface Props {

@@ -3,12 +3,12 @@
  */
 
 import type { ToolbarToolsConfig } from "@/components/tools/header-nav/toolbarConfig";
-import type { ResolvedExtensionGates } from "@/extensions/resolveExtensionGates";
+import type { ExtensionGates } from "@/core/runtime/types";
 
 /** 用扩展门控收敛工具栏配置，保证「扩展未注册则对应按钮不展示」 */
 export function applyExtensionGatesToToolbarConfig(
   base: ToolbarToolsConfig,
-  gates: ResolvedExtensionGates,
+  gates: ExtensionGates,
 ): ToolbarToolsConfig {
   return {
     ...base,

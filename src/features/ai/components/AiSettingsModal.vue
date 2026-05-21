@@ -121,7 +121,9 @@ import {
 } from "ant-design-vue";
 import { ref, reactive, computed, watch } from "vue";
 
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
+
+const t = useEditorT();
 
 import {
   type AiProvider,

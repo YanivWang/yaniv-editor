@@ -24,8 +24,8 @@ export interface FullEditorPresetConfig {
 
 export const basicFeatures: Required<FeatureConfig> = {
   image: true,
-  video: true,
-  table: true,
+  video: false,
+  table: false,
   math: false,
   ai: false,
   formatPainter: false,

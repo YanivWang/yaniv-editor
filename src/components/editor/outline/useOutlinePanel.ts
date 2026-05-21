@@ -1,7 +1,7 @@
 import { inject, provide, ref, type InjectionKey, type Ref } from "vue";
 
 export interface OutlinePanelContext {
-  visible: Ref<boolean>;
+  expanded: Ref<boolean>;
   toggle: () => void;
   close: () => void;
 }
@@ -9,15 +9,15 @@ export interface OutlinePanelContext {
 const OUTLINE_PANEL_KEY: InjectionKey<OutlinePanelContext> = Symbol("outlinePanel");
 
 export function provideOutlinePanel(): OutlinePanelContext {
-  const visible = ref(false);
+  const expanded = ref(true);
 
   const context: OutlinePanelContext = {
-    visible,
+    expanded,
     toggle: () => {
-      visible.value = !visible.value;
+      expanded.value = !expanded.value;
     },
     close: () => {
-      visible.value = false;
+      expanded.value = false;
     },
   };
 
@@ -28,7 +28,7 @@ export function provideOutlinePanel(): OutlinePanelContext {
 export function useOutlinePanel(): OutlinePanelContext {
   const context = inject(OUTLINE_PANEL_KEY);
   if (!context) {
-    throw new Error("[useOutlinePanel] must be used within YanivEditor");
+    throw new Error("[useOutlinePanel] must be used within EditorShell");
   }
   return context;
 }

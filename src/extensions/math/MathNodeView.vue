@@ -49,11 +49,13 @@ import katex from "katex";
 import { ref, computed, watch, nextTick, onMounted } from "vue";
 
 /* KaTeX 样式由接入方引入: import 'katex/dist/katex.min.css'（勿打入 npm 包） */
-import { t } from "@/locales";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 
 import { DEFAULT_KATEX_OPTIONS } from "./types";
 
 import type { MathExtensionOptions } from "./types";
+
+const t = useEditorT();
 
 const props = defineProps(nodeViewProps);
 

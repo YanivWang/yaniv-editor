@@ -323,32 +323,27 @@
   background: var(--ye-bg);
 }
 
-/* ===== 内容展示态样式 ===== */
-.yaniv-editor.document-layout.is-preview .document-container {
+/* ===== 内容展示态样式（纯视觉；交互层由 chromePolicy / isEditable 守卫） ===== */
+.yaniv-editor.document-layout[data-phase="preview"] .document-container {
   overflow: auto;
   cursor: default;
 }
 
-.yaniv-editor.document-layout.is-preview .ProseMirror {
+.yaniv-editor.document-layout[data-phase="preview"] .ProseMirror {
   caret-color: transparent;
 }
 
-.yaniv-editor.document-layout.is-preview .ProseMirror * {
+.yaniv-editor.document-layout[data-phase="preview"] .ProseMirror * {
   cursor: default !important;
 }
 
-.yaniv-editor.document-layout.is-preview .ProseMirror a {
+.yaniv-editor.document-layout[data-phase="preview"] .ProseMirror a {
   pointer-events: auto;
   cursor: pointer !important;
 }
 
-.yaniv-editor.document-layout.is-preview .ProseMirror img {
+.yaniv-editor.document-layout[data-phase="preview"] .ProseMirror img {
   resize: none;
-}
-
-.yaniv-editor.document-layout.is-preview .resize-handle,
-.yaniv-editor.document-layout.is-preview .image-resizer {
-  display: none !important;
 }
 
 /* ===== 查找 / 替换命中高亮 ===== */

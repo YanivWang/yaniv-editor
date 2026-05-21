@@ -10,19 +10,15 @@ import {
 } from "vue";
 
 import type { Editor } from "@tiptap/core";
+import type { Editor as VueEditor } from "@tiptap/vue-3";
 
 const YANIV_EDITOR_KEY: InjectionKey<Ref<Editor | null>> = Symbol("yanivEditor");
 
-/** 在 YanivEditor 根组件挂载 editor 实例后调用 */
-export function provideYanivEditor(editor: Ref<Editor | null>): void {
-  provide(YANIV_EDITOR_KEY, editor);
+/** 在 EditorShell 根挂载 editor 实例后调用 */
+export function provideYanivEditor(editor: Ref<VueEditor | null>): void {
+  provide(YANIV_EDITOR_KEY, editor as Ref<Editor | null>);
 }
 
-/**
- * 获取当前编辑器实例。
- * - YanivEditor 子树内：自动 inject
- * - 独立拼装工具栏（examples）：可传入 `editor` prop 作为 fallback
- */
 export function useYanivEditor(
   fallback?: MaybeRefOrGetter<Editor | null | undefined>,
 ): ComputedRef<Editor | null> {

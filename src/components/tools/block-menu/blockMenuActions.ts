@@ -97,7 +97,8 @@ export function isMediaBlockId(blockId: BlockMenuItemId): blockId is MediaBlockI
 export function pickMediaUrl(
   accept: string,
   kind: MediaKind,
-  upload?: MediaUploadHandler,
+  upload: MediaUploadHandler | undefined,
+  translate: (key: string) => string,
 ): Promise<string | null> {
   return new Promise((resolve) => {
     const input = document.createElement("input");
@@ -114,7 +115,7 @@ export function pickMediaUrl(
         resolve(null);
         return;
       }
-      void resolveMediaUrl({ file, kind, upload })
+      void resolveMediaUrl({ file, kind, upload, translate })
         .then(resolve)
         .catch(() => resolve(null));
     });

@@ -15,24 +15,26 @@
 </template>
 
 <script setup lang="ts">
-import { EditorContent, useEditor } from "@tiptap/vue-3";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
 
 import { resolveColorMode, watchSystemColorMode } from "@/appearance/applyAppearance";
+import { buildExtensions } from "@/capabilities/buildExtensions";
+import { CAPABILITIES } from "@/capabilities/registry";
 import type { EditorColorMode } from "@/configs/editorConfig";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import type { EditorMode } from "@/core/editorTypes";
-import { createI18n } from "@/locales";
+import { resolveInlineGates } from "@/core/runtime/resolveInlineGates";
+import { provideBlockMenuHost } from "@/core/shell/useBlockMenuHost";
+import { createI18n, loadLocale } from "@/locales";
 
 import {
   AlignDropdown,
-  buildInlineExtensions,
   ClearFormatButton,
   CodeBlockDropdown,
   HeadingControl,
   LinkButton,
   ListTools,
-  resolveInlineExtensionGates,
   TextFormatButtons,
   UndoRedoButton,
 } from "@yanivjs/yaniv-editor/inline";
@@ -45,10 +47,13 @@ const props = defineProps<{
 
 const content = defineModel<string>("content", { required: true });
 const isPreviewMode = computed(() => props.mode === "preview");
+const isEditable = computed(() => props.mode === "edit");
 
 createI18n();
 
 const rootRef = ref<HTMLElement | null>(null);
+const editor = shallowRef<Editor | null>(null);
+const blockMenuHost = provideBlockMenuHost();
 
 function applyColorMode() {
   if (!rootRef.value) return;
@@ -70,30 +75,45 @@ watch(
   { immediate: true },
 );
 
-onBeforeUnmount(() => {
-  cleanupSystemWatch?.();
-});
+async function initEditor() {
+  const locale = await loadLocale("zh-CN");
+  const gates = resolveInlineGates(props.toolbar, CAPABILITIES);
+  const extensions = await buildExtensions("inline", {
+    locale,
+    gates,
+    isEditable,
+    blockMenuHost,
+    upload: { image: () => undefined, video: () => undefined },
+    galleryImages: () => [],
+    officePaste: { onPasteFromOfficeWithImages: () => undefined },
+    outline: { scrollParent: () => null, bindScrollParent: () => {} },
+    aiConfig: () => undefined,
+    inlinePlaceholder: "写点什么…",
+  });
 
-const editor = useEditor({
-  content: content.value,
-  editable: props.mode === "edit",
-  extensions: buildInlineExtensions({
-    gates: resolveInlineExtensionGates({ toolbar: props.toolbar }),
-  }),
-  editorProps: {
-    attributes: { class: "inline-prose" },
-  },
-  onUpdate: ({ editor: ed }) => {
-    content.value = ed.getHTML();
-  },
-});
+  editor.value?.destroy();
+  editor.value = new Editor({
+    content: content.value,
+    editable: props.mode === "edit",
+    extensions,
+    editorProps: { attributes: { class: "inline-prose" } },
+    onUpdate: ({ editor: ed }) => {
+      content.value = ed.getHTML();
+    },
+  });
+}
+
+watch(
+  () => [props.toolbar, props.mode],
+  () => void initEditor(),
+  { deep: true, immediate: true },
+);
 
 watch(
   () => props.mode,
   (next) => {
     editor.value?.setEditable(next === "edit");
   },
-  { immediate: true },
 );
 
 watch(content, (next) => {
@@ -103,7 +123,9 @@ watch(content, (next) => {
 });
 
 onBeforeUnmount(() => {
+  cleanupSystemWatch?.();
   editor.value?.destroy();
+  editor.value = null;
 });
 </script>
 
