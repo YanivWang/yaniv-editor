@@ -20,8 +20,8 @@ const localeLoaders: Record<LocaleCode, () => Promise<LocaleMessages>> = {
 const localeCache = shallowRef<Partial<Record<LocaleCode, LocaleMessages>>>({});
 const loadingLocales = new Map<LocaleCode, Promise<LocaleMessages>>();
 
-/** Bumped after locale messages load so editor UI re-renders translated strings. */
-export const localeGeneration = ref(0);
+/** Internal bump counter so global `t()` re-renders after locale loads; not part of public API. */
+const localeGeneration = ref(0);
 
 const currentLocale = ref<LocaleCode>("zh-CN");
 const customMessages = ref<Record<string, LocaleMessages>>({});

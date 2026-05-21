@@ -30,19 +30,9 @@
 
 #### 3. `registerAppearance()` 全局 API 删除
 
-模块级 `registerAppearance(name, vars)` 已删除（违反多实例隔离原则）。
+模块级 `registerAppearance(name, vars)` 已删除（违反多实例隔离原则）。`YanivEditorExpose` **不**暴露 appearance 实例方法；宿主通过 props 注入自定义外观变量。
 
-**迁移**（二选一）：
-
-```ts
-// 方式 A：通过 expose 的实例方法
-const editorRef = ref<YanivEditorExpose | null>(null);
-editorRef.value?.appearance.registerCustom("mybrand", {
-  "--ye-primary": "#ff00ff",
-});
-
-// 方式 B：通过 props（推荐，响应式）
-```
+**迁移**：
 
 ```vue
 <YanivEditor appearance="custom" :custom-appearance-vars="{ '--ye-primary': '#ff00ff' }" />
@@ -50,9 +40,9 @@ editorRef.value?.appearance.registerCustom("mybrand", {
 
 #### 4. `buildEditorExtensions` / `buildInlineExtensions` / `resolveInlineExtensionGates` 删除
 
-旧的扩展 builder 已删除，统一由 `capabilities/buildExtensions(host, gates, ctx)` 取代。高级集成方如需自定义能力，通过 Capability Registry API 注册。
+旧的扩展 builder 已删除，统一由 `capabilities/buildExtensions(host, ctx)` 取代（`gates` 在 `ctx.gates` 内）。高级集成方如需自定义能力，通过 Capability Registry API 注册。
 
-#### 5. `resolveExtensionGates` / `applyExtensionGatesToToolbarConfig` 删除
+#### 5. `resolveExtensionGates` / `isFeatureEnabled` / `applyExtensionGatesToToolbarConfig` 删除
 
 能力门控逻辑统一收入 Capability Registry，不再对外暴露独立函数。
 
@@ -90,15 +80,17 @@ AI 功能从主包拆出，按需引入：
 import { AiMenuButton, useAiConfig } from "@yanivjs/yaniv-editor/ai";
 ```
 
+主入口不再 `export * from "./features/ai"`。
+
 #### 6. `localeGeneration` 不再 export
 
-旧的 `:key="localeEpoch"` 强制重渲方案已废弃，locale 切换通过 scoped locale + session rebuild 处理。
+旧的 `:key="localeEpoch"` 强制重渲方案已废弃；`localeGeneration` 为 `locales/manager.ts` 模块内部实现。locale 切换通过 scoped locale + session rebuild 处理。
 
 #### 7. Inline 编辑器 schema 容错行为变更
 
 Inline toolbar 关闭某类格式时，外部传入内容中对应的 mark/node 会在解析时**静默丢弃**（保留文字，丢失格式），而非"保留为 `<p>` 段落"。
 
-**影响**：若宿主依赖 Inline 编辑器保留 Full 编辑器写入的格式（如 table、math），改用 Full 编辑器，或显式开启对应 feature。
+**影响**：若宿主依赖 Inline 编辑器保留 Full 编辑器写入的格式（如 table、math），改用 Full 编辑器，或显式开启对应 toolbar slug。
 
 #### 8. capability 关闭后对应节点静默丢失
 
@@ -119,44 +111,74 @@ const { visible } = useOutlinePanel(); // 旧
 const { expanded } = useOutlinePanel(); // 新
 ```
 
-#### 10. `onPhaseChange` 事件新增 `reason` 字段
+#### 10. `PhaseChangeEvent` 新增 `reason` 字段；`from` 可为 `null`
 
-订阅方收到的 `PhaseChangeEvent` 新增 `reason: 'mode-change' | 'ready'` 字段，且 `from` 字段类型从 `EditorPhase` 改为 `EditorPhase | null`（`reason === 'ready'` 时 `from` 为 `null`）。
+`useEditorSession` 派发的 `PhaseChangeEvent` 新增 `reason: 'mode-change' | 'ready'`，且 `from` 类型改为 `EditorPhase | null`（`reason === 'ready'` 时为 `null`）。
 
-**迁移**：
+> **说明**：`onPhaseChange` 由 Session 层（`useEditorSession`）提供，**未**挂到 `YanivEditor` / `YanivInlineEditor` 的组件 expose。宿主切换 edit/preview 请使用 `:mode` prop；仅在 fork 库内 Session 集成或高级封装时订阅此回调。
+
+**迁移**（Session 层订阅方）：
 
 ```ts
-// 旧
-onPhaseChange(({ from, to, editor }) => { ... });
-
-// 新（向前兼容写法）
 onPhaseChange(({ from, to, editor, reason }) => {
-  if (reason === 'ready') return;            // 跳过 session ready 后的初始同步
-  // ... 原逻辑
+  if (reason === "ready") return; // 跳过 session rebuild 后的初始同步
+  // ... 原逻辑；from 可能为 null
 });
 ```
 
-#### 11. Shell / 扩展层禁止直接调用 `editor.setEditable`
+#### 11. 禁止直接调用 `editor.setEditable`；宿主用 `:mode` prop 切换 phase
 
-外部高级集成方若在自定义扩展或封装组件中调用 `editor.setEditable(...)`，需改为：
+Shell 与扩展层禁止直接调 `editor.setEditable`；入口收口至 `useEditorSession.requestPhaseTransition`。`YanivEditorExpose` **不**暴露 `requestPhase` / `getPhase`。
 
-```ts
-// 通过 expose 的实例方法
-editorRef.value?.requestPhase("preview");
+**迁移**（宿主业务代码）：
+
+```vue
+<!-- 旧：editorRef.value?.getEditor()?.setEditable(false) -->
+<YanivEditor :mode="previewMode ? 'preview' : 'edit'" />
 ```
 
-`setEditable` 入口收口至 `useEditorSession.requestPhaseTransition`，保证 buffer / emit 顺序的不变量。
+自定义扩展内若需感知 phase，通过 `ctx.isEditable`（`BuildExtensionsCtx`）或 `filterTransaction` 守卫，**不要**直接 `setEditable`。
 
 ---
 
-### 内部重构（无外部 API 变更，但影响子类化/高级集成）
+### 新增导出（`@yanivjs/yaniv-editor` 主入口）
+
+| 符号                        | 说明                                                    |
+| --------------------------- | ------------------------------------------------------- |
+| `EditorRuntimeProfile`      | Runtime 配置快照类型                                    |
+| `ResolvedChromePolicy`      | Chrome 显隐策略（Full / Inline discriminated union）    |
+| `SessionStatus`             | Session 状态：`idle` \| `loading` \| `ready` \| `error` |
+| `EditorShellHost`           | `'full'` \| `'inline'`                                  |
+| `EditorPhase`               | `'edit'` \| `'preview'`                                 |
+| `ExtensionGates`            | 能力门控对象                                            |
+| `PhaseChangeEvent`          | Phase 切换事件类型                                      |
+| `CapabilityDefinition`      | Registry 能力定义类型                                   |
+| `BuildExtensionsCtx`        | 扩展构建上下文类型                                      |
+| `resolveEditorProfile`      | Preset + features → profile                             |
+| `mergeFeatures`             | Overrides 合并（undefined 不覆盖）                      |
+| `resolveChromePolicy`       | profile + layout + gates → chromePolicy                 |
+| `computeSessionKey`         | Session 重建 key                                        |
+| `resolveInlineGates`        | Inline toolbar → gates                                  |
+| `buildExtensions`           | 统一扩展 builder                                        |
+| `BYPASS_GUARD_META`         | ContentAdapter 绕过守卫 meta（Symbol）                  |
+| `CAPABILITIES`              | 能力 Registry 常量                                      |
+| `applyGatesToToolbarConfig` | Full 工具栏 gate 过滤                                   |
+| `resolveShowInlineToolbar`  | Inline 工具栏是否展示                                   |
+| `ContentAdapter`            | 受控内容 raw dispatch                                   |
+| `applyPhaseTransition`      | Phase 切换顺序规范化                                    |
+
+`@yanivjs/yaniv-editor/inline` 额外导出：`CAPABILITIES`（与主入口同源，供 `resolveShowInlineToolbar(toolbar, CAPABILITIES)` 使用）。
+
+---
+
+### 内部重构（无宿主-facing API 变更，但影响 fork / 高级集成）
 
 - Session 层：`useEditorSession` 取代 `initEditor` + `isInitializing` + `isFirstInit` 并发锁
 - Phase 切换：`applyPhaseTransition` 规范化为"edit→preview: 先 emit 再 setEditable"顺序；Session 层提供 `requestPhaseTransition(nextPhase)` 入口与 buffer 机制（session loading 期间切换会延后到 rebuild 完成）
 - ContentAdapter：所有受控内容写入改用 raw transaction + `BYPASS_GUARD_META`（Symbol），不再使用 `editor.commands.setContent`；新增 `addToHistory` / `source` 选项
 - Locale：各编辑器实例独立 locale context，扩展通过 `ctx.locale` 静态快照读取文案
-- Appearance：`customAppearances` Map 移入实例作用域，多编辑器实例互不影响
-- Outline：scrollParent 改为 late-binding（`editor.commands.bindOutlineScrollParent(el)`），由 Workspace `onMounted` 后注入；解决冷启动时 DOM 未就绪的时序问题
+- Appearance：`customAppearances` Map 移入 `useEditorAppearance` 实例作用域，多编辑器实例互不影响
+- Outline：scrollParent 改为 late-binding（`editor.commands.bindOutlineScrollParent(el)`），由 Workspace `onMounted` 后注入
 - AI 配置：扩展层全部改为 getter 形式（`getApiKey: () => ctx.aiConfig()?.apiKey`），宿主修改 `aiConfig` 后无需重建 session
-- Inline gates：新增 `resolveInlineGates(toolbar, capabilities)` 统一推导，与 Full 的 `profile.features` 路径并存但互不重叠
-- Tiptap 版本绑定：要求 `@tiptap/core ≥ 3.0.0`；`withTransactionGuard` 不再依赖 `this.editor`，改通过 `ctx.isEditable` Ref 注入
+- Inline gates：`resolveInlineGates(toolbar, capabilities)` 为 Inline gates 唯一来源；Full gates 仅由 `profile.features` 推导
+- Tiptap 版本绑定：要求 `@tiptap/core ≥ 3.0.0`；`withTransactionGuard` 位于 `capabilities/transactionGuard.ts`，通过 `ctx.isEditable` Ref 注入

@@ -36,4 +36,19 @@ describe("ContentAdapter", () => {
   test("BYPASS_GUARD_META 是 Symbol", () => {
     expect(typeof BYPASS_GUARD_META).toBe("symbol");
   });
+
+  test("普通业务 commands 在 editable=false 下被守卫拦截", () => {
+    const isEditable = ref(false);
+    const guarded = withTransactionGuard(Extension.create({ name: "guardProbe" }), isEditable);
+
+    editor = new Editor({
+      extensions: [StarterKit, guarded],
+      content: "<p>before</p>",
+    });
+    editor.setEditable(false);
+
+    const before = editor.getJSON();
+    editor.commands.setContent("<p>hi</p>");
+    expect(editor.getJSON()).toEqual(before);
+  });
 });

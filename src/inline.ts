@@ -25,6 +25,7 @@ export type {
 export { provideYanivEditor, useYanivEditor } from "./core/editorContext";
 export { resolveInlineGates } from "./core/runtime/resolveInlineGates";
 export { resolveShowInlineToolbar } from "./capabilities/resolveShowInlineToolbar";
+export { CAPABILITIES } from "./capabilities/registry";
 export { buildExtensions } from "./capabilities/buildExtensions";
 export type { EditorShellHost, ExtensionGates } from "./core/runtime/types";
 

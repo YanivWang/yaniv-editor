@@ -228,10 +228,10 @@ Shell 模板通过 `policy.host === 'full'` narrowing 后才能访问 host-speci
 
 > **澄清**：DragHandle / SlashCommand 完成操作时**也会**派发 docChanged 事务（节点移动、块插入），事务守卫并非"无效"，而是 UX 较差（用户看到 ghost 但松手被吞）；事件入口短路负责 UX，事务守卫负责正确性。两层都不可省。
 
-**事务兜底实现**：
+**事务兜底实现**（`capabilities/transactionGuard.ts`，由 `buildExtensions` 对 `interaction` tier 调用）：
 
 ```ts
-// buildExtensions.ts 内部
+// capabilities/transactionGuard.ts
 import { Plugin } from "@tiptap/pm/state";
 
 /**
@@ -602,7 +602,7 @@ async function rebuild() {
   const myGen = ++generation;
   status.value = 'loading';
 
-  const extensions = await buildExtensions(host, gates, ctx);
+  const extensions = await buildExtensions(host, ctx);
   if (disposed || myGen !== generation) return;  // ← 双重检查
 
   // 使用快照内容（sessionKey 变化前已在 pre flush 阶段快照）
@@ -710,7 +710,7 @@ flowchart TB
   EditorShell --> runtime["provideEditorRuntime"]
   EditorShell --> editor["provideYanivEditor"]
   EditorShell --> appearance["useEditorAppearance (实例作用域)"]
-  EditorShell --> ai["useEditorAiHost"]
+  EditorShell --> ai["useYanivAiConfig"]
   EditorShell --> blockHost["provideBlockMenuHost"]
   EditorShell --> locale["provideEditorLocale"]
   EditorShell --> outline["provideOutlinePanel ← 必须在根"]
@@ -792,18 +792,28 @@ rg "host\.registerInstance\(null\)" src/components/tools/block-menu/
 // capabilities/buildExtensions.ts
 async function buildExtensions(
   host: EditorShellHost,
-  gates: ExtensionGates,
   ctx: BuildExtensionsCtx,
-): Promise<AnyExtension[]> {
-  const enabled = CAPABILITIES.filter((c) => !c.featureKey || gates[c.featureKey])
-    .filter((c) => (host === "inline" ? !!c.inlineToolbarSlugs?.length : true))
+): Promise<Extension[]> {
+  const enabled = CAPABILITIES.filter((c) =>
+    host === "inline" ? c.id.startsWith("inline-") : !c.id.startsWith("inline-"),
+  )
+    .filter((c) => {
+      if (host === "inline") {
+        if (c.inlineAlways) return true;
+        if (c.id === "inline-placeholder") return !!ctx.inlinePlaceholder;
+        if (!c.inlineToolbarSlugs?.length) return false;
+        return c.inlineToolbarSlugs.some((slug) => ctx.gates[slug] === true);
+      }
+      if (!c.featureKey) return true;
+      return ctx.gates[c.featureKey] === true;
+    })
     .sort((a, b) => a.order - b.order);
 
-  const result: AnyExtension[] = [];
+  const result: Extension[] = [];
   for (const cap of enabled) {
     const exts = await cap.extensions(ctx);
     if (cap.tier === "interaction") {
-      result.push(...exts.map(withTransactionGuard));
+      result.push(...exts.map((ext) => withTransactionGuard(ext, ctx.isEditable)));
     } else {
       result.push(...exts);
     }
@@ -1038,14 +1048,13 @@ function useEditorAppearance(options: UseEditorAppearanceOptions): UseEditorAppe
 
 > **Breaking**：模块级 `registerAppearance(name, vars)` 函数从公共 API 删除（违反实例隔离原则）。
 >
-> **迁移方式**：通过 `defineExpose` 暴露 `appearance.registerCustom(name, vars)` 实例方法，或通过 props 注入：
+> **迁移方式**（宿主 public API）：通过 props 注入自定义 CSS 变量；`YanivEditorExpose` 不暴露 appearance 方法：
 >
 > ```vue
-> <YanivEditor
->   :appearance="'custom'"
->   :custom-appearance-vars="{ '--ye-primary': '#ff00ff', ... }"
-> />
+> <YanivEditor appearance="custom" :custom-appearance-vars="{ '--ye-primary': '#6366f1' }" />
 > ```
+>
+> `useEditorAppearance` 返回的 `registerCustomAppearance` 仅供 Shell 内部 / fork 集成，非组件 expose。
 >
 > 详见 `CHANGELOG.md` 迁移指引。
 
@@ -1090,18 +1099,21 @@ Inline 编辑器 schema 是 Full 的子集。外部传入内容包含 Inline 不
 ```
 src/core/
   runtime/           resolveEditorProfile, resolveChromePolicy, computeSessionKey,
-                     mergeFeatures, useEditorRuntime
+                     mergeFeatures, resolveInlineGates, useEditorRuntime
   session/           useEditorSession, applyPhaseTransition, contentAdapter
-  shell/             EditorShell, EditChrome, Workspace, StatusChrome, chromeRegistry,
-                     useBlockMenuHost
-  infra/             useEditorAiHost, useEditorLocale
+  shell/             EditorShell, EditChrome, Workspace, StatusChrome, useBlockMenuHost
+  infra/             useEditorLocale
+  useYanivAiConfig.ts
   YanivEditor.vue
   YanivInlineEditor.vue
 src/capabilities/
   registry.ts
   buildExtensions.ts
+  transactionGuard.ts
+  applyGatesToToolbarConfig.ts
+  resolveShowInlineToolbar.ts
 src/locales/
-  manager.ts         加载 + EditorLocaleContext
+  manager.ts         加载 + scoped locale（`localeGeneration` 为模块内部实现，不 export）
 src/appearance/
   useEditorAppearance.ts   (实例作用域，含 registerCustomAppearance)
   applyAppearance.ts       (纯函数，无模块级单例)
@@ -1111,31 +1123,31 @@ src/appearance/
 
 ## Public API（Breaking）
 
-| 变更                       | 说明                                                                                                                    |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `@yanivjs/yaniv-editor/ai` | AI 从主入口拆出                                                                                                         |
-| 删除                       | 主入口 `export * from "./features/ai"`                                                                                  |
-| 删除                       | `resolveExtensionGates` / `isFeatureEnabled` / `applyExtensionGatesToToolbarConfig` 或改为 registry API                 |
-| 删除                       | `buildEditorExtensions`（旧 Full builder）→ 由 `capabilities/buildExtensions` 取代                                      |
-| 删除                       | `buildInlineExtensions` / `resolveInlineExtensionGates` / `hasInlineToolbarItems`（旧 Inline builder）→ 统一入 registry |
-| 删除                       | `registerAppearance`（模块级全局 API）→ 改为实例方法 `editor.appearance.registerCustom(name, vars)`                     |
-| 不再 export                | `localeGeneration`（旧 `:key="localeEpoch"` 已废，无需外部读取）                                                        |
-| 新增导出                   | `EditorRuntimeProfile`、`ResolvedChromePolicy`、`SessionStatus`、`EditorShellHost`                                      |
-| **CSS Breaking**           | 删除 `.is-preview` class，外部宿主如有基于 `.is-preview` 的自定义样式覆盖，须迁移到 `[data-phase="preview"]` 选择器     |
-| **Preset Breaking**        | `basic` 默认能力收紧（去掉 `table` / `video`），详见"Preset 默认能力映射"章节                                           |
-| **Capability Breaking**    | 关闭 capability 后内容中对应节点静默丢失（如关闭 table 后 JSON 中 table 节点丢失）                                      |
-| **Inline schema Breaking** | Inline toolbar 关闭某格式 = 对应 mark/node 不被保留，不再"序列化为 `<p>`"                                               |
+| 变更                       | 说明                                                                                                                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@yanivjs/yaniv-editor/ai` | AI 从主入口拆出                                                                                                                                                                 |
+| 删除                       | 主入口 `export * from "./features/ai"`                                                                                                                                          |
+| 删除                       | `resolveExtensionGates` / `isFeatureEnabled` / `applyExtensionGatesToToolbarConfig` 或改为 registry API                                                                         |
+| 删除                       | `buildEditorExtensions`（旧 Full builder）→ 由 `capabilities/buildExtensions` 取代                                                                                              |
+| 删除                       | `buildInlineExtensions` / `resolveInlineExtensionGates` / `hasInlineToolbarItems`（旧 Inline builder）→ 统一入 registry                                                         |
+| 删除                       | `registerAppearance`（模块级全局 API）→ 改为 `:custom-appearance-vars` prop（见 CHANGELOG #3）                                                                                  |
+| 不再 export                | `localeGeneration`（旧 `:key="localeEpoch"` 已废，无需外部读取）                                                                                                                |
+| 新增导出                   | 见 `CHANGELOG.md`「新增导出」：`EditorRuntimeProfile`、`ResolvedChromePolicy`、`SessionStatus`、`EditorShellHost`、`resolveEditorProfile`、`buildExtensions`、`CAPABILITIES` 等 |
+| **CSS Breaking**           | 删除 `.is-preview` class，外部宿主如有基于 `.is-preview` 的自定义样式覆盖，须迁移到 `[data-phase="preview"]` 选择器                                                             |
+| **Preset Breaking**        | `basic` 默认能力收紧（去掉 `table` / `video`），详见"Preset 默认能力映射"章节                                                                                                   |
+| **Capability Breaking**    | 关闭 capability 后内容中对应节点静默丢失（如关闭 table 后 JSON 中 table 节点丢失）                                                                                              |
+| **Inline schema Breaking** | Inline toolbar 关闭某格式 = 对应 mark/node 不被保留，不再"序列化为 `<p>`"                                                                                                       |
 
 同步更新：`package.json` exports、`vite.config.ts` 多入口、`CHANGELOG.md`。
 
 > **CHANGELOG 迁移指引**（必须包含）：
 >
 > 1. `.is-preview .my-class { ... }` → `[data-phase="preview"] .my-class { ... }`
-> 2. `registerAppearance('mybrand', vars)` → `editorRef.value?.appearance.registerCustom('mybrand', vars)`
+> 2. `registerAppearance('mybrand', vars)` → `<YanivEditor appearance="custom" :custom-appearance-vars="vars" />`
 > 3. `basic` preset 不再默认开启 `table`/`video`，需显式 `:features="{ table: true, video: true }"`
 > 4. Inline 编辑器内容中不支持的 mark/node 会在解析时丢弃（非保留为 `<p>`）
 > 5. `outlinePanel.visible` → `outlinePanel.expanded`（API rename，无行为变更，默认仍为 `true`）
-> 6. 通过 `editorRef.value?.getPhase()` / `onPhaseChange` 订阅的事件新增 `reason: 'mode-change' | 'ready'` 字段，旧订阅代码需兼容 `from` 可能为 `null`
+> 6. Session 层 `PhaseChangeEvent` 新增 `reason: 'mode-change' | 'ready'` 且 `from` 可能为 `null`；宿主切换 phase 用 `:mode` prop（`YanivEditorExpose` 不暴露 `getPhase` / `onPhaseChange`）
 
 ### 内部 `.is-preview` 样式迁移
 
@@ -1216,6 +1228,15 @@ src/appearance/
 11. verify-no-tails grep + 验收清单
 
 ### 最小测试集（步骤 3 必须覆盖）
+
+实现文件：
+
+| 组                                   | 文件                                            |
+| ------------------------------------ | ----------------------------------------------- |
+| 1–5 runtime 纯函数                   | `src/core/runtime/runtime.test.ts`              |
+| 6–7 ContentAdapter + 守卫            | `src/core/session/contentAdapter.test.ts`       |
+| 8 applyPhaseTransition 顺序          | `src/core/session/applyPhaseTransition.test.ts` |
+| 9–10 Session buffer / 竞态 / dispose | `src/core/session/useEditorSession.test.ts`     |
 
 ```ts
 // 1. resolveEditorProfile：三个 preset × override 合并表
