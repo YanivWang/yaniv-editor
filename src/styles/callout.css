@@ -1,0 +1,108 @@
+/* Callout block */
+.callout-block {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px 16px 16px 12px;
+  margin: 4px 0;
+  border-radius: 4px;
+}
+
+.callout-block__icon {
+  flex-shrink: 0;
+  width: 24px;
+  font-size: 20px;
+  line-height: 1.4;
+  text-align: center;
+  user-select: none;
+}
+
+.callout-block__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.callout-block__content > :first-child {
+  margin-top: 0;
+}
+
+.callout-block__content > :last-child {
+  margin-bottom: 0;
+}
+
+.callout-block[data-color="default"] {
+  background: rgba(241, 241, 239, 0.65);
+}
+
+.callout-block[data-color="gray"] {
+  background: rgba(241, 241, 239, 0.65);
+}
+
+.callout-block[data-color="brown"] {
+  background: rgba(244, 238, 238, 0.65);
+}
+
+.callout-block[data-color="orange"] {
+  background: rgba(251, 236, 221, 0.65);
+}
+
+.callout-block[data-color="yellow"] {
+  background: rgba(251, 243, 219, 0.65);
+}
+
+.callout-block[data-color="green"] {
+  background: rgba(237, 243, 236, 0.65);
+}
+
+.callout-block[data-color="blue"] {
+  background: rgba(231, 243, 248, 0.65);
+}
+
+.callout-block[data-color="purple"] {
+  background: rgba(244, 240, 247, 0.65);
+}
+
+.callout-block[data-color="pink"] {
+  background: rgba(249, 238, 243, 0.65);
+}
+
+.callout-block[data-color="red"] {
+  background: rgba(253, 235, 236, 0.65);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="default"],
+[data-color-mode="dark"] .callout-block[data-color="gray"] {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="brown"] {
+  background: rgba(159, 107, 83, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="orange"] {
+  background: rgba(217, 115, 13, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="yellow"] {
+  background: rgba(203, 145, 47, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="green"] {
+  background: rgba(68, 131, 97, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="blue"] {
+  background: rgba(51, 126, 169, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="purple"] {
+  background: rgba(144, 101, 176, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="pink"] {
+  background: rgba(193, 76, 138, 0.2);
+}
+
+[data-color-mode="dark"] .callout-block[data-color="red"] {
+  background: rgba(212, 76, 71, 0.2);
+}

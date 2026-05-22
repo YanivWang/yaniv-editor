@@ -18,6 +18,8 @@
 
   <FloatingMenu v-if="uiFlags.floatingMenu && editor" :show-ai="profile.gates.ai" />
 
+  <MentionSuggestionMenu v-if="profile.gates.slashCommand && editor" />
+
   <BlockPickerMenu
     v-if="chrome.showBlockPicker && editor"
     :features="profile.gates"
@@ -33,6 +35,7 @@ import { FloatingMenu } from "@/components/tools/floating-menu";
 import { ToolbarNav } from "@/components/tools/header-nav";
 import { ImageToolbar } from "@/components/tools/image-toolbar";
 import { LinkBubbleMenu } from "@/components/tools/link-bubble";
+import { MentionSuggestionMenu } from "@/components/tools/mention-suggestion";
 import { TableToolbar } from "@/components/tools/table-toolbar";
 import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { useYanivEditor } from "@/core/editorContext";

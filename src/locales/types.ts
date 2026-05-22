@@ -277,6 +277,7 @@ export interface TiptapLocale {
     noResults: string;
     basicBlocks: string;
     lists: string;
+    notionBlocks: string;
     advanced: string;
     paragraph: string;
     paragraphDesc: string;
@@ -292,6 +293,18 @@ export interface TiptapLocale {
     orderedListDesc: string;
     taskList: string;
     taskListDesc: string;
+    toggleBlock: string;
+    toggleBlockDesc: string;
+    callout: string;
+    calloutDesc: string;
+    columnLayout: string;
+    columnLayoutDesc: string;
+    embed: string;
+    embedDesc: string;
+    embedUrlPrompt: string;
+    mention: string;
+    mentionDesc: string;
+    mentionNoResults: string;
     blockquote: string;
     blockquoteDesc: string;
     codeBlock: string;

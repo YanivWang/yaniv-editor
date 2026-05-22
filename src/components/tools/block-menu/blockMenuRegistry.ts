@@ -1,21 +1,27 @@
 import {
   CheckSquareOutlined,
   CodeOutlined,
+  ColumnWidthOutlined,
   FileTextOutlined,
   FontSizeOutlined,
   FunctionOutlined,
+  InfoCircleOutlined,
   LineOutlined,
+  LinkOutlined,
   MinusOutlined,
   OrderedListOutlined,
   PictureOutlined,
+  RightOutlined,
   TableOutlined,
   UnorderedListOutlined,
+  UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons-vue";
 
 import type { ExtensionGates } from "@/core/runtime/types";
 
 import type { BlockMenuGroupDef, BlockMenuGroupId, BlockMenuItemId } from "./types";
+import type { Schema } from "@tiptap/pm/model";
 import type { Component } from "vue";
 
 export type BlockMenuFeatureGates = Pick<ExtensionGates, "table" | "image" | "video" | "math">;
@@ -87,6 +93,46 @@ const BLOCK_MENU_ITEMS: BlockMenuItemSource[] = [
     keywords: ["task", "todo", "checklist", "任务列表", "待办", "checkbox"],
   },
   {
+    id: "toggleBlock",
+    group: "notionBlocks",
+    titleKey: "toggleBlock",
+    descKey: "toggleBlockDesc",
+    icon: RightOutlined,
+    keywords: ["toggle", "collapse", "折叠", "toggle list"],
+  },
+  {
+    id: "callout",
+    group: "notionBlocks",
+    titleKey: "callout",
+    descKey: "calloutDesc",
+    icon: InfoCircleOutlined,
+    keywords: ["callout", "alert", "标注", "提示"],
+  },
+  {
+    id: "columnLayout",
+    group: "notionBlocks",
+    titleKey: "columnLayout",
+    descKey: "columnLayoutDesc",
+    icon: ColumnWidthOutlined,
+    keywords: ["column", "columns", "分栏", "layout"],
+  },
+  {
+    id: "embed",
+    group: "notionBlocks",
+    titleKey: "embed",
+    descKey: "embedDesc",
+    icon: LinkOutlined,
+    keywords: ["embed", "bookmark", "link", "嵌入", "书签"],
+  },
+  {
+    id: "mention",
+    group: "notionBlocks",
+    titleKey: "mention",
+    descKey: "mentionDesc",
+    icon: UserOutlined,
+    keywords: ["mention", "page", "@", "提及", "页面链接"],
+  },
+  {
     id: "blockquote",
     group: "advanced",
     titleKey: "blockquote",
@@ -144,11 +190,12 @@ const BLOCK_MENU_ITEMS: BlockMenuItemSource[] = [
   },
 ];
 
-const GROUP_ORDER: BlockMenuGroupId[] = ["basicBlocks", "lists", "advanced"];
+const GROUP_ORDER: BlockMenuGroupId[] = ["basicBlocks", "lists", "notionBlocks", "advanced"];
 
 const GROUP_TITLE_KEYS: Record<BlockMenuGroupId, string> = {
   basicBlocks: "slashCommand.basicBlocks",
   lists: "slashCommand.lists",
+  notionBlocks: "slashCommand.notionBlocks",
   advanced: "slashCommand.advanced",
 };
 
@@ -159,20 +206,38 @@ const FEATURE_REQUIREMENTS: Partial<Record<BlockMenuItemId, keyof BlockMenuFeatu
   math: "math",
 };
 
-function isBlockMenuItemAvailable(item: BlockMenuItemSource, gates?: BlockMenuFeatureGates) {
+const NODE_REQUIREMENTS: Partial<Record<BlockMenuItemId, string>> = {
+  toggleBlock: "toggleBlock",
+  callout: "callout",
+  columnLayout: "columnLayout",
+  embed: "embed",
+  mention: "mention",
+};
+
+function isBlockMenuItemAvailable(
+  item: BlockMenuItemSource,
+  gates?: BlockMenuFeatureGates,
+  schema?: Schema,
+) {
   const requiredFeature = FEATURE_REQUIREMENTS[item.id];
-  return !requiredFeature || gates?.[requiredFeature] === true;
+  if (requiredFeature && gates?.[requiredFeature] !== true) return false;
+
+  const requiredNode = NODE_REQUIREMENTS[item.id];
+  if (requiredNode && schema && !schema.nodes[requiredNode]) return false;
+
+  return true;
 }
 
 export function getBlockMenuGroups(
   gates: BlockMenuFeatureGates | undefined,
   translate: (key: string) => string,
+  schema?: Schema,
 ): BlockMenuGroupDef[] {
   return GROUP_ORDER.map((groupId) => ({
     id: groupId,
     title: translate(GROUP_TITLE_KEYS[groupId]),
     items: BLOCK_MENU_ITEMS.filter(
-      (item) => item.group === groupId && isBlockMenuItemAvailable(item, gates),
+      (item) => item.group === groupId && isBlockMenuItemAvailable(item, gates, schema),
     ).map((item) => ({
       id: item.id,
       group: item.group,
@@ -181,5 +246,5 @@ export function getBlockMenuGroups(
       icon: item.icon,
       keywords: [...item.keywords],
     })),
-  }));
+  })).filter((group) => group.items.length > 0);
 }

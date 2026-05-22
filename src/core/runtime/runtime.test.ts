@@ -45,10 +45,17 @@ describe("resolveEditorProfile", () => {
     expect(gates.dragHandle).toBe(false);
   });
 
-  test("notion preset 默认开启块编辑能力", () => {
+  test("notion preset 默认开启块编辑与文档能力（formatPainter 除外）", () => {
     const gates = resolveEditorProfile({ preset: "notion" }).gates;
     expect(gates.slashCommand).toBe(true);
     expect(gates.dragHandle).toBe(true);
+    expect(gates.video).toBe(true);
+    expect(gates.math).toBe(true);
+    expect(gates.outline).toBe(true);
+    expect(gates.searchReplace).toBe(true);
+    expect(gates.officePaste).toBe(true);
+    expect(gates.ai).toBe(true);
+    expect(gates.formatPainter).toBe(false);
   });
 });
 

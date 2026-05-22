@@ -1,0 +1,26 @@
+/* Notion-style block hover highlight (appearance-notion only) */
+.yaniv-editor.appearance-notion .ProseMirror > * {
+  border-radius: 3px;
+  transition: background 0.1s ease;
+}
+
+.yaniv-editor.appearance-notion .ProseMirror > *:hover {
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-notion .ProseMirror > .column-layout:hover,
+.yaniv-editor.appearance-notion .ProseMirror > .toggle-block:hover,
+.yaniv-editor.appearance-notion .ProseMirror > .callout-block:hover,
+.yaniv-editor.appearance-notion .ProseMirror > .embed-block:hover {
+  background: transparent;
+}
+
+.yaniv-editor.appearance-notion .ProseMirror > .column-layout > .column-block:hover,
+.yaniv-editor.appearance-notion .ProseMirror > .toggle-block .toggle-block__content > *:hover,
+.yaniv-editor.appearance-notion .ProseMirror > .callout-block .callout-block__content > *:hover {
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror > *:hover {
+  background: var(--ye-bg-hover);
+}

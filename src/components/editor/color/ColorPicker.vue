@@ -63,7 +63,7 @@
           <div class="ye-color-picker-section-title">{{ t("editor.defaultColors") }}</div>
           <div class="ye-color-picker-grid" :style="gridStyle">
             <button
-              v-for="color in DEFAULT_COLORS"
+              v-for="color in activeColors"
               :key="color"
               :class="[
                 'ye-color-picker__item',
@@ -72,7 +72,7 @@
               :style="{
                 width: `${props.itemSize}px`,
                 height: `${props.itemSize}px`,
-                backgroundColor: color,
+                backgroundColor: color === 'transparent' ? '#fff' : color,
               }"
               type="button"
               :title="color"
@@ -82,7 +82,7 @@
         </div>
 
         <!-- 标准色 -->
-        <div class="ye-color-picker-section">
+        <div v-if="showStandardColors" class="ye-color-picker-section">
           <div class="ye-color-picker-section-title">{{ t("editor.standardColors") }}</div>
           <div class="ye-color-picker-grid" :style="standardGridStyle">
             <button
@@ -163,6 +163,12 @@ import { StopOutlined } from "@ant-design/icons-vue";
 import { Popover, Tooltip } from "ant-design-vue";
 import { ref, computed, watch } from "vue";
 
+import {
+  NOTION_BACKGROUND_COLORS,
+  NOTION_DEFAULT_HIGHLIGHT,
+  NOTION_DEFAULT_TEXT,
+  NOTION_TEXT_COLORS,
+} from "@/appearance/notionColors";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { normalizeColor } from "@/utils/color";
 
@@ -188,6 +194,8 @@ interface Props {
   type?: "text" | "background";
   /** 按钮标题（tooltip 显示文本，可选，默认根据 type 自动生成） */
   title?: string;
+  /** 色板方案：office（默认）| notion */
+  palette?: "office" | "notion";
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -198,6 +206,7 @@ const props = withDefaults(defineProps<Props>(), {
   icon: undefined,
   type: "text",
   title: undefined,
+  palette: "office",
 });
 
 /**
@@ -284,6 +293,17 @@ const DEFAULT_COLORS = [
   "#330066",
   "#cc0033",
 ] as const;
+
+const activeColors = computed(() => {
+  if (props.palette !== "notion") {
+    return props.type === "text" ? DEFAULT_COLORS : DEFAULT_COLORS;
+  }
+  return props.type === "text" ? NOTION_TEXT_COLORS : NOTION_BACKGROUND_COLORS;
+});
+
+const activeColumns = computed(() => (props.palette === "notion" ? 10 : props.columns));
+
+const showStandardColors = computed(() => props.palette !== "notion");
 
 /**
  * 标准颜色列表（10个标准色）
@@ -393,7 +413,7 @@ const indicatorBarStyle = computed(() => {
  * 生成: { gridTemplateColumns: 'repeat(10, 20px)' }
  */
 const gridStyle = computed(() => ({
-  gridTemplateColumns: `repeat(${props.columns}, ${props.itemSize}px)`,
+  gridTemplateColumns: `repeat(${activeColumns.value}, ${props.itemSize}px)`,
 }));
 
 /**
@@ -450,7 +470,11 @@ const handleSelectColor = (color: string) => {
  *   - background: 恢复为透明 'transparent'
  */
 const clearColor = () => {
-  updateColor(props.type === "text" ? "#000000" : "transparent");
+  if (props.type === "text") {
+    updateColor(props.palette === "notion" ? NOTION_DEFAULT_TEXT : "#000000");
+    return;
+  }
+  updateColor(props.palette === "notion" ? NOTION_DEFAULT_HIGHLIGHT : "transparent");
 };
 
 /**

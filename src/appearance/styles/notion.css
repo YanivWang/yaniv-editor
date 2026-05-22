@@ -863,3 +863,145 @@
   color: #ff7369;
   background: rgb(255 115 105 / 12%);
 }
+
+/* ===== Notion 移动端 padding ===== */
+@media (width <= 768px) {
+  .yaniv-editor.appearance-notion {
+    --ye-doc-page-padding: 0 24px;
+    --ye-doc-padding-top: 24px;
+    --ye-doc-padding-bottom: 72px;
+  }
+}
+
+@media (width <= 480px) {
+  .yaniv-editor.appearance-notion {
+    --ye-doc-page-padding: 0 16px;
+  }
+}
+
+/* ===== Notion 大纲面板 ===== */
+.yaniv-editor.appearance-notion .outline-panel {
+  color: var(--ye-text);
+  background: var(--ye-bubble-bg);
+  border-right: var(--ye-border-width) solid var(--ye-border);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.yaniv-editor.appearance-notion .outline-panel--top-right {
+  border-right: none;
+  border-left: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__header {
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__title {
+  color: var(--ye-text);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__close {
+  color: var(--ye-text-secondary);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__close:hover {
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__item {
+  color: var(--ye-text-secondary);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__item:hover,
+.yaniv-editor.appearance-notion .outline-panel__item.is-active {
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-notion .outline-panel__empty {
+  color: var(--ye-text-muted);
+}
+
+/* ===== Notion 图片/表格工具条（含 tippy 挂载到 body 的情况） ===== */
+.yaniv-editor.appearance-notion .image-bubble-menu,
+.yaniv-editor.appearance-notion .table-bubble-menu,
+.image-bubble-menu.appearance-notion,
+.table-bubble-menu.appearance-notion {
+  padding: 2px;
+  background: var(--ye-bubble-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.yaniv-editor.appearance-notion .image-menu-btn,
+.yaniv-editor.appearance-notion .table-menu-btn,
+.image-bubble-menu.appearance-notion .image-menu-btn,
+.table-bubble-menu.appearance-notion .table-menu-btn {
+  color: var(--ye-text);
+  border-radius: 4px;
+}
+
+.yaniv-editor.appearance-notion .image-menu-btn:hover,
+.yaniv-editor.appearance-notion .table-menu-btn:hover:not(:disabled),
+.image-bubble-menu.appearance-notion .image-menu-btn:hover,
+.table-bubble-menu.appearance-notion .table-menu-btn:hover:not(:disabled) {
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-notion .image-menu-btn.active,
+.image-bubble-menu.appearance-notion .image-menu-btn.active {
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
+}
+
+.yaniv-editor.appearance-notion .ProseMirror img:hover,
+.yaniv-editor.appearance-notion .ProseMirror img[data-selected] {
+  outline-color: var(--ye-primary);
+}
+
+.yaniv-editor.appearance-notion .ProseMirror .video-wrapper:hover video,
+.yaniv-editor.appearance-notion .ProseMirror .video-wrapper.ProseMirror-selectednode video {
+  outline-color: var(--ye-primary);
+}
+
+/* ===== Notion 查找替换弹窗 ===== */
+.yaniv-find-replace-modal .ant-modal-content {
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.yaniv-find-replace-modal .ant-modal-header {
+  background: transparent;
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-find-replace-modal .ant-modal-title {
+  color: var(--ye-text);
+}
+
+.yaniv-find-replace-modal .ant-input,
+.yaniv-find-replace-modal .ant-checkbox-wrapper {
+  color: var(--ye-text);
+}
+
+/* ===== Notion @ 提及菜单 ===== */
+.mention-suggestion-menu.appearance-notion {
+  color: var(--ye-text);
+  background: var(--ye-bubble-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.mention-suggestion-menu.appearance-notion .mention-suggestion-menu__item:hover,
+.mention-suggestion-menu.appearance-notion .mention-suggestion-menu__item.is-active {
+  background: var(--ye-bg-hover);
+}
+
+.mention-suggestion-menu.appearance-notion[data-color-mode="dark"] {
+  box-shadow: var(--ye-bubble-shadow);
+}

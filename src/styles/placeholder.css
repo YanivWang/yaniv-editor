@@ -27,3 +27,33 @@
 .ProseMirror pre.is-empty::before {
   color: var(--ye-placeholder-color);
 }
+
+/* Notion custom blocks: placeholder decoration is on the container node */
+.ProseMirror .toggle-block.is-empty,
+.ProseMirror .callout-block.is-empty,
+.ProseMirror .column-layout.is-empty {
+  position: relative;
+}
+
+.ProseMirror .toggle-block.is-empty::before,
+.ProseMirror .callout-block.is-empty::before,
+.ProseMirror .column-layout.is-empty::before {
+  position: absolute;
+  top: 0;
+  height: 0;
+  color: var(--ye-placeholder-color);
+  pointer-events: none;
+  content: attr(data-placeholder);
+}
+
+.ProseMirror .toggle-block.is-empty::before {
+  left: 28px;
+}
+
+.ProseMirror .callout-block.is-empty::before {
+  left: 44px;
+}
+
+.ProseMirror .column-layout.is-empty::before {
+  left: 0;
+}

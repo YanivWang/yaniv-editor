@@ -6,6 +6,7 @@
     :footer="null"
     destroy-on-close
     width="480px"
+    :wrap-class-name="modalWrapClass"
     @cancel="onClose"
     @after-open-change="onAfterOpenChange"
   >
@@ -44,8 +45,9 @@
  */
 import { SearchOutlined } from "@ant-design/icons-vue";
 import { Modal, Input, Button, Checkbox, Space } from "ant-design-vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
+import { useInjectEditorAppearance } from "@/appearance";
 import { ToolbarButton } from "@/components/base";
 import { useFindReplaceHotkey } from "@/composables/useFindReplaceHotkey";
 import { useYanivEditor } from "@/core/editorContext";
@@ -54,6 +56,10 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const appearanceCtx = useInjectEditorAppearance();
+const modalWrapClass = computed(() =>
+  appearanceCtx?.appearance.value === "notion" ? "yaniv-find-replace-modal" : undefined,
+);
 
 interface Props {
   editor?: Editor | null;

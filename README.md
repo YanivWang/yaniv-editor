@@ -80,7 +80,7 @@ To keep the old basic behavior with table and video:
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
 ```
 
-`notion` focuses on block editing with table, image, slash command, and drag handle. It uses floating/block interactions and does not show the fixed top toolbar or footer.
+`notion` focuses on block editing (slash command, drag handle) plus video, math, outline, find/replace, Office paste, and AI. Format painter stays off. It uses floating/block interactions and does not show the fixed top toolbar or footer.
 
 ## Preview Behavior
 

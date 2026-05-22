@@ -16,13 +16,18 @@ import { Underline } from "@tiptap/extension-underline";
 import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 
+import { Callout } from "@/extensions/callout";
 import { codeBlockLowlightExtension } from "@/extensions/codeBlockLowlight";
+import { Column, ColumnLayout } from "@/extensions/column";
 import { DragHandleExtension } from "@/extensions/dragHandle";
+import { Embed } from "@/extensions/embed";
 import { FontSize } from "@/extensions/fontSize";
 import { FormatPainter } from "@/extensions/formatPainter";
 import { LineHeight } from "@/extensions/lineHeight";
 import { createLinkExtension } from "@/extensions/linkExtension";
 import { ListShortcuts } from "@/extensions/listShortcuts";
+import { NotionMarkdownInput } from "@/extensions/markdownInput/NotionMarkdownInput";
+import { Mention } from "@/extensions/mention";
 import { OfficePaste } from "@/extensions/office-paste";
 import {
   OutlineScrollParentBinder,
@@ -33,6 +38,7 @@ import { ResizableImage } from "@/extensions/resizableImage";
 import { SearchReplace } from "@/extensions/search-replace";
 import { SlashCommandExtension } from "@/extensions/slashCommand";
 import { TableCellWithBackground } from "@/extensions/table/TableCellWithBackground";
+import { ToggleBlock } from "@/extensions/toggle";
 import { Video } from "@/extensions/video";
 import { YanivPlaceholder } from "@/extensions/yanivPlaceholder";
 import {
@@ -219,6 +225,22 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         TranslationExtension.configure(aiOpts),
       ];
     },
+  },
+  {
+    id: "notionBlocks",
+    tier: "content",
+    order: 115,
+    featureKey: "slashCommand",
+    schemaSignature: (profile) => (profile.gates.slashCommand ? "notionBlocks" : ""),
+    extensions: () => [
+      ToggleBlock,
+      Callout,
+      Column,
+      ColumnLayout,
+      Embed,
+      Mention,
+      NotionMarkdownInput,
+    ],
   },
   {
     id: "dragHandle",

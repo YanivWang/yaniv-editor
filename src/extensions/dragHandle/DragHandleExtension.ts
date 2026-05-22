@@ -73,13 +73,20 @@ const DRAGGABLE_NODE_TYPES = new Set([
   "codeBlock",
   "orderedList",
   "bulletList",
+  "taskList",
   "table",
   "image",
   "video",
+  "horizontalRule",
+  "math",
+  "toggleBlock",
+  "callout",
+  "columnLayout",
+  "embed",
 ]);
 
-const MEDIA_NODE_TYPES = new Set(["image", "video"]);
-const LIST_NODE_TYPES = new Set(["orderedList", "bulletList"]);
+const MEDIA_NODE_TYPES = new Set(["image", "video", "embed"]);
+const LIST_NODE_TYPES = new Set(["orderedList", "bulletList", "taskList"]);
 
 interface DragTarget {
   node: ProseMirrorNode;
@@ -201,7 +208,7 @@ function findMediaTarget(view: EditorView, event: MouseEvent): DragTarget | null
   if (!target) return null;
 
   const mediaWrapper = target.closest<HTMLElement>(
-    ".resizable-image-wrapper, .video-wrapper, img, video",
+    ".resizable-image-wrapper, .video-wrapper, .embed-wrapper, .embed-block, img, video",
   );
 
   if (!mediaWrapper || !view.dom.contains(mediaWrapper)) return null;
@@ -492,6 +499,33 @@ function createTransformItems(
       id: "codeBlock",
       slashKey: "codeBlock",
       run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
+    },
+    {
+      id: "toggleBlock",
+      slashKey: "toggleBlock",
+      run: () =>
+        replaceTargetNode(
+          view,
+          target,
+          schema.nodes.toggleBlock
+            ? schema.nodes.toggleBlock.create({ open: true }, createParagraph(schema, text))
+            : createParagraph(schema, text),
+        ),
+    },
+    {
+      id: "callout",
+      slashKey: "callout",
+      run: () =>
+        replaceTargetNode(
+          view,
+          target,
+          schema.nodes.callout
+            ? schema.nodes.callout.create(
+                { icon: "💡", color: "default" },
+                createParagraph(schema, text),
+              )
+            : createBlockquote(schema, text),
+        ),
     },
   ];
 

@@ -5,6 +5,8 @@
     :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
     :should-show="shouldShow"
     class="table-bubble-menu"
+    :class="appearanceClass"
+    :data-color-mode="resolvedColorMode"
   >
     <div class="table-menu-content">
       <template v-for="item in menuTools" :key="item.key">
@@ -40,7 +42,9 @@ import {
 } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { Tooltip as ATooltip } from "ant-design-vue";
+import { computed } from "vue";
 
+import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowTableBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -63,6 +67,12 @@ const props = withDefaults(
 );
 
 const editor = useYanivEditor();
+
+const appearanceCtx = useInjectEditorAppearance();
+const appearanceClass = computed(() =>
+  getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
+);
+const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
 
 const runCommand = createCommandRunner(editor);
 const { canExecute } = createStateCheckers(editor);

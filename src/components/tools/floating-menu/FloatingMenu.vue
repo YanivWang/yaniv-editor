@@ -21,6 +21,7 @@
         <ColorPicker
           :icon="TextColorIcon"
           type="text"
+          :palette="colorPalette"
           :model-value="currentTextColor"
           :title="t('editor.textColor')"
           @select="setTextColor"
@@ -28,6 +29,7 @@
         <ColorPicker
           :icon="BackgroundColorIcon"
           type="background"
+          :palette="colorPalette"
           :model-value="currentBgColor"
           :title="t('editor.backgroundColor')"
           @select="setHighlight"
@@ -82,6 +84,9 @@ const appearanceClass = computed(() =>
   getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
 );
 const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
+const colorPalette = computed(() =>
+  appearanceCtx?.appearance.value === "notion" ? "notion" : "office",
+);
 
 const props = withDefaults(
   defineProps<{

@@ -103,13 +103,13 @@ flowchart TB
 | --------------- | :---: | :--: | :----: | ---------------------------------------------- |
 | `table`         |  ❌   |  ✅  |   ✅   | **Breaking**：旧 basic 默认 ✅，重构后默认关闭 |
 | `image`         |  ✅   |  ✅  |   ✅   |                                                |
-| `video`         |  ❌   |  ✅  |   ❌   | **Breaking**：旧 basic 默认 ✅，重构后默认关闭 |
-| `math`          |  ❌   |  ✅  |   ❌   |                                                |
-| `ai`            |  ❌   |  ❌  |   ❌   | 始终需要显式 Overrides 开启                    |
-| `formatPainter` |  ❌   |  ✅  |   ❌   |                                                |
-| `outline`       |  ❌   |  ✅  |   ❌   |                                                |
-| `searchReplace` |  ❌   |  ✅  |   ❌   |                                                |
-| `officePaste`   |  ❌   |  ✅  |   ❌   |                                                |
+| `video`         |  ❌   |  ✅  |   ✅   | **Breaking**：旧 basic 默认 ✅，重构后默认关闭 |
+| `math`          |  ❌   |  ✅  |   ✅   |                                                |
+| `ai`            |  ❌   |  ❌  |   ✅   | full/basic 需显式 Overrides；notion 默认开启   |
+| `formatPainter` |  ❌   |  ✅  |   ❌   | notion 不对齐 Notion 产品，保持关闭            |
+| `outline`       |  ❌   |  ✅  |   ✅   |                                                |
+| `searchReplace` |  ❌   |  ✅  |   ✅   |                                                |
+| `officePaste`   |  ❌   |  ✅  |   ✅   |                                                |
 | `slashCommand`  |  ❌   |  ❌  |   ✅   | notion preset 核心体验                         |
 | `dragHandle`    |  ❌   |  ❌  |   ✅   | notion preset 核心体验                         |
 

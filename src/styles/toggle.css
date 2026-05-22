@@ -1,0 +1,55 @@
+/* Toggle block */
+.toggle-block {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+  margin: 2px 0;
+}
+
+.toggle-block__chevron {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  margin-top: 2px;
+  color: var(--ye-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  transition:
+    transform 0.15s ease,
+    background 0.12s ease;
+}
+
+.toggle-block__chevron svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.15s ease;
+}
+
+.toggle-block__chevron.is-open svg,
+.toggle-block[data-open="true"] .toggle-block__chevron svg {
+  transform: rotate(90deg);
+}
+
+.toggle-block__chevron:hover {
+  background: var(--ye-bg-hover);
+}
+
+.toggle-block__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.toggle-block[data-open="false"] .toggle-block__content > :not(:first-child) {
+  display: none;
+}
+
+.toggle-block__content > :first-child {
+  margin-top: 0;
+}

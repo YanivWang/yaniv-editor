@@ -14,9 +14,14 @@ export type BlockMenuItemId =
   | "image"
   | "video"
   | "math"
-  | "horizontalRule";
+  | "horizontalRule"
+  | "toggleBlock"
+  | "callout"
+  | "columnLayout"
+  | "embed"
+  | "mention";
 
-export type BlockMenuGroupId = "basicBlocks" | "lists" | "advanced";
+export type BlockMenuGroupId = "basicBlocks" | "lists" | "advanced" | "notionBlocks";
 
 export interface BlockMenuItemDef {
   id: BlockMenuItemId;

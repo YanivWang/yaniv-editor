@@ -5,6 +5,8 @@
     :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
     :should-show="shouldShow"
     class="image-bubble-menu"
+    :class="appearanceClass"
+    :data-color-mode="resolvedColorMode"
   >
     <div class="image-menu-content">
       <!-- 对齐方式 -->
@@ -68,8 +70,9 @@ import {
 } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
+import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
@@ -86,6 +89,12 @@ const props = withDefaults(
 
 const editor = useYanivEditor();
 const runCommand = createCommandRunner(editor);
+
+const appearanceCtx = useInjectEditorAppearance();
+const appearanceClass = computed(() =>
+  getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
+);
+const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
 
 // ===== 状态 =====
 const previewVisible = ref(false);

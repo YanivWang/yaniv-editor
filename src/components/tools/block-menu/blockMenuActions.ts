@@ -2,6 +2,8 @@ import { Fragment, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/
 import { TextSelection } from "@tiptap/pm/state";
 
 import type { MediaUploadHandler } from "@/core/editorTypes";
+import { resolveEmbedProvider } from "@/extensions/embed";
+import type { MentionItem } from "@/extensions/mention";
 import { resolveMediaUrl, type MediaKind } from "@/utils/mediaUpload";
 
 import type { BlockInsertContext, BlockMenuItemId } from "./types";
@@ -44,6 +46,27 @@ function createList(
   return listType.create(null, itemType.create(attrs, createParagraph(schema, text)));
 }
 
+function createToggleBlock(schema: Schema, text = ""): ProseMirrorNode {
+  if (!schema.nodes.toggleBlock) throw new Error("toggleBlock node is not registered");
+  return schema.nodes.toggleBlock.create({ open: true }, createParagraph(schema, text));
+}
+
+function createCallout(schema: Schema, text = ""): ProseMirrorNode {
+  if (!schema.nodes.callout) throw new Error("callout node is not registered");
+  return schema.nodes.callout.create(
+    { icon: "💡", color: "default" },
+    createParagraph(schema, text),
+  );
+}
+
+function createColumnLayout(schema: Schema): ProseMirrorNode {
+  if (!schema.nodes.columnLayout || !schema.nodes.column) {
+    throw new Error("columnLayout node is not registered");
+  }
+  const column = () => schema.nodes.column.create(null, schema.nodes.paragraph.create());
+  return schema.nodes.columnLayout.create(null, [column(), column()]);
+}
+
 function createNodeForInsert(schema: Schema, blockId: BlockMenuItemId): ProseMirrorNode | null {
   switch (blockId) {
     case "paragraph":
@@ -64,6 +87,12 @@ function createNodeForInsert(schema: Schema, blockId: BlockMenuItemId): ProseMir
       return createBlockquote(schema);
     case "codeBlock":
       return createCodeBlock(schema);
+    case "toggleBlock":
+      return createToggleBlock(schema);
+    case "callout":
+      return createCallout(schema);
+    case "columnLayout":
+      return createColumnLayout(schema);
     default:
       return null;
   }
@@ -91,6 +120,10 @@ const MEDIA_BLOCK_IDS = new Set<MediaBlockId>(["image", "video"]);
 
 export function isMediaBlockId(blockId: BlockMenuItemId): blockId is MediaBlockId {
   return MEDIA_BLOCK_IDS.has(blockId as MediaBlockId);
+}
+
+export function isAsyncBlockId(blockId: BlockMenuItemId): boolean {
+  return isMediaBlockId(blockId) || blockId === "embed";
 }
 
 /** 打开系统文件选择器，上传或按策略读取为可插入 URL */
@@ -125,6 +158,12 @@ export function pickMediaUrl(
   });
 }
 
+export function promptEmbedUrl(translate: (key: string) => string): Promise<string | null> {
+  const url = window.prompt(translate("slashCommand.embedUrlPrompt"));
+  if (!url?.trim()) return Promise.resolve(null);
+  return Promise.resolve(url.trim());
+}
+
 /** 在指定文档位置插入图片/视频块（+ 号菜单） */
 export function insertBlockMediaAt(
   editor: Editor,
@@ -134,6 +173,49 @@ export function insertBlockMediaAt(
 ): void {
   if (!editor.state.schema.nodes[blockId]) return;
   editor.chain().insertContentAt(insertPos, { type: blockId, attrs: { src } }).focus().run();
+}
+
+export function insertBlockEmbedAt(editor: Editor, insertPos: number, url: string): void {
+  if (!editor.state.schema.nodes.embed) return;
+  editor
+    .chain()
+    .insertContentAt(insertPos, {
+      type: "embed",
+      attrs: {
+        url,
+        title: url,
+        provider: resolveEmbedProvider(url),
+      },
+    })
+    .focus()
+    .run();
+}
+
+export function insertBlockMentionAt(
+  editor: Editor,
+  insertPos: number,
+  item: MentionItem = {
+    id: "page-docs",
+    label: "文档",
+    href: "#docs",
+    type: "page",
+  },
+): void {
+  if (!editor.state.schema.nodes.mention) return;
+  editor
+    .chain()
+    .insertContentAt(insertPos, {
+      type: "mention",
+      attrs: {
+        id: item.id,
+        label: item.label,
+        href: item.href ?? null,
+        mentionType: item.type ?? "page",
+      },
+    })
+    .insertContent(" ")
+    .focus()
+    .run();
 }
 
 export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): void {
@@ -166,6 +248,29 @@ export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): v
       return;
     case "codeBlock":
       chain.toggleCodeBlock().run();
+      return;
+    case "toggleBlock":
+      if (!editor.state.schema.nodes.toggleBlock) return;
+      chain.setToggleBlock().run();
+      return;
+    case "callout":
+      if (!editor.state.schema.nodes.callout) return;
+      chain.toggleCallout().run();
+      return;
+    case "columnLayout":
+      if (!editor.state.schema.nodes.columnLayout) return;
+      chain.setColumnLayout(2).run();
+      return;
+    case "mention":
+      if (!editor.state.schema.nodes.mention) return;
+      chain
+        .insertMention({
+          id: "page-docs",
+          label: "文档",
+          href: "#docs",
+          type: "page",
+        })
+        .run();
       return;
     case "table":
       if (!editor.state.schema.nodes.table) return;
@@ -205,6 +310,14 @@ export function applyBlockInsert(
     case "horizontalRule":
       focusInsertPos(editor, insertPos);
       editor.chain().focus().setHorizontalRule().run();
+      return;
+    case "columnLayout":
+      if (!schema.nodes.columnLayout) return;
+      focusInsertPos(editor, insertPos);
+      editor.chain().focus().setColumnLayout(2).run();
+      return;
+    case "mention":
+      insertBlockMentionAt(editor, insertPos);
       return;
     default: {
       const node = createNodeForInsert(schema, blockId);

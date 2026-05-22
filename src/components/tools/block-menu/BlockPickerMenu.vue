@@ -70,9 +70,11 @@ import {
 import {
   applyBlockInsert,
   applyBlockTransform,
+  insertBlockEmbedAt,
   insertBlockMediaAt,
   isMediaBlockId,
   pickMediaUrl,
+  promptEmbedUrl,
 } from "./blockMenuActions";
 import { getBlockMenuGroups } from "./blockMenuRegistry";
 
@@ -110,7 +112,9 @@ const selectedIndex = ref(0);
 const menuRef = ref<HTMLElement | null>(null);
 const insertContext = ref<BlockInsertContext | null>(null);
 
-const commandGroups = computed(() => getBlockMenuGroups(props.features, t));
+const commandGroups = computed(() =>
+  getBlockMenuGroups(props.features, t, editor.value?.state.schema),
+);
 
 const filteredGroups = computed<BlockMenuGroupDef[]>(() => {
   const q = query.value.toLowerCase();
@@ -157,6 +161,33 @@ function selectItem(item: BlockMenuItemDef) {
   if (!e || !mode.value) return;
 
   const blockId = item.id;
+  if (blockId === "embed") {
+    const currentMode = mode.value;
+    const context = insertContext.value;
+
+    if (currentMode === "slash") {
+      const pluginState = slashCommandKey.getState(e.state) as SlashCommandState | undefined;
+      const slashRange = pluginState?.range ? { ...pluginState.range } : null;
+      const insertPos = slashRange?.from ?? e.state.selection.from;
+      if (slashRange) {
+        e.chain().focus().deleteRange(slashRange).run();
+      }
+      hide();
+      void promptEmbedUrl(t).then((url) => {
+        if (!url) return;
+        insertBlockEmbedAt(e, insertPos, url);
+      });
+      return;
+    }
+
+    hide();
+    void promptEmbedUrl(t).then((url) => {
+      if (!url || !context) return;
+      insertBlockEmbedAt(e, context.insertPos, url);
+    });
+    return;
+  }
+
   if (isMediaBlockId(blockId)) {
     const accept = blockId === "image" ? "image/*" : "video/*";
     const upload = blockId === "image" ? props.uploadImage : props.uploadVideo;

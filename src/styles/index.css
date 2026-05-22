@@ -38,6 +38,12 @@
 @import "./code-block.css";
 @import "./outline.css";
 @import "./zoom-toolbar.css";
+@import "./toggle.css";
+@import "./callout.css";
+@import "./column.css";
+@import "./embed.css";
+@import "./mention.css";
+@import "./block-hover.css";
 
 /* Tool chrome（原组件内零散 import，统一纳入全量包） */
 @import "../components/tools/footer-nav/footer-nav.css";
