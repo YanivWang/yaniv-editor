@@ -1,3 +1,4 @@
+/** Demo 用：appearance="custom" 时传入的 CSS 变量（无 custom.css，靠内联 token 覆盖） */
 export const DEMO_CUSTOM_APPEARANCE_VARS: Record<string, string> = {
   "--ye-primary": "#6366f1",
   "--ye-bg": "#f8fafc",

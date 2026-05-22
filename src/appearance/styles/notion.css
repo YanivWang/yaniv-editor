@@ -17,12 +17,6 @@
   --ye-bg: #ffffff;
   --ye-bg-secondary: #ffffff;
   --ye-bg-hover: rgba(55, 53, 47, 0.08);
-  --ye-toolbar-bg: #ffffff;
-  --ye-toolbar-border: rgb(55 53 47 / 9%);
-  --ye-toolbar-divider: rgb(55 53 47 / 9%);
-  --ye-toolbar-btn-text: rgb(55 53 47 / 65%);
-  --ye-toolbar-btn-hover: rgb(55 53 47 / 8%);
-  --ye-toolbar-btn-active: rgb(55 53 47 / 12%);
   --ye-text: #37352f;
   --ye-text-secondary: #787774;
   --ye-text-muted: #9b9a97;
@@ -60,26 +54,6 @@
   background: var(--ye-bg);
   border-radius: 0;
   box-shadow: none;
-}
-
-/* ===== Notion 风格 - 极简工具栏（尺寸保留，配色走 token） ===== */
-.yaniv-editor.appearance-notion .document-toolbar-container {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.yaniv-editor.appearance-notion .document-toolbar {
-  padding: 8px 12px;
-}
-
-.yaniv-editor.appearance-notion .ye-toolbar-button,
-.yaniv-editor.appearance-notion .ye-dropdown-btn {
-  min-width: 28px;
-  height: 28px;
-  padding: 0 6px;
-  font-size: 14px;
-  border-radius: 4px;
 }
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
@@ -221,12 +195,6 @@
   --ye-bg: #191919;
   --ye-bg-secondary: #191919;
   --ye-bg-hover: rgba(255, 255, 255, 0.055);
-  --ye-toolbar-bg: #191919;
-  --ye-toolbar-border: rgb(255 255 255 / 9%);
-  --ye-toolbar-divider: rgb(255 255 255 / 9%);
-  --ye-toolbar-btn-text: rgb(255 255 255 / 65%);
-  --ye-toolbar-btn-hover: rgb(255 255 255 / 5.5%);
-  --ye-toolbar-btn-active: rgb(255 255 255 / 8%);
   --ye-text: rgba(255, 255, 255, 0.9);
   --ye-text-secondary: rgba(255, 255, 255, 0.6);
   --ye-text-muted: rgba(255, 255, 255, 0.4);

@@ -10,6 +10,7 @@ export function resolveColorMode(mode: EditorColorMode): ResolvedColorMode {
   return mode;
 }
 
+/** custom 仅生成 appearance-custom class，无对应 CSS 文件；样式由 customAppearanceVars 内联注入 */
 export function getAppearanceClassName(appearance: EditorAppearance): string {
   const classPreset = appearance === "custom" ? "custom" : appearance;
   return `appearance-${classPreset}`;

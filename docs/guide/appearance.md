@@ -2,7 +2,7 @@
 
 Visual configuration is split into two props:
 
-- `appearance`: `default | word | notion | github | typora | custom`.
+- `appearance`: `default | word | notion | custom`.
 - `colorMode`: `light | dark | auto`.
 
 ```vue

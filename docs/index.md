@@ -20,7 +20,7 @@ Full Editor axes:
 
 - `mode`: runtime state, `edit | preview`.
 - `preset`: feature plan, `basic | full | notion`.
-- `appearance`: visual skin, `default | word | notion | github | typora | custom`.
+- `appearance`: visual skin, `default | word | notion | custom`.
 - `colorMode`: `light | dark | auto`.
 - `features`: ability overrides.
 

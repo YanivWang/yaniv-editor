@@ -41,7 +41,7 @@ Full Editor is defined by four independent axes:
 
 - `mode`: `edit | preview`.
 - `preset`: `basic | full | notion`.
-- `appearance`: `default | word | notion | github | typora | custom`.
+- `appearance`: `default | word | notion | custom`.
 - `colorMode`: `light | dark | auto`.
 - `features`: ability overrides only.
 

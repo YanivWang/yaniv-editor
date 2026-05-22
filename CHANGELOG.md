@@ -139,6 +139,22 @@ Shell 与扩展层禁止直接调 `editor.setEditable`；入口收口至 `useEdi
 
 自定义扩展内若需感知 phase，通过 `ctx.isEditable`（`BuildExtensionsCtx`）或 `filterTransaction` 守卫，**不要**直接 `setEditable`。
 
+#### 12. 内置 appearance `github` / `typora` 移除
+
+内置视觉皮肤收敛为 `default | word | notion | custom`，`appearance="github"` 与 `appearance="typora"` 不再可用。
+
+**迁移**：若仍需类似风格，使用 `appearance="custom"` 并通过 `:custom-appearance-vars` 覆盖 `--ye-*` token（可参考 git 历史中已删除的 CSS 变量定义）。
+
+```vue
+<YanivEditor
+  appearance="custom"
+  :custom-appearance-vars="{
+    '--ye-primary': '#0969da',
+    '--ye-bg': '#ffffff',
+  }"
+/>
+```
+
 ---
 
 ### 新增导出（`@yanivjs/yaniv-editor` 主入口）

@@ -18,4 +18,4 @@ export type { EditorAppearanceContext, ResolvedColorMode } from "./appearanceCon
 export { useEditorAppearance } from "./useEditorAppearance";
 export { useResolvedColorMode } from "./useResolvedColorMode";
 
-export const EDITOR_APPEARANCES = ["default", "notion", "github", "typora", "word"] as const;
+export const EDITOR_APPEARANCES = ["default", "notion", "word"] as const;

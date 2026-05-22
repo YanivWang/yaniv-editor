@@ -118,17 +118,6 @@
   list-style-type: circle;
 }
 
-/* 工具栏仅保留布局（颜色/线条/阴影由全局 token 控制） */
-.yaniv-editor.appearance-default .document-toolbar-container {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.yaniv-editor.appearance-default .document-toolbar {
-  padding: 6px 12px;
-}
-
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-bg-secondary: #141414;
   --ye-outline-title-color: var(--ye-primary);

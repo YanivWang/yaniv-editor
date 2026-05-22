@@ -3,7 +3,7 @@
  */
 import type { EditorAppearance } from "@/configs/editorConfig";
 
-const LOADABLE_APPEARANCES = ["default", "word", "notion", "github", "typora"] as const;
+const LOADABLE_APPEARANCES = ["default", "word", "notion"] as const;
 export type LoadableAppearance = (typeof LOADABLE_APPEARANCES)[number];
 
 // 目前 CSS 由 style.css 一次性提供；保留就绪记录是为了维持异步 API 形态。

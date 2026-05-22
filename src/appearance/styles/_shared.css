@@ -1,8 +1,22 @@
 /**
  * 视觉外观公共样式（各 appearance 通过 @import 引入）
+ *
+ * 本目录仅有 default / word / notion 三个主题文件。
+ * custom 不在此目录：见 appearance="custom" + customAppearanceVars（applyAppearance.ts）
  */
 
 /* 工具栏容器边框/背景见 src/styles/toolbar.css */
+
+/* 工具栏仅保留布局（颜色/线条/阴影由全局 token 控制） */
+.yaniv-editor .document-toolbar-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.yaniv-editor .document-toolbar {
+  padding: 6px 12px;
+}
 
 .yaniv-editor .continuous-pages {
   background: var(--ye-page-bg, #f5f5f5);

@@ -43,9 +43,14 @@
 @import "../components/tools/footer-nav/footer-nav.css";
 @import "../features/ai/shared/ai-highlight.css";
 
-/* Visual appearances（npm 全量打入 style.css；loadAppearance 仅切换 class） */
+/*
+ * Visual appearances（npm 全量打入 style.css；loadAppearance 仅切换 class）
+ *
+ * 内置主题：appearance/styles/ 下各 *.css，根节点 class 为 .appearance-{name}
+ *
+ * custom 无独立 CSS 文件：appearance="custom" 时沿用 variables.css + 全局样式，
+ * 通过 :custom-appearance-vars 在根节点内联覆盖 --ye-*（见 applyAppearance.ts）
+ */
 @import "../appearance/styles/default.css";
 @import "../appearance/styles/word.css";
 @import "../appearance/styles/notion.css";
-@import "../appearance/styles/github.css";
-@import "../appearance/styles/typora.css";

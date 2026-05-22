@@ -25,8 +25,6 @@ export const APPEARANCE_OPTIONS: SelectOption<EditorAppearance>[] = [
   { label: "Default", value: "default" },
   { label: "Word", value: "word" },
   { label: "Notion", value: "notion" },
-  { label: "GitHub", value: "github" },
-  { label: "Typora", value: "typora" },
   { label: "Custom", value: "custom" },
 ];
 
@@ -276,7 +274,7 @@ export const FEATURE_HINTS: FeatureHint[] = [
     id: "appearance",
     group: "布局",
     label: "外观皮肤",
-    hint: "上方切换 appearance：体验 word / notion / github / typora 等视觉",
+    hint: "上方切换 appearance：体验 word / notion 等视觉",
     presets: ["basic", "full", "notion"],
   },
   {
