@@ -159,6 +159,9 @@ importers:
       katex:
         specifier: ^0.16.28
         version: 0.16.28
+      linkifyjs:
+        specifier: ^4.3.2
+        version: 4.3.2
       lint-staged:
         specifier: ^16.4.0
         version: 16.4.0

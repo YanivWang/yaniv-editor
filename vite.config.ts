@@ -223,6 +223,7 @@ export default defineConfig({
         "@tiptap/pm",
         "@tiptap/starter-kit",
         /^@tiptap\/.*/,
+        "linkifyjs",
         "ant-design-vue",
         "@ant-design/icons-vue",
         "docx",

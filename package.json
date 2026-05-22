@@ -97,6 +97,7 @@
     "file-saver": "^2.0.0",
     "hotkeys-js": "^4.0.0",
     "katex": "^0.16.0",
+    "linkifyjs": "^4.0.0",
     "lowlight": "^3.0.0",
     "mammoth": "^1.0.0",
     "vue": "^3.4.0"
@@ -144,6 +145,7 @@
     "file-saver": "^2.0.5",
     "hotkeys-js": "^4.0.4",
     "katex": "^0.16.28",
+    "linkifyjs": "^4.3.2",
     "mammoth": "^1.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^3.10.1",
