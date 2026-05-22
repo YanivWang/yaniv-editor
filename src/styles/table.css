@@ -92,7 +92,7 @@
 
 :deep(table.table-border-default td),
 :deep(table.table-border-default th) {
-  border: 1px solid #d0d0d0;
+  border: var(--ye-border-width) solid var(--ye-table-border);
 }
 
 :deep(table.table-border-none) {

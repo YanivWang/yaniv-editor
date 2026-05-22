@@ -1,6 +1,6 @@
 <template>
   <div class="demo-page demo-page--split">
-    <aside class="demo-sidebar">
+    <DemoSidebar storage-key="yaniv-demo:sidebar:inline-compose">
       <DemoSubnav title="行内自行拼装" :description="entry?.description" />
       <div class="demo-sidebar__body">
         <div class="demo-inline-panel-wrapper">
@@ -11,7 +11,7 @@
           />
         </div>
       </div>
-    </aside>
+    </DemoSidebar>
     <main class="demo-main demo-main--centered">
       <InlineComposeDemoCore
         v-model:content="html"
@@ -29,6 +29,7 @@ import { ref } from "vue";
 import "@yanivjs/yaniv-editor/inline.css";
 
 import DemoInlinePanel from "../components/DemoInlinePanel.vue";
+import DemoSidebar from "../components/DemoSidebar.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import InlineComposeDemoCore from "../components/InlineComposeDemoCore.vue";
 import { getDemoEntry } from "../config/demoCatalog";

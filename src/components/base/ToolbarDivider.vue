@@ -11,7 +11,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   direction: "vertical",
-  color: "#e8e8e8",
+  color: "var(--ye-toolbar-divider)",
 });
 
 const dividerStyle = computed(() => {

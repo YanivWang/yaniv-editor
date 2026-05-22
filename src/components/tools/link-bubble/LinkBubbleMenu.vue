@@ -248,13 +248,13 @@ function removeLink() {
   align-items: center;
   padding: 8px 12px;
   background: #fff;
-  border: 1px solid #d0d0d0;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   [data-color-mode="dark"] & {
     background: #1f1f1f;
-    border-color: #434343;
+    border-color: var(--ye-border);
   }
 }
 

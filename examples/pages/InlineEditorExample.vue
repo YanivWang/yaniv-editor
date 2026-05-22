@@ -1,6 +1,6 @@
 <template>
   <div class="demo-page demo-page--split">
-    <aside class="demo-sidebar">
+    <DemoSidebar storage-key="yaniv-demo:sidebar:inline-editor">
       <DemoSubnav title="行内编辑器" :description="entry?.description" />
       <div class="demo-sidebar__body">
         <div class="demo-inline-panel-wrapper">
@@ -11,7 +11,7 @@
           />
         </div>
       </div>
-    </aside>
+    </DemoSidebar>
     <main class="demo-main demo-main--centered">
       <YanivInlineEditor
         v-model:content="html"
@@ -33,6 +33,7 @@ import { YanivInlineEditor } from "@yanivjs/yaniv-editor/inline";
 import "@yanivjs/yaniv-editor/inline.css";
 
 import DemoInlinePanel from "../components/DemoInlinePanel.vue";
+import DemoSidebar from "../components/DemoSidebar.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { getDemoEntry } from "../config/demoCatalog";
 import { INLINE_FULL_TOOLBAR } from "../config/demoInline";

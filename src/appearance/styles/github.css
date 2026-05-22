@@ -15,6 +15,11 @@
   --ye-bg-secondary: #f6f8fa;
   --ye-bg-hover: #f3f4f6;
   --ye-toolbar-bg: #f6f8fa;
+  --ye-toolbar-border: #d0d7de;
+  --ye-toolbar-divider: #d0d7de;
+  --ye-toolbar-btn-text: #57606a;
+  --ye-toolbar-btn-hover: rgb(31 35 41 / 6%);
+  --ye-toolbar-btn-active: rgb(31 35 41 / 10%);
   --ye-text: #24292f;
   --ye-text-secondary: #57606a;
   --ye-text-muted: #8b949e;
@@ -37,16 +42,14 @@
   --ye-line-height: 1.5;
 }
 
-/* GitHub 风格 - 边框工具栏 */
+/* GitHub 风格 - 工具栏布局 */
 .yaniv-editor.appearance-github .document-toolbar {
   padding: 8px 16px;
-  background: #f6f8fa !important;
-  border-bottom: 1px solid #d0d7de !important;
 }
 
 /* GitHub 风格 - 全宽无阴影 */
 .yaniv-editor.appearance-github .continuous-pages {
-  border: 1px solid var(--ye-border);
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: var(--ye-radius-md);
   box-shadow: none;
 }
@@ -56,14 +59,14 @@
   padding-bottom: 8px;
   margin-bottom: 16px;
   font-size: 32px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
 }
 
 .yaniv-editor.appearance-github .ProseMirror h2 {
   padding-bottom: 6px;
   margin-bottom: 16px;
   font-size: 24px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
 }
 
 .yaniv-editor.appearance-github .ProseMirror h3 {
@@ -78,6 +81,11 @@
   --ye-bg-secondary: #161b22;
   --ye-bg-hover: #21262d;
   --ye-toolbar-bg: #161b22;
+  --ye-toolbar-border: #30363d;
+  --ye-toolbar-divider: #30363d;
+  --ye-toolbar-btn-text: #8b949e;
+  --ye-toolbar-btn-hover: rgb(255 255 255 / 8%);
+  --ye-toolbar-btn-active: rgb(255 255 255 / 12%);
   --ye-text: #c9d1d9;
   --ye-text-secondary: #8b949e;
   --ye-text-muted: #484f58;
@@ -90,11 +98,6 @@
   --ye-code-text: #c9d1d9;
   --ye-blockquote-border: #30363d;
   --ye-link: #58a6ff;
-}
-
-.yaniv-editor.appearance-github[data-color-mode="dark"] .document-toolbar {
-  background: #161b22 !important;
-  border-bottom-color: #30363d !important;
 }
 
 .yaniv-editor.appearance-github[data-color-mode="dark"] .continuous-pages {

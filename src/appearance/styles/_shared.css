@@ -2,9 +2,7 @@
  * 视觉外观公共样式（各 appearance 通过 @import 引入）
  */
 
-.yaniv-editor .document-toolbar {
-  border-bottom: 1px solid var(--ye-border, #e8e8e8);
-}
+/* 工具栏容器边框/背景见 src/styles/toolbar.css */
 
 .yaniv-editor .continuous-pages {
   background: var(--ye-page-bg, #f5f5f5);

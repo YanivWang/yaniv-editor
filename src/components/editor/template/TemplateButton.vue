@@ -99,7 +99,7 @@ function insertTemplate(tpl: TemplateItem) {
   align-items: flex-start;
   padding: 14px;
   cursor: pointer;
-  border: 1px solid #e8e8e8;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   transition: all 0.2s;
 }
@@ -110,7 +110,7 @@ function insertTemplate(tpl: TemplateItem) {
 }
 
 [data-color-mode="dark"] .template-card {
-  border-color: #434343;
+  border-color: var(--ye-border);
 }
 
 [data-color-mode="dark"] .template-card:hover {

@@ -217,7 +217,7 @@ watch(
   min-width: 300px;
   padding: 12px;
   background: var(--ye-bg);
-  border: 1px solid var(--ye-border);
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -240,7 +240,7 @@ watch(
   resize: vertical;
   outline: none;
   background: var(--ye-bg-secondary);
-  border: 1px solid var(--ye-border);
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 4px;
 }
 

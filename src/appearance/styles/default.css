@@ -2,64 +2,136 @@
 
 /**
  * Default Visual Appearance
- * 通用 Web 编辑器风格（非 Word 分页纸张）
- * 依赖 variables.css 中的 CSS 变量，仅覆盖布局与少量视觉差异
+ * 飞书/Lark 文档风格：扁平白底正文区 + 右侧大纲
  */
 
 .yaniv-editor.appearance-default {
-  --ye-bg-secondary: #f5f5f5;
-  --ye-doc-page-width: 960px;
+  --ye-primary: #3370ff;
+  --ye-primary-hover: #1456f0;
+  --ye-primary-light: rgb(51 112 255 / 8%);
+  --ye-outline-title-color: #3370ff;
+  --ye-bg-secondary: #f5f6f7;
+  --ye-doc-page-width: 900px;
   --ye-doc-page-min-height: 480px;
-  --ye-doc-padding-top: 40px;
-  --ye-doc-padding-bottom: 40px;
-  --ye-doc-padding-inline: 56px;
-  --ye-doc-container-padding-y: 24px;
+  --ye-doc-padding-top: 48px;
+  --ye-doc-padding-bottom: 80px;
+  --ye-doc-padding-inline: 72px;
+  --ye-doc-container-padding-y: 0;
+  --ye-font-size: 15px;
+  --ye-line-height: 1.7;
+  --ye-outline-width: 200px;
 }
 
-/* 浅灰画布，区别于 Word 的深灰纸张背景 */
 .yaniv-editor.appearance-default.document-layout {
   background: var(--ye-bg-secondary);
 }
 
-/* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
+/* 全宽白底正文区：无纸张阴影与圆角卡片 */
 .yaniv-editor.appearance-default .continuous-pages {
-  overflow: hidden;
-  border: 1px solid var(--ye-border);
-  border-radius: var(--ye-radius-md);
-  box-shadow: var(--ye-shadow-sm);
+  overflow: visible;
+  background: var(--ye-bg);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.yaniv-editor.appearance-default .document-content .ProseMirror h1 {
-  margin: 0 0 16px;
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: var(--ye-text);
+.yaniv-editor.appearance-default .document-content .ProseMirror {
+  color: #1f2329;
+}
+
+/* 文档主标题（首个 H1） */
+.yaniv-editor.appearance-default .document-content .ProseMirror > h1:first-child {
+  margin: 0 0 8px;
+  font-size: 2.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #1f2329;
+  letter-spacing: -0.01em;
+}
+
+/* 正文章节 H1 */
+.yaniv-editor.appearance-default .document-content .ProseMirror > h1:not(:first-child) {
+  margin: 36px 0 12px;
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #1f2329;
 }
 
 .yaniv-editor.appearance-default .document-content .ProseMirror h2 {
-  margin: 24px 0 12px;
-  font-size: 1.5rem;
-  color: var(--ye-text);
+  margin: 28px 0 10px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1f2329;
 }
 
 .yaniv-editor.appearance-default .document-content .ProseMirror h3 {
-  margin: 20px 0 8px;
-  font-size: 1.25rem;
-  color: var(--ye-text);
+  margin: 22px 0 8px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #1f2329;
 }
 
-/* 扁平工具栏，无 Word 渐变 */
-.yaniv-editor.appearance-default .document-toolbar {
+.yaniv-editor.appearance-default .document-content .ProseMirror h4,
+.yaniv-editor.appearance-default .document-content .ProseMirror h5,
+.yaniv-editor.appearance-default .document-content .ProseMirror h6 {
+  margin: 18px 0 6px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #1f2329;
+}
+
+/* 正文段落 */
+.yaniv-editor.appearance-default .document-content .ProseMirror p {
+  margin: 0 0 10px;
+  line-height: 1.7;
+  color: #1f2329;
+}
+
+/* 高亮（飞书淡黄底） */
+.yaniv-editor.appearance-default .document-content .ProseMirror mark {
+  padding: 0 2px;
+  color: inherit;
+  background-color: #fff3ca;
+  border-radius: 2px;
+}
+
+/* 列表 */
+.yaniv-editor.appearance-default .document-content .ProseMirror ul,
+.yaniv-editor.appearance-default .document-content .ProseMirror ol {
+  padding-left: 1.35em;
+  margin: 0 0 12px;
+}
+
+.yaniv-editor.appearance-default .document-content .ProseMirror li {
+  margin: 4px 0;
+  line-height: 1.7;
+}
+
+.yaniv-editor.appearance-default
+  .document-content
+  .ProseMirror
+  ul:not([data-type="taskList"])
+  > li:not([data-checked]) {
+  list-style-type: circle;
+}
+
+/* 工具栏仅保留布局（颜色/线条/阴影由全局 token 控制） */
+.yaniv-editor.appearance-default .document-toolbar-container {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.yaniv-editor.appearance-default .document-toolbar {
   padding: 6px 12px;
-  background: var(--ye-toolbar-bg) !important;
-  border-bottom: 1px solid var(--ye-border) !important;
 }
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-bg-secondary: #141414;
+  --ye-outline-title-color: var(--ye-primary);
 }
 
 .yaniv-editor.appearance-default.document-layout[data-color-mode="dark"] {
@@ -67,6 +139,21 @@
 }
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] .continuous-pages {
-  border-color: var(--ye-border);
+  border: none;
   box-shadow: none;
+}
+
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror p,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h1,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h2,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h3,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h4,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h5,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h6 {
+  color: var(--ye-text);
+}
+
+.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror mark {
+  background-color: rgb(255 243 202 / 22%);
 }

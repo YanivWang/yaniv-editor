@@ -18,6 +18,11 @@
   --ye-bg-secondary: #f2f2f2;
   --ye-bg-hover: #e6e6e6;
   --ye-toolbar-bg: #f3f3f3;
+  --ye-toolbar-border: #d4d4d4;
+  --ye-toolbar-divider: #d4d4d4;
+  --ye-toolbar-btn-text: #444444;
+  --ye-toolbar-btn-hover: rgb(0 0 0 / 6%);
+  --ye-toolbar-btn-active: rgb(0 0 0 / 10%);
   --ye-text: #000000;
   --ye-text-secondary: #444444;
   --ye-text-muted: #888888;
@@ -39,14 +44,17 @@
   --ye-line-height: 1.5;
 }
 
-/* Word 风格 - 厚重工具栏 (sticky 定位) */
-.yaniv-editor.appearance-word .document-toolbar {
+/* Word 风格 - 厚重工具栏（渐变保留为品牌差异） */
+.yaniv-editor.appearance-word .document-toolbar-container {
   position: sticky;
   top: 0;
   z-index: 100;
+  background: linear-gradient(180deg, #ffffff 0%, #f3f3f3 100%);
+  border-bottom: var(--ye-border-width) solid var(--ye-toolbar-border);
+}
+
+.yaniv-editor.appearance-word .document-toolbar {
   padding: 4px 8px;
-  background: linear-gradient(180deg, #ffffff 0%, #f3f3f3 100%) !important;
-  border-bottom: 1px solid #d4d4d4 !important;
 }
 
 /* Word 风格 - A4 纸张 */
@@ -92,6 +100,11 @@
   --ye-bg-secondary: #252525;
   --ye-bg-hover: #3e3e3e;
   --ye-toolbar-bg: #2d2d2d;
+  --ye-toolbar-border: #3e3e3e;
+  --ye-toolbar-divider: #3e3e3e;
+  --ye-toolbar-btn-text: #9e9e9e;
+  --ye-toolbar-btn-hover: rgb(255 255 255 / 8%);
+  --ye-toolbar-btn-active: rgb(255 255 255 / 12%);
   --ye-text: #d4d4d4;
   --ye-text-secondary: #9e9e9e;
   --ye-text-muted: #6e6e6e;
@@ -102,9 +115,9 @@
   --ye-link: #4fc3f7;
 }
 
-.yaniv-editor.appearance-word[data-color-mode="dark"] .document-toolbar {
-  background: linear-gradient(180deg, #2d2d2d 0%, #252525 100%) !important;
-  border-bottom-color: #3e3e3e !important;
+.yaniv-editor.appearance-word[data-color-mode="dark"] .document-toolbar-container {
+  background: linear-gradient(180deg, #2d2d2d 0%, #252525 100%);
+  border-bottom-color: var(--ye-toolbar-border);
 }
 
 .yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h2,

@@ -29,7 +29,7 @@ const sharedLayout: FullEditorPresetConfig["layout"] = {
   linkBubble: true,
   tableTools: true,
   shortcutHints: false,
-  outlineAnchor: "top-left",
+  outlineAnchor: "top-right",
   zoomPlacement: "bottom",
   tableToolsShowMode: 2,
 };

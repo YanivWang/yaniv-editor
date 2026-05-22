@@ -276,11 +276,11 @@ function insertSelected() {
   justify-content: space-between;
   padding-top: 12px;
   margin-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  border-top: var(--ye-border-width) solid var(--ye-border);
 }
 
 [data-color-mode="dark"] .gallery-footer {
-  border-top-color: #434343;
+  border-top-color: var(--ye-border);
 }
 
 .gallery-footer__count {

@@ -92,14 +92,22 @@ function onDblClick() {
 }
 
 .ye-toolbar-button:hover:not(:disabled) {
+  color: var(--ye-text);
   background: var(--ye-toolbar-btn-hover);
 }
 
 .ye-toolbar-button:active:not(:disabled) {
+  color: var(--ye-text);
   background: var(--ye-toolbar-btn-active);
 }
 
 .ye-toolbar-button.is-active {
+  font-weight: 500;
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
+}
+
+.ye-toolbar-button.is-active:hover:not(:disabled) {
   color: var(--ye-primary);
   background: var(--ye-primary-light);
 }

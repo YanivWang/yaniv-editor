@@ -1,15 +1,18 @@
 /* Yaniv Editor 主工具栏样式 */
 
 /* 主工具栏（固定在顶部，不随内容滚动） */
+.document-toolbar-container {
+  flex-shrink: 0;
+  width: 100%;
+  background: var(--ye-toolbar-bg);
+  border-bottom: var(--ye-border-width) solid var(--ye-toolbar-border);
+  box-shadow: none;
+}
+
 .document-toolbar {
   z-index: 10;
   flex-shrink: 0;
-  background: #fff;
-  border-bottom: 1px solid #d0d0d0;
-}
-
-/* 深色模式 */
-[data-color-mode="dark"] .document-toolbar {
-  background: #1f1f1f;
-  border-bottom-color: #434343;
+  background: transparent;
+  border-bottom: none;
+  box-shadow: none;
 }

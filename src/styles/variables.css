@@ -8,9 +8,9 @@
 
 :root {
   /* ===== Color Palette ===== */
-  --ye-primary: #3b82f6;
-  --ye-primary-hover: #2563eb;
-  --ye-primary-light: rgba(59, 130, 246, 0.1);
+  --ye-primary: #3370ff;
+  --ye-primary-hover: #1456f0;
+  --ye-primary-light: rgb(51 112 255 / 10%);
 
   /* ===== Semantic ===== */
   --ye-danger: #ef4444;
@@ -18,34 +18,38 @@
 
   /* ===== Editor Core ===== */
   --ye-bg: #ffffff;
-  --ye-bg-secondary: #f9fafb;
+  --ye-bg-secondary: #f3f4f6;
+  --ye-bg-tertiary: #eef0f3;
   --ye-bg-hover: #f3f4f6;
   --ye-text: #1a1a1a;
   --ye-text-secondary: #666666;
   --ye-text-muted: #999999;
   --ye-placeholder-color: #ccc;
 
-  /* ===== Borders ===== */
-  --ye-border: #e5e5e5;
-  --ye-border-hover: #d0d0d0;
+  /* ===== Borders（飞书/Lark 风格，略浅于 #e5e5e5） ===== */
+  --ye-border-width: 1px;
+  --ye-border: #e9eaec;
+  --ye-border-hover: #dadde2;
   --ye-border-focus: var(--ye-primary);
 
   /* ===== Selection & Caret ===== */
-  --ye-selection: rgba(59, 130, 246, 0.2);
+  --ye-selection: rgb(51 112 255 / 20%);
   --ye-caret: var(--ye-primary);
 
-  /* ===== Toolbar ===== */
-  --ye-toolbar-bg: #fafafa;
+  /* ===== Toolbar（白底工具栏 + 浅灰画布由 --ye-bg-secondary 区分） ===== */
+  --ye-toolbar-bg: #ffffff;
   --ye-toolbar-border: var(--ye-border);
+  --ye-toolbar-shadow: none;
+  --ye-toolbar-divider: var(--ye-border);
+  --ye-toolbar-btn-bg: transparent;
+  --ye-toolbar-btn-text: #646a73;
+  --ye-toolbar-btn-hover: rgb(31 35 41 / 6%);
+  --ye-toolbar-btn-active: rgb(31 35 41 / 10%);
+  --ye-toolbar-btn-disabled: #bbbfc4;
+  --ye-toolbar-dropdown-shadow: var(--ye-shadow-md);
   --ye-footer-bg: var(--ye-bg-secondary);
   --ye-footer-text: var(--ye-text-secondary);
   --ye-footer-divider: var(--ye-border);
-  --ye-toolbar-btn-bg: transparent;
-  --ye-toolbar-btn-hover: #f0f0f0;
-  --ye-toolbar-btn-active: #e5e5e5;
-  --ye-toolbar-btn-disabled: #cccccc;
-  --ye-toolbar-btn-text: var(--ye-text);
-  --ye-toolbar-divider: #e5e7eb;
 
   /* ===== Bubble / Floating Menu ===== */
   --ye-bubble-bg: #ffffff;
@@ -64,10 +68,10 @@
   --ye-codeblock-text: #d4d4d4;
 
   /* ===== Table ===== */
-  --ye-table-border: #d0d0d0;
-  --ye-table-header-bg: #f5f5f5;
-  --ye-table-selected: rgba(59, 130, 246, 0.1);
-  --ye-table-selected-bg: rgba(59, 130, 246, 0.1);
+  --ye-table-border: var(--ye-border);
+  --ye-table-header-bg: #f9fafb;
+  --ye-table-selected: rgb(51 112 255 / 10%);
+  --ye-table-selected-bg: rgb(51 112 255 / 10%);
 
   /* ===== Blockquote ===== */
   --ye-blockquote-border: var(--ye-primary);
@@ -98,25 +102,26 @@
   --ye-radius-full: 9999px;
 
   /* ===== Shadows ===== */
-  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --ye-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --ye-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --ye-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --ye-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.08);
 
   /* ===== Transitions ===== */
   --ye-transition-fast: 0.1s ease;
   --ye-transition-normal: 0.2s ease;
   --ye-transition-slow: 0.3s ease;
 
-  /* ===== Outline Panel ===== */
-  --ye-outline-width: 220px;
-  --ye-outline-offset: 12px;
+  /* ===== Outline Panel（飞书/Lark 贴边风格） ===== */
+  --ye-outline-width: 200px;
+  --ye-outline-offset: 0;
+  --ye-outline-title-color: var(--ye-primary);
   --ye-outline-scroll-offset: 80px;
-  --ye-outline-h1-size: 14px;
+  --ye-outline-h1-size: 13px;
   --ye-outline-h2-size: 13px;
   --ye-outline-h3-size: 12px;
   --ye-outline-h4-size: 12px;
-  --ye-outline-h5-size: 11px;
-  --ye-outline-h6-size: 11px;
+  --ye-outline-h5-size: 12px;
+  --ye-outline-h6-size: 12px;
 
   /* ===== Z-Index ===== */
   --ye-z-toolbar: 100;
@@ -137,29 +142,33 @@
 
 /* ===== Dark Mode（唯一约定：data-color-mode="dark"） ===== */
 [data-color-mode="dark"] {
-  --ye-primary: #60a5fa;
-  --ye-primary-hover: #93c5fd;
-  --ye-primary-light: rgba(96, 165, 250, 0.15);
+  --ye-primary: #4c88ff;
+  --ye-primary-hover: #6b9bff;
+  --ye-primary-light: rgb(76 136 255 / 15%);
   --ye-danger: #f87171;
   --ye-danger-bg: #3f1d1d;
   --ye-bg: #1a1a1a;
   --ye-bg-secondary: #111827;
+  --ye-bg-tertiary: #2d3748;
   --ye-bg-hover: #374151;
   --ye-text: #e5e5e5;
   --ye-text-secondary: #a3a3a3;
   --ye-text-muted: #737373;
   --ye-placeholder-color: #666;
-  --ye-border: #333333;
-  --ye-border-hover: #444444;
-  --ye-selection: rgba(96, 165, 250, 0.25);
+  --ye-border: #373737;
+  --ye-border-hover: #464646;
+  --ye-selection: rgb(76 136 255 / 25%);
   --ye-toolbar-bg: #262626;
+  --ye-toolbar-border: var(--ye-border);
+  --ye-toolbar-shadow: none;
+  --ye-toolbar-divider: var(--ye-border);
+  --ye-toolbar-btn-text: #8f959e;
+  --ye-toolbar-btn-hover: rgb(255 255 255 / 8%);
+  --ye-toolbar-btn-active: rgb(255 255 255 / 12%);
+  --ye-toolbar-btn-disabled: #5c6066;
   --ye-footer-bg: #262626;
   --ye-footer-text: #c4c4c4;
   --ye-footer-divider: #434343;
-  --ye-toolbar-btn-hover: #333333;
-  --ye-toolbar-btn-active: #404040;
-  --ye-toolbar-btn-text: var(--ye-text);
-  --ye-toolbar-divider: #374151;
   --ye-bubble-bg: #262626;
   --ye-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   --ye-code-bg: #2a2a2a;
@@ -167,7 +176,7 @@
   --ye-codeblock-bg: #0d0d0d;
   --ye-table-header-bg: #2a2a2a;
   --ye-blockquote-bg: #262626;
-  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --ye-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --ye-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --ye-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
+  --ye-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 24px rgba(0, 0, 0, 0.45);
 }

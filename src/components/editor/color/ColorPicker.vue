@@ -625,7 +625,7 @@ $dark-selector: "[data-color-mode=" dark "] &";
   min-width: 40px;
   height: 24px;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: var(--ye-border-width) solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 
   #{$dark-selector} {
@@ -778,12 +778,12 @@ $dark-selector: "[data-color-mode=" dark "] &";
   position: relative;
   padding: 0;
   cursor: pointer;
-  border: 1px solid #ddd;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 50%; /* 圆形 */
   transition: transform 0.2s;
 
   #{$dark-selector} {
-    border-color: #434343;
+    border-color: var(--ye-border);
   }
 
   /* 选中状态：蓝色边框和阴影，轻微放大 */
@@ -843,10 +843,10 @@ $dark-selector: "[data-color-mode=" dark "] &";
 .ye-color-picker-advanced {
   padding-top: 12px;
   margin-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: var(--ye-border-width) solid var(--ye-border);
 
   #{$dark-selector} {
-    border-top-color: rgba(255, 255, 255, 0.15);
+    border-top-color: var(--ye-border);
   }
 }
 
@@ -909,12 +909,12 @@ $dark-selector: "[data-color-mode=" dark "] &";
   height: 32px;
   padding: 0;
   cursor: pointer;
-  border: 1px solid #d9d9d9;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 4px;
 
   #{$dark-selector} {
     background: #1f1f1f;
-    border-color: #434343;
+    border-color: var(--ye-border);
   }
 
   &:hover {
@@ -944,14 +944,14 @@ $dark-selector: "[data-color-mode=" dark "] &";
   font-size: 14px;
   color: #262626;
   background: #fff;
-  border: 1px solid #d9d9d9;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 4px;
   transition: all 0.2s;
 
   #{$dark-selector} {
     color: #f0f0f0;
     background: #1f1f1f;
-    border-color: #434343;
+    border-color: var(--ye-border);
   }
 
   &:hover {

@@ -3,12 +3,12 @@
 /* 缩放控制条 */
 .zoom-controls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 8px 16px;
   background: var(--ye-footer-bg);
-  border-bottom: 1px solid var(--ye-footer-divider);
+  border-bottom: var(--ye-border-width) solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
     background: var(--ye-footer-bg);
@@ -46,7 +46,7 @@
   margin-left: 8px;
   font-size: 13px;
   color: var(--ye-footer-text);
-  border-left: 1px solid var(--ye-footer-divider);
+  border-left: var(--ye-border-width) solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
     color: var(--ye-footer-text);
@@ -61,10 +61,10 @@
   margin-left: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--ye-text-muted);
   white-space: nowrap;
-  border-left: 1px solid var(--ye-footer-divider);
+  border-left: var(--ye-border-width) solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
     color: var(--ye-text-muted);
@@ -72,17 +72,16 @@
   }
 }
 
+/* 底栏位置 */
 .zoom-controls--bottom {
   z-index: 10;
   flex-shrink: 0;
   width: 100%;
-  background: var(--ye-footer-bg);
-  border-top: 1px solid var(--ye-footer-divider);
+  border-top: var(--ye-border-width) solid var(--ye-footer-divider);
   border-bottom: none;
   box-shadow: none;
 
   [data-color-mode="dark"] & {
-    background: var(--ye-footer-bg);
     border-top-color: var(--ye-footer-divider);
     box-shadow: none;
   }

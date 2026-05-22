@@ -251,30 +251,21 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 </script>
 
 <style lang="scss" scoped>
-$dark-selector: "[data-color-mode=" dark "] &";
+$dark-selector: '[data-color-mode="dark"] &';
 
 .document-toolbar-container {
   z-index: 1000;
-  flex-shrink: 0;
-  width: 100%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
-
-  #{$dark-selector} {
-    background: #1f1f1f;
-    box-shadow: 0 1px 4px rgb(0 0 0 / 40%);
-  }
 }
 
 .document-toolbar {
-  min-height: 48px;
+  // min-height: 52px;
   padding: 6px 12px;
 }
 
 .toolbar-sections {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 0;
+  gap: 6px 0;
   align-items: center;
   justify-content: center;
   min-width: 0;
@@ -293,10 +284,10 @@ $dark-selector: "[data-color-mode=" dark "] &";
 .toolbar-section + .toolbar-section {
   padding-left: 8px;
   margin-left: 8px;
-  border-left: 1px solid #e8e8e8;
+  border-left: var(--ye-border-width) solid var(--ye-toolbar-divider);
 
   #{$dark-selector} {
-    border-left-color: #434343;
+    border-left-color: var(--ye-toolbar-divider);
   }
 }
 
@@ -310,10 +301,10 @@ $dark-selector: "[data-color-mode=" dark "] &";
 
 .tool-row + .tool-row {
   padding-left: 6px;
-  border-left: 1px solid #e8e8e8;
+  border-left: var(--ye-border-width) solid var(--ye-toolbar-divider);
 
   #{$dark-selector} {
-    border-left-color: #434343;
+    border-left-color: var(--ye-toolbar-divider);
   }
 }
 

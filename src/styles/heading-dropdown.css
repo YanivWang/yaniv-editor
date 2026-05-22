@@ -15,8 +15,9 @@
 .ye-heading-dropdown-overlay .ant-menu {
   min-width: 180px;
   padding: 4px;
-  border-radius: 10px;
-  box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-toolbar-dropdown-shadow);
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item {
@@ -33,17 +34,17 @@
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item:not(.ant-menu-item-disabled):hover {
-  background: #f3f4f6;
+  background: var(--ye-toolbar-btn-hover);
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item-selected,
 .ye-heading-dropdown-overlay .ant-menu-item.ant-menu-item-selected {
   color: inherit !important;
-  background: #eef2ff !important;
+  background: var(--ye-primary-light) !important;
 }
 
 .ye-heading-dropdown-overlay .ant-menu-item-selected:hover {
-  background: #eef2ff !important;
+  background: var(--ye-primary-light) !important;
 }
 
 .ye-heading-dropdown-overlay .ye-dropdown-menu-item {
@@ -58,26 +59,26 @@
   flex-shrink: 0;
   margin-left: auto;
   font-size: 14px;
-  color: #4f46e5;
+  color: var(--ye-primary);
 }
 
 [data-color-mode="dark"] .ye-heading-dropdown-overlay .ant-menu {
-  box-shadow: 0 4px 16px rgb(0 0 0 / 35%);
+  box-shadow: var(--ye-toolbar-dropdown-shadow);
 }
 
 [data-color-mode="dark"]
   .ye-heading-dropdown-overlay
   .ant-menu-item:not(.ant-menu-item-disabled):hover {
-  background: rgb(255 255 255 / 8%);
+  background: var(--ye-toolbar-btn-hover);
 }
 
 [data-color-mode="dark"] .ye-heading-dropdown-overlay .ant-menu-item-selected,
 [data-color-mode="dark"] .ye-heading-dropdown-overlay .ant-menu-item.ant-menu-item-selected {
-  background: rgb(79 70 229 / 20%) !important;
+  background: var(--ye-primary-light) !important;
 }
 
 [data-color-mode="dark"] .ye-heading-dropdown-overlay .ye-dropdown-menu-item__check {
-  color: #818cf8;
+  color: var(--ye-primary);
 }
 
 .heading-icon {
@@ -89,7 +90,7 @@
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   line-height: 1;
-  color: rgb(0 0 0 / 75%);
+  color: var(--ye-toolbar-btn-text);
 }
 
 .heading-icon--paragraph {
@@ -133,5 +134,5 @@
 }
 
 [data-color-mode="dark"] .heading-icon {
-  color: rgb(255 255 255 / 75%);
+  color: var(--ye-toolbar-btn-text);
 }

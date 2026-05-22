@@ -98,7 +98,7 @@
     Arial,
     sans-serif;
   background: #fff;
-  border: 1px solid rgb(15 23 42 / 10%);
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   box-shadow:
     0 12px 32px rgb(15 23 42 / 14%),
@@ -189,7 +189,7 @@
   width: 196px;
   padding: 8px;
   background: #fff;
-  border: 1px solid rgb(15 23 42 / 10%);
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   box-shadow:
     0 12px 32px rgb(15 23 42 / 14%),

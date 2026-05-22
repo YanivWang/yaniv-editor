@@ -24,12 +24,11 @@
         type="button"
         class="outline-panel__item"
         :class="[headingLevelClass(item.originalLevel), { 'is-active': item.isActive }]"
-        :style="{ paddingLeft: `${12 + (item.level - 1) * 14}px` }"
+        :style="{ paddingLeft: `${16 + (item.level - 1) * 16}px` }"
         :data-outline-id="item.id"
         :aria-current="item.isActive ? 'location' : undefined"
         @click="scrollToHeading(item)"
       >
-        <span v-if="item.itemIndex" class="outline-panel__index">{{ item.itemIndex }}.</span>
         <span class="outline-panel__text">{{ item.textContent }}</span>
       </button>
     </nav>

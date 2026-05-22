@@ -1,6 +1,6 @@
 <template>
   <div class="demo-page demo-page--split">
-    <aside class="demo-sidebar">
+    <DemoSidebar storage-key="yaniv-demo:sidebar:full-editor">
       <DemoSubnav title="完整编辑器" :description="fullEntry?.description" />
       <div class="demo-sidebar__body">
         <DemoControlsBar
@@ -17,7 +17,7 @@
         />
         <DemoFeatureHints :preset="preset" />
       </div>
-    </aside>
+    </DemoSidebar>
     <main class="demo-main yaniv-editor-host">
       <YanivEditor
         :mode="mode"
@@ -47,6 +47,7 @@ import DemoControlsBar from "../components/DemoControlsBar.vue";
 import DemoFeatureHints from "../components/DemoFeatureHints.vue";
 import DemoFeatureOverrides from "../components/DemoFeatureOverrides.vue";
 import DemoIntegrationPanel from "../components/DemoIntegrationPanel.vue";
+import DemoSidebar from "../components/DemoSidebar.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { DEMO_CUSTOM_APPEARANCE_VARS } from "../config/demoAdvanced";
 import { getDemoEntry } from "../config/demoCatalog";

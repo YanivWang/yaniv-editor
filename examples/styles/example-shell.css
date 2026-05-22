@@ -43,13 +43,70 @@ body,
 
 /* 左侧配置面板 */
 .demo-sidebar {
+  --demo-sidebar-width: 460px;
+
+  position: relative;
   display: flex;
   flex-shrink: 0;
   flex-direction: column;
-  width: 460px;
+  width: var(--demo-sidebar-width);
   min-height: 0;
+  overflow: visible;
   background: #fff;
-  border-right: 1px solid #e8edf3;
+  border-right: 1px solid #e2e8f0;
+  transition: width 0.2s ease;
+}
+
+.demo-sidebar--collapsed {
+  width: 0;
+  border-right-color: transparent;
+}
+
+.demo-sidebar__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: var(--demo-sidebar-width);
+  min-height: 0;
+}
+
+/* 收起后：第一版中线悬浮展开钮 */
+.demo-sidebar__toggle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 48px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 2px 0 8px rgb(15 23 42 / 6%);
+  transform: translate(0, -50%);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.demo-sidebar__toggle:hover {
+  color: #0284c7;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.demo-sidebar__toggle-icon {
+  display: block;
+  margin-top: -1px;
 }
 
 .demo-sidebar__body {
@@ -66,11 +123,30 @@ body,
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  margin: 6px;
+  margin: 8px;
   overflow: hidden;
   background: #f4f7fb;
-  border: 2px dashed #cbd5e1;
-  border-radius: 8px;
+}
+
+/* 边框与圆角放在编辑器根节点；box-sizing 保证 border 不计入 flex 高度 */
+.demo-main.yaniv-editor-host > .yaniv-editor {
+  box-sizing: border-box;
+  border: 1px solid #e6e9ed;
+  border-radius: 4px;
+}
+
+/* Demo 圆角：顶栏 / 底栏贴合编辑器圆角边框（3px = 4px 外圆角 − 1px 边框） */
+.demo-main.yaniv-editor-host > .yaniv-editor .document-toolbar-container {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.demo-main.yaniv-editor-host
+  > .yaniv-editor
+  .footer-nav-container
+  .zoom-controls.zoom-controls--bottom {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
 /* App.vue：顶部导航 */
@@ -219,13 +295,42 @@ body,
   flex-shrink: 0;
   padding: 12px 16px;
   background: #fff;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid #f1f5f9;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
+}
+
+.demo-subnav__toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .demo-subnav__back {
   font-size: 15px;
   color: #64748b;
   text-decoration: none;
+}
+
+.demo-subnav__collapse {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.demo-subnav__collapse:hover {
+  color: #0284c7;
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .demo-subnav__back:hover {
@@ -253,6 +358,7 @@ body,
 .demo-controls {
   padding: 12px 16px;
   background: #fff;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .demo-controls__row {
@@ -331,7 +437,7 @@ body,
 .demo-integration {
   padding: 10px 16px 12px;
   background: #f8fafc;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .demo-integration__head {
@@ -414,7 +520,7 @@ body,
 .demo-overrides {
   padding: 10px 16px 12px;
   background: #fff;
-  border-bottom: 1px solid #e8edf3;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .demo-overrides__head {

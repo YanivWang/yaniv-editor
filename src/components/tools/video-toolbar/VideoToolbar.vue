@@ -164,13 +164,13 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 8px;
   background: #fff;
-  border: 1px solid #d0d0d0;
+  border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   [data-color-mode="dark"] & {
     background: #1f1f1f;
-    border-color: #434343;
+    border-color: var(--ye-border);
   }
 }
 
@@ -179,10 +179,10 @@ onBeforeUnmount(() => {
   gap: 4px;
   align-items: center;
   padding: 0 4px;
-  border-right: 1px solid #e8e8e8;
+  border-right: var(--ye-border-width) solid var(--ye-border);
 
   [data-color-mode="dark"] & {
-    border-right-color: #434343;
+    border-right-color: var(--ye-border);
   }
 }
 

@@ -31,11 +31,17 @@
 }
 
 .ye-dropdown-btn:hover {
-  color: var(--ye-toolbar-btn-text);
+  color: var(--ye-text);
   background: var(--ye-toolbar-btn-hover);
 }
 
 .ye-dropdown-btn.is-active {
+  font-weight: 500;
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
+}
+
+.ye-dropdown-btn.is-active:hover {
   color: var(--ye-primary);
   background: var(--ye-primary-light);
 }
@@ -111,11 +117,16 @@
 
 .ye-dropdown-menu-item__icon {
   font-size: 16px;
-  color: rgb(0 0 0 / 65%);
+  color: var(--ye-toolbar-btn-text);
 }
 
-[data-color-mode="dark"] .ye-dropdown-menu-item__icon {
-  color: rgb(255 255 255 / 65%);
+/* 下拉浮层：1px 浅灰描边 */
+.yaniv-editor .ant-dropdown .ant-dropdown-menu,
+.yaniv-editor .ant-dropdown .ant-menu,
+.yaniv-editor .ye-dropdown-overlay.ant-dropdown-menu,
+.yaniv-editor .ye-dropdown-overlay .ant-dropdown-menu {
+  border: var(--ye-border-width) solid var(--ye-border);
+  box-shadow: var(--ye-toolbar-dropdown-shadow);
 }
 
 /* Dark mode: dropdown container & menu */

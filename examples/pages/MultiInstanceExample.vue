@@ -1,6 +1,6 @@
 <template>
   <div class="demo-page demo-page--split">
-    <aside class="demo-sidebar">
+    <DemoSidebar storage-key="yaniv-demo:sidebar:multi-instance">
       <DemoSubnav title="多实例隔离" :description="entry?.description" />
       <div class="demo-sidebar__body">
         <DemoMultiInstancePanel
@@ -14,7 +14,7 @@
           :probe-b="probeB"
         />
       </div>
-    </aside>
+    </DemoSidebar>
 
     <main class="demo-main demo-main--multi">
       <section class="demo-multi__column">
@@ -59,6 +59,7 @@ import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
 
 import DemoMultiInstancePanel from "../components/DemoMultiInstancePanel.vue";
+import DemoSidebar from "../components/DemoSidebar.vue";
 import DemoSubnav from "../components/DemoSubnav.vue";
 import { getDemoEntry } from "../config/demoCatalog";
 import {

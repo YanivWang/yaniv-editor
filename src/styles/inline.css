@@ -39,7 +39,7 @@
   align-items: center;
   padding: 8px 12px;
   background: var(--ye-toolbar-bg);
-  border-bottom: 1px solid var(--ye-border);
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
 }
 
 .yaniv-inline-editor__content {

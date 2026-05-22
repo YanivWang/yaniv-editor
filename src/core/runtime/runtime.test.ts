@@ -17,7 +17,7 @@ const fullLayout = {
   linkBubble: true,
   tableTools: true,
   shortcutHints: true,
-  outlineAnchor: "top-left" as const,
+  outlineAnchor: "top-right" as const,
   zoomPlacement: "bottom" as const,
   tableToolsShowMode: 2 as const,
 };
@@ -104,7 +104,7 @@ describe("resolveChromePolicy", () => {
         linkBubble: false,
         tableTools: false,
         shortcutHints: false,
-        outlineAnchor: "top-left" as const,
+        outlineAnchor: "top-right" as const,
         zoomPlacement: "bottom" as const,
         tableToolsShowMode: 2 as const,
       },

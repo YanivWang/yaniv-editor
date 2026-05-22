@@ -18,6 +18,11 @@
   --ye-bg-secondary: #ffffff;
   --ye-bg-hover: rgba(55, 53, 47, 0.08);
   --ye-toolbar-bg: #ffffff;
+  --ye-toolbar-border: rgb(55 53 47 / 9%);
+  --ye-toolbar-divider: rgb(55 53 47 / 9%);
+  --ye-toolbar-btn-text: rgb(55 53 47 / 65%);
+  --ye-toolbar-btn-hover: rgb(55 53 47 / 8%);
+  --ye-toolbar-btn-active: rgb(55 53 47 / 12%);
   --ye-text: #37352f;
   --ye-text-secondary: #787774;
   --ye-text-muted: #9b9a97;
@@ -57,39 +62,24 @@
   box-shadow: none;
 }
 
-/* ===== Notion 风格 - 极简工具栏 ===== */
-.yaniv-editor.appearance-notion .document-toolbar {
+/* ===== Notion 风格 - 极简工具栏（尺寸保留，配色走 token） ===== */
+.yaniv-editor.appearance-notion .document-toolbar-container {
   position: sticky;
   top: 0;
   z-index: 50;
-  padding: 8px 12px;
-  background: #ffffff !important;
-  border-bottom: 1px solid rgba(55, 53, 47, 0.09) !important;
-  box-shadow: none;
 }
 
-/* 工具栏按钮 */
+.yaniv-editor.appearance-notion .document-toolbar {
+  padding: 8px 12px;
+}
+
 .yaniv-editor.appearance-notion .ye-toolbar-button,
 .yaniv-editor.appearance-notion .ye-dropdown-btn {
   min-width: 28px;
   height: 28px;
   padding: 0 6px;
   font-size: 14px;
-  color: rgba(55, 53, 47, 0.65);
-  background: transparent;
   border-radius: 4px;
-}
-
-.yaniv-editor.appearance-notion .ye-toolbar-button:hover,
-.yaniv-editor.appearance-notion .ye-dropdown-btn:hover {
-  color: #37352f;
-  background: rgba(55, 53, 47, 0.08);
-}
-
-.yaniv-editor.appearance-notion .ye-toolbar-button.is-active,
-.yaniv-editor.appearance-notion .ye-dropdown-btn.is-active {
-  color: rgb(35, 131, 226);
-  background: rgba(35, 131, 226, 0.12);
 }
 
 /* ===== Notion 风格 - 编辑器内容区域 ===== */
@@ -232,6 +222,11 @@
   --ye-bg-secondary: #191919;
   --ye-bg-hover: rgba(255, 255, 255, 0.055);
   --ye-toolbar-bg: #191919;
+  --ye-toolbar-border: rgb(255 255 255 / 9%);
+  --ye-toolbar-divider: rgb(255 255 255 / 9%);
+  --ye-toolbar-btn-text: rgb(255 255 255 / 65%);
+  --ye-toolbar-btn-hover: rgb(255 255 255 / 5.5%);
+  --ye-toolbar-btn-active: rgb(255 255 255 / 8%);
   --ye-text: rgba(255, 255, 255, 0.9);
   --ye-text-secondary: rgba(255, 255, 255, 0.6);
   --ye-text-muted: rgba(255, 255, 255, 0.4);
@@ -249,11 +244,6 @@
   background: #191919;
 }
 
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .document-toolbar {
-  background: #191919 !important;
-  border-bottom-color: rgba(255, 255, 255, 0.09) !important;
-}
-
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .document-content .ProseMirror {
   color: rgba(255, 255, 255, 0.9);
   background: #191919;
@@ -263,17 +253,6 @@
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror h2,
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror h3 {
   color: rgba(255, 255, 255, 0.9);
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-toolbar-button,
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-dropdown-btn {
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-toolbar-button:hover,
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ye-dropdown-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.055);
 }
 
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror th {
