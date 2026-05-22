@@ -42,6 +42,7 @@ import { computed, ref } from "vue";
 
 import { YanivEditor } from "@yanivjs/yaniv-editor";
 import "@yanivjs/yaniv-editor/style.css";
+import "katex/dist/katex.min.css";
 
 import DemoControlsBar from "../components/DemoControlsBar.vue";
 import DemoFeatureHints from "../components/DemoFeatureHints.vue";

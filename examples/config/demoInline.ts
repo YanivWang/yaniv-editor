@@ -60,7 +60,7 @@ export const INLINE_HINTS: InlineHint[] = [
   {
     id: "compose",
     label: "自行拼装",
-    hint: '见「行内自行拼装」：Editor + buildExtensions("inline", ctx)',
+    hint: "见「行内自行拼装」：YanivInlineEditor #toolbar 插槽按需挂载按钮",
   },
 ];
 

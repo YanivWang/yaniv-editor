@@ -76,7 +76,7 @@ To keep the old basic behavior with table and video:
 <YanivEditor preset="basic" :features="{ table: true, video: true }" />
 ```
 
-`full` enables advanced document abilities such as table, video, math, Office paste, outline, find/replace, format painter, slash command, and drag handle. AI is not enabled by default:
+`full` enables table, video, math, Office paste, outline, find/replace, and format painter. Slash command and drag handle stay off unless you opt in with `:features`. AI is not enabled by default:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />

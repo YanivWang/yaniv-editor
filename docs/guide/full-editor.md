@@ -15,7 +15,7 @@ Full Editor uses four explicit axes:
 
 `basic` enables image only for common writing workflows. Text formatting and links remain available. It keeps a fixed header and footer, but does not enable video, table, AI, Office paste, math, outline, find/replace, format painter, slash command, or drag handle by default.
 
-`full` enables the advanced document capability set and keeps the fixed header, footer, floating menu, contextual tools, and shortcut hints. AI is not enabled by default.
+`full` enables table, video, math, Office paste, outline, find/replace, and format painter. It keeps the fixed header, footer, floating menu, contextual tools, and shortcut hints. Slash command, drag handle, and AI are not enabled by default.
 
 `notion` enables block editing (slash command, drag handle) plus video, math, outline, find/replace, Office paste, and AI (format painter off). It hides the fixed top toolbar and footer, relying on floating/block interactions instead.
 

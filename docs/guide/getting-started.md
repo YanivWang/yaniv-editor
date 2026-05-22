@@ -13,7 +13,7 @@ import "@yanivjs/yaniv-editor/style.css";
 </template>
 ```
 
-Use `preset="full"` when the page needs advanced document abilities such as table, video, math, Office paste, outline, find/replace, format painter, slash command, and drag handle.
+Use `preset="full"` when the page needs table, video, math, Office paste, outline, find/replace, and format painter (not slash command or drag handle — use `preset="notion"` for those).
 
 Use `preset="notion"` when the page needs a block editing workflow.
 

@@ -245,6 +245,41 @@ export const FEATURE_HINTS: FeatureHint[] = [
     presets: ["notion"],
   },
   {
+    id: "notionCallout",
+    group: "块编辑",
+    label: "标注块",
+    hint: "notion 方案：输入 / 选择「标注」；或空行输入 > 触发 Markdown 转标注",
+    presets: ["notion"],
+  },
+  {
+    id: "notionToggle",
+    group: "块编辑",
+    label: "折叠列表",
+    hint: "输入 / 选择「折叠列表」插入可展开块",
+    presets: ["notion"],
+  },
+  {
+    id: "notionColumn",
+    group: "块编辑",
+    label: "分栏",
+    hint: "输入 / 选择「分栏」插入双列布局",
+    presets: ["notion"],
+  },
+  {
+    id: "notionEmbed",
+    group: "块编辑",
+    label: "嵌入 / 书签",
+    hint: "输入 / 选择「嵌入/书签」插入外部链接卡片",
+    presets: ["notion"],
+  },
+  {
+    id: "notionMention",
+    group: "块编辑",
+    label: "@ 提及",
+    hint: "输入 @ 唤起提及建议菜单",
+    presets: ["notion"],
+  },
+  {
     id: "floatingMenu",
     group: "块编辑",
     label: "行首悬浮菜单",
@@ -387,7 +422,8 @@ const SAMPLE_NOTION = `
 <p>Notion 方案：无固定顶栏/底栏，依赖行首悬浮菜单、<code>/</code> 与左侧手柄。</p>
 <h2>试一试</h2>
 <ul>
-  <li>空行输入 <code>/</code> 插入块</li>
+  <li>空行输入 <code>/</code> 插入块（标注、折叠列表、分栏、嵌入等）</li>
+  <li>空行输入 <code>@</code> 唤起提及菜单；输入 <code>&gt; </code> 可转标注块</li>
   <li>段落左侧六点：菜单或拖拽</li>
   <li>选中文字使用行首 AI 与格式</li>
 </ul>

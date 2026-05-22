@@ -16,7 +16,7 @@ export const DEMO_ENTRIES: DemoEntry[] = [
     routeName: "full-editor",
     tags: ["YanivEditor", "preset", "appearance"],
     highlights: [
-      "preset / features 覆盖 / 预览 / 六套外观",
+      "preset / features 覆盖 / 预览 / 四套外观",
       "集成 API + Custom 外观 custom-appearance-vars",
       "全量工具栏与块编辑能力指引",
     ],
@@ -36,13 +36,14 @@ export const DEMO_ENTRIES: DemoEntry[] = [
   {
     id: "inline-compose",
     title: "行内自行拼装",
-    description: "自管 Editor 生命周期，按需挂载 UndoRedo、标题、格式、列表等工具栏组件。",
+    description:
+      "YanivInlineEditor #toolbar 插槽：按需挂载 UndoRedo、标题、格式、列表等工具栏组件，扩展仍与 toolbar 同步。",
     routeName: "inline-compose",
-    tags: ["Editor", "buildExtensions"],
+    tags: ["YanivInlineEditor", "#toolbar"],
     highlights: [
-      "按需挂载工具栏组件（含 Align / Link 等）",
-      "toolbar 开关驱动 resolveInlineGates + buildExtensions",
-      "编辑/预览与 Full 行内能力对齐",
+      "#toolbar 插槽按需挂载工具栏组件",
+      "toolbar 开关驱动扩展注册，与开箱即用页一致",
+      "编辑/预览与行内编辑器能力对齐",
     ],
   },
   {
