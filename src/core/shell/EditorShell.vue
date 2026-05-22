@@ -95,18 +95,14 @@ const rootRef = ref<HTMLElement | null>(null);
 const workspaceRef = ref<EditorWorkspaceExpose | null>(null);
 const localeMessages = shallowRef<TiptapLocale | null>(null);
 
-const localeCode = computed((): "zh-CN" | "en-US" => {
-  const raw = isFull.value ? fullProps.value?.locale : inlineProps.value?.locale;
-  if (raw?.startsWith("en")) return "en-US";
-  return "zh-CN";
-});
-
-const localeContext = provideEditorLocale(
-  computed(() => (isFull.value ? fullProps.value?.locale : inlineProps.value?.locale)),
+const localeSource = computed(() =>
+  isFull.value ? fullProps.value?.locale : inlineProps.value?.locale,
 );
 
+const localeContext = provideEditorLocale(localeSource);
+
 watch(
-  localeCode,
+  () => localeContext.locale.value,
   async (code) => {
     localeMessages.value = await resolveLocaleMessages(code);
   },
@@ -133,13 +129,13 @@ const runtime = isFull.value
   ? useEditorRuntime({
       host: "full",
       props: computed(() => fullProps.value ?? {}),
-      locale: localeCode,
+      locale: localeContext.locale,
     })
   : useEditorRuntime({
       host: "inline",
       mode: computed(() => inlineProps.value?.mode ?? "edit"),
       toolbar: computed(() => inlineProps.value?.toolbar),
-      locale: localeCode,
+      locale: localeContext.locale,
     });
 
 const { profile, chrome, sessionKey, toolbarConfig } = runtime;

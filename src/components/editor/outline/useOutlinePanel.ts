@@ -9,7 +9,7 @@ export interface OutlinePanelContext {
 const OUTLINE_PANEL_KEY: InjectionKey<OutlinePanelContext> = Symbol("outlinePanel");
 
 export function provideOutlinePanel(): OutlinePanelContext {
-  const expanded = ref(false);
+  const expanded = ref(true);
 
   const context: OutlinePanelContext = {
     expanded,

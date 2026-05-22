@@ -2,7 +2,7 @@
 
 Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
 
-> **状态**：本文档描述的重构已于 v0.1.0 完成并落地。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文保留的「删除清单」「实施顺序」等内容作为历史验收依据，不再表示待办事项。
+> **状态（已完成）**：本文档描述的重构已于 v0.1.0 完成并落地；后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
 
 ## 实施约定
 
@@ -1161,13 +1161,13 @@ src/appearance/
 | 隐藏交互组件（`.is-preview .drag-handle { display: none }` 这类） | **整条删除**，由 `chromePolicy.showBlockPicker` / `v-if` 或 `ctx.isEditable` 守卫接管，**不允许靠 CSS 隐藏交互层** |
 | `classList.toggle('is-preview')` 命令式写入                       | **整段删除**，phase attribute 通过 `<div :data-phase="profile.mode">` 声明式绑定                                   |
 
-> **验证**：合并前 `rg "\.is-preview" src/` 应为零命中；只有 `[data-phase="preview"]` 形式存在。
+> **验证（已完成）**：`rg "\.is-preview" src/` 为零命中；仅存在 `[data-phase="preview"]` 形式。
 
 ---
 
 ## 必须删除的旧实现（验收清单，已完成）
 
-合并前 `src/` 中以下模式 **grep 为零**（当前仓库已满足）：
+`src/` 中以下旧模式 **grep 为零**（当前仓库已满足，无需再执行删除）：
 
 | 删除项                                                                           | 替代                                                                     |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -1229,7 +1229,7 @@ src/appearance/
 10. ~~breaking exports + docs + examples 重写~~
 11. ~~verify-no-tails grep + 验收清单~~
 
-### 最小测试集（步骤 3 必须覆盖）
+### 最小测试集（步骤 3，已覆盖）
 
 实现文件：
 
@@ -1394,7 +1394,7 @@ test("onBeforeUnmount 后 buildExtensions resolve 被 discard", async () => {
 - [x] **AI config 热更新**：宿主修改 `aiConfig.model` 后下次发请求使用新 model，无需重建 session — registry `getModel: () => ctx.aiConfig()?.model`
 - [x] **BlockPicker 卸载→重建**：preview → edit 切换后 `host.registerInstance` 重新绑定，SlashCommand 可弹出菜单 — `BlockPickerMenu.vue` `onBeforeUnmount → registerInstance(null)`
 
-**无尾巴（合并门槛）** — 2026-05-22 grep 结果
+**无尾巴（合并门槛，已完成）** — 下列为 2026-05-22 验收时的 grep 记录，仅供复查参考，非待执行清单
 
 ```bash
 # 旧模式：均应无命中（CHANGELOG / 本文档除外）；统一限定 ts/vue，避免误伤 markdown
@@ -1482,6 +1482,17 @@ rg -t ts -t vue "normalizeInitialContent" src/
 rg -t ts -t vue "hasInlineToolbarItems|applyExtensionGatesToToolbarConfig|editorCapabilityMap" src/
 # ✅ 0 命中（已替换为 applyGatesToToolbarConfig / resolveShowInlineToolbar）
 ```
+
+---
+
+## 重构后清理（已完成）
+
+| 项                                                                                                                               | 处理                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `src/utils/clipboard.ts` 死代码                                                                                                  | 已删除                                                                                    |
+| 无人引用的 barrel（`utils/index`、`extensions/index`、`components/editor/index`、`configs/index`、`features/ai/adapters/index`） | 已删除；`core/runtime/index` 已删除，`src/index.ts` 改为直引子模块                        |
+| `EditorShell` locale 与 `normalizeLocaleCode` 不一致                                                                             | 已统一：`provideEditorLocale(localeSource)` + `localeContext.locale` 供 runtime / session |
+| `outlinePanel.expanded` 默认 `true`                                                                                              | 已与文档对齐（`useOutlinePanel.ts`）                                                      |
 
 ---
 

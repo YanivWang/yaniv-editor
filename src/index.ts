@@ -16,7 +16,8 @@ export type {
   ExtensionGates,
 } from "./core/runtime/types";
 
-export { resolveEditorProfile, mergeFeatures } from "./core/runtime";
+export { mergeFeatures } from "./core/runtime/mergeFeatures";
+export { resolveEditorProfile } from "./core/runtime/resolveEditorProfile";
 export { resolveChromePolicy } from "./core/runtime/resolveChromePolicy";
 export { computeSessionKey } from "./core/runtime/computeSessionKey";
 export { resolveInlineGates } from "./core/runtime/resolveInlineGates";
