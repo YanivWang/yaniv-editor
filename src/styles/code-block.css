@@ -6,31 +6,31 @@
   position: relative;
 }
 
-/* 代码块容器：始终深色，覆盖各 appearance 中的浅色 pre */
+/* 代码块容器：布局与语法 token；颜色由 --ye-codeblock-* 控制（appearance 可覆盖 token） */
 .yaniv-editor .ProseMirror pre {
   position: relative;
   min-height: 4.5em;
-  padding: 40px 24px 24px !important;
+  padding: 40px 24px 24px;
   margin: 12px 0;
   overflow-x: auto;
-  font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
-  font-size: 13px !important;
+  font-family: var(--ye-code-font-family, var(--ye-font-mono));
+  font-size: 13px;
   line-height: 1.5;
-  color: var(--ye-codeblock-text) !important;
+  color: var(--ye-codeblock-text);
   tab-size: 2;
-  background: var(--ye-codeblock-bg) !important;
-  border: none !important;
+  background-color: var(--ye-codeblock-bg);
+  border: none;
   border-radius: 8px;
 }
 
 .yaniv-editor .ProseMirror pre code {
   display: block;
-  padding: 0 !important;
+  padding: 0;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
-  color: inherit !important;
-  background: none !important;
+  color: inherit;
+  background: none;
   border-radius: 0;
 }
 

@@ -51,8 +51,14 @@ import {
 } from "@/features/ai";
 import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
 
-import type { CapabilityDefinition } from "./types";
+import type { BuildExtensionsCtx, CapabilityDefinition } from "./types";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+
+function resolveParagraphPlaceholder(ctx: BuildExtensionsCtx): string {
+  return ctx.gates.slashCommand
+    ? ctx.locale.placeholder.paragraphWithSlash
+    : ctx.locale.placeholder.paragraph;
+}
 
 export const CAPABILITIES: CapabilityDefinition[] = [
   {
@@ -73,7 +79,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
           placeholder: ({ node }: { node: ProseMirrorNode }) => {
             if (node.type.name === "heading") return ctx.locale.placeholder.heading;
             if (node.type.name === "codeBlock") return ctx.locale.placeholder.codeBlock;
-            return ctx.locale.placeholder.paragraph;
+            return resolveParagraphPlaceholder(ctx);
           },
         }),
         TextAlign.configure({ types: ["heading", "paragraph"] }),

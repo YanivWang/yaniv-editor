@@ -1,9 +1,94 @@
 /**
- * 表格浮动工具栏样式
- * @description 表格操作菜单（依赖 base.css）
+ * 表格样式
+ * @description 编辑器内表格内容、列宽拖拽、浮动工具栏（依赖 base.css / variables.css）
+ *
+ * 架构约定：
+ * - 本文件是 ProseMirror 表格的唯一结构样式来源（边框、单元格、resize handle）
+ * - appearance/*.css 仅通过 --ye-* token 与 margin/padding 等布局差异做主题化，禁止重复声明 border
  */
 
-/* 工具栏容器 */
+/* ===== 编辑器内表格内容与列宽拖拽 ===== */
+.yaniv-editor .ProseMirror .tableWrapper {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.yaniv-editor .ProseMirror table {
+  width: 100%;
+  max-width: 100%;
+  margin: 14px 0;
+  overflow: hidden;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.yaniv-editor .ProseMirror table td,
+.yaniv-editor .ProseMirror table th {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 10px 14px;
+  vertical-align: top;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  border: var(--ye-border-width) solid var(--ye-table-border);
+}
+
+.yaniv-editor .ProseMirror table td > *,
+.yaniv-editor .ProseMirror table th > * {
+  margin-bottom: 0;
+}
+
+.yaniv-editor .ProseMirror table th {
+  font-size: inherit;
+  font-weight: 600;
+  text-align: left;
+  background-color: var(--ye-table-header-bg);
+}
+
+.yaniv-editor .ProseMirror table .selectedCell::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background: var(--ye-table-selected-bg);
+}
+
+/*
+ * 列宽拖拽（prosemirror-tables / Table.configure({ resizable: true })）
+ * 每行会插入独立的 .column-resize-handle（仅 hover 列边界时出现）；拖拽时需隐藏同列边界上的单元格边框，
+ * 避免灰色边框与蓝色指示线叠加。视觉宽度 3px，命中区域由 prosemirror 默认 handleWidth=5px 控制。
+ */
+.yaniv-editor .ProseMirror table td:has(> .column-resize-handle),
+.yaniv-editor .ProseMirror table th:has(> .column-resize-handle) {
+  border-right-color: transparent;
+}
+
+.yaniv-editor .ProseMirror table td:has(> .column-resize-handle) + td,
+.yaniv-editor .ProseMirror table th:has(> .column-resize-handle) + th {
+  border-left-color: transparent;
+}
+
+.yaniv-editor .ProseMirror table .column-resize-handle {
+  position: absolute;
+  top: -1px;
+  right: -1.5px;
+  bottom: -1px;
+  z-index: 10;
+  width: 3px;
+  pointer-events: none;
+  background-color: var(--ye-primary);
+}
+
+.yaniv-editor .ProseMirror.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+/* ===== 表格浮动工具栏 ===== */
 .table-bubble-menu {
   position: absolute !important;
   top: 50px;

@@ -56,7 +56,7 @@ test.describe("Notion preset + appearance", () => {
     await page.locator(".block-picker-item-title", { hasText: "折叠列表" }).click();
     const toggle = page.locator(".toggle-block").last();
     await expect(toggle).toHaveClass(/is-empty/);
-    await expect(toggle).toHaveAttribute("data-placeholder", /输入文本/);
+    await expect(toggle).toHaveAttribute("data-placeholder", /唤起命令/);
     await expect(toggle).toHaveCSS("position", "relative");
   });
 

@@ -56,7 +56,10 @@ export interface TiptapLocale {
 
   placeholder: {
     heading: string;
+    /** 默认段落占位（basic / full 等非斜杠命令场景） */
     paragraph: string;
+    /** 启用斜杠命令时的段落占位（notion preset） */
+    paragraphWithSlash: string;
     codeBlock: string;
   };
 

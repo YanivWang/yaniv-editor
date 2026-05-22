@@ -18,6 +18,7 @@
 @import "./floating-menu-toolbar.css";
 
 /* Content features required by the first inline entry surface. */
+@import "./content.css";
 @import "./task-list.css";
 @import "./placeholder.css";
 @import "./code-block.css";

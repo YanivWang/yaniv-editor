@@ -41,7 +41,8 @@ export const enUS: TiptapLocale = {
 
   placeholder: {
     heading: "Heading",
-    paragraph: "Enter text or type '/' for commands",
+    paragraph: "Enter text",
+    paragraphWithSlash: "Enter text or type '/' for commands",
     codeBlock: "Enter code",
   },
 

@@ -38,6 +38,12 @@
   --ye-codeblock-text: #37352f;
   --ye-blockquote-border: rgba(55, 53, 47, 0.16);
   --ye-blockquote-bg: transparent;
+  --ye-table-header-bg: rgba(55, 53, 47, 0.04);
+  --ye-mark-bg: rgb(255 212 0 / 35%);
+  --ye-hr-color: rgba(55, 53, 47, 0.09);
+  --ye-code-inline-border: transparent;
+  --ye-code-font-family:
+    sfmono-regular, menlo, consolas, "PT Mono", "Liberation Mono", courier, monospace;
   --ye-link: rgb(35, 131, 226);
   --ye-font-family:
     ui-sans-serif, -apple-system, blinkmacsystemfont, "Segoe UI Variable Display", "Segoe UI",
@@ -138,13 +144,7 @@
   margin-top: 0;
 }
 
-/* ===== Notion 风格 - 高亮 ===== */
-.yaniv-editor.appearance-notion .document-content .ProseMirror mark {
-  padding: 0 2px;
-  color: inherit;
-  background-color: rgb(255 212 0 / 35%);
-  border-radius: 2px;
-}
+/* ===== Notion 风格 - 高亮（token 见上方 --ye-mark-bg） ===== */
 
 /* ===== Notion 风格 - placeholder ===== */
 .yaniv-editor.appearance-notion .ProseMirror p.is-empty::before,
@@ -249,20 +249,14 @@
   border-color: var(--ye-primary-hover);
 }
 
-/* ===== Notion 风格 - 代码 ===== */
-.yaniv-editor.appearance-notion .ProseMirror code {
+/* Notion 行内代码：排版微调（颜色/背景见 token，结构见 content.css） */
+.yaniv-editor.appearance-notion .ProseMirror code:not(pre code) {
   padding: 0.2em 0.4em;
-  font-family: SFMono-Regular, Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace;
   font-size: 85%;
-  color: #eb5757;
-  background: rgba(135, 131, 120, 0.15);
   border-radius: 3px;
 }
 
-/* 代码块：浅色 Notion 风格（覆盖 code-block.css 默认深色） */
 .yaniv-editor.appearance-notion .ProseMirror pre {
-  color: var(--ye-codeblock-text) !important;
-  background: var(--ye-codeblock-bg) !important;
   border-radius: 4px;
 }
 
@@ -382,18 +376,15 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-/* ===== Notion 风格 - 引用 ===== */
+/* ===== Notion 风格 - 引用（结构见 content.css，此处仅排版） ===== */
 .yaniv-editor.appearance-notion .ProseMirror blockquote {
   padding-left: 14px;
   margin: 8px 0;
   color: var(--ye-text);
-  border-left: 3px solid var(--ye-blockquote-border);
 }
 
 /* ===== Notion 风格 - 链接 ===== */
 .yaniv-editor.appearance-notion .ProseMirror a {
-  color: var(--ye-link);
-  text-decoration: underline;
   text-underline-offset: 3px;
 }
 
@@ -401,40 +392,29 @@
   opacity: 0.8;
 }
 
-/* ===== Notion 风格 - 分割线 ===== */
+/* ===== Notion 风格 - 分割线（颜色见 --ye-hr-color） ===== */
 .yaniv-editor.appearance-notion .ProseMirror hr {
   margin: 24px 0;
-  border: none;
-  border-top: 1px solid rgba(55, 53, 47, 0.09);
 }
 
-/* ===== Notion 风格 - 表格 ===== */
+/* ===== Notion 风格 - 表格（边框/resize 见 table.css，此处仅布局） ===== */
 .yaniv-editor.appearance-notion .ProseMirror table {
-  width: 100%;
   margin: 8px 0;
-  border-collapse: collapse;
 }
 
-.yaniv-editor.appearance-notion .ProseMirror th,
-.yaniv-editor.appearance-notion .ProseMirror td {
+.yaniv-editor.appearance-notion .ProseMirror table td,
+.yaniv-editor.appearance-notion .ProseMirror table th {
   padding: 8px 12px;
-  text-align: left;
-  border: 1px solid rgba(55, 53, 47, 0.09);
 }
 
-.yaniv-editor.appearance-notion .ProseMirror th {
-  font-weight: 600;
-  background: rgba(55, 53, 47, 0.04);
+.yaniv-editor.appearance-notion .document-content .ProseMirror .tableWrapper {
+  margin: 8px 0;
 }
 
 /* ===== Notion 风格 - 图片 ===== */
 .yaniv-editor.appearance-notion .ProseMirror img {
   max-width: 100%;
   border-radius: 0;
-}
-
-.yaniv-editor.appearance-notion .document-content .ProseMirror .tableWrapper {
-  margin: 8px 0;
 }
 
 /* ===== Notion 深色模式 ===== */
@@ -460,6 +440,8 @@
   --ye-codeblock-bg: #252525;
   --ye-codeblock-text: rgba(255, 255, 255, 0.9);
   --ye-blockquote-border: rgba(255, 255, 255, 0.15);
+  --ye-table-header-bg: rgba(255, 255, 255, 0.04);
+  --ye-hr-color: rgba(255, 255, 255, 0.09);
   --ye-link: rgb(82, 156, 202);
 }
 
@@ -503,19 +485,6 @@
   input[type="checkbox"]:checked {
   background-color: var(--ye-primary);
   border-color: var(--ye-primary);
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror th {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror th,
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror td {
-  border-color: rgba(255, 255, 255, 0.09);
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror hr {
-  border-top-color: rgba(255, 255, 255, 0.09);
 }
 
 /* ===== Notion 拖拽手柄与块菜单（自 drag-handle.css 收拢） ===== */
@@ -955,16 +924,6 @@
 .image-bubble-menu.appearance-notion .image-menu-btn.active {
   color: var(--ye-primary);
   background: var(--ye-primary-light);
-}
-
-.yaniv-editor.appearance-notion .ProseMirror img:hover,
-.yaniv-editor.appearance-notion .ProseMirror img[data-selected] {
-  outline-color: var(--ye-primary);
-}
-
-.yaniv-editor.appearance-notion .ProseMirror .video-wrapper:hover video,
-.yaniv-editor.appearance-notion .ProseMirror .video-wrapper.ProseMirror-selectednode video {
-  outline-color: var(--ye-primary);
 }
 
 /* ===== Notion 查找替换弹窗 ===== */

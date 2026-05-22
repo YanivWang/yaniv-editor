@@ -1,0 +1,110 @@
+/**
+ * ProseMirror 正文内容 — 唯一结构样式来源
+ *
+ * 架构约定（与 table.css 相同）：
+ * - 本文件定义边框、背景、交互行为等「结构 + 语义」样式，使用 --ye-* token
+ * - appearance/*.css 仅覆盖 token，或调整 margin / padding / font-size 等排版差异
+ * - 禁止在 appearance 中对本文件已声明的选择器使用 border / background 等 shorthand 重声明
+ */
+
+/* ===== 段落 ===== */
+.yaniv-editor .ProseMirror p {
+  margin: 0 0 12px;
+}
+
+/* ===== 高亮 mark ===== */
+.yaniv-editor .ProseMirror mark {
+  padding: 0 2px;
+  color: inherit;
+  background-color: var(--ye-mark-bg);
+  border-radius: 2px;
+}
+
+/* ===== 列表 ===== */
+.yaniv-editor .ProseMirror ul,
+.yaniv-editor .ProseMirror ol {
+  padding-left: 14px;
+  margin: 0 0 14px;
+}
+
+.yaniv-editor .ProseMirror ul li,
+.yaniv-editor .ProseMirror ol li {
+  margin: 4px 0;
+}
+
+.yaniv-editor .ProseMirror ul:not([data-type="taskList"]) > li:not([data-checked]) {
+  list-style-type: disc;
+}
+
+.yaniv-editor .ProseMirror ol li {
+  list-style-type: decimal;
+}
+
+/* ===== 图片 ===== */
+.yaniv-editor .ProseMirror img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+}
+
+/* ===== 行内代码 ===== */
+.yaniv-editor .ProseMirror code.inline-code,
+.yaniv-editor .ProseMirror code:not(pre code) {
+  display: inline;
+  padding: 2px 6px;
+  margin: 0 1px;
+  font-family: var(--ye-code-font-family, var(--ye-font-mono));
+  font-size: 0.9em;
+  font-weight: 400;
+  line-height: 1.5;
+  vertical-align: baseline;
+  color: var(--ye-code-text);
+  letter-spacing: 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+  background-color: var(--ye-code-bg);
+  border: var(--ye-border-width) solid var(--ye-code-inline-border, var(--ye-border));
+  border-radius: var(--ye-radius-sm);
+}
+
+.yaniv-editor .ProseMirror a code.inline-code,
+.yaniv-editor .ProseMirror a code:not(pre code) {
+  color: var(--ye-link);
+}
+
+.yaniv-editor .ProseMirror strong code.inline-code,
+.yaniv-editor .ProseMirror strong code:not(pre code),
+.yaniv-editor .ProseMirror em code.inline-code,
+.yaniv-editor .ProseMirror em code:not(pre code) {
+  font-weight: 600;
+}
+
+/* ===== 链接 ===== */
+.yaniv-editor .ProseMirror a {
+  color: var(--ye-link);
+  word-break: break-word;
+  text-decoration: underline;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.yaniv-editor .ProseMirror a:hover {
+  color: var(--ye-link-hover);
+}
+
+/* ===== 引用 ===== */
+.yaniv-editor .ProseMirror blockquote {
+  padding-left: 12px;
+  margin: 12px 0;
+  color: var(--ye-text-secondary);
+  background-color: var(--ye-blockquote-bg);
+  border-left: 3px solid var(--ye-blockquote-border);
+}
+
+/* ===== 分割线 ===== */
+.yaniv-editor .ProseMirror hr {
+  margin: 16px 0;
+  border: none;
+  border-top: var(--ye-border-width) solid var(--ye-hr-color, var(--ye-border));
+}

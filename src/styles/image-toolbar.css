@@ -1,40 +1,37 @@
 /**
- * Image Toolbar Styles
- * @description 图片工具栏相关样式
+ * Image / Video 选中与缩放交互样式
+ *
+ * 架构约定：outline 使用 --ye-primary / --ye-media-outline-* token；
+ * appearance 仅覆盖 token，勿用 outline shorthand 重声明（避免与 hover 态冲突）。
  */
 
-/* 图片选中时的样式 */
-.ProseMirror img {
+.yaniv-editor .ProseMirror img {
   cursor: pointer;
   transition: outline 0.2s ease;
 }
 
-.ProseMirror img:hover {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-.ProseMirror img[data-selected] {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.yaniv-editor .ProseMirror img:hover,
+.yaniv-editor .ProseMirror img[data-selected] {
+  outline: var(--ye-media-outline-width) solid var(--ye-primary);
+  outline-offset: var(--ye-media-outline-offset);
 }
 
 /* 预览/只读模式：禁用图片编辑态视觉与交互 */
-.ProseMirror[contenteditable="false"] img {
+.yaniv-editor .ProseMirror[contenteditable="false"] img {
   cursor: default;
 }
 
-.ProseMirror[contenteditable="false"] img:hover,
-.ProseMirror[contenteditable="false"] img[data-selected] {
+.yaniv-editor .ProseMirror[contenteditable="false"] img:hover,
+.yaniv-editor .ProseMirror[contenteditable="false"] img[data-selected] {
   outline: none;
 }
 
-.ProseMirror[contenteditable="false"] .resizable-image-wrapper .resize-handle {
+.yaniv-editor .ProseMirror[contenteditable="false"] .resizable-image-wrapper .resize-handle {
   display: none;
   pointer-events: none;
 }
 
-.ProseMirror .video-wrapper {
+.yaniv-editor .ProseMirror .video-wrapper {
   position: relative;
   display: block;
   width: fit-content;
@@ -43,49 +40,49 @@
   cursor: pointer;
 }
 
-.ProseMirror .video-wrapper video {
+.yaniv-editor .ProseMirror .video-wrapper video {
   display: block;
   max-width: 100%;
   transition: outline 0.2s ease;
 }
 
-.ProseMirror .video-wrapper:hover video,
-.ProseMirror .video-wrapper.ProseMirror-selectednode video,
-.ProseMirror .video-wrapper video[data-selected] {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+.yaniv-editor .ProseMirror .video-wrapper:hover video,
+.yaniv-editor .ProseMirror .video-wrapper.ProseMirror-selectednode video,
+.yaniv-editor .ProseMirror .video-wrapper video[data-selected] {
+  outline: var(--ye-media-outline-width) solid var(--ye-primary);
+  outline-offset: var(--ye-media-outline-offset);
 }
 
-.ProseMirror .video-wrapper[data-align="left"] {
+.yaniv-editor .ProseMirror .video-wrapper[data-align="left"] {
   margin-right: auto;
   margin-left: 0;
 }
 
-.ProseMirror .video-wrapper[data-align="center"] {
+.yaniv-editor .ProseMirror .video-wrapper[data-align="center"] {
   margin-right: auto;
   margin-left: auto;
 }
 
-.ProseMirror .video-wrapper[data-align="right"] {
+.yaniv-editor .ProseMirror .video-wrapper[data-align="right"] {
   margin-right: 0;
   margin-left: auto;
 }
 
 /* 图片包装器样式 */
-.ProseMirror .image-wrapper {
+.yaniv-editor .ProseMirror .image-wrapper {
   position: relative;
   display: inline-block;
   margin: 8px 0;
 }
 
-.ProseMirror .image-wrapper img {
+.yaniv-editor .ProseMirror .image-wrapper img {
   display: block;
   max-width: 100%;
   height: auto;
 }
 
 /* 可调整大小的图片包装器 */
-.ProseMirror .resizable-image-wrapper {
+.yaniv-editor .ProseMirror .resizable-image-wrapper {
   position: relative;
   display: inline-block;
   width: fit-content;
@@ -94,43 +91,41 @@
   vertical-align: middle;
 }
 
-.ProseMirror .resizable-image-wrapper img {
+.yaniv-editor .ProseMirror .resizable-image-wrapper img {
   display: block;
   max-width: 100%;
   height: auto;
   user-select: none;
 }
 
-/* 图片对齐样式 */
-.ProseMirror .resizable-image-wrapper[data-align] {
+.yaniv-editor .ProseMirror .resizable-image-wrapper[data-align] {
   display: block;
   width: fit-content;
 }
 
-.ProseMirror .resizable-image-wrapper[data-align] img {
+.yaniv-editor .ProseMirror .resizable-image-wrapper[data-align] img {
   display: block;
 }
 
-.ProseMirror .resizable-image-wrapper[data-align="left"] {
+.yaniv-editor .ProseMirror .resizable-image-wrapper[data-align="left"] {
   margin-right: auto;
   margin-left: 0;
   text-align: left;
 }
 
-.ProseMirror .resizable-image-wrapper[data-align="center"] {
+.yaniv-editor .ProseMirror .resizable-image-wrapper[data-align="center"] {
   margin-right: auto;
   margin-left: auto;
   text-align: center;
 }
 
-.ProseMirror .resizable-image-wrapper[data-align="right"] {
+.yaniv-editor .ProseMirror .resizable-image-wrapper[data-align="right"] {
   margin-right: 0;
   margin-left: auto;
   text-align: right;
 }
 
-/* 调整手柄样式 - 圆点模式（右下角） */
-.ProseMirror .resizable-image-wrapper .resize-handle {
+.yaniv-editor .ProseMirror .resizable-image-wrapper .resize-handle {
   position: absolute;
   right: -6px;
   bottom: -6px;
@@ -139,43 +134,34 @@
   height: 12px;
   pointer-events: auto;
   cursor: nwse-resize;
-  background: #fff;
-  border: 2px solid #3b82f6;
+  background: var(--ye-bg);
+  border: 2px solid var(--ye-primary);
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
   opacity: 0;
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
 }
 
-.ProseMirror .resizable-image-wrapper:hover .resize-handle {
+.yaniv-editor .ProseMirror .resizable-image-wrapper:hover .resize-handle {
   opacity: 0.8;
 }
 
-.ProseMirror .resizable-image-wrapper:hover .resize-handle:hover,
-.ProseMirror .resizable-image-wrapper.resizing .resize-handle {
-  box-shadow: 0 3px 8px rgba(59, 130, 246, 0.4);
+.yaniv-editor .ProseMirror .resizable-image-wrapper:hover .resize-handle:hover,
+.yaniv-editor .ProseMirror .resizable-image-wrapper.resizing .resize-handle {
   opacity: 1;
   transform: scale(1.15);
 }
 
-.ProseMirror .resizable-image-wrapper.resizing {
+.yaniv-editor .ProseMirror .resizable-image-wrapper.resizing {
   user-select: none;
 }
 
-.ProseMirror .resizable-image-wrapper.resizing img {
+.yaniv-editor .ProseMirror .resizable-image-wrapper.resizing img {
   pointer-events: none;
 }
 
-/* 暗黑模式 */
-[data-color-mode="dark"] .resizable-image-wrapper .resize-handle {
+[data-color-mode="dark"] .yaniv-editor .ProseMirror .resizable-image-wrapper .resize-handle {
   background: #1f1f1f;
-  border-color: #4fc3f7;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-[data-color-mode="dark"] .resizable-image-wrapper:hover .resize-handle:hover,
-[data-color-mode="dark"] .resizable-image-wrapper.resizing .resize-handle {
-  box-shadow: 0 3px 8px rgba(79, 195, 247, 0.5);
 }

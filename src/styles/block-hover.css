@@ -1,18 +1,19 @@
-/* Notion-style block hover highlight (appearance-notion only) */
-.yaniv-editor.appearance-notion .ProseMirror > * {
+/**
+ * Notion-style block hover highlight (appearance-notion only)
+ *
+ * 仅作用于文本块级节点；排除 table / pre / 复合块容器，避免与结构样式或交互态冲突。
+ */
+.yaniv-editor.appearance-notion
+  .ProseMirror
+  > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote):not(.tableWrapper, pre) {
   border-radius: 3px;
   transition: background 0.1s ease;
 }
 
-.yaniv-editor.appearance-notion .ProseMirror > *:hover {
+.yaniv-editor.appearance-notion
+  .ProseMirror
+  > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote):not(.tableWrapper, pre):hover {
   background: var(--ye-bg-hover);
-}
-
-.yaniv-editor.appearance-notion .ProseMirror > .column-layout:hover,
-.yaniv-editor.appearance-notion .ProseMirror > .toggle-block:hover,
-.yaniv-editor.appearance-notion .ProseMirror > .callout-block:hover,
-.yaniv-editor.appearance-notion .ProseMirror > .embed-block:hover {
-  background: transparent;
 }
 
 .yaniv-editor.appearance-notion .ProseMirror > .column-layout > .column-block:hover,
@@ -21,6 +22,8 @@
   background: var(--ye-bg-hover);
 }
 
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .ProseMirror > *:hover {
+.yaniv-editor.appearance-notion[data-color-mode="dark"]
+  .ProseMirror
+  > :is(p, h1, h2, h3, h4, h5, h6, ul, ol, blockquote):not(.tableWrapper, pre):hover {
   background: var(--ye-bg-hover);
 }

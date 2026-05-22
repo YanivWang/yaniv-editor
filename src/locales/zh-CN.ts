@@ -41,7 +41,8 @@ export const zhCN: TiptapLocale = {
 
   placeholder: {
     heading: "标题",
-    paragraph: "输入文本或输入 '/' 唤起命令",
+    paragraph: "输入文本",
+    paragraphWithSlash: "输入文本或输入 '/' 唤起命令",
     codeBlock: "输入代码",
   },
 

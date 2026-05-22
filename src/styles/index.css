@@ -18,6 +18,12 @@
 /* Document layout (A4 paper, scroll container) */
 @import "./document-layout.css";
 
+/*
+ * ProseMirror 正文结构样式（须在 appearance 之前；appearance 仅改 token / 排版）
+ * 详见 content.css / table.css 文件头架构约定
+ */
+@import "./content.css";
+
 /* Task list (checkbox + text inline) */
 @import "./task-list.css";
 
@@ -53,6 +59,9 @@
  * Visual appearances（npm 全量打入 style.css；loadAppearance 仅切换 class）
  *
  * 内置主题：appearance/styles/ 下各 *.css，根节点 class 为 .appearance-{name}
+ *
+ * 架构约定：appearance 仅覆盖 --ye-* token 与排版（margin / font-size / padding）；
+ * 禁止对 content.css / table.css / code-block.css 等已声明的选择器使用 border / background shorthand。
  *
  * custom 无独立 CSS 文件：appearance="custom" 时沿用 variables.css + 全局样式，
  * 通过 :custom-appearance-vars 在根节点内联覆盖 --ye-*（见 applyAppearance.ts）

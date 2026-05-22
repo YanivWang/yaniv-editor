@@ -80,22 +80,14 @@
   color: #1f2329;
 }
 
-/* 正文段落 */
+/* 正文段落（排版差异，结构见 content.css） */
 .yaniv-editor.appearance-default .document-content .ProseMirror p {
   margin: 0 0 10px;
   line-height: 1.7;
   color: #1f2329;
 }
 
-/* 高亮（飞书淡黄底） */
-.yaniv-editor.appearance-default .document-content .ProseMirror mark {
-  padding: 0 2px;
-  color: inherit;
-  background-color: #fff3ca;
-  border-radius: 2px;
-}
-
-/* 列表 */
+/* 列表（排版差异） */
 .yaniv-editor.appearance-default .document-content .ProseMirror ul,
 .yaniv-editor.appearance-default .document-content .ProseMirror ol {
   padding-left: 1.35em;
@@ -115,43 +107,25 @@
   list-style-type: circle;
 }
 
-/* 图片 */
-.yaniv-editor.appearance-default .document-content .ProseMirror img {
-  display: block;
-  max-width: 100%;
-  height: auto;
+/* 图片间距 */
+.yaniv-editor.appearance-default .ProseMirror img {
   margin: 12px 0;
 }
 
-/* 表格 */
-.yaniv-editor.appearance-default .document-content .ProseMirror table {
+/* 表格：仅布局差异，边框/resize 见 src/styles/table.css */
+.yaniv-editor.appearance-default .ProseMirror table {
   margin: 12px 0;
   font-size: 14px;
 }
 
-.yaniv-editor.appearance-default .document-content .ProseMirror table td,
-.yaniv-editor.appearance-default .document-content .ProseMirror table th {
+.yaniv-editor.appearance-default .ProseMirror table td,
+.yaniv-editor.appearance-default .ProseMirror table th {
   padding: 8px 12px;
-  vertical-align: top;
-  border: var(--ye-border-width) solid var(--ye-table-border);
-}
-
-.yaniv-editor.appearance-default .document-content .ProseMirror table th {
-  font-weight: 600;
-  background-color: var(--ye-table-header-bg);
-}
-
-/* 链接 */
-.yaniv-editor.appearance-default .document-content .ProseMirror a {
-  color: var(--ye-link);
-  word-break: break-word;
-  text-decoration: underline;
-  pointer-events: auto;
-  cursor: pointer;
 }
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-outline-title-color: var(--ye-primary);
+  --ye-mark-bg: rgb(255 243 202 / 22%);
 }
 
 .yaniv-editor.appearance-default.document-layout[data-color-mode="dark"] {
@@ -172,41 +146,6 @@
 .yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h5,
 .yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror h6 {
   color: var(--ye-text);
-}
-
-.yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror mark {
-  background-color: rgb(255 243 202 / 22%);
-}
-
-/* 表格滚动容器 */
-.yaniv-editor.appearance-default .document-content .ProseMirror .tableWrapper {
-  margin: 1.5rem 0;
-}
-
-/* 引用 */
-.yaniv-editor.appearance-default .document-content .ProseMirror blockquote {
-  padding-left: 12px;
-  margin: 12px 0;
-  color: var(--ye-text-secondary);
-  background: var(--ye-blockquote-bg);
-  border-left: 3px solid var(--ye-blockquote-border);
-}
-
-/* 行内代码 */
-.yaniv-editor.appearance-default .document-content .ProseMirror code:not(pre code) {
-  display: inline;
-  padding: 2px 6px;
-  margin: 0 1px;
-  font-family: var(--ye-font-mono);
-  font-size: 0.9em;
-  line-height: 1.5;
-  vertical-align: baseline;
-  color: var(--ye-text);
-  word-break: break-word;
-  white-space: pre-wrap;
-  background: var(--ye-code-bg);
-  border: var(--ye-border-width) solid var(--ye-border);
-  border-radius: var(--ye-radius-sm);
 }
 
 /* 任务列表间距 */

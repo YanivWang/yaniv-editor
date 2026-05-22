@@ -3,6 +3,8 @@
  *
  * 本目录仅有 default / word / notion 三个主题文件。
  * custom 不在此目录：见 appearance="custom" + customAppearanceVars（applyAppearance.ts）
+ *
+ * 架构约定：ProseMirror 正文结构见 src/styles/content.css；此处仅放跨主题 chrome 布局。
  */
 
 /* 工具栏容器边框/背景见 src/styles/toolbar.css */
@@ -20,25 +22,4 @@
 
 .yaniv-editor .continuous-pages {
   background: var(--ye-page-bg, #f5f5f5);
-}
-
-.yaniv-editor .ProseMirror h1 {
-  margin-top: 1.25em;
-  margin-bottom: 0.5em;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.yaniv-editor .ProseMirror h2 {
-  margin-top: 1em;
-  margin-bottom: 0.4em;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.yaniv-editor .ProseMirror h3 {
-  margin-top: 0.85em;
-  margin-bottom: 0.35em;
-  font-weight: 600;
-  line-height: 1.4;
 }
