@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased] — Architecture Refactor
+## [0.1.0] — 2026-05-22
+
+Architecture Refactor（Session / Runtime / Capability Registry 分层重构）
 
 ### BREAKING CHANGES
 
