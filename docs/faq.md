@@ -10,7 +10,7 @@ Use `YanivEditor` for document editing and `YanivInlineEditor` for compact input
 <YanivEditor preset="full" />
 ```
 
-AI is not part of the full preset defaults. Enable it explicitly:
+AI is not part of the `full` preset defaults. Enable it explicitly:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
@@ -20,8 +20,10 @@ AI is not part of the full preset defaults. Enable it explicitly:
 
 Use `preset="notion"` for block editing behavior. Use `appearance="notion"` for the visual skin.
 
+`notion` enables AI by default; pass `:ai-config` for a working provider:
+
 ```vue
-<YanivEditor preset="notion" appearance="notion" />
+<YanivEditor preset="notion" appearance="notion" :ai-config="aiConfig" />
 ```
 
 ## How do I show content without editing chrome?

@@ -1,5 +1,8 @@
 /**
- * Code Block - 语法高亮与深色代码块样式
+ * Code Block — 语法高亮与代码块样式
+ *
+ * 架构约定：本文件是 ProseMirror 代码块（pre）的唯一结构样式来源；
+ * appearance/*.css 仅通过 --ye-codeblock-* token 做主题化。
  */
 
 .yaniv-editor .document-container {

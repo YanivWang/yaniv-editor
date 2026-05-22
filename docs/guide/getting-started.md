@@ -17,10 +17,16 @@ Use `preset="full"` when the page needs advanced document abilities such as tabl
 
 Use `preset="notion"` when the page needs a block editing workflow.
 
-Enable AI explicitly when needed:
+For `basic` and `full`, enable AI explicitly:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
+```
+
+For `notion`, AI is enabled by default; pass `:ai-config` for a working provider:
+
+```vue
+<YanivEditor preset="notion" :ai-config="aiConfig" />
 ```
 
 ## Inline Editor

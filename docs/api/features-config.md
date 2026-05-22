@@ -23,13 +23,15 @@ interface FeatureConfig {
 Full Editor resolves abilities with one fixed rule:
 
 ```ts
-resolvedFeatures = {
-  ...presetFeatures[preset],
-  ...props.features,
-};
+import { resolveEditorProfile } from "@yanivjs/yaniv-editor";
+
+const { features: resolvedFeatures } = resolveEditorProfile({
+  preset,
+  features: props.features,
+});
 ```
 
-`features` has higher priority than `preset`, so explicit `false` can turn off a capability that the selected preset enables.
+Internally this uses `mergeFeatures`. Only explicitly set keys override the preset; `undefined` does not replace a preset default. Explicit `false` can turn off a capability that the selected preset enables.
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: false, math: false }" />

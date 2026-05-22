@@ -1,4 +1,4 @@
-# Feature Status
+# 功能状态
 
 Implemented abilities are exposed through `preset` and `features`:
 
@@ -16,6 +16,6 @@ Implemented abilities are exposed through `preset` and `features`:
 
 The recommended starting point is `preset="basic"`. Use `preset="full"` for the advanced document capability set. Use `preset="notion"` for block editing.
 
-AI is not enabled by any preset by default. Enable it with `:features="{ ai: true }"`.
+`basic` and `full` disable AI by default (`:features="{ ai: true }"` plus `:ai-config`). `notion` enables AI by default; still pass `:ai-config` for a working provider.
 
 Layout chrome is selected by preset. Ability overrides are selected by `features`.

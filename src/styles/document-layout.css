@@ -1,4 +1,4 @@
-/* Yaniv Editor 文档布局样式 */
+/* Yaniv Editor — 文档布局（A4 纸面、滚动容器、preview 视觉态） */
 
 /*
  * 宿主全屏容器（可选）：限定高度并禁止页面级滚动，编辑器内部仅 .document-container 滚动

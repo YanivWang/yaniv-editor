@@ -36,10 +36,17 @@ Inline toolbar switches also drive the Inline extension set, keeping visible con
 
 ## AI
 
-AI is not enabled by any preset by default:
+`basic` and `full` disable AI by default. Enable it explicitly:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
+```
+
+`notion` enables the AI capability by default, but you still need `:ai-config` (or demo env) for a working provider:
+
+```vue
+<YanivEditor preset="notion" :ai-config="aiConfig" />
+<YanivEditor preset="notion" :features="{ ai: false }" />
 ```
 
 Import AI modules from `@yanivjs/yaniv-editor/ai`.

@@ -3,6 +3,7 @@
  *
  * 架构约定（与 table.css 相同）：
  * - 本文件定义边框、背景、交互行为等「结构 + 语义」样式，使用 --ye-* token
+ * - 标题（h1–h6）排版在 appearance/*.css 与 inline-content.css；本文件管段落、列表、引用、链接、行内代码、分割线等
  * - appearance/*.css 仅覆盖 token，或调整 margin / padding / font-size 等排版差异
  * - 禁止在 appearance 中对本文件已声明的选择器使用 border / background 等 shorthand 重声明
  */

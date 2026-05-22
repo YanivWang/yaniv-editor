@@ -1,10 +1,17 @@
 # AI
 
-AI is disabled in all presets by default. Enable it with `features.ai` and provide host-owned config through `ai-config`.
+`basic` and `full` disable AI by default. Enable it with `features.ai` and provide host-owned config through `ai-config`:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
 <YanivEditor preset="full" :features="{ ai: false }" />
+```
+
+`notion` enables the AI capability by default (extensions and floating AI entry points register automatically). You still need `:ai-config` (or demo env) to call a provider:
+
+```vue
+<YanivEditor preset="notion" :ai-config="aiConfig" />
+<YanivEditor preset="notion" :features="{ ai: false }" />
 ```
 
 When AI is disabled, AI extensions and AI UI entry points are unavailable.

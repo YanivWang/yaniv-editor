@@ -51,7 +51,7 @@
 @import "./mention.css";
 @import "./block-hover.css";
 
-/* Tool chrome（原组件内零散 import，统一纳入全量包） */
+/* Footer nav, AI highlight, and other tool chrome */
 @import "../components/tools/footer-nav/footer-nav.css";
 @import "../features/ai/shared/ai-highlight.css";
 

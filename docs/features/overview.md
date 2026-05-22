@@ -23,6 +23,6 @@ Full Editor feature availability is selected by `preset` and then refined by `fe
 
 Disabling a capability removes its extension and matching UI entry points. Preset-owned layout chrome, such as fixed header/footer or floating menu availability, is not part of `FeatureConfig`.
 
-AI is disabled in all presets by default.
+`basic` and `full` disable AI by default. `notion` enables AI by default; pass `:ai-config` for a working provider.
 
 See [FeatureConfig](/api/features-config) for preset default ability tables.

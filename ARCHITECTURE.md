@@ -1165,34 +1165,9 @@ src/appearance/
 
 ---
 
-## 必须删除的旧实现（验收清单，已完成）
+## 历史迁移（已完成）
 
-`src/` 中以下旧模式 **grep 为零**（当前仓库已满足，无需再执行删除）：
-
-| 删除项                                                                           | 替代                                                                     |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `useEditorFeatures.ts`                                                           | `useEditorRuntime`                                                       |
-| `resolveExtensionGates` / `editorCapabilityMap` / inline gates                   | registry                                                                 |
-| `coreExtensions.ts` 单体 builder                                                 | `capabilities/buildExtensions`                                           |
-| `inlineExtensions.ts` 独立 builder                                               | `capabilities/buildExtensions` (host='inline')                           |
-| `YanivEditor` 内 initEditor / 业务 watch                                         | `useEditorSession`                                                       |
-| `blockPickerMenuRef`                                                             | `useBlockMenuHost`                                                       |
-| `isPreviewMode` 模板判断                                                         | `chromePolicy`                                                           |
-| `classList.toggle('is-preview')`                                                 | Vue `:class` / `:data-phase`                                             |
-| FooterNav `v-show`                                                               | `v-if="chromePolicy.showFooter"`                                         |
-| `:key="localeEpoch"`                                                             | scoped locale                                                            |
-| `.is-preview` 交互隐藏 CSS                                                       | 扩展 `isEditable` 守卫                                                   |
-| Demo `:key="editorKey"` / `inlineKey`                                            | sessionKey + 「加载示例文档」                                            |
-| 模块级 `registerAppearance` / `customAppearances` / `activeCustomAppearanceName` | `useEditorAppearance` 实例方法                                           |
-| 扩展层 `import { t } from "@/locales"`                                           | `ctx.locale.xxx`                                                         |
-| `editor.commands.setContent(...)` 在 ContentAdapter 内                           | raw dispatch + `BYPASS_GUARD_META`                                       |
-| `applyPhaseTransition` 中先 setEditable 再 emit 的顺序                           | 先 emit 再 setEditable（edit→preview 方向）                              |
-| Shell 层直接调用 `editor.setEditable`                                            | 统一走 `useEditorSession.requestPhaseTransition(nextPhase)`              |
-| `outlinePanel.visible` 命名                                                      | `outlinePanel.expanded`（语义对齐 chromePolicy 文档）                    |
-| outline 扩展 configure 时取 `scrollParent`                                       | late-binding：`editor.commands.bindOutlineScrollParent(el)`              |
-| AI 扩展 `.configure({ apiKey: ctx.aiConfig().apiKey })` 静态取值                 | 全部改 getter：`.configure({ getApiKey: () => ctx.aiConfig()?.apiKey })` |
-| `BlockPicker onBeforeUnmount` 不 deregister                                      | `host.registerInstance(null)` 必须在 onBeforeUnmount                     |
-| `flush: 'sync'` 用于 sessionKey watch                                            | `flush: 'pre'`（Vue 默认）+ pre-flush 阶段同步快照                       |
+旧 API 与实现模式的删除/替换记录见 [CHANGELOG.md](./CHANGELOG.md)。`src/` 中上述旧符号已无引用；日常回归以 `pnpm run verify` 为准。
 
 ---
 
@@ -1215,21 +1190,28 @@ src/appearance/
 
 ---
 
-## 实施顺序（单 branch，已完成）
+## CSS 分层
 
-1. ~~创建 `CHANGELOG.md`~~
-2. ~~runtime pure 函数先行~~
-3. ~~vitest + 纯函数单测~~
-4. ~~`capabilities/registry` + `buildExtensions`~~
-5. ~~`runtime/` composable + `session/`~~
-6. ~~`shell/` + `useBlockMenuHost`~~
-7. ~~重写 YanivEditor / YanivInlineEditor~~
-8. ~~scoped i18n + appearance 统一~~
-9. ~~outline scrollParent late-binding~~
-10. ~~breaking exports + docs + examples 重写~~
-11. ~~verify-no-tails grep + 验收清单~~
+样式分为 token、结构、功能 chrome、appearance 四层（详见 `docs/contributing/project-structure.md`）：
 
-### 最小测试集（步骤 3，已覆盖）
+| 层          | 位置                                           | 职责                                            |
+| ----------- | ---------------------------------------------- | ----------------------------------------------- |
+| Token       | `src/styles/variables.css`                     | `--ye-*` 设计 token                             |
+| 结构        | `content.css` / `table.css` / `code-block.css` | ProseMirror 边框、背景、交互语义                |
+| 功能 chrome | `src/styles/*.css`、工具组件 CSS               | 工具栏、菜单、拖拽手柄等                        |
+| Appearance  | `src/appearance/styles/*.css`                  | 仅 token 与排版（margin / font-size / padding） |
+
+- `src/styles/index.css` 与 `src/styles/inline.css` 均在 appearance 之前 import `content.css`。
+- appearance 禁止对结构层已声明的选择器使用 `border` / `background` shorthand 重声明。
+- `block-hover.css` 打入 Full 包，选择器限定 `.appearance-notion`（Notion 块 hover 高亮）。
+
+---
+
+## 测试与验收
+
+架构重构已于 2026-05 完成。功能验收与 demo 手验记录见下方清单；旧符号 grep 复查已通过 `pnpm run verify`。
+
+### 最小测试集
 
 实现文件：
 
@@ -1394,105 +1376,7 @@ test("onBeforeUnmount 后 buildExtensions resolve 被 discard", async () => {
 - [x] **AI config 热更新**：宿主修改 `aiConfig.model` 后下次发请求使用新 model，无需重建 session — registry `getModel: () => ctx.aiConfig()?.model`
 - [x] **BlockPicker 卸载→重建**：preview → edit 切换后 `host.registerInstance` 重新绑定，SlashCommand 可弹出菜单 — `BlockPickerMenu.vue` `onBeforeUnmount → registerInstance(null)`
 
-**无尾巴（合并门槛，已完成）** — 下列为 2026-05-22 验收时的 grep 记录，仅供复查参考，非待执行清单
-
-```bash
-# 旧模式：均应无命中（CHANGELOG / 本文档除外）；统一限定 ts/vue，避免误伤 markdown
-rg -t ts -t vue "isPreviewMode|blockPickerMenuRef|localeEpoch|useEditorFeatures|resolveInlineExtensionGates|editorCapabilityMap" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "classList\.toggle\(['\"]is-preview" src/
-# ✅ 0 命中（DragHandle 菜单 classList.toggle 与 phase 无关，不在此 pattern 内）
-
-rg -t ts -t vue "v-show.*preview" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "\.is-preview" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "coreExtensions\b|buildEditorExtensions\b|buildInlineExtensions\b" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "inlineExtensions\b" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "isInitializing|isFirstInit" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "v-show.*[Ff]ooter|v-show.*[Nn]av" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "editorError\b" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "registerAppearance\b|activeCustomAppearanceName\b" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "customAppearances" src/
-# ✅ 1 命中，仅 useEditorAppearance.ts（实例作用域，符合不变量 5）
-
-rg -t ts -t vue "commands\.setContent" src/core/session src/capabilities
-# ✅ 0 命中
-
-rg -t ts -t vue "setEditable.*emit|emit.*setEditable" src/core/session
-# ✅ 0 命中（顺序在 applyPhaseTransition.ts 分分支保证）
-
-rg -t css "\.is-preview" src/
-# ✅ 0 命中
-
-rg -t css "v-show|v-if" src/
-# ✅ 0 命中
-
-rg -t vue "v-if.*v-show|v-show.*v-if" src/
-# ✅ 0 命中（同元素双重表达）
-
-rg -t ts -t vue "editor\.setEditable" src/core/shell src/core/YanivEditor.vue src/core/YanivInlineEditor.vue
-# ✅ 0 命中
-
-rg -t ts "scrollParent\s*:\s*ctx\.outline\.scrollParent" src/capabilities
-# ✅ 0 命中
-
-rg -t ts "apiKey\s*:\s*ctx\.aiConfig\(\)" src/capabilities
-# ✅ 0 命中
-
-rg "host\.registerInstance\(null\)" src/components/tools/block-menu/
-# ✅ 1 命中 BlockPickerMenu.vue
-
-rg "BYPASS_GUARD_META\s*=\s*['\"]" src/
-# ✅ 0 命中
-
-rg "BYPASS_GUARD_META\s*:\s*symbol\s*=\s*Symbol\(" src/capabilities
-# ✅ 1 命中 transactionGuard.ts
-
-rg -t ts -t vue "from\s+[\"']@/locales[\"']" src/extensions src/components/tools src/features
-# ✅ 0 命中
-
-rg -t ts -t vue "outlinePanel\.visible\b" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "lastEmittedContentSignature" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "resolveScrollContainer" src/
-# ✅ 0 命中
-
-rg -t ts -t vue "normalizeInitialContent" src/
-# ✅ 1 命中 useControlledContent.ts（受控回写规范化，非旧散落 helper）
-
-rg -t ts -t vue "hasInlineToolbarItems|applyExtensionGatesToToolbarConfig|editorCapabilityMap" src/
-# ✅ 0 命中（已替换为 applyGatesToToolbarConfig / resolveShowInlineToolbar）
-```
-
----
-
-## 重构后清理（已完成）
-
-| 项                                                                                                                               | 处理                                                                                      |
-| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `src/utils/clipboard.ts` 死代码                                                                                                  | 已删除                                                                                    |
-| 无人引用的 barrel（`utils/index`、`extensions/index`、`components/editor/index`、`configs/index`、`features/ai/adapters/index`） | 已删除；`core/runtime/index` 已删除，`src/index.ts` 改为直引子模块                        |
-| `EditorShell` locale 与 `normalizeLocaleCode` 不一致                                                                             | 已统一：`provideEditorLocale(localeSource)` + `localeContext.locale` 供 runtime / session |
-| `outlinePanel.expanded` 默认 `true`                                                                                              | 已与文档对齐（`useOutlinePanel.ts`）                                                      |
+**无尾巴（合并门槛，已完成）** — 2026-05-22 验收时旧 API grep 均为零命中；日常以 `pnpm run verify` 为准。
 
 ---
 
@@ -1500,4 +1384,4 @@ rg -t ts -t vue "hasInlineToolbarItems|applyExtensionGatesToToolbarConfig|editor
 
 - SSR / Shadow DOM 全面适配
 - 协同编辑 / Yjs
-- Playwright E2E（vitest + demo 手验即可）
+- Playwright E2E 全量覆盖（已有 `e2e/notion-features.spec.ts` 起步；其余以 vitest + demo 手验为主）

@@ -45,13 +45,15 @@ Full Editor is defined by four independent axes:
 - `colorMode`: `light | dark | auto`.
 - `features`: ability overrides only.
 
-`features` is merged after `preset`:
+`features` is merged after `preset` via `mergeFeatures`. Only explicitly set keys override the preset; `undefined` does not replace a preset default:
 
 ```ts
-resolvedFeatures = {
-  ...presetFeatures[preset],
-  ...props.features,
-};
+import { resolveEditorProfile } from "@yanivjs/yaniv-editor";
+
+const { features: resolvedFeatures } = resolveEditorProfile({
+  preset,
+  features: props.features,
+});
 ```
 
 Example:

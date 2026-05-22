@@ -45,3 +45,11 @@ import {
 ```
 
 All built-in appearance CSS is provided by `@yanivjs/yaniv-editor/style.css`. `loadAppearance` and `preloadAppearances` keep the public API asynchronous but only mark built-in appearances as ready.
+
+## CSS Architecture
+
+ProseMirror structure styles (paragraphs, lists, blockquote, inline code, tables, code blocks) live in `src/styles/content.css`, `table.css`, and `code-block.css`. Appearance files only change tokens and typography.
+
+Notion block hover highlight is in `src/styles/block-hover.css` and activates only when the root has `appearance-notion`.
+
+For contributor rules and file layout, see [Project Structure — CSS Layering](/contributing/project-structure#css-layering).
