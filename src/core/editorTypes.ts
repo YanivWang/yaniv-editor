@@ -92,6 +92,8 @@ export interface YanivEditorProps {
   customTemplates?: TemplateItem[];
   /** 语言设置 */
   locale?: string;
+  /** 大纲面板初始是否展开；outline 能力开启时生效，默认 false */
+  defaultOutlineExpanded?: boolean;
   /**
    * 集成方注入的 AI 配置；传入后完全托管（忽略 localStorage 与 .env），默认隐藏「AI 设置」
    */

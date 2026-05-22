@@ -8,8 +8,8 @@ export interface OutlinePanelContext {
 
 const OUTLINE_PANEL_KEY: InjectionKey<OutlinePanelContext> = Symbol("outlinePanel");
 
-export function provideOutlinePanel(): OutlinePanelContext {
-  const expanded = ref(true);
+export function provideOutlinePanel(defaultExpanded = false): OutlinePanelContext {
+  const expanded = ref(defaultExpanded);
 
   const context: OutlinePanelContext = {
     expanded,

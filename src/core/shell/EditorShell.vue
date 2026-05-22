@@ -122,7 +122,7 @@ useEditorAppearance({
 
 useYanivAiConfig(fullProps);
 
-provideOutlinePanel();
+provideOutlinePanel(fullProps.value?.defaultOutlineExpanded ?? false);
 const blockMenuHost = provideBlockMenuHost();
 
 const runtime = isFull.value
