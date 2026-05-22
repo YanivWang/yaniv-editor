@@ -41,6 +41,6 @@ export interface BlockInsertContext {
   insertPos: number;
   /** + 按钮位置，用于水平定位 */
   anchorRect: DOMRect;
-  /** 当前块 DOM 位置，用于垂直底对齐 */
+  /** 当前块 DOM 位置，用于垂直顶对齐（默认向下展开） */
   blockRect: DOMRect;
 }

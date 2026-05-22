@@ -62,6 +62,10 @@ import { useYanivEditor } from "@/core/editorContext";
 import type { MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { blockMenuHostKey } from "@/core/shell/useBlockMenuHost";
+import {
+  getBlockMenuAnchorPosition,
+  resolveFloatingMenuPosition,
+} from "@/utils/floatingMenuPosition";
 
 import {
   applyBlockInsert,
@@ -222,10 +226,7 @@ function activate(state: SlashCommandState) {
 function openInsert(context: BlockInsertContext) {
   mode.value = "insert";
   insertContext.value = context;
-  position.value = {
-    x: context.anchorRect.right + 8,
-    y: context.blockRect.bottom,
-  };
+  position.value = getBlockMenuAnchorPosition(context.anchorRect, context.blockRect.top);
   query.value = "";
   isVisible.value = true;
   selectedIndex.value = 0;
@@ -269,27 +270,12 @@ function adjustPosition() {
   if (!el) return;
 
   const rect = el.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const margin = 8;
-
-  let { x, y } = position.value;
-
-  if (x + rect.width + margin > viewportWidth) {
-    x = viewportWidth - rect.width - margin;
-  }
-
-  if (mode.value === "insert" && insertContext.value) {
-    // 菜单底部与当前块底部对齐（与占位行下边一致）
-    y = insertContext.value.blockRect.bottom - rect.height;
-    if (y < margin) {
-      y = margin;
-    }
-  } else if (y + rect.height + margin > viewportHeight) {
-    y = y - rect.height - 24;
-  }
-
-  position.value = { x: Math.max(margin, x), y: Math.max(margin, y) };
+  position.value = resolveFloatingMenuPosition({
+    x: position.value.x,
+    y: position.value.y,
+    menuWidth: rect.width,
+    menuHeight: rect.height,
+  });
 }
 
 function handleKeyDown(event: KeyboardEvent) {

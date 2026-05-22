@@ -12,6 +12,12 @@ import {
 } from "@tiptap/pm/model";
 import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
+import {
+  FLOATING_MENU_VIEWPORT_MARGIN,
+  getBlockMenuAnchorPosition,
+  resolveFloatingMenuPosition,
+} from "@/utils/floatingMenuPosition";
+
 import type { EditorView } from "@tiptap/pm/view";
 
 const APPEARANCE_MENU_CLASSES = [
@@ -608,26 +614,22 @@ function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: (
 function positionBlockMenu(menu: HTMLElement, target: DragTarget, anchor?: HTMLElement): void {
   const anchorRect = anchor?.getBoundingClientRect() ?? target.dom.getBoundingClientRect();
   const targetRect = target.dom.getBoundingClientRect();
+  const initial = getBlockMenuAnchorPosition(anchorRect, targetRect.top);
 
-  menu.style.left = `${Math.max(8, anchorRect.right + 10)}px`;
-  menu.style.top = `${Math.max(8, targetRect.top)}px`;
+  menu.style.left = `${Math.max(FLOATING_MENU_VIEWPORT_MARGIN, initial.x)}px`;
+  menu.style.top = `${Math.max(FLOATING_MENU_VIEWPORT_MARGIN, initial.y)}px`;
 
   requestAnimationFrame(() => {
     const rect = menu.getBoundingClientRect();
-    const margin = 8;
-    let left = rect.left;
-    let top = rect.top;
+    const resolved = resolveFloatingMenuPosition({
+      x: rect.left,
+      y: rect.top,
+      menuWidth: rect.width,
+      menuHeight: rect.height,
+    });
 
-    if (rect.right + margin > window.innerWidth) {
-      left = window.innerWidth - rect.width - margin;
-    }
-
-    if (rect.bottom + margin > window.innerHeight) {
-      top = window.innerHeight - rect.height - margin;
-    }
-
-    menu.style.left = `${Math.max(margin, left)}px`;
-    menu.style.top = `${Math.max(margin, top)}px`;
+    menu.style.left = `${resolved.x}px`;
+    menu.style.top = `${resolved.y}px`;
   });
 }
 
