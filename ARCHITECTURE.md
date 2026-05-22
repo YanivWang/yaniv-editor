@@ -110,8 +110,8 @@ flowchart TB
 | `outline`       |  ❌   |  ✅  |   ❌   |                                                |
 | `searchReplace` |  ❌   |  ✅  |   ❌   |                                                |
 | `officePaste`   |  ❌   |  ✅  |   ❌   |                                                |
-| `slashCommand`  |  ❌   |  ✅  |   ✅   | notion preset 核心体验                         |
-| `dragHandle`    |  ❌   |  ✅  |   ✅   | notion preset 核心体验                         |
+| `slashCommand`  |  ❌   |  ❌  |   ✅   | notion preset 核心体验                         |
+| `dragHandle`    |  ❌   |  ❌  |   ✅   | notion preset 核心体验                         |
 
 > **实施要求**：`resolveEditorProfile` 中的 Preset 默认值以此表为准，禁止在其他地方散落 preset 判断。Overrides 中值为 `true` 开启、`false` 强制关闭（即使 preset 默认开启也关闭）、`undefined` 继承 preset 默认。
 >

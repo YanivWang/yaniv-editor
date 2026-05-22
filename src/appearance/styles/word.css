@@ -15,7 +15,6 @@
   --ye-doc-page-padding: 0;
   --ye-doc-container-padding-y: 20px;
   --ye-bg: #ffffff;
-  --ye-bg-secondary: #f2f2f2;
   --ye-bg-hover: #e6e6e6;
   --ye-text: #000000;
   --ye-text-secondary: #444444;
@@ -36,6 +35,8 @@
   --ye-font-family: "Calibri", "Segoe UI", arial, sans-serif;
   --ye-font-size: 11pt;
   --ye-line-height: 1.5;
+  --ye-outline-width: 200px;
+  --ye-outline-title-color: var(--ye-primary);
 }
 
 /* Word 风格 - A4 纸张 */
@@ -78,7 +79,6 @@
 /* Word 深色模式 */
 .yaniv-editor.appearance-word[data-color-mode="dark"] {
   --ye-bg: #1e1e1e;
-  --ye-bg-secondary: #252525;
   --ye-bg-hover: #3e3e3e;
   --ye-text: #d4d4d4;
   --ye-text-secondary: #9e9e9e;

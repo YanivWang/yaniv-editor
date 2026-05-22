@@ -232,14 +232,14 @@ export const FEATURE_HINTS: FeatureHint[] = [
     group: "块编辑",
     label: "斜杠命令",
     hint: "空行输入 / 选择块类型",
-    presets: ["full", "notion"],
+    presets: ["notion"],
   },
   {
     id: "dragHandle",
     group: "块编辑",
     label: "拖拽块",
     hint: "段落左侧六点：打开菜单或拖拽排序",
-    presets: ["full", "notion"],
+    presets: ["notion"],
   },
   {
     id: "floatingMenu",
@@ -375,9 +375,8 @@ const SAMPLE_FULL = `
   <tr><td>查找</td><td>Ctrl/Cmd+F</td></tr>
 </table>
 <h2>更多</h2>
-<p>选中文字体验 <strong>AI 悬浮菜单</strong>；空行输入 <code>/</code> 试斜杠命令；左侧六点拖拽块。</p>
-<p>数学公式、模板、图库、Office 粘贴等见顶栏与下方功能指引。</p>
-<p>可从 Word 复制内容粘贴试 <strong>Office 粘贴</strong>；顶栏插入公式试 <strong>数学</strong>。</p>
+<p>选中文字体验 <strong>AI 悬浮菜单</strong>；数学公式、模板、图库、Office 粘贴等见顶栏。</p>
+<p>可从 Word 复制内容粘贴试 <strong>Office 粘贴</strong>；顶栏插入公式试 <strong>数学</strong>。块编辑（<code>/</code>、拖拽块）请切换 <strong>Notion</strong> 方案。</p>
 `;
 
 const SAMPLE_NOTION = `

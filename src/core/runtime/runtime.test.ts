@@ -38,6 +38,18 @@ describe("resolveEditorProfile", () => {
       resolveEditorProfile({ preset: "full", features: { table: undefined } }).gates.table,
     ).toBe(true);
   });
+
+  test("full preset 默认关闭 notion 块编辑能力", () => {
+    const gates = resolveEditorProfile({ preset: "full" }).gates;
+    expect(gates.slashCommand).toBe(false);
+    expect(gates.dragHandle).toBe(false);
+  });
+
+  test("notion preset 默认开启块编辑能力", () => {
+    const gates = resolveEditorProfile({ preset: "notion" }).gates;
+    expect(gates.slashCommand).toBe(true);
+    expect(gates.dragHandle).toBe(true);
+  });
 });
 
 describe("mergeFeatures", () => {

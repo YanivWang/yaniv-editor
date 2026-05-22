@@ -28,8 +28,8 @@ const PRESET_DEFAULT_FEATURES: Record<EditorPreset, Required<FeatureConfig>> = {
     outline: true,
     searchReplace: true,
     officePaste: true,
-    slashCommand: true,
-    dragHandle: true,
+    slashCommand: false,
+    dragHandle: false,
   },
   notion: {
     table: true,

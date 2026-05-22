@@ -6,7 +6,11 @@
     :should-show="shouldShow"
     class="link-bubble-menu"
   >
-    <div class="link-bubble-menu-content">
+    <div
+      class="link-bubble-menu-content"
+      :class="appearanceClass"
+      :data-color-mode="resolvedColorMode"
+    >
       <!-- 链接URL显示 -->
       <div class="link-url-display">
         <span class="link-url-text" :title="currentLinkUrl">{{ currentLinkUrl }}</span>
@@ -68,8 +72,9 @@
  */
 import { EditOutlined, LinkOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch, computed } from "vue";
 
+import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -77,6 +82,12 @@ import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 const t = useEditorT();
+
+const appearanceCtx = useInjectEditorAppearance();
+const appearanceClass = computed(() =>
+  getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
+);
+const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
 
 const props = withDefaults(
   defineProps<{
@@ -242,7 +253,7 @@ function removeLink() {
   z-index: 1002; /* 比图片工具栏稍高，确保链接悬浮框显示在上层 */
 }
 
-.link-bubble-menu-content {
+.link-bubble-menu-content:not(.appearance-notion) {
   display: flex;
   gap: 0;
   align-items: center;
@@ -256,6 +267,12 @@ function removeLink() {
     background: #1f1f1f;
     border-color: var(--ye-border);
   }
+}
+
+.link-bubble-menu-content.appearance-notion {
+  display: flex;
+  gap: 0;
+  align-items: center;
 }
 
 /* 链接URL显示区域 */
@@ -272,8 +289,11 @@ function removeLink() {
   text-overflow: ellipsis;
   font-size: 14px;
   line-height: 1.5;
-  color: #262626;
   white-space: nowrap;
+}
+
+.link-bubble-menu-content:not(.appearance-notion) .link-url-text {
+  color: #262626;
 
   [data-color-mode="dark"] & {
     color: #f0f0f0;
@@ -288,7 +308,7 @@ function removeLink() {
 }
 
 /* 分隔线 */
-.link-divider {
+.link-bubble-menu-content:not(.appearance-notion) .link-divider {
   width: 1px;
   height: 20px;
   margin: 0 4px;
@@ -299,6 +319,12 @@ function removeLink() {
   }
 }
 
+.link-bubble-menu-content.appearance-notion .link-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 4px;
+}
+
 /* 操作按钮 */
 .link-action-btn {
   display: flex;
@@ -307,19 +333,22 @@ function removeLink() {
   width: 32px;
   height: 32px;
   padding: 0;
-  color: #262626;
   cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 4px;
   transition: all 0.2s;
+}
+
+.link-bubble-menu-content:not(.appearance-notion) .link-action-btn {
+  color: #262626;
 
   [data-color-mode="dark"] & {
     color: #f0f0f0;
   }
 }
 
-.link-action-btn:hover:not(:disabled) {
+.link-bubble-menu-content:not(.appearance-notion) .link-action-btn:hover:not(:disabled) {
   background: #f5f5f5;
 
   [data-color-mode="dark"] & {
@@ -333,7 +362,7 @@ function removeLink() {
 }
 
 /* 危险按钮样式（删除） */
-.link-action-btn--danger {
+.link-bubble-menu-content:not(.appearance-notion) .link-action-btn--danger {
   color: #ff4d4f;
 
   [data-color-mode="dark"] & {
@@ -341,7 +370,7 @@ function removeLink() {
   }
 }
 
-.link-action-btn--danger:hover {
+.link-bubble-menu-content:not(.appearance-notion) .link-action-btn--danger:hover:not(:disabled) {
   color: #ff4d4f;
   background: #fff1f0;
 

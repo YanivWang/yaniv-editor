@@ -41,11 +41,11 @@ Turning off an ability removes its extension registration and all matching inter
 
 Preset default abilities come from `resolveEditorProfile`. Toolbar buttons are filtered again by active gates.
 
-| Preset   | Default abilities                                                                                          | Layout strategy                                        |
-| -------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `basic`  | image                                                                                                      | fixed header and footer, no floating menu              |
-| `full`   | image, video, table, math, format painter, outline, find/replace, Office paste, slash command, drag handle | fixed header and footer, floating menu                 |
-| `notion` | image, table, slash command, drag handle                                                                   | no fixed header or footer, floating/block interactions |
+| Preset   | Default abilities                                                              | Layout strategy                                        |
+| -------- | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| `basic`  | image                                                                          | fixed header and footer, no floating menu              |
+| `full`   | image, video, table, math, format painter, outline, find/replace, Office paste | fixed header and footer, floating menu                 |
+| `notion` | image, table, slash command, drag handle                                       | no fixed header or footer, floating/block interactions |
 
 AI is disabled in all presets by default. Enable it explicitly:
 

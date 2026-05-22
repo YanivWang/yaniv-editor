@@ -8,7 +8,6 @@
   --ye-primary-hover: #1456f0;
   --ye-primary-light: rgb(51 112 255 / 8%);
   --ye-outline-title-color: #3370ff;
-  --ye-bg-secondary: #f5f6f7;
   --ye-doc-page-width: 900px;
   --ye-doc-page-min-height: 480px;
   --ye-doc-padding-top: 48px;
@@ -152,7 +151,6 @@
 }
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
-  --ye-bg-secondary: #141414;
   --ye-outline-title-color: var(--ye-primary);
 }
 
@@ -214,72 +212,6 @@
 /* 任务列表间距 */
 .yaniv-editor.appearance-default .document-content .ProseMirror ul[data-type="taskList"] {
   margin: 0 0 14px;
-}
-
-/* ===== 大纲（飞书扁平贴边） ===== */
-.yaniv-editor.appearance-default .outline-panel {
-  background: var(--ye-bg);
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.yaniv-editor.appearance-default .outline-panel--top-left {
-  border-right: var(--ye-border-width) solid var(--ye-border);
-}
-
-.yaniv-editor.appearance-default .outline-panel--top-right {
-  border-left: var(--ye-border-width) solid var(--ye-border);
-}
-
-.yaniv-editor.appearance-default .outline-panel__header {
-  border-bottom: var(--ye-border-width) solid var(--ye-border);
-}
-
-.yaniv-editor.appearance-default .outline-panel__title {
-  color: var(--ye-outline-title-color, var(--ye-primary));
-}
-
-.yaniv-editor.appearance-default .outline-panel__close {
-  color: var(--ye-text-muted);
-}
-
-.yaniv-editor.appearance-default .outline-panel__close:hover {
-  color: var(--ye-text-secondary);
-  background: var(--ye-bg-hover);
-}
-
-.yaniv-editor.appearance-default .outline-panel__empty {
-  color: var(--ye-text-muted);
-}
-
-.yaniv-editor.appearance-default .outline-panel__item:hover,
-.yaniv-editor.appearance-default .outline-panel__item.is-active {
-  color: var(--ye-primary);
-}
-
-.yaniv-editor.appearance-default .outline-panel__item--h1 {
-  color: var(--ye-text);
-}
-
-.yaniv-editor.appearance-default .outline-panel__item--h2,
-.yaniv-editor.appearance-default .outline-panel__item--h3 {
-  color: var(--ye-text-secondary);
-}
-
-.yaniv-editor.appearance-default .outline-panel__item--h4,
-.yaniv-editor.appearance-default .outline-panel__item--h5,
-.yaniv-editor.appearance-default .outline-panel__item--h6 {
-  color: var(--ye-text-muted);
-}
-
-.yaniv-editor.appearance-default .outline-panel__item--h1.is-active,
-.yaniv-editor.appearance-default .outline-panel__item--h2.is-active,
-.yaniv-editor.appearance-default .outline-panel__item--h3.is-active,
-.yaniv-editor.appearance-default .outline-panel__item--h4.is-active,
-.yaniv-editor.appearance-default .outline-panel__item--h5.is-active,
-.yaniv-editor.appearance-default .outline-panel__item--h6.is-active {
-  color: var(--ye-primary);
 }
 
 /* ===== 拖拽手柄 ===== */

@@ -207,3 +207,62 @@
 .outline-panel__item--h6.is-active {
   font-weight: 500;
 }
+
+/* ===== 大纲视觉皮肤（各 appearance 通过 --ye-outline-* token 微调） ===== */
+.yaniv-editor .outline-panel {
+  background: var(--ye-bg);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.yaniv-editor .outline-panel--top-left {
+  border-right: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor .outline-panel--top-right {
+  border-left: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor .outline-panel__header {
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor .outline-panel__title {
+  color: var(--ye-outline-title-color, var(--ye-primary));
+}
+
+.yaniv-editor .outline-panel__close {
+  color: var(--ye-text-muted);
+}
+
+.yaniv-editor .outline-panel__close:hover {
+  color: var(--ye-text-secondary);
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor .outline-panel__empty {
+  color: var(--ye-text-muted);
+}
+
+.yaniv-editor .outline-panel__item {
+  color: var(--ye-text-secondary);
+}
+
+.yaniv-editor .outline-panel__item:hover,
+.yaniv-editor .outline-panel__item.is-active {
+  color: var(--ye-primary);
+}
+
+.yaniv-editor .outline-panel__item--h1 {
+  color: var(--ye-text);
+}
+
+.yaniv-editor .outline-panel__item--h1.is-active,
+.yaniv-editor .outline-panel__item--h2.is-active,
+.yaniv-editor .outline-panel__item--h3.is-active,
+.yaniv-editor .outline-panel__item--h4.is-active,
+.yaniv-editor .outline-panel__item--h5.is-active,
+.yaniv-editor .outline-panel__item--h6.is-active {
+  color: var(--ye-primary);
+}

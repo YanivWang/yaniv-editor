@@ -5,6 +5,8 @@
     :tippy-options="{ duration: 100, placement: 'top' }"
     :should-show="shouldShow"
     class="floating-menu"
+    :class="appearanceClass"
+    :data-color-mode="resolvedColorMode"
   >
     <div class="menu-content">
       <div class="menu-group">
@@ -61,6 +63,7 @@ import { ThunderboltOutlined } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed } from "vue";
 
+import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
 import { HeadingControl } from "@/components/editor/heading";
 import { LinkButton } from "@/components/editor/link";
@@ -73,6 +76,12 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
 
 const t = useEditorT();
+
+const appearanceCtx = useInjectEditorAppearance();
+const appearanceClass = computed(() =>
+  getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
+);
+const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
 
 const props = withDefaults(
   defineProps<{
