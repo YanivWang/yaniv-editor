@@ -23,6 +23,7 @@
 
 /* 全宽内容区：无 A4 纸张阴影，圆角卡片 */
 .yaniv-editor.appearance-default .continuous-pages {
+  overflow: hidden;
   border: 1px solid var(--ye-border);
   border-radius: var(--ye-radius-md);
   box-shadow: var(--ye-shadow-sm);

@@ -18,16 +18,16 @@
   flex-shrink: 0;
   width: 100%;
   margin-bottom: 0; /* 移除底部留白，由父容器控制 */
-  background: #f5f5f5; /* 确保有背景色 */
-  border-top: 1px solid #d0d0d0;
+  background: var(--ye-footer-bg);
+  border-top: 1px solid var(--ye-footer-divider);
   border-bottom: none;
   border-radius: 0; /* 移除圆角，底部导航应该贴合底部 */
-  box-shadow: 0 -2px 8px rgb(0 0 0 / 5%);
+  box-shadow: none;
 
   [data-color-mode="dark"] & {
-    background: #262626;
-    border-top-color: #434343;
-    box-shadow: 0 -2px 8px rgb(0 0 0 / 20%);
+    background: var(--ye-footer-bg);
+    border-top-color: var(--ye-footer-divider);
+    box-shadow: none;
   }
 }
 
@@ -66,13 +66,13 @@
 
 /* ===== 暗黑模式按钮样式 ===== */
 [data-color-mode="dark"] .footer-nav-container .ant-btn {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--ye-text);
   background: transparent;
-  border-color: #434343;
+  border-color: var(--ye-border);
 }
 
 [data-color-mode="dark"] .footer-nav-container .ant-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #595959;
+  color: var(--ye-text);
+  background: var(--ye-bg-tertiary);
+  border-color: var(--ye-border);
 }

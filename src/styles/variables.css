@@ -37,6 +37,9 @@
   /* ===== Toolbar ===== */
   --ye-toolbar-bg: #fafafa;
   --ye-toolbar-border: var(--ye-border);
+  --ye-footer-bg: var(--ye-bg-secondary);
+  --ye-footer-text: var(--ye-text-secondary);
+  --ye-footer-divider: var(--ye-border);
   --ye-toolbar-btn-bg: transparent;
   --ye-toolbar-btn-hover: #f0f0f0;
   --ye-toolbar-btn-active: #e5e5e5;
@@ -150,6 +153,9 @@
   --ye-border-hover: #444444;
   --ye-selection: rgba(96, 165, 250, 0.25);
   --ye-toolbar-bg: #262626;
+  --ye-footer-bg: #262626;
+  --ye-footer-text: #c4c4c4;
+  --ye-footer-divider: #434343;
   --ye-toolbar-btn-hover: #333333;
   --ye-toolbar-btn-active: #404040;
   --ye-toolbar-btn-text: var(--ye-text);

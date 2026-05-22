@@ -7,12 +7,12 @@
   align-items: center;
   justify-content: center;
   padding: 12px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #d0d0d0;
+  background: var(--ye-footer-bg);
+  border-bottom: 1px solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
-    background: #262626;
-    border-bottom-color: #434343;
+    background: var(--ye-footer-bg);
+    border-bottom-color: var(--ye-footer-divider);
   }
 }
 
@@ -21,11 +21,11 @@
   min-width: 50px;
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--ye-footer-text);
   text-align: center;
 
   [data-color-mode="dark"] & {
-    color: #f0f0f0;
+    color: var(--ye-footer-text);
   }
 }
 
@@ -33,10 +33,10 @@
 .page-info {
   margin-left: 8px;
   font-size: 13px;
-  color: #666;
+  color: var(--ye-footer-text);
 
   [data-color-mode="dark"] & {
-    color: #d0d0d0;
+    color: var(--ye-footer-text);
   }
 }
 
@@ -45,12 +45,12 @@
   padding-left: 12px;
   margin-left: 8px;
   font-size: 13px;
-  color: #666;
-  border-left: 1px solid #d0d0d0;
+  color: var(--ye-footer-text);
+  border-left: 1px solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
-    color: #d0d0d0;
-    border-left-color: #434343;
+    color: var(--ye-footer-text);
+    border-left-color: var(--ye-footer-divider);
   }
 }
 
@@ -62,13 +62,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 12px;
-  color: #888;
+  color: var(--ye-text-muted);
   white-space: nowrap;
-  border-left: 1px solid #d0d0d0;
+  border-left: 1px solid var(--ye-footer-divider);
 
   [data-color-mode="dark"] & {
-    color: #b5b5b5;
-    border-left-color: #434343;
+    color: var(--ye-text-muted);
+    border-left-color: var(--ye-footer-divider);
   }
 }
 
@@ -76,14 +76,14 @@
   z-index: 10;
   flex-shrink: 0;
   width: 100%;
-  background: #f5f5f5;
-  border-top: 1px solid #d0d0d0;
+  background: var(--ye-footer-bg);
+  border-top: 1px solid var(--ye-footer-divider);
   border-bottom: none;
-  box-shadow: 0 -2px 8px rgb(0 0 0 / 5%);
+  box-shadow: none;
 
   [data-color-mode="dark"] & {
-    background: #262626;
-    border-top-color: #434343;
-    box-shadow: 0 -2px 8px rgb(0 0 0 / 20%);
+    background: var(--ye-footer-bg);
+    border-top-color: var(--ye-footer-divider);
+    box-shadow: none;
   }
 }
