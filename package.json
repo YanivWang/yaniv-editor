@@ -44,6 +44,8 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "pages:build": "bash scripts/build-pages.sh",
+    "pages:preview": "pnpm pages:build && npx serve _site",
     "build:types": "vue-tsc --noEmit -p tsconfig.build.json",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
@@ -218,7 +220,7 @@
     "cms"
   ],
   "author": "YanivWang",
-  "homepage": "https://github.com/YanivWang/yaniv-editor#readme",
+  "homepage": "https://yanivwang.github.io/yaniv-editor/",
   "bugs": {
     "url": "https://github.com/YanivWang/yaniv-editor/issues"
   },

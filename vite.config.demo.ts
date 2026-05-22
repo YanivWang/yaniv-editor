@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 
+const repoBase = "/yaniv-editor/";
+const isPagesBuild = process.env.PAGES_BUILD === "1";
+
 function getVendorChunkName(id: string) {
   const match = id.match(
     /\/node_modules\/(?:\.pnpm\/[^/]+\/node_modules\/)?((?:@[^/]+\/)?[^/]+)(?:\/(.*))?/,
@@ -22,8 +25,9 @@ function getVendorChunkName(id: string) {
   return `vendor-${packageName.replace("@", "").replace("/", "-")}`;
 }
 
-// Examples build configuration for Vercel/Netlify deployment
+// Examples build configuration for GitHub Pages / static hosting
 export default defineConfig({
+  base: isPagesBuild ? `${repoBase}examples/` : "/",
   plugins: [vue()],
   resolve: {
     alias: {
@@ -37,11 +41,10 @@ export default defineConfig({
   server: {
     port: 9527,
   },
-  // Build examples app, not library
   build: {
-    // Keep examples browser targets aligned with the library build and CSS nesting usage.
     target: ["es2022", "chrome105", "safari16", "firefox110", "edge105"],
-    outDir: "dist",
+    outDir: "dist-demo",
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),

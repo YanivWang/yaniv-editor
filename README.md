@@ -10,7 +10,7 @@ Vue 3 + Tiptap 3 rich-text editor library (**v0.1.0**).
 | `YanivInlineEditor` | `@yanivjs/yaniv-editor/inline` | Comments, forms                |
 | AI (optional)       | `@yanivjs/yaniv-editor/ai`     | AI extensions & UI             |
 
-Full API reference and guides live in [`docs/`](./docs/index.md) (`pnpm docs:dev` → local site). Breaking changes and migration: [`CHANGELOG.md`](./CHANGELOG.md). Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+Full API reference and guides live in [`docs/`](./docs/index.md) ([live docs](https://yanivwang.github.io/yaniv-editor/) · `pnpm docs:dev` for local). [Live demo](https://yanivwang.github.io/yaniv-editor/examples/). Breaking changes and migration: [`CHANGELOG.md`](./CHANGELOG.md). Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 
 ## Install
 
@@ -231,7 +231,7 @@ AI symbols live under `@yanivjs/yaniv-editor/ai` only (not re-exported from the 
 
 ```bash
 pnpm install
-pnpm dev          # demo → http://localhost:9527
-pnpm docs:dev     # VitePress docs
+pnpm dev          # demo → http://localhost:9527 (live: https://yanivwang.github.io/yaniv-editor/examples/)
+pnpm docs:dev     # VitePress docs (live: https://yanivwang.github.io/yaniv-editor/)
 pnpm run verify   # typecheck + test + lint
 ```

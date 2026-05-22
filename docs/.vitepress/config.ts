@@ -1,5 +1,12 @@
 import { defineConfig } from "vitepress";
 
+const repoBase = "/yaniv-editor/";
+const isPagesBuild = process.env.VP_BASE != null;
+const demoUrl = isPagesBuild ? `${repoBase}examples/` : "http://localhost:9527";
+const demoNavItem = isPagesBuild
+  ? { text: "Demo", link: demoUrl }
+  : { text: "Demo", link: demoUrl, target: "_blank" as const };
+
 const socialLinks = [{ icon: "github", link: "https://github.com/YanivWang/yaniv-editor" }];
 
 const guideSidebar = (prefix: string, en: boolean) => [
@@ -78,6 +85,7 @@ const contributingSidebar = (prefix: string, en: boolean) => [
 ];
 
 export default defineConfig({
+  base: process.env.VP_BASE ?? "/",
   cleanUrls: true,
   lastUpdated: true,
   ignoreDeadLinks: [/^http:\/\/localhost:\d+/],
@@ -96,7 +104,7 @@ export default defineConfig({
           { text: "API", link: "/api/yaniv-editor" },
           { text: "FAQ", link: "/faq" },
           { text: "贡献", link: "/contributing/project-structure" },
-          { text: "Demo", link: "http://localhost:9527", target: "_blank" },
+          demoNavItem,
         ],
         sidebar: {
           "/guide/": guideSidebar("", false),
@@ -123,7 +131,7 @@ export default defineConfig({
           { text: "API", link: "/en/api/yaniv-editor" },
           { text: "FAQ", link: "/en/faq" },
           { text: "Contributing", link: "/en/contributing/project-structure" },
-          { text: "Demo", link: "http://localhost:9527", target: "_blank" },
+          demoNavItem,
         ],
         sidebar: {
           "/en/guide/": guideSidebar("/en", true),

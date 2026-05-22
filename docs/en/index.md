@@ -4,15 +4,16 @@ Vue 3 + Tiptap 3 rich text editor with **Full** and **Inline** component shapes.
 
 ## Quick Links
 
-| I want to…                    | Start here                                                          |
-| ----------------------------- | ------------------------------------------------------------------- |
-| Get started in 5 minutes      | [Getting Started](./guide/getting-started.md)                       |
-| Pick preset / enable features | [Feature Matrix](./features/feature-matrix.md)                      |
-| Look up props                 | [YanivEditor API](./api/yaniv-editor.md)                            |
-| Notion-style block editing    | [Block Editing](./features/block-editing.md)                        |
-| Integrate AI                  | [AI Assistance](./features/ai.md) + [AI Config](./api/ai-config.md) |
-| Understand code structure     | [Architecture](./contributing/architecture.md)                      |
-| Try locally                   | Run `pnpm dev` → [localhost:9527](http://localhost:9527)            |
+| I want to…                    | Start here                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| Get started in 5 minutes      | [Getting Started](./guide/getting-started.md)                                                    |
+| Pick preset / enable features | [Feature Matrix](./features/feature-matrix.md)                                                   |
+| Look up props                 | [YanivEditor API](./api/yaniv-editor.md)                                                         |
+| Notion-style block editing    | [Block Editing](./features/block-editing.md)                                                     |
+| Integrate AI                  | [AI Assistance](./features/ai.md) + [AI Config](./api/ai-config.md)                              |
+| Understand code structure     | [Architecture](./contributing/architecture.md)                                                   |
+| Try locally                   | Run `pnpm dev` → [localhost:9527](http://localhost:9527)                                         |
+| Live demo                     | [yanivwang.github.io/yaniv-editor/examples/](https://yanivwang.github.io/yaniv-editor/examples/) |
 
 ## Component Shapes
 
