@@ -1,25 +1,25 @@
-# Full Editor Guide
+# Full Editor 指南
 
-Full Editor uses four explicit axes:
+Full Editor 有四个明确的配置维度：
 
-- `mode` controls runtime state.
-- `preset` controls the feature plan.
-- `appearance` controls visual skin.
-- `colorMode` controls light, dark, or system color.
+- `mode` 控制运行状态。
+- `preset` 控制功能方案。
+- `appearance` 控制视觉皮肤。
+- `colorMode` 控制浅色、深色或跟随系统。
 
 ```vue
 <YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
 ```
 
-## Presets
+## Preset
 
-`basic` enables image only for common writing workflows. Text formatting and links remain available. It keeps a fixed header and footer, but does not enable video, table, AI, Office paste, math, outline, find/replace, format painter, slash command, or drag handle by default.
+`basic` 面向常见写作场景，默认仅开启图片。文本格式和链接始终可用，保留固定页眉页脚，但不默认开启视频、表格、AI、Office 粘贴、公式、大纲、查找替换、格式刷、斜杠命令或拖拽手柄。
 
-`full` enables table, video, math, Office paste, outline, find/replace, and format painter. It keeps the fixed header, footer, floating menu, contextual tools, and shortcut hints. Slash command, drag handle, and AI are not enabled by default.
+`full` 开启表格、视频、公式、Office 粘贴、大纲、查找替换和格式刷，保留固定页眉页脚、浮动菜单、上下文工具和快捷键提示。斜杠命令、拖拽手柄和 AI 默认不开启。
 
-`notion` enables block editing (slash command, drag handle) plus video, math, outline, find/replace, Office paste, and AI (format painter off). It hides the fixed top toolbar and footer, relying on floating/block interactions instead.
+`notion` 开启块编辑（斜杠命令、拖拽手柄），以及视频、公式、大纲、查找替换、Office 粘贴和 AI（格式刷关闭）。隐藏固定顶部工具栏和页脚，依赖浮动/块级交互。
 
-## Ability Overrides
+## 能力覆盖
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
@@ -27,14 +27,14 @@ Full Editor uses four explicit axes:
 <YanivEditor preset="basic" :features="{ table: true, video: true }" />
 ```
 
-The selected preset remains active, but disabled abilities remove their extensions and related UI entry points.
+preset 仍然生效，但被禁用的能力会移除对应扩展和相关 UI 入口。
 
-`features` does not control layout chrome. Header, footer, floating menu, and shortcut hints are preset layout decisions.
+`features` 不控制布局 chrome。页眉、页脚、浮动菜单和快捷键提示由 preset 的布局策略决定。
 
-## Preview
+## 预览
 
 ```vue
 <YanivEditor mode="preview" preset="basic" :initial-content="html" />
 ```
 
-Preview shows content without editing chrome. Links, video playback, scrolling, and text selection remain available.
+预览模式展示内容但不显示编辑 UI。链接、视频播放、滚动和文本选择仍然可用。

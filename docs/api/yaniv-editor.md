@@ -1,6 +1,6 @@
 # YanivEditor API
 
-## Import
+## 导入
 
 ```ts
 import { YanivEditor } from "@yanivjs/yaniv-editor";
@@ -9,23 +9,23 @@ import "@yanivjs/yaniv-editor/style.css";
 
 ## Props
 
-| Prop                   | Type                                          | Default                        | Description                         |
-| ---------------------- | --------------------------------------------- | ------------------------------ | ----------------------------------- |
-| `mode`                 | `"edit" \| "preview"`                         | `"edit"`                       | Runtime state                       |
-| `preset`               | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Full Editor feature plan            |
-| `appearance`           | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | Visual skin                         |
-| `colorMode`            | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                          |
-| `features`             | `FeatureConfig`                               | preset defaults                | Ability overrides                   |
-| `initialContent`       | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | Initial document                    |
-| `customAppearanceVars` | `Record<string, string>`                      | none                           | CSS variables for custom appearance |
-| `uploadImage`          | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                |
-| `uploadVideo`          | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                |
-| `galleryImages`        | `GalleryImage[]`                              | current document images        | External gallery source             |
-| `customTemplates`      | `TemplateItem[]`                              | built-in templates             | Extra templates                     |
-| `locale`               | `string`                                      | `"zh-CN"`                      | Locale code                         |
-| `aiConfig`             | `YanivEditorAiConfig`                         | none                           | Host-owned AI config                |
+| Prop                   | 类型                                          | 默认值                         | 说明                 |
+| ---------------------- | --------------------------------------------- | ------------------------------ | -------------------- |
+| `mode`                 | `"edit" \| "preview"`                         | `"edit"`                       | 运行状态             |
+| `preset`               | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Full Editor 功能方案 |
+| `appearance`           | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | 视觉皮肤             |
+| `colorMode`            | `"light" \| "dark" \| "auto"`                 | `"light"`                      | 颜色模式             |
+| `features`             | `FeatureConfig`                               | preset 默认值                  | 能力覆盖             |
+| `initialContent`       | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | 初始文档内容         |
+| `customAppearanceVars` | `Record<string, string>`                      | 无                             | 自定义外观 CSS 变量  |
+| `uploadImage`          | `(file: File) => Promise<string>`             | DataURL 回退                   | 图片上传处理         |
+| `uploadVideo`          | `(file: File) => Promise<string>`             | DataURL 回退                   | 视频上传处理         |
+| `galleryImages`        | `GalleryImage[]`                              | 当前文档图片                   | 外部图库来源         |
+| `customTemplates`      | `TemplateItem[]`                              | 内置模板                       | 额外模板             |
+| `locale`               | `string`                                      | `"zh-CN"`                      | 语言代码             |
+| `aiConfig`             | `YanivEditorAiConfig`                         | 无                             | 宿主侧 AI 配置       |
 
-## Examples
+## 示例
 
 ```vue
 <YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
@@ -45,12 +45,12 @@ interface YanivEditorExpose {
 }
 ```
 
-## Advanced Exports
+## 高级导出
 
-For custom shells and advanced integration, the root package also exports:
+自定义 shell 和高级集成时，根包还导出：
 
-- `resolveEditorProfile`, `mergeFeatures`, `resolveChromePolicy`, `computeSessionKey`
-- `buildExtensions`, `CAPABILITIES`, `applyGatesToToolbarConfig`, `resolveShowInlineToolbar`
-- `ContentAdapter`, `applyPhaseTransition`
+- `resolveEditorProfile`、`mergeFeatures`、`resolveChromePolicy`、`computeSessionKey`
+- `buildExtensions`、`CAPABILITIES`、`applyGatesToToolbarConfig`、`resolveShowInlineToolbar`
+- `ContentAdapter`、`applyPhaseTransition`
 
-See [Composables](/api/composables) for details.
+详见 [Composables](./composables.md)。

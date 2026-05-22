@@ -1,4 +1,4 @@
-# 快速开始
+# Getting Started
 
 ## Full Editor
 
@@ -13,17 +13,17 @@ import "@yanivjs/yaniv-editor/style.css";
 </template>
 ```
 
-页面需要表格、视频、公式、Office 粘贴、大纲、查找替换、格式刷时，使用 `preset="full"`（不含斜杠命令和拖拽手柄，块编辑请用 `preset="notion"`）。
+Use `preset="full"` when the page needs table, video, math, Office paste, outline, find/replace, and format painter (not slash command or drag handle — use `preset="notion"` for those).
 
-需要块编辑工作流时使用 `preset="notion"`。
+Use `preset="notion"` when the page needs a block editing workflow.
 
-`basic` 和 `full` 需显式开启 AI：
+For `basic` and `full`, enable AI explicitly:
 
 ```vue
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
 ```
 
-`notion` 默认开启 AI，传入 `:ai-config` 即可调用 provider：
+For `notion`, AI is enabled by default; pass `:ai-config` for a working provider:
 
 ```vue
 <YanivEditor preset="notion" :ai-config="aiConfig" />
@@ -45,7 +45,7 @@ const html = ref("<p>Hello Yaniv</p>");
 </template>
 ```
 
-## AI 子包
+## AI Subpackage
 
 ```ts
 import { ContinueWritingExtension, AiMenuButton } from "@yanivjs/yaniv-editor/ai";

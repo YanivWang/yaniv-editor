@@ -1,6 +1,6 @@
-# Inline 按需拼装
+# Inline Composition
 
-Inline Editor 没有 preset 层，默认工具栏类似评论输入框：
+Inline Editor has no preset layer. The default toolbar is comment-like:
 
 ```ts
 {
@@ -10,7 +10,7 @@ Inline Editor 没有 preset 层，默认工具栏类似评论输入框：
 }
 ```
 
-精细控制时传入 `toolbar`：
+For detailed control, pass `toolbar`.
 
 ```vue
 <YanivInlineEditor
@@ -20,9 +20,9 @@ Inline Editor 没有 preset 层，默认工具栏类似评论输入框：
 />
 ```
 
-工具栏配置同时也是 Inline 扩展注册的能力来源。例如 `toolbar.link !== true` 表示隐藏链接按钮且不注册链接扩展。
+The toolbar config is also the ability source for Inline Editor extension registration. For example, `toolbar.link !== true` means the link button is hidden and the link extension is not registered.
 
-也可以自行组装 inline shell：
+You can also build your own inline shell:
 
 ```ts
 import { buildExtensions, resolveInlineGates, CAPABILITIES } from "@yanivjs/yaniv-editor/inline";
@@ -39,4 +39,4 @@ const extensions = await buildExtensions("inline", {
 });
 ```
 
-`buildExtensions` 和 `resolveInlineGates` 是 Inline 扩展注册的唯一来源。请勿使用已移除的 `buildInlineExtensions` 或 `resolveInlineExtensionGates` API。
+`buildExtensions` and `resolveInlineGates` are the single source of truth for Inline extension registration. Do not use the removed `buildInlineExtensions` or `resolveInlineExtensionGates` APIs.

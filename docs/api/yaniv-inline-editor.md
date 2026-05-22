@@ -1,6 +1,6 @@
 # YanivInlineEditor API
 
-## Import
+## 导入
 
 ```ts
 import { YanivInlineEditor } from "@yanivjs/yaniv-editor/inline";
@@ -9,25 +9,25 @@ import "@yanivjs/yaniv-editor/inline.css";
 
 ## Props
 
-| Prop              | Type                          | Default                        | Description                              |
-| ----------------- | ----------------------------- | ------------------------------ | ---------------------------------------- |
-| `content`         | `string`                      | `"<p></p>"`                    | HTML content, supports `v-model:content` |
-| `mode`            | `"edit" \| "preview"`         | `"edit"`                       | Runtime state                            |
-| `colorMode`       | `"light" \| "dark" \| "auto"` | `"light"`                      | Color mode                               |
-| `toolbar`         | `InlineToolbarConfig`         | undo/redo + text format + link | Toolbar controls                         |
-| `placeholder`     | `string`                      | none                           | Empty paragraph hint                     |
-| `extraExtensions` | `AnyExtension[]`              | `[]`                           | Additional Tiptap extensions             |
-| `editorProps`     | `Record<string, unknown>`     | none                           | Tiptap editor props                      |
-| `locale`          | `string`                      | `"zh-CN"`                      | Locale code                              |
+| Prop              | 类型                          | 默认值                      | 说明                              |
+| ----------------- | ----------------------------- | --------------------------- | --------------------------------- |
+| `content`         | `string`                      | `"<p></p>"`                 | HTML 内容，支持 `v-model:content` |
+| `mode`            | `"edit" \| "preview"`         | `"edit"`                    | 运行状态                          |
+| `colorMode`       | `"light" \| "dark" \| "auto"` | `"light"`                   | 颜色模式                          |
+| `toolbar`         | `InlineToolbarConfig`         | 撤销/重做 + 文本格式 + 链接 | 工具栏控件                        |
+| `placeholder`     | `string`                      | 无                          | 空段落提示                        |
+| `extraExtensions` | `AnyExtension[]`              | `[]`                        | 额外 Tiptap 扩展                  |
+| `editorProps`     | `Record<string, unknown>`     | 无                          | Tiptap editor props               |
+| `locale`          | `string`                      | `"zh-CN"`                   | 语言代码                          |
 
-## Examples
+## 示例
 
 ```vue
 <YanivInlineEditor v-model:content="html" mode="edit" />
 <YanivInlineEditor :content="html" mode="preview" color-mode="auto" />
 ```
 
-Custom toolbar:
+自定义工具栏：
 
 ```vue
 <YanivInlineEditor
@@ -36,11 +36,11 @@ Custom toolbar:
 />
 ```
 
-In `mode="preview"`, the built-in toolbar and custom toolbar slot are not rendered. Content remains selectable, and links remain normal document links.
+`mode="preview"` 时不渲染内置工具栏和自定义工具栏 slot。内容仍可选择，链接保持正常文档链接行为。
 
-## Advanced Exports
+## 高级导出
 
-The inline entry also exports building blocks for custom inline shells:
+inline 入口还导出用于自定义 inline shell 的构建块：
 
 ```ts
 import {
@@ -56,4 +56,4 @@ import {
 } from "@yanivjs/yaniv-editor/inline";
 ```
 
-See [Inline Composition](/guide/inline-composition) for a full custom-shell example.
+完整自定义 shell 示例见 [Inline 按需拼装](../guide/inline-composition.md)。

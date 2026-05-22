@@ -1,15 +1,15 @@
-# Appearance And Color
+# 外观与颜色
 
-Visual configuration is split into two props:
+视觉配置分为两个 prop：
 
-- `appearance`: `default | word | notion | custom`.
-- `colorMode`: `light | dark | auto`.
+- `appearance`：`default | word | notion | custom`。
+- `colorMode`：`light | dark | auto`。
 
 ```vue
 <YanivEditor appearance="notion" color-mode="auto" />
 ```
 
-`appearance="notion"` is only visual. `preset="notion"` controls the block editing feature plan. They can be used independently or together:
+`appearance="notion"` 仅影响视觉。`preset="notion"` 控制块编辑功能方案。两者可独立或组合使用：
 
 ```vue
 <YanivEditor preset="basic" appearance="notion" />
@@ -17,9 +17,9 @@ Visual configuration is split into two props:
 <YanivEditor preset="notion" appearance="notion" />
 ```
 
-## Custom Appearance
+## 自定义外观
 
-Use `appearance="custom"` with `customAppearanceVars` on the editor instance:
+使用 `appearance="custom"` 并在编辑器实例上传入 `customAppearanceVars`：
 
 ```vue
 <YanivEditor
@@ -31,7 +31,7 @@ Use `appearance="custom"` with `customAppearanceVars` on the editor instance:
 />
 ```
 
-## Utilities
+## 工具函数
 
 ```ts
 import {
@@ -44,12 +44,12 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-All built-in appearance CSS is provided by `@yanivjs/yaniv-editor/style.css`. `loadAppearance` and `preloadAppearances` keep the public API asynchronous but only mark built-in appearances as ready.
+所有内置外观 CSS 由 `@yanivjs/yaniv-editor/style.css` 提供。`loadAppearance` 和 `preloadAppearances` 保持公共 API 异步，但仅标记内置外观为就绪。
 
-## CSS Architecture
+## CSS 架构
 
-ProseMirror structure styles (paragraphs, lists, blockquote, inline code, tables, code blocks) live in `src/styles/content.css`, `table.css`, and `code-block.css`. Appearance files only change tokens and typography.
+ProseMirror 结构样式（段落、列表、引用、行内代码、表格、代码块）位于 `src/styles/content.css`、`table.css` 和 `code-block.css`。外观文件只修改 token 和排版。
 
-Notion block hover highlight is in `src/styles/block-hover.css` and activates only when the root has `appearance-notion`.
+Notion 块悬停高亮在 `src/styles/block-hover.css`，仅在根节点带有 `appearance-notion` 时生效。
 
-For contributor rules and file layout, see [Project Structure — CSS Layering](/contributing/project-structure#css-layering).
+贡献者规则与文件布局见 [项目结构 — CSS 分层](../contributing/project-structure.md#css-layering)。

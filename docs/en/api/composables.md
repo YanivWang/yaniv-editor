@@ -1,16 +1,16 @@
 # Composables
 
-公共 composables 和高级运行时辅助函数从根包导出。
+Public composables and advanced runtime helpers are exported from the root package.
 
-## 编辑器上下文
+## Editor Context
 
 ```ts
 import { provideYanivEditor, useYanivEditor } from "@yanivjs/yaniv-editor";
 ```
 
-自定义工具组件需要访问当前编辑器实例时使用。
+Use these when custom tool components need access to the active editor instance.
 
-## 视觉上下文
+## Visual Context
 
 ```ts
 import {
@@ -26,9 +26,9 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-`YanivEditor` 通过 `appearance`、`colorMode` 和可选的 `customAppearanceVars` 驱动视觉状态。
+`YanivEditor` drives visual state with `appearance`, `colorMode`, and optional `customAppearanceVars`.
 
-## 气泡菜单辅助
+## Bubble Menu Helpers
 
 ```ts
 import {
@@ -42,15 +42,15 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-## 编辑器状态辅助
+## Editor State Helpers
 
 ```ts
 import { useEditorColorState, useFindReplaceHotkey } from "@yanivjs/yaniv-editor";
 ```
 
-## 运行时与能力
+## Runtime And Capabilities
 
-高级集成可组合与内置组件相同的运行时管线：
+Advanced integration can compose the same runtime pipeline used by the built-in components:
 
 ```ts
 import {
@@ -68,7 +68,7 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-## 国际化
+## Locales
 
 ```ts
 import {
@@ -81,9 +81,9 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-## AI 子包
+## AI Subpackage
 
-AI 扩展和 UI 从 `@yanivjs/yaniv-editor/ai` 导出，不在根包中：
+AI extensions and UI are exported from `@yanivjs/yaniv-editor/ai`, not the root package:
 
 ```ts
 import { ContinueWritingExtension, AiMenuButton, useAiConfig } from "@yanivjs/yaniv-editor/ai";

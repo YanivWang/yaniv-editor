@@ -1,52 +1,50 @@
-# Yaniv Editor Docs
+# Yaniv Editor 文档
 
-Yaniv Editor exposes two component shapes and a small, explicit API.
+Vue 3 + Tiptap 3 富文本编辑器，提供 **Full** 与 **Inline** 两种组件形态。
 
-## Component Shapes
+## 快速链接
 
-| Shape  | Import                                                  | Use case                                      |
-| ------ | ------------------------------------------------------- | --------------------------------------------- |
-| Full   | `YanivEditor` from `@yanivjs/yaniv-editor`              | Documents, CMS pages, knowledge-base articles |
-| Inline | `YanivInlineEditor` from `@yanivjs/yaniv-editor/inline` | Comments, forms, compact inputs               |
-| AI     | `@yanivjs/yaniv-editor/ai`                              | Optional AI extensions and UI                 |
+| 我想…              | 从这里开始                                                  |
+| ------------------ | ----------------------------------------------------------- |
+| 5 分钟接入         | [快速开始](./guide/getting-started.md)                      |
+| 选 preset / 开功能 | [功能对照表](./features/feature-matrix.md)                  |
+| 查 Props           | [YanivEditor API](./api/yaniv-editor.md)                    |
+| Notion 块编辑      | [块编辑](./features/block-editing.md)                       |
+| 接 AI              | [AI 辅助](./features/ai.md) + [AI 配置](./api/ai-config.md) |
+| 理解代码结构       | [架构设计](./contributing/architecture.md)                  |
+| 本地体验           | 运行 `pnpm dev` → [localhost:9527](http://localhost:9527)   |
 
-## Full Editor
+## 组件形态
 
-```vue
-<YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
-```
+| 形态   | 导入                           | 场景              |
+| ------ | ------------------------------ | ----------------- |
+| Full   | `@yanivjs/yaniv-editor`        | 文档、CMS、知识库 |
+| Inline | `@yanivjs/yaniv-editor/inline` | 评论、表单        |
+| AI     | `@yanivjs/yaniv-editor/ai`     | 可选 AI 扩展      |
 
-Full Editor axes:
-
-- `mode`: runtime state, `edit | preview`.
-- `preset`: feature plan, `basic | full | notion`.
-- `appearance`: visual skin, `default | word | notion | custom`.
-- `colorMode`: `light | dark | auto`.
-- `features`: ability overrides.
-
-## Inline Editor
+## Full Editor 四维 API
 
 ```vue
-<YanivInlineEditor v-model:content="html" mode="edit" />
+<YanivEditor
+  mode="edit"
+  preset="basic"
+  appearance="default"
+  color-mode="light"
+  :features="{ table: true }"
+/>
 ```
 
-Inline Editor has no preset layer. Use `toolbar` for detailed toolbar control.
+- `mode` — `edit | preview`
+- `preset` — `basic | full | notion`
+- `appearance` — `default | word | notion | custom`
+- `colorMode` — `light | dark | auto`
+- `features` — 能力覆盖
 
-Inline toolbar switches also drive the Inline extension set, keeping visible controls and registered editing capabilities aligned.
+## 文档结构
 
-## AI
+- **指南** — 接入、外观、预览、国际化、集成
+- **功能** — 逐项能力说明与 preset 对照
+- **API** — 组件 props、FeatureConfig、Composables
+- **贡献** — 目录结构与架构设计
 
-`basic` and `full` disable AI by default. Enable it explicitly:
-
-```vue
-<YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
-```
-
-`notion` enables the AI capability by default, but you still need `:ai-config` (or demo env) for a working provider:
-
-```vue
-<YanivEditor preset="notion" :ai-config="aiConfig" />
-<YanivEditor preset="notion" :features="{ ai: false }" />
-```
-
-Import AI modules from `@yanivjs/yaniv-editor/ai`.
+完整架构规范见仓库根目录 [`ARCHITECTURE.md`](https://github.com/YanivWang/yaniv-editor/blob/main/ARCHITECTURE.md)。
