@@ -1,5 +1,5 @@
 /**
- * Drag handle styles
+ * Drag handle styles（布局与交互；视觉皮肤见 appearance/styles/）
  * @description Left-side six-dot handle for block sorting.
  */
 
@@ -41,7 +41,6 @@
 .drag-handle-plus {
   display: inline-flex;
   padding: 0;
-  color: #cfcfcf;
   cursor: pointer;
 }
 
@@ -57,27 +56,16 @@
   opacity: 1;
 }
 
-.drag-handle:hover,
-.drag-handle-plus:hover {
-  background: rgb(55 53 47 / 8%);
-}
-
 .drag-handle:active,
 .drag-handle.is-dragging {
   cursor: grabbing;
-  background: rgb(55 53 47 / 8%);
 }
 
 .drag-handle__dot {
   display: block;
   width: 3px;
   height: 3px;
-  background: #c4c4c4;
   border-radius: 999px;
-}
-
-.drag-handle.is-dragging .drag-handle__dot {
-  background: #c4c4c4;
 }
 
 .drag-handle-menu {
@@ -88,21 +76,6 @@
   max-height: min(460px, calc(100vh - 16px));
   padding: 6px;
   overflow-y: auto;
-  font-family:
-    ui-sans-serif,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI Variable Display",
-    "Segoe UI",
-    Helvetica,
-    Arial,
-    sans-serif;
-  background: #fff;
-  border: var(--ye-border-width) solid var(--ye-border);
-  border-radius: 8px;
-  box-shadow:
-    0 12px 32px rgb(15 23 42 / 14%),
-    0 2px 8px rgb(15 23 42 / 8%);
 }
 
 .drag-handle-menu.is-visible {
@@ -123,7 +96,6 @@
   width: 100%;
   padding: 7px 8px;
   font: inherit;
-  color: #1f2937;
   text-align: left;
   cursor: pointer;
   background: transparent;
@@ -144,12 +116,8 @@
   cursor: default;
 }
 
-.drag-handle-menu__item:hover {
-  background: rgb(55 53 47 / 8%);
-}
-
 .drag-handle-menu__item.is-danger {
-  color: #dc2626;
+  color: var(--ye-danger);
 }
 
 .drag-handle-menu__label {
@@ -166,7 +134,6 @@
 .drag-handle-menu__description {
   font-size: 12px;
   line-height: 1.35;
-  color: #6b7280;
 }
 
 .drag-handle-menu.is-actions-menu .drag-handle-menu__description {
@@ -177,7 +144,6 @@
   margin-left: auto;
   font-size: 18px;
   line-height: 1;
-  color: #6b7280;
 }
 
 .drag-handle-menu__submenu {
@@ -188,12 +154,6 @@
   display: none;
   width: 196px;
   padding: 8px;
-  background: #fff;
-  border: var(--ye-border-width) solid var(--ye-border);
-  border-radius: 8px;
-  box-shadow:
-    0 12px 32px rgb(15 23 42 / 14%),
-    0 2px 8px rgb(15 23 42 / 8%);
 }
 
 .drag-handle-menu.is-actions-menu .drag-handle-menu__submenu {
@@ -213,40 +173,6 @@
 .drag-handle-menu__divider {
   height: 1px;
   margin: 6px 4px;
-  background: rgb(15 23 42 / 8%);
-}
-
-[data-color-mode="dark"] .drag-handle:hover,
-[data-color-mode="dark"] .drag-handle-plus:hover {
-  background: rgb(255 255 255 / 12%);
-}
-
-[data-color-mode="dark"] .drag-handle__dot {
-  background: #c4c4c4;
-}
-
-[data-color-mode="dark"] .drag-handle-menu {
-  background: #1f1f1f;
-  border-color: rgb(255 255 255 / 12%);
-  box-shadow:
-    0 12px 32px rgb(0 0 0 / 35%),
-    0 2px 8px rgb(0 0 0 / 25%);
-}
-
-[data-color-mode="dark"] .drag-handle-menu__item {
-  color: #f3f4f6;
-}
-
-[data-color-mode="dark"] .drag-handle-menu__item:hover {
-  background: rgb(255 255 255 / 10%);
-}
-
-[data-color-mode="dark"] .drag-handle-menu__description {
-  color: #a3a3a3;
-}
-
-[data-color-mode="dark"] .drag-handle-menu__divider {
-  background: rgb(255 255 255 / 10%);
 }
 
 /* ===== 拖动拖影（Drag Image） ===== */
@@ -274,6 +200,5 @@
   width: 100%;
   height: 100%;
   content: "";
-  background-color: #7b89e1;
   border-radius: 30px;
 }

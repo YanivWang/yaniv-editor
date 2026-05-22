@@ -4,6 +4,8 @@
       v-if="isVisible"
       ref="menuRef"
       class="block-picker-menu"
+      :class="appearanceClass"
+      :data-color-mode="resolvedColorMode"
       :style="menuStyle"
       @mousedown.prevent
     >
@@ -54,6 +56,7 @@ import {
   watch,
 } from "vue";
 
+import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
 import { useYanivEditor } from "@/core/editorContext";
 import type { MediaUploadHandler } from "@/core/editorTypes";
@@ -79,6 +82,12 @@ import type {
 import type { Editor } from "@tiptap/core";
 
 const t = useEditorT();
+
+const appearanceCtx = useInjectEditorAppearance();
+const appearanceClass = computed(() =>
+  getAppearanceClassName(appearanceCtx?.appearance.value ?? "default"),
+);
+const resolvedColorMode = computed(() => appearanceCtx?.resolvedMode.value ?? "light");
 
 const props = defineProps<{
   editor?: Editor | null;

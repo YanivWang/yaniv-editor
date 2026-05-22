@@ -1,5 +1,3 @@
-@import "./_shared.css";
-
 /**
  * Notion Visual Appearance
  * 仿 Tiptap 官方 Notion-like 模板的视觉样式
@@ -38,6 +36,7 @@
     helvetica, "Apple Color Emoji", arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
   --ye-font-size: 16px;
   --ye-line-height: 1.5;
+  --ye-outline-width: 0;
 }
 
 /* ===== Notion 风格 - 全宽无纸张边框布局 ===== */
@@ -101,6 +100,26 @@
 
 .yaniv-editor.appearance-notion .ProseMirror p + p {
   margin-top: 0;
+}
+
+/* ===== Notion 风格 - 高亮 ===== */
+.yaniv-editor.appearance-notion .document-content .ProseMirror mark {
+  padding: 0 2px;
+  color: inherit;
+  background-color: rgb(255 212 0 / 35%);
+  border-radius: 2px;
+}
+
+/* ===== Notion 风格 - placeholder ===== */
+.yaniv-editor.appearance-notion .ProseMirror p.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h1.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h2.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h3.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h4.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h5.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror h6.is-empty::before,
+.yaniv-editor.appearance-notion .ProseMirror pre.is-empty::before {
+  font-style: italic;
 }
 
 /* ===== Notion 风格 - 列表 ===== */
@@ -188,6 +207,10 @@
 .yaniv-editor.appearance-notion .ProseMirror img {
   max-width: 100%;
   border-radius: 4px;
+}
+
+.yaniv-editor.appearance-notion .document-content .ProseMirror .tableWrapper {
+  margin: 8px 0;
 }
 
 /* ===== Notion 深色模式 ===== */
@@ -279,9 +302,10 @@
   background: #c4c4c4;
 }
 
-.drag-handle-menu.appearance-notion-menu {
+.drag-handle-menu.appearance-notion {
   color: rgb(55 53 47);
-  border-color: rgb(55 53 47 / 9%);
+  background: #fff;
+  border: var(--ye-border-width) solid rgb(55 53 47 / 9%);
   border-radius: 6px;
   box-shadow:
     rgb(15 15 15 / 5%) 0 0 0 1px,
@@ -289,13 +313,70 @@
     rgb(15 15 15 / 20%) 0 9px 24px;
 }
 
-.drag-handle-menu.appearance-notion-menu .drag-handle-menu__item {
+.drag-handle-menu.appearance-notion .drag-handle-menu__item {
   color: rgb(55 53 47);
   border-radius: 4px;
 }
 
-.drag-handle-menu.appearance-notion-menu .drag-handle-menu__description {
+.drag-handle-menu.appearance-notion .drag-handle-menu__item:hover {
+  background: rgb(55 53 47 / 8%);
+}
+
+.drag-handle-menu.appearance-notion .drag-handle-menu__description {
   color: rgb(120 119 116);
+}
+
+.drag-handle-menu.appearance-notion .drag-handle-menu__arrow {
+  color: rgb(120 119 116);
+}
+
+.drag-handle-menu.appearance-notion .drag-handle-menu__submenu {
+  background: #fff;
+  border: var(--ye-border-width) solid rgb(55 53 47 / 9%);
+  border-radius: 6px;
+  box-shadow:
+    rgb(15 15 15 / 5%) 0 0 0 1px,
+    rgb(15 15 15 / 10%) 0 3px 6px,
+    rgb(15 15 15 / 20%) 0 9px 24px;
+}
+
+.drag-handle-menu.appearance-notion .drag-handle-menu__divider {
+  background: rgb(15 23 42 / 8%);
+}
+
+.yaniv-editor.appearance-notion .prosemirror-dropcursor-block::before {
+  background-color: rgb(35 131 226);
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] {
+  color: #f3f4f6;
+  background: #1f1f1f;
+  border-color: rgb(255 255 255 / 12%);
+  box-shadow:
+    0 12px 32px rgb(0 0 0 / 35%),
+    0 2px 8px rgb(0 0 0 / 25%);
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__item {
+  color: #f3f4f6;
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__item:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__description,
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__arrow {
+  color: #a3a3a3;
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__submenu {
+  background: #1f1f1f;
+  border-color: rgb(255 255 255 / 12%);
+}
+
+.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__divider {
+  background: rgb(255 255 255 / 10%);
 }
 
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle-plus:hover,
@@ -307,4 +388,107 @@
 
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle__dot {
   background: #c4c4c4;
+}
+
+/* ===== Notion 块选择菜单 ===== */
+.block-picker-menu.appearance-notion {
+  color: var(--ye-text);
+  scrollbar-color: #bfbfbf transparent;
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow:
+    0 4px 16px rgb(0 0 0 / 12%),
+    0 0 1px rgb(0 0 0 / 8%);
+}
+
+.block-picker-menu.appearance-notion::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+}
+
+.block-picker-menu.appearance-notion::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+.block-picker-menu.appearance-notion .block-picker-group-title {
+  color: var(--ye-text-muted);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item {
+  color: var(--ye-text);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item:hover,
+.block-picker-menu.appearance-notion .block-picker-item.active {
+  background: var(--ye-bg-hover);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item-icon {
+  color: var(--ye-text-secondary);
+  background: var(--ye-bg-hover);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item.active .block-picker-item-icon,
+.block-picker-menu.appearance-notion .block-picker-item:hover .block-picker-item-icon {
+  color: var(--ye-primary);
+  background: rgb(46 170 220 / 12%);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item-title {
+  color: var(--ye-text);
+}
+
+.block-picker-menu.appearance-notion .block-picker-item-desc,
+.block-picker-menu.appearance-notion .block-picker-empty {
+  color: var(--ye-text-muted);
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] {
+  box-shadow:
+    0 4px 16px rgb(0 0 0 / 40%),
+    0 0 1px rgb(255 255 255 / 10%);
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item {
+  color: #e8e8e8;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item:hover,
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item.active {
+  background: #2a2a2a;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item-icon {
+  color: #a8a8a8;
+  background: #2a2a2a;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"]
+  .block-picker-item.active
+  .block-picker-item-icon,
+.block-picker-menu.appearance-notion[data-color-mode="dark"]
+  .block-picker-item:hover
+  .block-picker-item-icon {
+  color: var(--ye-primary);
+  background: rgb(46 170 220 / 15%);
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item-title {
+  color: #e8e8e8;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item-desc,
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-empty {
+  color: #808080;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-group-title {
+  color: #808080;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"]::-webkit-scrollbar-thumb {
+  background: #434343;
+}
+
+.block-picker-menu.appearance-notion[data-color-mode="dark"]::-webkit-scrollbar-thumb:hover {
+  background: #595959;
 }

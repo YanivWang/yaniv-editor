@@ -26,7 +26,7 @@
   --ye-text-muted: #999999;
   --ye-placeholder-color: #ccc;
 
-  /* ===== Borders（飞书/Lark 风格，略浅于 #e5e5e5） ===== */
+  /* ===== Borders（default 基线；appearance 可覆盖） ===== */
   --ye-border-width: 1px;
   --ye-border: #e9eaec;
   --ye-border-hover: #dadde2;
@@ -85,8 +85,8 @@
   --ye-font-family:
     -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
   --ye-font-mono: "SF Mono", "Fira Code", "Consolas", monospace;
-  --ye-font-size: 16px;
-  --ye-line-height: 1.75;
+  --ye-font-size: 15px;
+  --ye-line-height: 1.7;
 
   /* ===== Spacing ===== */
   --ye-spacing-xs: 4px;
@@ -111,7 +111,7 @@
   --ye-transition-normal: 0.2s ease;
   --ye-transition-slow: 0.3s ease;
 
-  /* ===== Outline Panel（飞书/Lark 贴边风格） ===== */
+  /* ===== Outline Panel（default 基线；appearance 可覆盖） ===== */
   --ye-outline-width: 200px;
   --ye-outline-offset: 0;
   --ye-outline-title-color: var(--ye-primary);
@@ -129,15 +129,15 @@
   --ye-z-bubble: 200;
   --ye-z-modal: 300;
 
-  /* ===== Document Layout（默认 A4 / Word；各 visual appearance 可覆盖） ===== */
-  --ye-doc-page-width: 794px;
-  --ye-doc-page-min-height: 939px;
-  --ye-doc-padding-top: 96px;
-  --ye-doc-padding-bottom: 96px;
-  --ye-doc-padding-inline: 92px;
+  /* ===== Document Layout（default 基线；word/notion 等在 appearance 覆盖） ===== */
+  --ye-doc-page-width: 900px;
+  --ye-doc-page-min-height: 480px;
+  --ye-doc-padding-top: 48px;
+  --ye-doc-padding-bottom: 80px;
+  --ye-doc-padding-inline: 72px;
   --ye-doc-page-padding: 0;
   --ye-doc-page-cut-height: 16px;
-  --ye-doc-container-padding-y: 20px;
+  --ye-doc-container-padding-y: 0;
 }
 
 /* ===== Dark Mode（唯一约定：data-color-mode="dark"） ===== */

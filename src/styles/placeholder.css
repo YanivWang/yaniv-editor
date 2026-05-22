@@ -27,14 +27,3 @@
 .ProseMirror pre.is-empty::before {
   color: var(--ye-placeholder-color);
 }
-
-.yaniv-editor.appearance-notion .ProseMirror p.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h1.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h2.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h3.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h4.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h5.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h6.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror pre.is-empty::before {
-  font-style: italic;
-}

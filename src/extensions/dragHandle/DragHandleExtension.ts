@@ -14,6 +14,27 @@ import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/stat
 
 import type { EditorView } from "@tiptap/pm/view";
 
+const APPEARANCE_MENU_CLASSES = [
+  "appearance-default",
+  "appearance-word",
+  "appearance-notion",
+  "appearance-custom",
+] as const;
+
+function syncDragHandleMenuAppearance(menu: HTMLElement, view: EditorView): void {
+  const editorRoot = view.dom.closest(".yaniv-editor");
+  menu.classList.remove(...APPEARANCE_MENU_CLASSES);
+  const matched = APPEARANCE_MENU_CLASSES.find((cls) => editorRoot?.classList.contains(cls));
+  menu.classList.add(matched ?? "appearance-default");
+
+  const colorMode = editorRoot?.getAttribute("data-color-mode");
+  if (colorMode) {
+    menu.setAttribute("data-color-mode", colorMode);
+  } else {
+    menu.removeAttribute("data-color-mode");
+  }
+}
+
 export interface DragInsertMenuContext {
   targetPos: number;
   targetNodeSize: number;
@@ -796,10 +817,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
             const target = currentTarget;
             activeMenuKind = "actions";
-            menu.classList.toggle(
-              "appearance-notion-menu",
-              Boolean(view.dom.closest(".yaniv-editor.appearance-notion")),
-            );
+            syncDragHandleMenuAppearance(menu, view);
             menu.classList.add("is-actions-menu");
 
             renderBlockMenu(menu, createActionItems(view, target, getMenuLabel), closeMenu);

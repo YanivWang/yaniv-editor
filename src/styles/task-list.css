@@ -7,7 +7,7 @@
 
 .yaniv-editor .ProseMirror ul[data-type="taskList"] {
   padding-left: 0;
-  margin: 0 0 14px;
+  margin: 0;
   list-style: none;
 }
 

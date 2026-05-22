@@ -15,7 +15,7 @@
 /* Base editor styles */
 @import "./base.css";
 
-/* Word mode (A4 paper layout) */
+/* Document layout (A4 paper, scroll container) */
 @import "./document-layout.css";
 
 /* Task list (checkbox + text inline) */

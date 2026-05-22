@@ -1,6 +1,5 @@
 /**
- * BlockPicker 样式
- * @description Notion 风格块选择菜单（依赖 base.css）
+ * BlockPicker 样式（布局与交互；视觉皮肤见 appearance/styles/）
  */
 
 /* ========== 菜单容器 ========== */
@@ -13,13 +12,7 @@
   padding: 6px 0;
   overflow: hidden auto;
   overscroll-behavior: contain;
-  scrollbar-color: #bfbfbf transparent;
   scrollbar-width: thin;
-  background: var(--ye-bubble-bg);
-  border-radius: var(--ye-radius-md);
-  box-shadow:
-    0 4px 16px rgb(0 0 0 / 12%),
-    0 0 1px rgb(0 0 0 / 8%);
   animation: block-picker-fade-in 0.12s ease-out;
   -webkit-overflow-scrolling: touch;
 }
@@ -42,7 +35,6 @@
   background: transparent;
 }
 
-/* 滚动条样式 */
 .block-picker-menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -51,21 +43,11 @@
   background: transparent;
 }
 
-.block-picker-menu::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 6px;
-}
-
-.block-picker-menu::-webkit-scrollbar-thumb:hover {
-  background: #bfbfbf;
-}
-
 /* ========== 分组标题 ========== */
 .block-picker-group-title {
   padding: 8px 14px 4px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--ye-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   user-select: none;
@@ -79,17 +61,11 @@
   width: 100%;
   padding: 8px 14px;
   font-size: 14px;
-  color: var(--ye-text);
   text-align: left;
   cursor: pointer;
   background: transparent;
   border: none;
   transition: background-color 0.1s ease;
-}
-
-.block-picker-item:hover,
-.block-picker-item.active {
-  background: var(--ye-bg-secondary);
 }
 
 .block-picker-item-icon {
@@ -100,15 +76,7 @@
   width: 36px;
   height: 36px;
   font-size: 18px;
-  color: var(--ye-text-secondary);
-  background: var(--ye-bg-secondary);
   border-radius: 6px;
-}
-
-.block-picker-item.active .block-picker-item-icon,
-.block-picker-item:hover .block-picker-item-icon {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
 }
 
 .block-picker-item-content {
@@ -123,7 +91,6 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--ye-text);
 }
 
 .block-picker-item-desc {
@@ -131,7 +98,6 @@
   text-overflow: ellipsis;
   font-size: 12px;
   line-height: 1.3;
-  color: var(--ye-text-muted);
   white-space: nowrap;
 }
 
@@ -139,56 +105,7 @@
 .block-picker-empty {
   padding: 16px 14px;
   font-size: 13px;
-  color: var(--ye-text-muted);
   text-align: center;
-}
-
-/* ========== 深色模式 ========== */
-[data-color-mode="dark"] .block-picker-menu {
-  background: var(--ye-bubble-bg);
-  box-shadow:
-    0 4px 16px rgb(0 0 0 / 40%),
-    0 0 1px rgb(255 255 255 / 10%);
-}
-
-[data-color-mode="dark"] .block-picker-item {
-  color: #e8e8e8;
-}
-
-[data-color-mode="dark"] .block-picker-item:hover,
-[data-color-mode="dark"] .block-picker-item.active {
-  background: #2a2a2a;
-}
-
-[data-color-mode="dark"] .block-picker-item-icon {
-  color: #a8a8a8;
-  background: #2a2a2a;
-}
-
-[data-color-mode="dark"] .block-picker-item.active .block-picker-item-icon,
-[data-color-mode="dark"] .block-picker-item:hover .block-picker-item-icon {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
-}
-
-[data-color-mode="dark"] .block-picker-item-title {
-  color: #e8e8e8;
-}
-
-[data-color-mode="dark"] .block-picker-item-desc {
-  color: #808080;
-}
-
-[data-color-mode="dark"] .block-picker-group-title {
-  color: #808080;
-}
-
-[data-color-mode="dark"] .block-picker-menu::-webkit-scrollbar-thumb {
-  background: #434343;
-}
-
-[data-color-mode="dark"] .block-picker-menu::-webkit-scrollbar-thumb:hover {
-  background: #595959;
 }
 
 /* ========== 响应式 ========== */

@@ -1,5 +1,3 @@
-@import "./_shared.css";
-
 /**
  * Default Visual Appearance
  * 飞书/Lark 文档风格：扁平白底正文区 + 右侧大纲
@@ -118,6 +116,41 @@
   list-style-type: circle;
 }
 
+/* 图片 */
+.yaniv-editor.appearance-default .document-content .ProseMirror img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+}
+
+/* 表格 */
+.yaniv-editor.appearance-default .document-content .ProseMirror table {
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.yaniv-editor.appearance-default .document-content .ProseMirror table td,
+.yaniv-editor.appearance-default .document-content .ProseMirror table th {
+  padding: 8px 12px;
+  vertical-align: top;
+  border: var(--ye-border-width) solid var(--ye-table-border);
+}
+
+.yaniv-editor.appearance-default .document-content .ProseMirror table th {
+  font-weight: 600;
+  background-color: var(--ye-table-header-bg);
+}
+
+/* 链接 */
+.yaniv-editor.appearance-default .document-content .ProseMirror a {
+  color: var(--ye-link);
+  word-break: break-word;
+  text-decoration: underline;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-bg-secondary: #141414;
   --ye-outline-title-color: var(--ye-primary);
@@ -145,4 +178,232 @@
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror mark {
   background-color: rgb(255 243 202 / 22%);
+}
+
+/* 表格滚动容器 */
+.yaniv-editor.appearance-default .document-content .ProseMirror .tableWrapper {
+  margin: 1.5rem 0;
+}
+
+/* 引用 */
+.yaniv-editor.appearance-default .document-content .ProseMirror blockquote {
+  padding-left: 12px;
+  margin: 12px 0;
+  color: var(--ye-text-secondary);
+  background: var(--ye-blockquote-bg);
+  border-left: 3px solid var(--ye-blockquote-border);
+}
+
+/* 行内代码 */
+.yaniv-editor.appearance-default .document-content .ProseMirror code:not(pre code) {
+  display: inline;
+  padding: 2px 6px;
+  margin: 0 1px;
+  font-family: var(--ye-font-mono);
+  font-size: 0.9em;
+  line-height: 1.5;
+  vertical-align: baseline;
+  color: var(--ye-text);
+  word-break: break-word;
+  white-space: pre-wrap;
+  background: var(--ye-code-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-sm);
+}
+
+/* 任务列表间距 */
+.yaniv-editor.appearance-default .document-content .ProseMirror ul[data-type="taskList"] {
+  margin: 0 0 14px;
+}
+
+/* ===== 大纲（飞书扁平贴边） ===== */
+.yaniv-editor.appearance-default .outline-panel {
+  background: var(--ye-bg);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.yaniv-editor.appearance-default .outline-panel--top-left {
+  border-right: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor.appearance-default .outline-panel--top-right {
+  border-left: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor.appearance-default .outline-panel__header {
+  border-bottom: var(--ye-border-width) solid var(--ye-border);
+}
+
+.yaniv-editor.appearance-default .outline-panel__title {
+  color: var(--ye-outline-title-color, var(--ye-primary));
+}
+
+.yaniv-editor.appearance-default .outline-panel__close {
+  color: var(--ye-text-muted);
+}
+
+.yaniv-editor.appearance-default .outline-panel__close:hover {
+  color: var(--ye-text-secondary);
+  background: var(--ye-bg-hover);
+}
+
+.yaniv-editor.appearance-default .outline-panel__empty {
+  color: var(--ye-text-muted);
+}
+
+.yaniv-editor.appearance-default .outline-panel__item:hover,
+.yaniv-editor.appearance-default .outline-panel__item.is-active {
+  color: var(--ye-primary);
+}
+
+.yaniv-editor.appearance-default .outline-panel__item--h1 {
+  color: var(--ye-text);
+}
+
+.yaniv-editor.appearance-default .outline-panel__item--h2,
+.yaniv-editor.appearance-default .outline-panel__item--h3 {
+  color: var(--ye-text-secondary);
+}
+
+.yaniv-editor.appearance-default .outline-panel__item--h4,
+.yaniv-editor.appearance-default .outline-panel__item--h5,
+.yaniv-editor.appearance-default .outline-panel__item--h6 {
+  color: var(--ye-text-muted);
+}
+
+.yaniv-editor.appearance-default .outline-panel__item--h1.is-active,
+.yaniv-editor.appearance-default .outline-panel__item--h2.is-active,
+.yaniv-editor.appearance-default .outline-panel__item--h3.is-active,
+.yaniv-editor.appearance-default .outline-panel__item--h4.is-active,
+.yaniv-editor.appearance-default .outline-panel__item--h5.is-active,
+.yaniv-editor.appearance-default .outline-panel__item--h6.is-active {
+  color: var(--ye-primary);
+}
+
+/* ===== 拖拽手柄 ===== */
+.yaniv-editor.appearance-default .drag-handle-plus {
+  color: #bbbfc4;
+}
+
+.yaniv-editor.appearance-default .drag-handle:hover,
+.yaniv-editor.appearance-default .drag-handle-plus:hover,
+.yaniv-editor.appearance-default .drag-handle.is-dragging {
+  background: rgb(31 35 41 / 6%);
+}
+
+.yaniv-editor.appearance-default .drag-handle__dot {
+  background: #bbbfc4;
+}
+
+.yaniv-editor.appearance-default[data-color-mode="dark"] .drag-handle:hover,
+.yaniv-editor.appearance-default[data-color-mode="dark"] .drag-handle-plus:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.yaniv-editor.appearance-default .prosemirror-dropcursor-block::before {
+  background-color: var(--ye-primary);
+}
+
+.drag-handle-menu.appearance-default {
+  font-family: var(--ye-font-family);
+  color: var(--ye-text);
+  background: var(--ye-bubble-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.drag-handle-menu.appearance-default .drag-handle-menu__item {
+  color: var(--ye-text);
+}
+
+.drag-handle-menu.appearance-default .drag-handle-menu__item:hover {
+  background: var(--ye-bg-hover);
+}
+
+.drag-handle-menu.appearance-default .drag-handle-menu__description,
+.drag-handle-menu.appearance-default .drag-handle-menu__arrow {
+  color: var(--ye-text-muted);
+}
+
+.drag-handle-menu.appearance-default .drag-handle-menu__submenu {
+  background: var(--ye-bubble-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.drag-handle-menu.appearance-default .drag-handle-menu__divider {
+  background: var(--ye-border);
+}
+
+/* ===== 块选择菜单 ===== */
+.block-picker-menu.appearance-default {
+  color: var(--ye-text);
+  scrollbar-color: var(--ye-border) transparent;
+  background: var(--ye-bubble-bg);
+  border-radius: var(--ye-radius-md);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.block-picker-menu.appearance-default::-webkit-scrollbar-thumb {
+  background: var(--ye-border);
+}
+
+.block-picker-menu.appearance-default::-webkit-scrollbar-thumb:hover {
+  background: var(--ye-border-hover);
+}
+
+.block-picker-menu.appearance-default .block-picker-group-title {
+  color: var(--ye-text-muted);
+}
+
+.block-picker-menu.appearance-default .block-picker-item {
+  color: var(--ye-text);
+}
+
+.block-picker-menu.appearance-default .block-picker-item:hover,
+.block-picker-menu.appearance-default .block-picker-item.active {
+  background: var(--ye-bg-hover);
+}
+
+.block-picker-menu.appearance-default .block-picker-item-icon {
+  color: var(--ye-text-secondary);
+  background: var(--ye-bg-secondary);
+}
+
+.block-picker-menu.appearance-default .block-picker-item.active .block-picker-item-icon,
+.block-picker-menu.appearance-default .block-picker-item:hover .block-picker-item-icon {
+  color: var(--ye-primary);
+  background: var(--ye-primary-light);
+}
+
+.block-picker-menu.appearance-default .block-picker-item-title {
+  color: var(--ye-text);
+}
+
+.block-picker-menu.appearance-default .block-picker-item-desc,
+.block-picker-menu.appearance-default .block-picker-empty {
+  color: var(--ye-text-muted);
+}
+
+.drag-handle-menu.appearance-default[data-color-mode="dark"] {
+  color: var(--ye-text);
+  background: var(--ye-bubble-bg);
+  border-color: var(--ye-border);
+  box-shadow: var(--ye-bubble-shadow);
+}
+
+.drag-handle-menu.appearance-default[data-color-mode="dark"] .drag-handle-menu__item {
+  color: var(--ye-text);
+}
+
+.drag-handle-menu.appearance-default[data-color-mode="dark"] .drag-handle-menu__item:hover {
+  background: var(--ye-bg-hover);
+}
+
+.block-picker-menu.appearance-default[data-color-mode="dark"] {
+  box-shadow: var(--ye-bubble-shadow);
 }

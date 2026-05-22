@@ -27,7 +27,7 @@
   pointer-events: auto;
 }
 
-/* ===== 飞书/Lark 风格大纲：右侧贴边、全高、扁平无卡片阴影 ===== */
+/* 大纲面板：结构与定位（视觉皮肤见 appearance/styles/） */
 .outline-panel {
   position: absolute;
   top: 0;
@@ -40,10 +40,6 @@
   height: auto;
   overflow: hidden;
   pointer-events: auto;
-  background: var(--ye-bg);
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
 }
 
 .outline-panel--top-left {
@@ -51,7 +47,6 @@
 
   --ye-outline-enter-x: -8px;
 
-  border-right: var(--ye-border-width) solid var(--ye-border);
   transform-origin: top left;
 }
 
@@ -60,7 +55,6 @@
 
   --ye-outline-enter-x: 8px;
 
-  border-left: var(--ye-border-width) solid var(--ye-border);
   transform-origin: top right;
 }
 
@@ -107,13 +101,11 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 16px 10px;
-  border-bottom: var(--ye-border-width) solid var(--ye-border);
 }
 
 .outline-panel__title {
   font-size: 14px;
   font-weight: 500;
-  color: var(--ye-outline-title-color, var(--ye-primary));
 }
 
 .outline-panel__close {
@@ -124,7 +116,6 @@
   height: 24px;
   padding: 0;
   font-size: 12px;
-  color: var(--ye-text-muted);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -134,18 +125,12 @@
     background var(--ye-transition-normal);
 }
 
-.outline-panel__close:hover {
-  color: var(--ye-text-secondary);
-  background: var(--ye-bg-hover);
-}
-
 .outline-panel__empty {
   flex: 1;
   min-height: 0;
   padding: 12px 16px 16px;
   font-size: 12px;
   line-height: 1.6;
-  color: var(--ye-text-muted);
 }
 
 .outline-panel__list {
@@ -173,17 +158,6 @@
   transition: color var(--ye-transition-normal);
 }
 
-.outline-panel__item:hover {
-  color: var(--ye-primary);
-  background: transparent;
-}
-
-.outline-panel__item.is-active {
-  font-weight: 500;
-  color: var(--ye-primary);
-  background: transparent;
-}
-
 .outline-panel__index {
   display: none;
 }
@@ -195,44 +169,36 @@
   white-space: nowrap;
 }
 
-/* H1–H6 等级：字号递进，非激活态为中性灰 */
 .outline-panel__item--h1 {
   font-size: var(--ye-outline-h1-size, 13px);
   font-weight: 600;
-  color: var(--ye-text);
 }
 
 .outline-panel__item--h2 {
   font-size: var(--ye-outline-h2-size, 13px);
   font-weight: 500;
-  color: var(--ye-text-secondary);
 }
 
 .outline-panel__item--h3 {
   font-size: var(--ye-outline-h3-size, 12px);
   font-weight: 400;
-  color: var(--ye-text-secondary);
 }
 
 .outline-panel__item--h4 {
   font-size: var(--ye-outline-h4-size, 12px);
   font-weight: 400;
-  color: var(--ye-text-muted);
 }
 
 .outline-panel__item--h5 {
   font-size: var(--ye-outline-h5-size, 12px);
   font-weight: 400;
-  color: var(--ye-text-muted);
 }
 
 .outline-panel__item--h6 {
   font-size: var(--ye-outline-h6-size, 12px);
   font-weight: 400;
-  color: var(--ye-text-muted);
 }
 
-/* 激活态：仅蓝色文字，保留层级字号 */
 .outline-panel__item--h1.is-active,
 .outline-panel__item--h2.is-active,
 .outline-panel__item--h3.is-active,
@@ -240,5 +206,4 @@
 .outline-panel__item--h5.is-active,
 .outline-panel__item--h6.is-active {
   font-weight: 500;
-  color: var(--ye-primary);
 }

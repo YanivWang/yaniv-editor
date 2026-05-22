@@ -1,6 +1,12 @@
 /* Yaniv Editor 主工具栏样式 */
 
 /* 主工具栏（固定在顶部，不随内容滚动） */
+.yaniv-editor .document-toolbar-container {
+  position: sticky;
+  top: 0;
+  z-index: var(--ye-z-toolbar, 100);
+}
+
 .document-toolbar-container {
   flex-shrink: 0;
   width: 100%;
@@ -12,6 +18,7 @@
 .document-toolbar {
   z-index: 10;
   flex-shrink: 0;
+  padding: 6px 12px;
   background: transparent;
   border-bottom: none;
   box-shadow: none;
