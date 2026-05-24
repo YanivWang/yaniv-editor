@@ -5,26 +5,6 @@ import { resolve } from "path";
 const repoBase = "/yaniv-editor/";
 const isPagesBuild = process.env.PAGES_BUILD === "1";
 
-function getVendorChunkName(id: string) {
-  const match = id.match(
-    /\/node_modules\/(?:\.pnpm\/[^/]+\/node_modules\/)?((?:@[^/]+\/)?[^/]+)(?:\/(.*))?/,
-  );
-  if (!match) return "vendor";
-
-  const [, packageName, rest = ""] = match;
-  const segments = rest.split("/").filter(Boolean);
-
-  if (packageName === "ant-design-vue") {
-    return `vendor-antd-${segments[0] === "es" ? segments[1] || "core" : segments[0] || "core"}`;
-  }
-
-  if (packageName === "@ant-design/icons-vue") {
-    return "vendor-antd-icons";
-  }
-
-  return `vendor-${packageName.replace("@", "").replace("/", "-")}`;
-}
-
 // Examples build configuration for GitHub Pages / static hosting
 export default defineConfig({
   base: isPagesBuild ? `${repoBase}examples/` : "/",
@@ -62,8 +42,12 @@ export default defineConfig({
           if (id.includes("/vue/") || id.includes("/@vue/")) {
             return "vendor-vue";
           }
+          // ant-design-vue submodules have circular deps; splitting them breaks runtime init.
+          if (id.includes("/ant-design-vue/") || id.includes("/@ant-design/")) {
+            return "vendor-antd";
+          }
 
-          return getVendorChunkName(id);
+          return "vendor-misc";
         },
       },
     },
