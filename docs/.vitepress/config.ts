@@ -1,8 +1,8 @@
 import { defineConfig } from "vitepress";
 
-const repoBase = "/yaniv-editor/";
 const isPagesBuild = process.env.VP_BASE != null;
-const demoUrl = isPagesBuild ? `${repoBase}examples/` : "http://localhost:9527";
+// VitePress prepends `base` automatically; do not include repo prefix here.
+const demoUrl = isPagesBuild ? "/examples/" : "http://localhost:9527";
 const demoNavItem = isPagesBuild
   ? { text: "Demo", link: demoUrl }
   : { text: "Demo", link: demoUrl, target: "_blank" as const };
