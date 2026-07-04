@@ -17,6 +17,7 @@ export function useYanivAiConfig(propsSource: MaybeRefOrGetter<YanivEditorProps 
   showAiSettings: ComputedRef<boolean>;
 } {
   const props = computed(() => toValue(propsSource));
+  const owner = Symbol("yaniv-ai-config-owner");
 
   const showAiSettings = computed(() => {
     if (props.value?.aiConfig) {
@@ -29,12 +30,12 @@ export function useYanivAiConfig(propsSource: MaybeRefOrGetter<YanivEditorProps 
 
   watch(
     () => props.value?.aiConfig,
-    () => setHostAiConfig(props.value?.aiConfig),
+    () => setHostAiConfig(props.value?.aiConfig, owner),
     { deep: true, immediate: true },
   );
 
   onBeforeUnmount(() => {
-    setHostAiConfig(null);
+    setHostAiConfig(null, owner);
   });
 
   return { showAiSettings };

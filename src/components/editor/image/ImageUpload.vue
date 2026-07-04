@@ -41,6 +41,7 @@ import {
   LinkOutlined,
   InboxOutlined,
 } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
@@ -49,6 +50,7 @@ import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { resolveMediaUrl } from "@/utils/mediaUpload";
+import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -93,8 +95,14 @@ const imageMenuItems = computed<MenuItemConfig[]>(() => [
  * 插入图片（网络上传）
  */
 function applyImage() {
-  if (imageUrl.value) {
-    runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: imageUrl.value } }))();
+  const safeUrl = normalizeSafeMediaUrl(imageUrl.value, "image");
+  if (imageUrl.value && !safeUrl) {
+    message.warning(t("editor.enterValidLink"));
+    return;
+  }
+
+  if (safeUrl) {
+    runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: safeUrl } }))();
   }
   imageModalOpen.value = false;
   imageUrl.value = "";

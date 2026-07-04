@@ -9,6 +9,7 @@ import { DEFAULT_CONFIG, getProviderInfo } from "./types";
 import type { AiUserConfig } from "./types";
 
 let hostAiConfig: AiUserConfig | null = null;
+let hostAiConfigOwner: symbol | null = null;
 
 function normalizeHostConfig(input: YanivEditorAiConfig): AiUserConfig {
   const providerInfo = getProviderInfo(input.provider);
@@ -35,6 +36,18 @@ export function getHostAiConfig(): AiUserConfig | null {
   return hostAiConfig;
 }
 
-export function setHostAiConfig(input: YanivEditorAiConfig | null | undefined): void {
-  hostAiConfig = input ? normalizeHostConfig(input) : null;
+export function setHostAiConfig(
+  input: YanivEditorAiConfig | null | undefined,
+  owner?: symbol,
+): void {
+  if (input) {
+    hostAiConfig = normalizeHostConfig(input);
+    hostAiConfigOwner = owner ?? null;
+    return;
+  }
+
+  if (owner && hostAiConfigOwner && owner !== hostAiConfigOwner) return;
+
+  hostAiConfig = null;
+  hostAiConfigOwner = null;
 }

@@ -65,7 +65,6 @@ import { useControlledContent } from "@/core/session/useControlledContent";
 import { useEditorSession } from "@/core/session/useEditorSession";
 import { useEditorPagination } from "@/core/useEditorPagination";
 import { useYanivAiConfig } from "@/core/useYanivAiConfig";
-import { setBoundOutlineScrollParent } from "@/extensions/outlineScrollParentBinder";
 import type { TiptapLocale } from "@/locales/types";
 
 import EditorEditChrome from "./EditorEditChrome.vue";
@@ -136,6 +135,8 @@ const runtime = isFull.value
       mode: computed(() => inlineProps.value?.mode ?? "edit"),
       toolbar: computed(() => inlineProps.value?.toolbar),
       locale: localeContext.locale,
+      inlinePlaceholder: computed(() => inlineProps.value?.placeholder),
+      extraExtensions: computed(() => inlineProps.value?.extraExtensions),
     });
 
 const { profile, chrome, sessionKey, toolbarConfig } = runtime;
@@ -197,7 +198,6 @@ const {
       scrollParent: () => outlineScrollEl,
       bindScrollParent: (el) => {
         outlineScrollEl = el;
-        setBoundOutlineScrollParent(el);
       },
     },
     aiConfig: () => fullProps.value?.aiConfig,

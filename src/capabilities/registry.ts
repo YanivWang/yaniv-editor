@@ -29,10 +29,7 @@ import { ListShortcuts } from "@/extensions/listShortcuts";
 import { NotionMarkdownInput } from "@/extensions/markdownInput/NotionMarkdownInput";
 import { Mention } from "@/extensions/mention";
 import { OfficePaste } from "@/extensions/office-paste";
-import {
-  OutlineScrollParentBinder,
-  getBoundOutlineScrollParent,
-} from "@/extensions/outlineScrollParentBinder";
+import { OutlineScrollParentBinder } from "@/extensions/outlineScrollParentBinder";
 import { PasteImage } from "@/extensions/pasteImage";
 import { ResizableImage } from "@/extensions/resizableImage";
 import { SearchReplace } from "@/extensions/search-replace";
@@ -144,12 +141,12 @@ export const CAPABILITIES: CapabilityDefinition[] = [
     schemaSignature: () => "outline",
     fullToolbarSlugs: ["outline"],
     chrome: ["outlinePanel"],
-    extensions: () => [
+    extensions: (ctx) => [
       UniqueID.configure({ types: ["heading"] }),
       TableOfContents.configure({
         anchorTypes: ["heading"],
         scrollParent: () =>
-          getBoundOutlineScrollParent() ??
+          ctx.outline.scrollParent() ??
           (typeof window !== "undefined" ? window : (null as unknown as Window)),
       }),
       OutlineScrollParentBinder,

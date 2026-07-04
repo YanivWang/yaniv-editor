@@ -1,6 +1,7 @@
 import { notification } from "ant-design-vue";
 
 import type { MediaUploadHandler } from "@/core/editorTypes";
+import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export type MediaKind = "image" | "video";
 
@@ -18,7 +19,10 @@ export async function resolveMediaUrl({
   translate,
 }: ResolveMediaUrlOptions): Promise<string> {
   if (upload) {
-    return upload(file);
+    const uploadedUrl = await upload(file);
+    const safeUrl = normalizeSafeMediaUrl(uploadedUrl, kind);
+    if (!safeUrl) throw new Error(`Unsafe ${kind} URL returned by upload handler`);
+    return safeUrl;
   }
 
   const label =
@@ -30,5 +34,5 @@ export async function resolveMediaUrl({
     placement: "topRight",
   });
 
-  return URL.createObjectURL(file);
+  return normalizeSafeMediaUrl(URL.createObjectURL(file), kind)!;
 }

@@ -3,6 +3,7 @@ import { notification } from "ant-design-vue";
 
 import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
 import {
+  createConfiguredAiClient,
   localeText,
   type AiExtensionConfigureOptions,
 } from "@/features/ai/shared/extensionOptions";
@@ -41,7 +42,12 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
           }
 
           preventCommandAutoDispatch(tr);
-          aiSuggestionManager.showCustom(editor, selectedText, { from, to });
+          aiSuggestionManager.showCustom(
+            editor,
+            selectedText,
+            { from, to },
+            createConfiguredAiClient(this.options),
+          );
           return true;
         },
     };

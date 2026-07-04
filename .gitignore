@@ -48,6 +48,7 @@ lerna-debug.log*
 
 # Testing
 coverage/
+test-results/
 .nyc_output
 
 # Lint / typecheck caches

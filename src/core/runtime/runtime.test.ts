@@ -1,6 +1,9 @@
+import { Extension } from "@tiptap/core";
 import { describe, expect, test } from "vitest";
+import { createApp, ref } from "vue";
 
 import { applyGatesToToolbarConfig } from "@/capabilities/applyGatesToToolbarConfig";
+import { buildExtensions } from "@/capabilities/buildExtensions";
 import { CAPABILITIES } from "@/capabilities/registry";
 import { resolveShowInlineToolbar } from "@/capabilities/resolveShowInlineToolbar";
 import { FULL_TOOLBAR_CONFIG } from "@/components/tools/header-nav/toolbarConfig";
@@ -9,6 +12,8 @@ import { mergeFeatures } from "@/core/runtime/mergeFeatures";
 import { resolveChromePolicy } from "@/core/runtime/resolveChromePolicy";
 import { resolveEditorProfile, PRESET_DEFAULT_FEATURES } from "@/core/runtime/resolveEditorProfile";
 import { resolveInlineGates } from "@/core/runtime/resolveInlineGates";
+import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
+import { zhCN } from "@/locales/zh-CN";
 
 const fullLayout = {
   header: true,
@@ -174,6 +179,56 @@ describe("computeSessionKey", () => {
       computeSessionKey(profile, "full", "en-US", CAPABILITIES),
     );
   });
+
+  test("inline toolbar gates 变化会产生不同 sessionKey", () => {
+    const textFormatProfile = {
+      mode: "edit" as const,
+      preset: "basic" as const,
+      features: {} as never,
+      gates: resolveInlineGates({ textFormat: true }, CAPABILITIES),
+    };
+    const linkProfile = {
+      ...textFormatProfile,
+      gates: resolveInlineGates({ link: true }, CAPABILITIES),
+    };
+
+    expect(computeSessionKey(textFormatProfile, "inline", "zh-CN", CAPABILITIES)).not.toBe(
+      computeSessionKey(linkProfile, "inline", "zh-CN", CAPABILITIES),
+    );
+  });
+
+  test("inline placeholder 和 extraExtensions 变化会产生不同 sessionKey", () => {
+    const placeholder = ref<string | undefined>(undefined);
+    const extraExtensions = ref([Extension.create({ name: "runtimeExtensionA" })]);
+    let runtime!: ReturnType<typeof useEditorRuntime>;
+    const app = createApp({
+      setup() {
+        runtime = useEditorRuntime({
+          host: "inline",
+          mode: ref("edit"),
+          toolbar: ref({ textFormat: true }),
+          locale: ref("zh-CN"),
+          inlinePlaceholder: placeholder,
+          extraExtensions,
+        });
+        return () => null;
+      },
+    });
+
+    app.mount(document.createElement("div"));
+    try {
+      const initialKey = runtime.sessionKey.value;
+
+      placeholder.value = "Type here";
+      expect(runtime.sessionKey.value).not.toBe(initialKey);
+
+      const withPlaceholderKey = runtime.sessionKey.value;
+      extraExtensions.value = [Extension.create({ name: "runtimeExtensionB" })];
+      expect(runtime.sessionKey.value).not.toBe(withPlaceholderKey);
+    } finally {
+      app.unmount();
+    }
+  });
 });
 
 describe("resolveInlineGates", () => {
@@ -226,5 +281,39 @@ describe("resolveShowInlineToolbar", () => {
 
   test("任一 registry slug 为 true → 展示", () => {
     expect(resolveShowInlineToolbar({ link: true }, CAPABILITIES)).toBe(true);
+  });
+});
+
+describe("buildExtensions", () => {
+  test("inline extraExtensions 会追加到扩展列表", async () => {
+    const customExtension = Extension.create({ name: "customInlineExtension" });
+    const extensions = await buildExtensions("inline", {
+      locale: zhCN,
+      gates: resolveInlineGates({}, CAPABILITIES),
+      isEditable: ref(true),
+      blockMenuHost: {
+        registerInstance: () => {},
+        activate: () => {},
+        openInsert: () => {},
+        hide: () => {},
+        updateQuery: () => {},
+      },
+      upload: {
+        image: () => undefined,
+        video: () => undefined,
+      },
+      galleryImages: () => [],
+      officePaste: {
+        onPasteFromOfficeWithImages: () => undefined,
+      },
+      outline: {
+        scrollParent: () => null,
+        bindScrollParent: () => {},
+      },
+      aiConfig: () => undefined,
+      extraExtensions: [customExtension],
+    });
+
+    expect(extensions.some((extension) => extension.name === "customInlineExtension")).toBe(true);
   });
 });

@@ -59,6 +59,34 @@ function createCallout(schema: Schema, text = ""): ProseMirrorNode {
   );
 }
 
+function wrapCurrentBlockInCallout(editor: Editor): boolean {
+  const calloutType = editor.state.schema.nodes.callout;
+  if (!calloutType) return false;
+
+  const { state, view } = editor;
+  const { $from } = state.selection;
+
+  for (let depth = $from.depth; depth >= 1; depth -= 1) {
+    const node = $from.node(depth);
+    if (node.type.name === "callout") {
+      return editor.chain().focus().toggleCallout().run();
+    }
+    if (!node.isBlock) continue;
+
+    const parent = $from.node(depth - 1);
+    const index = $from.index(depth - 1);
+    if (!parent.canReplaceWith(index, index + 1, calloutType)) continue;
+
+    const pos = $from.before(depth);
+    const callout = calloutType.create({ icon: "💡", color: "default" }, node.copy(node.content));
+    view.dispatch(state.tr.replaceWith(pos, pos + node.nodeSize, callout).scrollIntoView());
+    view.focus();
+    return true;
+  }
+
+  return false;
+}
+
 function createColumnLayout(schema: Schema): ProseMirrorNode {
   if (!schema.nodes.columnLayout || !schema.nodes.column) {
     throw new Error("columnLayout node is not registered");
@@ -255,7 +283,7 @@ export function applyBlockTransform(editor: Editor, blockId: BlockMenuItemId): v
       return;
     case "callout":
       if (!editor.state.schema.nodes.callout) return;
-      chain.toggleCallout().run();
+      wrapCurrentBlockInCallout(editor);
       return;
     case "columnLayout":
       if (!editor.state.schema.nodes.columnLayout) return;

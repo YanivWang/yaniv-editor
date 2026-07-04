@@ -3,6 +3,7 @@ import { createApp, h, provide, ref } from "vue";
 
 import { editorLocaleKey } from "@/core/infra/useEditorLocale";
 import { aiClient } from "@/features/ai/client";
+import type { createAiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
 import type { LocaleCode } from "@/locales/manager";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
@@ -32,6 +33,7 @@ export interface AiSuggestionState {
 }
 
 const editorClickHandlers = new WeakMap<HTMLElement, (event: MouseEvent) => void>();
+type AiClient = ReturnType<typeof createAiClient>;
 
 class AiSuggestionManager {
   private getLocaleText: (key: string) => string = (key) => key;
@@ -48,6 +50,7 @@ class AiSuggestionManager {
   private userContextRange: { from: number; to: number } | null = null;
   private isTemporarilyHidden = false;
   private abortController: AbortController | null = null;
+  private customClient: AiClient = aiClient;
 
   private state: AiSuggestionState = {
     visible: false,
@@ -116,7 +119,12 @@ class AiSuggestionManager {
     this.beginSession(selectedText, suggestionSelection, true);
   }
 
-  showCustom(editor: Editor, selectedText: string, selection: { from: number; to: number }): void {
+  showCustom(
+    editor: Editor,
+    selectedText: string,
+    selection: { from: number; to: number },
+    client: AiClient = aiClient,
+  ): void {
     this.ensureEditor(editor);
     if (!this.editor) return;
 
@@ -125,6 +133,7 @@ class AiSuggestionManager {
     this.positionAnchor = selection;
     this.userContextRange = null;
     this.isExecutingRef.value = false;
+    this.customClient = client;
 
     addAiHighlight(this.editor, selection.from, selection.to, {
       originalText: selectedText,
@@ -145,7 +154,7 @@ class AiSuggestionManager {
 
     let accumulated = "";
 
-    aiClient.customCommand(
+    this.customClient.customCommand(
       this.state.originalText,
       prompt,
       this.editor ? buildDocumentContextPrompt(this.editor) : "",
@@ -269,6 +278,7 @@ class AiSuggestionManager {
     this.mode = "replace";
     this.userContextRange = null;
     this.isExecutingRef.value = false;
+    this.customClient = aiClient;
   }
 
   isVisible(): boolean {

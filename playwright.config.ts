@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = Number(process.env.E2E_PORT ?? 9530);
+const PORT = Number(process.env.E2E_PORT ?? 9527);
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
@@ -15,13 +15,12 @@ export default defineConfig({
     baseURL,
     trace: "on-first-retry",
   },
-  webServer: process.env.CI
-    ? {
-        command: "pnpm dev -- --port 9527 --strictPort",
-        url: "http://localhost:9527/",
-        timeout: 120_000,
-      }
-    : undefined,
+  webServer: {
+    command: `pnpm dev -- --port ${PORT} --strictPort`,
+    url: baseURL,
+    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
+  },
   projects: [
     {
       name: "chromium",

@@ -16,6 +16,7 @@ import { resolveEditorProfile } from "./resolveEditorProfile";
 import { resolveInlineGates } from "./resolveInlineGates";
 
 import type { UiFlags } from "./types";
+import type { AnyExtension } from "@tiptap/core";
 
 export interface UseEditorRuntimeFullOptions {
   host: "full";
@@ -28,6 +29,8 @@ export interface UseEditorRuntimeInlineOptions {
   mode: Ref<"edit" | "preview">;
   toolbar: Ref<InlineToolbarConfig | undefined>;
   locale: Ref<LocaleCode>;
+  inlinePlaceholder?: Ref<string | undefined> | ComputedRef<string | undefined>;
+  extraExtensions?: Ref<AnyExtension[] | undefined> | ComputedRef<AnyExtension[] | undefined>;
 }
 
 export function useEditorRuntime(
@@ -115,8 +118,22 @@ export function useEditorRuntime(
     }),
   );
 
+  const runtimeSignature = computed(() => {
+    if (host !== "inline") return "";
+    return JSON.stringify({
+      inlinePlaceholder: options.inlinePlaceholder?.value ?? "",
+      extraExtensions: (options.extraExtensions?.value ?? []).map((extension) => extension.name),
+    });
+  });
+
   const sessionKey = computed(() =>
-    computeSessionKey(profile.value, host, options.locale.value, CAPABILITIES),
+    computeSessionKey(
+      profile.value,
+      host,
+      options.locale.value,
+      CAPABILITIES,
+      runtimeSignature.value,
+    ),
   );
 
   const runtime = { profile, chrome, toolbarConfig, presetLayout, uiFlags, sessionKey };

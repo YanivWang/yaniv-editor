@@ -39,6 +39,10 @@ export async function buildExtensions(
     }
   }
 
+  if (host === "inline" && ctx.extraExtensions?.length) {
+    result.push(...(ctx.extraExtensions as Extension[]));
+  }
+
   return result;
 }
 
