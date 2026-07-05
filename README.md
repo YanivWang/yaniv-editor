@@ -21,6 +21,8 @@ pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-ki
 # Install remaining @tiptap/* peers from package.json as needed for your preset/features.
 ```
 
+After installing peer dependencies, you can use the editor **without** `app.use(Antd)` or any extra global Ant Design Vue registration in the host app (components register antd locally). This also applies to Nuxt projects using `@ant-design-vue/nuxt`.
+
 ### Entry points
 
 ```ts

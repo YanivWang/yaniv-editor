@@ -23,11 +23,11 @@
  * ZoomBar - 缩放控制栏组件
  * @description 提供文档缩放、页数统计和字数统计功能
  */
-import { Button as AButton } from "ant-design-vue";
 import { computed, ref, watch } from "vue";
 
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Button as AButton } from "@/shared/antd";
 
 import type { Editor } from "@tiptap/core";
 

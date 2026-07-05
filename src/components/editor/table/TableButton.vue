@@ -108,12 +108,13 @@ import {
   MergeCellsOutlined,
   SplitCellsOutlined,
 } from "@ant-design/icons-vue";
-import { Popover } from "ant-design-vue";
 import { ref } from "vue";
+
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Button as AButton, Checkbox as ACheckbox, Popover } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 

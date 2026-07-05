@@ -124,10 +124,18 @@
 
 <script setup lang="ts">
 import { CheckOutlined, DownOutlined, RightOutlined } from "@ant-design/icons-vue";
-import { Tooltip as ATooltip } from "ant-design-vue";
 import { ref } from "vue";
 
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
+import {
+  Button as AButton,
+  Dropdown as ADropdown,
+  Menu as AMenu,
+  MenuDivider as AMenuDivider,
+  MenuItem as AMenuItem,
+  SubMenu as ASubMenu,
+  Tooltip as ATooltip,
+} from "@/shared/antd";
 import { findMenuItemByKey } from "@/utils/menuItem";
 
 import type { Component } from "vue";

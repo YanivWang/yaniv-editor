@@ -78,6 +78,7 @@ import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance"
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Input as AInput, Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
 

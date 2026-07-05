@@ -41,9 +41,11 @@
 import { SnippetsOutlined, FileTextOutlined } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
+
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import { builtinTemplates, normalizeTemplateHtml } from "./templates";

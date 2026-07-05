@@ -56,10 +56,11 @@
 
 <script setup lang="ts">
 import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
-import { Popover, Button as AButton } from "ant-design-vue";
 import { ref, computed } from "vue";
 
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Button as AButton, Popover } from "@/shared/antd";
+
 
 const t = useEditorT();
 

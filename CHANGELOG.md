@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2] — 2026-07-06
+
+### Fixed
+
+- Ant Design Vue 组件改为在各 UI 组件内局部 import（`src/shared/antd.ts`），宿主应用**无需** `app.use(Antd)` 或 Nuxt 额外全局注册即可使用 `<YanivEditor>`。
+
 ## [0.1.0] — 2026-05-22
 
 Architecture Refactor（Session / Runtime / Capability Registry 分层重构）

@@ -72,9 +72,11 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref } from "vue";
 
+
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
+import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
 
 // ===== Props =====

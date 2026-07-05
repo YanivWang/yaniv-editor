@@ -88,10 +88,11 @@
 
 <script setup lang="ts">
 import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
-import { Popover, Button as AButton, Input as ATextarea } from "ant-design-vue";
 import { ref, computed, nextTick, watch } from "vue";
 
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Button as AButton, Popover, Textarea as ATextarea } from "@/shared/antd";
+
 
 const t = useEditorT();
 

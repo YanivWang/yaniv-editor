@@ -60,9 +60,11 @@
 import { AppstoreOutlined, FileImageOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
+
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Button as AButton, Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 
 import type { Editor } from "@tiptap/vue-3";

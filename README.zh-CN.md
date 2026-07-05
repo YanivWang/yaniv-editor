@@ -21,6 +21,8 @@ pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-ki
 # 根据所需的 preset / 功能，按 package.json 继续安装其余 @tiptap/* peer 依赖。
 ```
 
+安装 peer 依赖后即可使用，**无需**在宿主应用中执行 `app.use(Antd)` 或额外全局注册 Ant Design Vue 组件（库内部已按需局部注册）。Nuxt 项目使用 `@ant-design-vue/nuxt` 时同样适用。
+
 ### 入口
 
 ```ts

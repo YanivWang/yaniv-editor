@@ -60,10 +60,12 @@ import {
 import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
+
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Input as AInput, Modal as AModal, UploadDragger as AUploadDragger } from "@/shared/antd";
 
 import type { Editor } from "@tiptap/vue-3";
 

@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip as ATooltip } from "ant-design-vue";
+import { Tooltip as ATooltip } from "@/shared/antd";
 
 import type { Component } from "vue";
 

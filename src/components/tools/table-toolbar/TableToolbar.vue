@@ -41,13 +41,13 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons-vue";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { Tooltip as ATooltip } from "ant-design-vue";
 import { computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowTableBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Tooltip as ATooltip } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 

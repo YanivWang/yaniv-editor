@@ -32,9 +32,11 @@
 import { InboxOutlined, VideoCameraOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
+
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Modal as AModal, UploadDragger as AUploadDragger } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { resolveMediaUrl } from "@/utils/mediaUpload";
 

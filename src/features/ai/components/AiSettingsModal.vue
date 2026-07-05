@@ -112,16 +112,17 @@
 
 <script setup lang="ts">
 import { ApiOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons-vue";
-import {
-  Modal as AModal,
-  Select as ASelect,
-  Input as AInput,
-  Button as AButton,
-  Switch as ASwitch,
-} from "ant-design-vue";
 import { ref, reactive, computed, watch } from "vue";
 
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import {
+  Button as AButton,
+  Input as AInput,
+  Modal as AModal,
+  Select as ASelect,
+  Switch as ASwitch,
+} from "@/shared/antd";
+
 
 const t = useEditorT();
 
