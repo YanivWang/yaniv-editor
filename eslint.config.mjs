@@ -123,6 +123,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ["src/**/*Icons.ts", "src/**/*.test.ts"],
+    rules: {
+      "vue/one-component-per-file": "off",
+    },
+  },
+  {
     files: ["src/**/*.vue", "examples/**/*.vue"],
     languageOptions: {
       parser: vueParser,
