@@ -32,7 +32,6 @@ import { LinkOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { ref } from "vue";
 
-
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";

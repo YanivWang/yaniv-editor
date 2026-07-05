@@ -110,7 +110,6 @@ import {
 } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
-
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";

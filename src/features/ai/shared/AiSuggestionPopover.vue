@@ -61,7 +61,6 @@ import { ref, computed } from "vue";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Popover } from "@/shared/antd";
 
-
 const t = useEditorT();
 
 export interface AiSuggestionPopoverProps {

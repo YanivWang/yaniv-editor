@@ -27,7 +27,6 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-
 import { CODE_LANGUAGES, DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
 import { useYanivEditor } from "@/core/editorContext";
 import { Select as ASelect } from "@/shared/antd";
@@ -35,6 +34,7 @@ import { Select as ASelect } from "@/shared/antd";
 import { findCodeBlockDepth, updateCodeBlockLanguage } from "./codeBlockUtils";
 
 import type { Editor } from "@tiptap/core";
+import type { SelectValue } from "ant-design-vue/es/select";
 
 interface Props {
   editor?: Editor | null;
@@ -112,10 +112,11 @@ function scheduleUpdate() {
   requestAnimationFrame(updatePosition);
 }
 
-function onLanguageChange(language: string) {
+function onLanguageChange(value: SelectValue) {
+  if (typeof value !== "string" || !value) return;
   const e = editor.value;
   if (!e) return;
-  updateCodeBlockLanguage(e, language);
+  updateCodeBlockLanguage(e, value);
   scheduleUpdate();
 }
 

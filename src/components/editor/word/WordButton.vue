@@ -60,7 +60,6 @@ import {
 import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
-
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";

@@ -49,7 +49,6 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { onBeforeUnmount, ref, watch } from "vue";
 
-
 import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";

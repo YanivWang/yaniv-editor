@@ -93,7 +93,6 @@ import { ref, computed, nextTick, watch } from "vue";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Popover, Textarea as ATextarea } from "@/shared/antd";
 
-
 const t = useEditorT();
 
 export interface CustomAiPopoverProps {

@@ -40,7 +40,7 @@
                 </span>
                 <a-dropdown
                   :trigger="hasSplitSelection(item) ? ['hover'] : []"
-                  placement="rightTop"
+                  placement="topRight"
                   :open="isSplitOverlayOpen(item)"
                   :get-popup-container="getPopupContainer"
                   @open-change="(open: boolean) => onSplitOverlayOpenChange(item, open)"
@@ -138,6 +138,7 @@ import {
 } from "@/shared/antd";
 import { findMenuItemByKey } from "@/utils/menuItem";
 
+import type { MenuInfo } from "ant-design-vue/es/menu/src/interface";
 import type { Component } from "vue";
 
 const dropdownOpen = ref(false);
@@ -227,14 +228,15 @@ function onSplitPrimary(item: MenuItemConfig) {
   emit("splitPrimary", item.key);
 }
 
-function onSplitChildSelect(info: { key: string }) {
-  const item = findMenuItemByKey(props.items, info.key);
+function onSplitChildSelect(info: MenuInfo) {
+  const key = String(info.key);
+  const item = findMenuItemByKey(props.items, key);
   if (!item) return;
 
   dropdownOpen.value = false;
   splitOverlayKey.value = null;
   item.action?.();
-  emit("select", info.key);
+  emit("select", key);
 }
 
 function handleOpenChange(open: boolean) {
@@ -253,15 +255,16 @@ function getPopupContainer(triggerNode?: HTMLElement): HTMLElement {
   return document.body;
 }
 
-function onMenuClick(info: { key: string }) {
-  if (info.key.endsWith(":split-hover")) return;
+function onMenuClick(info: MenuInfo) {
+  const key = String(info.key);
+  if (key.endsWith(":split-hover")) return;
 
-  const item = findMenuItemByKey(props.items, info.key);
+  const item = findMenuItemByKey(props.items, key);
   if (!item) return;
 
   dropdownOpen.value = false;
   splitOverlayKey.value = null;
   item.action?.();
-  emit("select", info.key);
+  emit("select", key);
 }
 </script>
