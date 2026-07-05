@@ -6,6 +6,19 @@
 
 - Ant Design Vue 组件改为在各 UI 组件内局部 import（`src/shared/antd.ts`），宿主应用**无需** `app.use(Antd)` 或 Nuxt 额外全局注册即可使用 `<YanivEditor>`。
 
+## [0.1.1] — 2026-05-23
+
+### Changed
+
+- 大纲面板默认**收起**（`provideOutlinePanel` 默认 `expanded=false`）。如需初始展开，传入 `:default-outline-expanded="true"`。
+
+### Fixed
+
+- Inline Editor：`placeholder`、`extraExtensions` 变化现在会正确更新 `sessionKey` 并触发 session 重建（此前修改可能不生效）。
+- 多实例场景下 `aiConfig` 卸载时不再误清其他编辑器实例的配置（`hostConfig` owner 隔离）。
+- 块菜单「标注框 / Callout」改为包裹当前块，而非仅 toggle 空标注。
+- 媒体上传 URL 经 `safeUrl` 规范化，过滤不安全协议。
+
 ## [0.1.0] — 2026-05-22
 
 Architecture Refactor（Session / Runtime / Capability Registry 分层重构）
@@ -110,9 +123,13 @@ Inline toolbar 关闭某类格式时，外部传入内容中对应的 mark/node 
 
 `provideOutlinePanel()` / `useOutlinePanel()` 返回的字段从 `visible` 改名为 `expanded`，语义对齐 chromePolicy 文档。
 
-**默认值不变**：仍为 `true`（outline gate 开启时默认展开大纲）。
+**v0.1.0 发布时**默认仍为 `true`；**v0.1.1 起**默认改为 `false`。恢复旧默认展开行为：
 
-**迁移**：
+```vue
+<YanivEditor preset="full" :default-outline-expanded="true" />
+```
+
+**迁移（字段重命名）**：
 
 ```ts
 const { visible } = useOutlinePanel(); // 旧

@@ -54,13 +54,13 @@ flowchart TB
 
 preview 时：`showEditChrome=false`，顶栏/底栏/块菜单/上下文条隐藏；扩展集合不变。
 
-大纲展开状态由 `provideOutlinePanel` 持有，**不在** chromePolicy 中。
+大纲展开状态由 `provideOutlinePanel` 持有，**不在** chromePolicy 中。初始状态由 `defaultOutlineExpanded` prop 控制（v0.1.1 起默认 `false`）。
 
 ## Session 与 sessionKey
 
-**触发 rebuild**：extension gates、locale、inline toolbar 签名、schema 相关选项。
+**触发 rebuild**：extension gates、locale、inline toolbar 签名、Inline 的 `placeholder` / `extraExtensions`、schema 相关选项。
 
-**不触发 rebuild**：phase、appearance、colorMode、upload/gallery/aiConfig 等集成 props。
+**不触发 rebuild**：phase、appearance、colorMode、upload/gallery/aiConfig、`defaultOutlineExpanded` 等集成 props。
 
 rebuild 流程：快照 content → destroy → loading skeleton → async buildExtensions → create Editor。
 

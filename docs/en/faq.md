@@ -34,6 +34,10 @@ AI requires additional setup:
 
 Links are clickable and videos are playable. See [Preview Mode](./guide/preview-mode.md).
 
+## Do I need to globally register Ant Design Vue?
+
+No. After installing peer dependencies, the library registers Ant Design Vue components locally in each UI shell via `src/shared/antd.ts`—the host app does **not** need `app.use(Antd)`. This also applies to Nuxt projects using `@ant-design-vue/nuxt`.
+
 ## Why doesn't basic have table/video?
 
 Since v0.1.0, basic defaults to **image** only. Restore previous behavior:

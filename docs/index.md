@@ -1,6 +1,8 @@
 # Yaniv Editor 文档
 
-Vue 3 + Tiptap 3 富文本编辑器，提供 **Full** 与 **Inline** 两种组件形态。
+Vue 3 + Tiptap 3 富文本编辑器，提供 **Full** 与 **Inline** 两种组件形态（当前 **v0.1.2**）。
+
+安装 peer 依赖后即可使用，**无需**在宿主应用中全局注册 Ant Design Vue（详见 [快速开始](./guide/getting-started.md)）。
 
 ## 快速链接
 

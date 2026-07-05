@@ -20,6 +20,8 @@ import "@yanivjs/yaniv-editor/inline.css";
 | `editorProps`     | `Record<string, unknown>`     | 无                          | Tiptap editor props               |
 | `locale`          | `string`                      | `"zh-CN"`                   | 语言代码                          |
 
+`placeholder` 与 `extraExtensions` 变化会更新 `sessionKey` 并触发 session 重建（内容会快照保留）。
+
 ## 示例
 
 ```vue

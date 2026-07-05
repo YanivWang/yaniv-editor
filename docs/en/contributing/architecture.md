@@ -54,13 +54,13 @@ Four axes merge into `EditorRuntimeProfile`:
 
 In preview: `showEditChrome=false`; header/footer/block menu/context bars hidden; extension set unchanged.
 
-Outline expanded state is held by `provideOutlinePanel` and is **not** in chromePolicy.
+Outline expanded state is held by `provideOutlinePanel` and is **not** in chromePolicy. Initial state comes from the `defaultOutlineExpanded` prop (default `false` since v0.1.1).
 
 ## Session and sessionKey
 
-**Triggers rebuild**: extension gates, locale, inline toolbar signature, schema-related options.
+**Triggers rebuild**: extension gates, locale, inline toolbar signature, Inline `placeholder` / `extraExtensions`, schema-related options.
 
-**Does not trigger rebuild**: phase, appearance, colorMode, upload/gallery/aiConfig and other integration props.
+**Does not trigger rebuild**: phase, appearance, colorMode, upload/gallery/aiConfig, `defaultOutlineExpanded`, and other integration props.
 
 Rebuild flow: snapshot content → destroy → loading skeleton → async buildExtensions → create Editor.
 

@@ -1,5 +1,15 @@
 # Getting Started
 
+## Install
+
+Peer dependencies are required (`vue`, `@tiptap/*`, `ant-design-vue`, etc.—see `package.json` → `peerDependencies`).
+
+```bash
+pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-kit @tiptap/pm ant-design-vue
+```
+
+After installing peers, you can use the editor **without** `app.use(Antd)` or any extra global Ant Design Vue registration in the host app (components import antd locally via `src/shared/antd.ts`).
+
 ## Full Editor
 
 ```vue

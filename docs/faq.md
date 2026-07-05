@@ -34,6 +34,10 @@ AI 需额外开启：
 
 链接可点、视频可播。详见 [预览模式](./guide/preview-mode.md)。
 
+## 需要全局注册 Ant Design Vue 吗？
+
+不需要。安装 peer 依赖后即可使用，库内部通过 `src/shared/antd.ts` 在各 UI 组件内按需局部注册 Ant Design Vue 组件，宿主应用**无需** `app.use(Antd)`。Nuxt 项目使用 `@ant-design-vue/nuxt` 时同样适用。
+
 ## basic 没有表格/视频？
 
 v0.1.0 起 basic 默认仅 **image**。恢复旧行为：

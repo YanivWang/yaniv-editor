@@ -1,5 +1,15 @@
 # 快速开始
 
+## 安装
+
+需要 peer 依赖（`vue`、`@tiptap/*`、`ant-design-vue` 等，完整列表见 `package.json` → `peerDependencies`）。
+
+```bash
+pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-kit @tiptap/pm ant-design-vue
+```
+
+安装 peer 依赖后即可使用，**无需**在宿主应用中执行 `app.use(Antd)` 或额外全局注册 Ant Design Vue 组件（库内部通过 `src/shared/antd.ts` 按需局部注册）。
+
 ## Full Editor
 
 ```vue

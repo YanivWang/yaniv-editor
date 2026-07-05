@@ -2,7 +2,7 @@
 
 Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
 
-> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
+> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；v0.1.1 / v0.1.2 的增量变更（大纲默认收起、Ant Design Vue 局部注册等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
 
 ## 实施约定
 
@@ -175,7 +175,7 @@ interface ResolveChromePolicyInput {
 
 > **大纲两层语义**：`showOutlineRail` 决定**容器是否渲染**（gates 与 phase 决定），`outlinePanel.expanded` 决定**面板是否展开**（用户 uiState，由 `provideOutlinePanel` 持有）。
 >
-> **`outlinePanelExpanded` 默认值**：保持与旧实现一致 `true`（即 outline gate 开启时默认展示大纲）。**不变更默认值**——此前曾考虑改成 `false`（用户主动展开），评估后认为属于隐性 UX 破坏，撤回。如需改变默认行为应另作 minor 版本变更并显式列入 CHANGELOG。
+> **`outlinePanelExpanded` 默认值**：v0.1.1 起默认 `false`（outline gate 开启时面板默认收起）。宿主可通过 `:default-outline-expanded="true"` 恢复初始展开；该 prop 由 `EditorShell` 传入 `provideOutlinePanel(defaultOutlineExpanded ?? false)`，**不进 chromePolicy**、**不触发 session rebuild**。
 
 ### ChromePolicy 的 host 区分（discriminated union）
 
@@ -553,6 +553,7 @@ function computeSessionKey(
   host: EditorShellHost,
   locale: LocaleCode,
   capabilities: ReadonlyArray<CapabilityDefinition>,
+  runtimeSignature = "",
 ): string {
   const enabledCaps = capabilities
     .filter((c) => !c.featureKey || profile.gates[c.featureKey])
@@ -568,9 +569,11 @@ function computeSessionKey(
     .filter(Boolean)
     .join("|");
 
-  return `${host}|${locale}|${gateIds}|${schemaSignatures}`;
+  return `${host}|${locale}|${gateIds}|${enabledGateEntries}|${schemaSignatures}|${runtimeSignature}`;
 }
 ```
+
+`enabledGateEntries` 为已开启 gate 的键名列表；Inline 路径下 `runtimeSignature` 包含 `placeholder` 与 `extraExtensions` 扩展名。
 
 **Capability 类型中必须声明 `schemaSignature`**：
 
@@ -1156,7 +1159,7 @@ src/appearance/
 > 2. `registerAppearance('mybrand', vars)` → `<YanivEditor appearance="custom" :custom-appearance-vars="vars" />`
 > 3. `basic` preset 不再默认开启 `table`/`video`，需显式 `:features="{ table: true, video: true }"`
 > 4. Inline 编辑器内容中不支持的 mark/node 会在解析时丢弃（非保留为 `<p>`）
-> 5. `outlinePanel.visible` → `outlinePanel.expanded`（API rename，无行为变更，默认仍为 `true`）
+> 5. `outlinePanel.visible` → `outlinePanel.expanded`（API rename）；v0.1.1 起默认 `false`，可用 `:default-outline-expanded="true"` 恢复展开
 > 6. Session 层 `PhaseChangeEvent` 新增 `reason: 'mode-change' | 'ready'` 且 `from` 可能为 `null`；宿主切换 phase 用 `:mode` prop（`YanivEditorExpose` 不暴露 `getPhase` / `onPhaseChange`）
 
 ### 内部 `.is-preview` 样式迁移

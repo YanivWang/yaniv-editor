@@ -10,6 +10,7 @@ Important source areas:
 - `src/components/editor`: reusable editor controls.
 - `src/components/tools`: editor chrome and contextual tools.
 - `src/appearance`: appearance and color utilities.
+- `src/shared`: cross-component shared modules (e.g. `antd.ts` for local Ant Design Vue registration).
 - `src/styles`: explicit CSS entries.
 
 Full Editor API decisions belong in `src/core/editorTypes.ts`, `src/configs/editorPreset.ts`, and `src/core/runtime/resolveEditorProfile.ts`.

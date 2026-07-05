@@ -20,6 +20,8 @@ import "@yanivjs/yaniv-editor/inline.css";
 | `editorProps`     | `Record<string, unknown>`     | none                           | Tiptap editor props                      |
 | `locale`          | `string`                      | `"zh-CN"`                      | Locale code                              |
 
+Changing `placeholder` or `extraExtensions` updates `sessionKey` and triggers session rebuild (content is snapshotted first).
+
 ## Examples
 
 ```vue

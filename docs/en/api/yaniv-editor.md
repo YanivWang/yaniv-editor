@@ -9,21 +9,22 @@ import "@yanivjs/yaniv-editor/style.css";
 
 ## Props
 
-| Prop                   | Type                                          | Default                        | Description                         |
-| ---------------------- | --------------------------------------------- | ------------------------------ | ----------------------------------- |
-| `mode`                 | `"edit" \| "preview"`                         | `"edit"`                       | Runtime state                       |
-| `preset`               | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Full Editor feature plan            |
-| `appearance`           | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | Visual skin                         |
-| `colorMode`            | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                          |
-| `features`             | `FeatureConfig`                               | preset defaults                | Ability overrides                   |
-| `initialContent`       | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | Initial document                    |
-| `customAppearanceVars` | `Record<string, string>`                      | none                           | CSS variables for custom appearance |
-| `uploadImage`          | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                |
-| `uploadVideo`          | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                |
-| `galleryImages`        | `GalleryImage[]`                              | current document images        | External gallery source             |
-| `customTemplates`      | `TemplateItem[]`                              | built-in templates             | Extra templates                     |
-| `locale`               | `string`                                      | `"zh-CN"`                      | Locale code                         |
-| `aiConfig`             | `YanivEditorAiConfig`                         | none                           | Host-owned AI config                |
+| Prop                     | Type                                          | Default                        | Description                                   |
+| ------------------------ | --------------------------------------------- | ------------------------------ | --------------------------------------------- |
+| `mode`                   | `"edit" \| "preview"`                         | `"edit"`                       | Runtime state                                 |
+| `preset`                 | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Full Editor feature plan                      |
+| `appearance`             | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | Visual skin                                   |
+| `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                                    |
+| `features`               | `FeatureConfig`                               | preset defaults                | Ability overrides                             |
+| `initialContent`         | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | Initial document                              |
+| `customAppearanceVars`   | `Record<string, string>`                      | none                           | CSS variables for custom appearance           |
+| `uploadImage`            | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                          |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                          |
+| `galleryImages`          | `GalleryImage[]`                              | current document images        | External gallery source                       |
+| `customTemplates`        | `TemplateItem[]`                              | built-in templates             | Extra templates                               |
+| `locale`                 | `string`                                      | `"zh-CN"`                      | Locale code                                   |
+| `defaultOutlineExpanded` | `boolean`                                     | `false`                        | Initial outline panel when outline gate is on |
+| `aiConfig`               | `YanivEditorAiConfig`                         | none                           | Host-owned AI config                          |
 
 ## Examples
 

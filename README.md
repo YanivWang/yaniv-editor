@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Vue 3 + Tiptap 3 rich-text editor library (**v0.1.0**).
+Vue 3 + Tiptap 3 rich-text editor library (**v0.1.2**).
 
 | Shape               | Import                         | Use case                       |
 | ------------------- | ------------------------------ | ------------------------------ |
@@ -21,7 +21,7 @@ pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-ki
 # Install remaining @tiptap/* peers from package.json as needed for your preset/features.
 ```
 
-After installing peer dependencies, you can use the editor **without** `app.use(Antd)` or any extra global Ant Design Vue registration in the host app (components register antd locally). This also applies to Nuxt projects using `@ant-design-vue/nuxt`.
+After installing peer dependencies, you can use the editor **without** `app.use(Antd)` or any extra global Ant Design Vue registration in the host app (components register antd locally via `src/shared/antd.ts`). This also applies to Nuxt projects using `@ant-design-vue/nuxt`.
 
 ### Entry points
 
@@ -97,21 +97,22 @@ Four independent axes plus optional overrides:
 <YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
 ```
 
-| Prop                   | Type                                          | Default                        | Notes                                      |
-| ---------------------- | --------------------------------------------- | ------------------------------ | ------------------------------------------ |
-| `mode`                 | `"edit" \| "preview"`                         | `"edit"`                       | Edit vs read-only display                  |
-| `preset`               | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Default feature + layout bundle            |
-| `appearance`           | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | Visual skin                                |
-| `colorMode`            | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                                 |
-| `features`             | `FeatureConfig`                               | preset defaults                | Ability overrides only                     |
-| `initialContent`       | `string \| JSONContent`                       | built-in placeholder paragraph | Initial document                           |
-| `customAppearanceVars` | `Record<string, string>`                      | —                              | `--ye-*` tokens when `appearance="custom"` |
-| `uploadImage`          | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                       |
-| `uploadVideo`          | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                       |
-| `galleryImages`        | `GalleryImage[]`                              | images from current doc        | External gallery source                    |
-| `customTemplates`      | `TemplateItem[]`                              | built-in templates             | Extra document templates                   |
-| `locale`               | `string`                                      | `"zh-CN"`                      | Locale code (`zh-CN` \| `en-US`)           |
-| `aiConfig`             | `YanivEditorAiConfig`                         | —                              | Host-managed AI config                     |
+| Prop                     | Type                                          | Default                        | Notes                                               |
+| ------------------------ | --------------------------------------------- | ------------------------------ | --------------------------------------------------- |
+| `mode`                   | `"edit" \| "preview"`                         | `"edit"`                       | Edit vs read-only display                           |
+| `preset`                 | `"basic" \| "full" \| "notion"`               | `"basic"`                      | Default feature + layout bundle                     |
+| `appearance`             | `"default" \| "word" \| "notion" \| "custom"` | `"default"`                    | Visual skin                                         |
+| `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                                          |
+| `features`               | `FeatureConfig`                               | preset defaults                | Ability overrides only                              |
+| `initialContent`         | `string \| JSONContent`                       | built-in placeholder paragraph | Initial document                                    |
+| `customAppearanceVars`   | `Record<string, string>`                      | —                              | `--ye-*` tokens when `appearance="custom"`          |
+| `uploadImage`            | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                                |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                                |
+| `galleryImages`          | `GalleryImage[]`                              | images from current doc        | External gallery source                             |
+| `customTemplates`        | `TemplateItem[]`                              | built-in templates             | Extra document templates                            |
+| `locale`                 | `string`                                      | `"zh-CN"`                      | Locale code (`zh-CN` \| `en-US`)                    |
+| `defaultOutlineExpanded` | `boolean`                                     | `false`                        | Initial outline panel state when outline gate is on |
+| `aiConfig`               | `YanivEditorAiConfig`                         | —                              | Host-managed AI config                              |
 
 `features` is merged after `preset` via `mergeFeatures`. Only explicitly set keys override the preset; `undefined` does not replace a preset default:
 

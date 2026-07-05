@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-基于 Vue 3 + Tiptap 3 的富文本编辑器组件库（**v0.1.0**）。
+基于 Vue 3 + Tiptap 3 的富文本编辑器组件库（**v0.1.2**）。
 
 | 形态                | 引入路径                       | 适用场景                       |
 | ------------------- | ------------------------------ | ------------------------------ |
@@ -21,7 +21,7 @@ pnpm add @yanivjs/yaniv-editor vue @tiptap/core @tiptap/vue-3 @tiptap/starter-ki
 # 根据所需的 preset / 功能，按 package.json 继续安装其余 @tiptap/* peer 依赖。
 ```
 
-安装 peer 依赖后即可使用，**无需**在宿主应用中执行 `app.use(Antd)` 或额外全局注册 Ant Design Vue 组件（库内部已按需局部注册）。Nuxt 项目使用 `@ant-design-vue/nuxt` 时同样适用。
+安装 peer 依赖后即可使用，**无需**在宿主应用中执行 `app.use(Antd)` 或额外全局注册 Ant Design Vue 组件（库内部通过 `src/shared/antd.ts` 按需局部注册）。Nuxt 项目使用 `@ant-design-vue/nuxt` 时同样适用。
 
 ### 入口
 
@@ -97,21 +97,22 @@ const html = ref("<p>Hello</p>");
 <YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
 ```
 
-| 属性                   | 类型                                          | 默认值           | 说明                                         |
-| ---------------------- | --------------------------------------------- | ---------------- | -------------------------------------------- |
-| `mode`                 | `"edit" \| "preview"`                         | `"edit"`         | 编辑态 / 只读展示态                          |
-| `preset`               | `"basic" \| "full" \| "notion"`               | `"basic"`        | 默认能力 + 布局组合                          |
-| `appearance`           | `"default" \| "word" \| "notion" \| "custom"` | `"default"`      | 视觉皮肤                                     |
-| `colorMode`            | `"light" \| "dark" \| "auto"`                 | `"light"`        | 配色模式                                     |
-| `features`             | `FeatureConfig`                               | 跟随 preset      | 仅用于按需覆盖能力开关                       |
-| `initialContent`       | `string \| JSONContent`                       | 内置占位段落     | 初始文档                                     |
-| `customAppearanceVars` | `Record<string, string>`                      | —                | `appearance="custom"` 时的 `--ye-*` 设计令牌 |
-| `uploadImage`          | `(file: File) => Promise<string>`             | 回落到 DataURL   | 图片上传处理函数                             |
-| `uploadVideo`          | `(file: File) => Promise<string>`             | 回落到 DataURL   | 视频上传处理函数                             |
-| `galleryImages`        | `GalleryImage[]`                              | 当前文档中的图片 | 外部图库来源                                 |
-| `customTemplates`      | `TemplateItem[]`                              | 内置模板         | 额外的文档模板                               |
-| `locale`               | `string`                                      | `"zh-CN"`        | 语言代码（`zh-CN` \| `en-US`）               |
-| `aiConfig`             | `YanivEditorAiConfig`                         | —                | 宿主侧管理的 AI 配置                         |
+| 属性                     | 类型                                          | 默认值           | 说明                                         |
+| ------------------------ | --------------------------------------------- | ---------------- | -------------------------------------------- |
+| `mode`                   | `"edit" \| "preview"`                         | `"edit"`         | 编辑态 / 只读展示态                          |
+| `preset`                 | `"basic" \| "full" \| "notion"`               | `"basic"`        | 默认能力 + 布局组合                          |
+| `appearance`             | `"default" \| "word" \| "notion" \| "custom"` | `"default"`      | 视觉皮肤                                     |
+| `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`        | 配色模式                                     |
+| `features`               | `FeatureConfig`                               | 跟随 preset      | 仅用于按需覆盖能力开关                       |
+| `initialContent`         | `string \| JSONContent`                       | 内置占位段落     | 初始文档                                     |
+| `customAppearanceVars`   | `Record<string, string>`                      | —                | `appearance="custom"` 时的 `--ye-*` 设计令牌 |
+| `uploadImage`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 图片上传处理函数                             |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 视频上传处理函数                             |
+| `galleryImages`          | `GalleryImage[]`                              | 当前文档中的图片 | 外部图库来源                                 |
+| `customTemplates`        | `TemplateItem[]`                              | 内置模板         | 额外的文档模板                               |
+| `locale`                 | `string`                                      | `"zh-CN"`        | 语言代码（`zh-CN` \| `en-US`）               |
+| `defaultOutlineExpanded` | `boolean`                                     | `false`          | outline 能力开启时，大纲面板是否初始展开     |
+| `aiConfig`               | `YanivEditorAiConfig`                         | —                | 宿主侧管理的 AI 配置                         |
 
 `features` 会在 `preset` 之后通过 `mergeFeatures` 合并：只有显式设置的键会覆盖 preset，`undefined` 不会重置默认值。
 

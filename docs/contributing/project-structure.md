@@ -10,6 +10,7 @@
 - `src/components/editor`：可复用编辑器控件。
 - `src/components/tools`：编辑器 chrome 和上下文工具。
 - `src/appearance`：外观和颜色工具。
+- `src/shared`：跨组件共享模块（如 `antd.ts` 局部 Ant Design Vue 注册）。
 - `src/styles`：显式 CSS 入口。
 
 Full Editor API 决策位于 `src/core/editorTypes.ts`、`src/configs/editorPreset.ts` 和 `src/core/runtime/resolveEditorProfile.ts`。

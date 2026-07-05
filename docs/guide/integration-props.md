@@ -45,6 +45,16 @@
 
 见 [AI 配置 API](../api/ai-config.md)。
 
+## 大纲初始展开
+
+outline 能力开启时，面板默认**收起**。需要初始展开时：
+
+```vue
+<YanivEditor preset="full" :default-outline-expanded="true" />
+```
+
+该 prop 不触发 session rebuild。详见 [大纲目录](../features/outline.md)。
+
 ## 受控内容
 
 ```vue

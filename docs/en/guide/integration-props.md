@@ -45,6 +45,16 @@ See [Templates and Gallery](../features/templates-gallery.md).
 
 See [AI Config API](../api/ai-config.md).
 
+## Outline Initial State
+
+When the outline gate is on, the panel is **collapsed** by default. To open it initially:
+
+```vue
+<YanivEditor preset="full" :default-outline-expanded="true" />
+```
+
+This prop does not trigger session rebuild. See [Outline](../features/outline.md).
+
 ## Controlled Content
 
 ```vue
