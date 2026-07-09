@@ -1,5 +1,8 @@
 <template>
   <div ref="rootRef" :class="rootSurfaceClass" :data-phase="profile.mode">
+    <!-- portal 须先于 chrome 挂载，供 BubbleMenu appendTo 在子组件 setup 时可用 -->
+    <div ref="overlayPortalRef" :class="OVERLAY_PORTAL_CLASS" />
+
     <div v-show="sessionStatus !== 'loading'" class="yaniv-editor__chrome">
       <template v-if="isFull && fullChrome?.showEditChrome">
         <EditorEditChrome
@@ -45,8 +48,6 @@
       {{ sessionError }}
       <button type="button" @click="retrySession">重试</button>
     </div>
-
-    <div ref="overlayPortalRef" :class="OVERLAY_PORTAL_CLASS" />
   </div>
 </template>
 

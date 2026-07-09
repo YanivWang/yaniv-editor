@@ -1,4 +1,6 @@
-import { Node, mergeAttributes } from "@tiptap/core";
+import { isNodeEmpty, Node, mergeAttributes } from "@tiptap/core";
+
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -7,6 +9,19 @@ declare module "@tiptap/core" {
       toggleToggleOpen: () => ReturnType;
     };
   }
+}
+
+function isVisuallyEmptyContainer(node: ProseMirrorNode): boolean {
+  if (isNodeEmpty(node)) return true;
+  let empty = true;
+  node.forEach((child) => {
+    if (child.isTextblock) {
+      if (child.content.size > 0) empty = false;
+      return;
+    }
+    if (!isVisuallyEmptyContainer(child)) empty = false;
+  });
+  return empty;
 }
 
 export const ToggleBlock = Node.create({
@@ -83,9 +98,7 @@ export const ToggleBlock = Node.create({
   addNodeView() {
     return ({ node, getPos, editor }) => {
       const dom = document.createElement("div");
-      dom.className = "toggle-block";
       dom.dataset.type = "toggle";
-      dom.dataset.open = node.attrs.open ? "true" : "false";
 
       const chevron = document.createElement("button");
       chevron.type = "button";
@@ -97,12 +110,38 @@ export const ToggleBlock = Node.create({
       const contentDOM = document.createElement("div");
       contentDOM.className = "toggle-block__content";
 
+      const resolvePlaceholder = (current: ProseMirrorNode, pos: number): string => {
+        const placeholderExt = editor.extensionManager.extensions.find(
+          (ext) => ext.name === "placeholder",
+        );
+        const option = placeholderExt?.options?.placeholder;
+        if (typeof option === "function") {
+          return option({ editor, node: current, pos, hasAnchor: true }) || "";
+        }
+        if (typeof option === "string") return option;
+        return "";
+      };
+
       const syncOpen = (open: boolean) => {
         dom.dataset.open = open ? "true" : "false";
         chevron.classList.toggle("is-open", open);
       };
 
+      const syncEmptyState = (current: ProseMirrorNode) => {
+        const empty = isVisuallyEmptyContainer(current);
+        dom.className = empty ? "toggle-block is-empty" : "toggle-block";
+        if (empty) {
+          const pos = typeof getPos === "function" ? (getPos() ?? 0) : 0;
+          const text = resolvePlaceholder(current, pos);
+          if (text) dom.setAttribute("data-placeholder", text);
+          else dom.removeAttribute("data-placeholder");
+        } else {
+          dom.removeAttribute("data-placeholder");
+        }
+      };
+
       syncOpen(node.attrs.open);
+      syncEmptyState(node);
 
       chevron.addEventListener("mousedown", (event) => {
         event.preventDefault();
@@ -129,9 +168,13 @@ export const ToggleBlock = Node.create({
       return {
         dom,
         contentDOM,
+        ignoreMutation: (mutation) =>
+          mutation.type === "attributes" &&
+          (mutation.attributeName === "class" || mutation.attributeName === "data-placeholder"),
         update(updatedNode) {
           if (updatedNode.type.name !== "toggleBlock") return false;
           syncOpen(updatedNode.attrs.open);
+          syncEmptyState(updatedNode);
           return true;
         },
       };

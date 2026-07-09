@@ -13,3 +13,15 @@
 .yaniv-editor__overlay-portal > * {
   pointer-events: auto;
 }
+
+/* BubbleMenu 根节点 z-index（Floating UI 不再提供 tippy zIndex） */
+.yaniv-editor__overlay-portal .link-bubble-menu,
+.yaniv-editor__overlay-portal .image-bubble-menu,
+.yaniv-editor__overlay-portal .video-bubble-menu,
+.yaniv-editor__overlay-portal .table-bubble-menu {
+  z-index: var(--ye-z-bubble-menu);
+}
+
+.yaniv-editor__overlay-portal .floating-menu {
+  z-index: var(--ye-z-floating-menu);
+}

@@ -15,6 +15,7 @@
 @import "./toolbar.css";
 @import "./toolbar-dropdown.css";
 @import "./heading-dropdown.css";
+@import "./overlay-portal.css";
 @import "./floating-menu-toolbar.css";
 
 /* Content features required by the first inline entry surface. */

@@ -1,32 +1,80 @@
-import { computed } from "vue";
+import { computed, type ComputedRef } from "vue";
 
-import { useYeZIndex } from "@/composables/useYeZIndex";
-import { useOverlayPortal } from "@/core/editorContext";
+import { useEditorRoot, useOverlayPortal } from "@/core/editorContext";
+import { resolveOverlayPortal } from "@/core/overlayPortal";
 import type { YeZIndexToken } from "@/utils/zIndex";
 
-export interface OverlayTippyOptions {
-  duration?: number;
-  placement?: "top" | "bottom" | "left" | "right";
-  offset?: [number, number];
+export type OverlayBubblePlacement =
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "top-start"
+  | "top-end"
+  | "bottom-start"
+  | "bottom-end"
+  | "left-start"
+  | "left-end"
+  | "right-start"
+  | "right-end";
+
+export interface OverlayBubbleMenuOptions {
+  placement?: OverlayBubblePlacement;
+  /**
+   * Floating UI offset：
+   * - number → mainAxis
+   * - [skidding, distance]（兼容旧 tippy 写法）→ crossAxis / mainAxis
+   */
+  offset?: number | [number, number];
 }
 
-/** Tippy 浮层：挂载到编辑器 overlay portal，z-index 与 CSS token 同步。 */
-export function useOverlayTippyOptions(token: YeZIndexToken, options: OverlayTippyOptions = {}) {
+export interface OverlayBubbleMenuBindings {
+  /** 传给 `<bubble-menu :options>`（Floating UI） */
+  options: {
+    strategy: "fixed";
+    placement: OverlayBubblePlacement;
+    offset: number | { mainAxis?: number; crossAxis?: number };
+  };
+  /** 传给 `<bubble-menu :append-to>` */
+  appendTo: () => HTMLElement;
+}
+
+function resolveOffset(
+  offset: OverlayBubbleMenuOptions["offset"],
+): number | { mainAxis?: number; crossAxis?: number } {
+  if (offset == null) return 8;
+  if (typeof offset === "number") return offset;
+  const [skidding, distance] = offset;
+  return { mainAxis: distance, crossAxis: skidding };
+}
+
+/**
+ * Tiptap 3 BubbleMenu（Floating UI）绑定：
+ * - appendTo → overlay portal
+ * - options → placement / offset / strategy
+ * z-index 由 CSS token（.floating-menu 等）继承，无需 tippy zIndex。
+ */
+export function useOverlayBubbleMenu(
+  _token: YeZIndexToken,
+  menuOptions: OverlayBubbleMenuOptions = {},
+): ComputedRef<OverlayBubbleMenuBindings> {
   const overlayPortal = useOverlayPortal();
-  const zIndex = useYeZIndex(token);
+  const editorRoot = useEditorRoot();
 
-  return computed(() => {
-    const portal = overlayPortal.value;
-    if (!portal) {
+  return computed(() => ({
+    options: {
+      strategy: "fixed" as const,
+      placement: menuOptions.placement ?? "top",
+      offset: resolveOffset(menuOptions.offset),
+    },
+    appendTo: () => {
+      if (overlayPortal.value) return overlayPortal.value;
+      const root = editorRoot.value;
+      if (root) return resolveOverlayPortal(root);
       throw new Error("Overlay portal is not mounted");
-    }
-
-    return {
-      duration: options.duration ?? 100,
-      placement: options.placement ?? "top",
-      offset: options.offset,
-      zIndex: zIndex.value,
-      appendTo: portal,
-    };
-  });
+    },
+  }));
 }
+
+/** @deprecated 使用 useOverlayBubbleMenu */
+export const useOverlayTippyOptions = useOverlayBubbleMenu;

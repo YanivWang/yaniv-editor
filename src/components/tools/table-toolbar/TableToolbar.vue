@@ -2,7 +2,8 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="tippyOptions"
+    :options="bubbleBindings.options"
+    :append-to="bubbleBindings.appendTo"
     :should-show="shouldShow"
     class="table-bubble-menu"
     :class="appearanceClass"
@@ -189,7 +190,7 @@ const menuTools: TableToolItem[] = [
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowTableBubbleMenu(bubbleProps, props.disabled, props.showMode);
 
-const tippyOptions = useOverlayTippyOptions("--ye-z-bubble-menu", {
+const bubbleBindings = useOverlayTippyOptions("--ye-z-bubble-menu", {
   placement: "top",
   offset: [0, 16],
 });

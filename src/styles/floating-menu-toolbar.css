@@ -4,6 +4,7 @@
  */
 
 .floating-menu {
+  z-index: var(--ye-z-floating-menu);
   display: flex;
   padding: 4px;
   background: var(--ye-bubble-bg);

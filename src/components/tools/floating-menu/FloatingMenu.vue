@@ -2,7 +2,8 @@
   <bubble-menu
     v-if="floatingEditor"
     :editor="floatingEditor!"
-    :tippy-options="tippyOptions"
+    :options="bubbleBindings.options"
+    :append-to="bubbleBindings.appendTo"
     :should-show="shouldShow"
     class="floating-menu"
     :class="appearanceClass"
@@ -111,7 +112,7 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowFloatingTextToolbar(bubbleProps, props.disabled);
 
-const tippyOptions = useOverlayTippyOptions("--ye-z-floating-menu", {
+const bubbleBindings = useOverlayTippyOptions("--ye-z-floating-menu", {
   placement: "top",
 });
 </script>

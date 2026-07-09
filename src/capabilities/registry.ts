@@ -73,6 +73,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         }),
         codeBlockLowlightExtension,
         YanivPlaceholder.configure({
+          includeChildren: true,
           placeholder: ({ node }: { node: ProseMirrorNode }) => {
             if (node.type.name === "heading") return ctx.locale.placeholder.heading;
             if (node.type.name === "codeBlock") return ctx.locale.placeholder.codeBlock;

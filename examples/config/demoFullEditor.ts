@@ -413,7 +413,7 @@ const SAMPLE_FULL = `
   <tr><td>查找</td><td>Ctrl/Cmd+F</td></tr>
 </table>
 <h2>更多</h2>
-<p>选中文字体验 <strong>AI 悬浮菜单</strong>；数学公式、模板、图库、Office 粘贴等见顶栏。</p>
+<p>选中文字体验 <strong>AI 悬浮菜单</strong>；也可选中 <a href="https://example.com">示例链接</a> 查看链接气泡；数学公式、模板、图库、Office 粘贴等见顶栏。</p>
 <p>可从 Word 复制内容粘贴试 <strong>Office 粘贴</strong>；顶栏插入公式试 <strong>数学</strong>。块编辑（<code>/</code>、拖拽块）请切换 <strong>Notion</strong> 方案。</p>
 `;
 

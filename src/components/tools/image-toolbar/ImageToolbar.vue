@@ -2,7 +2,8 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="tippyOptions"
+    :options="bubbleBindings.options"
+    :append-to="bubbleBindings.appendTo"
     :should-show="shouldShow"
     class="image-bubble-menu"
     :class="appearanceClass"
@@ -202,7 +203,7 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
-const tippyOptions = useOverlayTippyOptions("--ye-z-bubble-menu", {
+const bubbleBindings = useOverlayTippyOptions("--ye-z-bubble-menu", {
   placement: "top",
   offset: [0, 16],
 });
