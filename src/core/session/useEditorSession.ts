@@ -8,6 +8,7 @@ import type { BlockMenuHost } from "@/core/shell/useBlockMenuHost";
 import type { TiptapLocale } from "@/locales/types";
 
 import { applyPhaseTransition } from "./applyPhaseTransition";
+import { ContentAdapter } from "./contentAdapter";
 
 import type { PhaseChangeEvent, PhaseChangeHandler, PhaseChangeOff, SessionStatus } from "./types";
 import type { JSONContent } from "@tiptap/core";
@@ -95,7 +96,10 @@ export function useEditorSession(options: UseEditorSessionOptions) {
       const extensions = await buildExtensions(host, ctx);
       if (disposed || myGen !== generation) return;
 
-      const initialContent = contentSnapshot ?? EMPTY_DOC;
+      const initialContent = ContentAdapter.prepareEditorContent(
+        contentSnapshot ?? EMPTY_DOC,
+        extensions,
+      );
       contentSnapshot = null;
 
       editor.value = new Editor({
@@ -149,6 +153,8 @@ export function useEditorSession(options: UseEditorSessionOptions) {
   watch(sessionKey, async (newKey, oldKey) => {
     if (!oldKey || !newKey || newKey === oldKey) return;
     if (editor.value) {
+      // full 保留 JSON（属性更完整）；inline 用 HTML。
+      // 灌入新 schema 前由 ContentAdapter.prepareEditorContent 清洗未知节点。
       contentSnapshot = host === "inline" ? editor.value.getHTML() : editor.value.getJSON();
     }
     const oldEditor = editor.value;

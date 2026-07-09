@@ -75,7 +75,7 @@ See **[Z-Index and Overlay Mounting](./z-index.md)** for the full token table, h
 
 Full Editor content protocol is **JSON** (`JSONContent`). Inline uses **HTML** (`v-model:content`).
 
-Controlled write-back uses signature deduplication to avoid cursor jumps from emit feedback. In preview mode, `ContentAdapter` can still write via raw transactions.
+Controlled write-back uses signature deduplication to avoid cursor jumps from emit feedback. In preview mode, `ContentAdapter` can still write via raw transactions; JSON is schema-adapted (unknown nodes/marks stripped) before write.
 
 ## Expose
 

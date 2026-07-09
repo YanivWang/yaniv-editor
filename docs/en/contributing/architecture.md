@@ -62,7 +62,9 @@ Outline expanded state is held by `provideOutlinePanel` and is **not** in chrome
 
 **Does not trigger rebuild**: phase, appearance, colorMode, upload/gallery/aiConfig, `defaultOutlineExpanded`, `zIndexBase`, and other integration props.
 
-Rebuild flow: snapshot content → destroy → loading skeleton → async buildExtensions → create Editor.
+Rebuild flow: snapshot content → destroy → loading skeleton → async buildExtensions → `prepareEditorContent` (schema-adapt) → create Editor.
+
+When the schema narrows (e.g. `table` off), JSON snapshots may contain unknown nodes. `ContentAdapter.adaptJsonToSchema` lifts unknown-node children and strips unknown marks before `new Editor` / `setContent`, avoiding TipTap `Unknown node type`.
 
 ## Phase Transition {#phase-transition}
 
@@ -71,7 +73,7 @@ Unified entry `requestPhaseTransition`:
 - edit → preview: **emit cleanup first**, then `setEditable(false)`
 - preview → edit: **`setEditable(true)` first**, then emit
 
-`ContentAdapter` uses raw transactions + `BYPASS_GUARD_META`; do not use `commands.setContent`.
+`ContentAdapter` uses raw transactions + `BYPASS_GUARD_META`; do not use `commands.setContent`. Writes are schema-aware: HTML via DOMParser; JSON via `adaptJsonToSchema`.
 
 ## Capability Registry
 

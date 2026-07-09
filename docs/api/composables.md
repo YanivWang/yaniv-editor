@@ -79,9 +79,13 @@ import {
   applyGatesToToolbarConfig,
   resolveShowInlineToolbar,
   ContentAdapter,
+  adaptJsonToSchema,
+  prepareEditorContent,
   applyPhaseTransition,
 } from "@yanivjs/yaniv-editor";
 ```
+
+`ContentAdapter` / `adaptJsonToSchema` / `prepareEditorContent`：跨 schema 写入时清洗未知节点与 mark（session rebuild、受控 JSON）。
 
 ## 国际化
 

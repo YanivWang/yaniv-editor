@@ -46,13 +46,17 @@ export interface OverlayBubbleMenuBindings {
     placement: OverlayBubblePlacement;
     offset: number | { mainAxis?: number; crossAxis?: number };
   };
-  /** 传给 `<bubble-menu :append-to>` */
-  appendTo: () => HTMLElement;
+  /**
+   * 传给 `<bubble-menu :append-to>`。
+   * 必须是 HTMLElement：@tiptap/vue-3 运行时 prop 仅声明 Object，
+   * 传 () => HTMLElement 会触发 Vue type check 警告。
+   */
+  appendTo: HTMLElement;
 }
 
 /**
  * Tiptap 3 BubbleMenu（Floating UI）绑定：
- * - appendTo → overlay portal
+ * - appendTo → overlay portal（HTMLElement，非 getter）
  * - options → placement / offset / strategy
  * z-index 由 CSS token（.floating-menu 等）继承。
  */
@@ -67,6 +71,6 @@ export function useOverlayBubbleMenu(
       placement: menuOptions.placement ?? "top",
       offset: menuOptions.offset ?? 8,
     },
-    appendTo: getMountTarget.value,
+    appendTo: getMountTarget.value(),
   }));
 }

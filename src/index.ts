@@ -26,7 +26,12 @@ export { CAPABILITIES } from "./capabilities/registry";
 export { applyGatesToToolbarConfig } from "./capabilities/applyGatesToToolbarConfig";
 export { resolveShowInlineToolbar } from "./capabilities/resolveShowInlineToolbar";
 export type { CapabilityDefinition, BuildExtensionsCtx } from "./capabilities/types";
-export { ContentAdapter } from "./core/session/contentAdapter";
+export {
+  ContentAdapter,
+  adaptJsonToSchema,
+  parseContentToDoc,
+  prepareEditorContent,
+} from "./core/session/contentAdapter";
 export { applyPhaseTransition } from "./core/session/applyPhaseTransition";
 export type { SessionStatus, PhaseChangeEvent } from "./core/session/types";
 

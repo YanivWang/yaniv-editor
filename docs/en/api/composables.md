@@ -79,9 +79,13 @@ import {
   applyGatesToToolbarConfig,
   resolveShowInlineToolbar,
   ContentAdapter,
+  adaptJsonToSchema,
+  prepareEditorContent,
   applyPhaseTransition,
 } from "@yanivjs/yaniv-editor";
 ```
+
+`ContentAdapter` / `adaptJsonToSchema` / `prepareEditorContent`: clean unknown nodes and marks for cross-schema writes (session rebuild, controlled JSON).
 
 ## Locales
 

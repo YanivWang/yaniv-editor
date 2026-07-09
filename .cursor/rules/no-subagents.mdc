@@ -1,0 +1,11 @@
+---
+description: 所有工作任务必须由主 agent 直接完成，禁止使用子 agent
+alwaysApply: true
+---
+
+# 禁止使用子 Agent
+
+- **永远不要**调用 Task 工具或启动任何子 agent（explore、generalPurpose、shell、best-of-n-runner 等）。
+- 所有探索、搜索、实现、调试、文档整理等工作，**一律由主 agent 亲自用工具完成**。
+- 原因：子 agent 经常断链/中断，不可靠。
+- 即使用户任务很大、很复杂，也拆成主 agent 自己的多步工具调用，而不是委派给子 agent。

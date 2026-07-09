@@ -75,7 +75,7 @@ outline 能力开启时，面板默认**收起**。需要初始展开时：
 
 Full Editor 内容协议为 **JSON**（`JSONContent`）。Inline 为 **HTML**（`v-model:content`）。
 
-受控回写带签名去重，避免 emit 回流导致光标跳动。preview 模式下 `ContentAdapter` 仍可通过 raw transaction 写入。
+受控回写带签名去重，避免 emit 回流导致光标跳动。preview 模式下 `ContentAdapter` 仍可通过 raw transaction 写入；JSON 写入前会按当前 schema 清洗未知节点/mark。
 
 ## Expose
 
