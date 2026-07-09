@@ -94,7 +94,7 @@
     "@tiptap/pm": "^3.0.0",
     "@tiptap/starter-kit": "^3.0.0",
     "@tiptap/vue-3": "^3.0.0",
-    "ant-design-vue": "^4.0.0",
+    "ant-design-vue": "^4.2.6",
     "docx": "^9.0.0",
     "file-saver": "^2.0.0",
     "hotkeys-js": "^4.0.0",
