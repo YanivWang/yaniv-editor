@@ -2,7 +2,7 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
+    :tippy-options="tippyOptions"
     :should-show="shouldShow"
     class="table-bubble-menu"
     :class="appearanceClass"
@@ -50,6 +50,7 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Tooltip as ATooltip } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
+import { getYeZIndex } from "@/utils/zIndex";
 
 import type { Component } from "vue";
 
@@ -187,4 +188,11 @@ const menuTools: TableToolItem[] = [
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowTableBubbleMenu(bubbleProps, props.disabled, props.showMode);
+
+const tippyOptions = computed(() => ({
+  duration: 100,
+  placement: "top" as const,
+  offset: [0, 16] as [number, number],
+  zIndex: getYeZIndex("--ye-z-bubble-menu"),
+}));
 </script>

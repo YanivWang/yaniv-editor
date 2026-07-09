@@ -2,7 +2,7 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
+    :tippy-options="tippyOptions"
     :should-show="shouldShow"
     class="image-bubble-menu"
     :class="appearanceClass"
@@ -77,6 +77,7 @@ import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
+import { getYeZIndex } from "@/utils/zIndex";
 
 // ===== Props =====
 const props = withDefaults(
@@ -201,6 +202,13 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
+const tippyOptions = computed(() => ({
+  duration: 100,
+  placement: "top" as const,
+  offset: [0, 16] as [number, number],
+  zIndex: getYeZIndex("--ye-z-bubble-menu"),
+}));
+
 /**
  * 设置图片对齐方式
  */
@@ -249,10 +257,6 @@ function deleteImage() {
 </script>
 
 <style scoped>
-.image-bubble-menu {
-  z-index: 1001;
-}
-
 .image-menu-content {
   display: flex;
   gap: 4px;

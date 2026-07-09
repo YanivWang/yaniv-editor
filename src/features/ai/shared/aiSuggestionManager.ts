@@ -7,6 +7,7 @@ import type { createAiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
 import type { LocaleCode } from "@/locales/manager";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
+import { getYeZIndex } from "@/utils/zIndex";
 
 import {
   addAiHighlight,
@@ -465,19 +466,18 @@ class AiSuggestionManager {
     this.container = document.createElement("div");
 
     Object.assign(this.container.style, {
-      position: "absolute",
+      position: "fixed",
       top: "0",
       left: "0",
-      zIndex: "1000",
+      width: "0",
+      height: "0",
+      zIndex: String(getYeZIndex("--ye-z-picker-menu")),
     });
 
-    const editorElement = this.editor.view.dom.parentElement;
-    if (editorElement) {
-      editorElement.append(this.container);
-    } else {
-      document.body.append(this.container);
-    }
+    document.body.append(this.container);
 
+    const editorRoot =
+      (this.editor.view.dom.closest(".yaniv-editor")) ?? undefined;
     const position = this.calculatePopoverPosition();
     const isCustom = this.mode === "custom";
     const translate = this.getLocaleText.bind(this);
@@ -499,7 +499,7 @@ class AiSuggestionManager {
             isStreaming: this.isStreamingRef.value,
             isExecuting: this.isExecutingRef.value,
             position,
-            editorElement: editorElement || undefined,
+            editorElement: editorRoot,
             "onUpdate:visible": (val: boolean) => {
               this.visibleRef.value = val;
             },
@@ -519,7 +519,7 @@ class AiSuggestionManager {
           suggestedText: this.suggestedTextRef.value,
           isStreaming: this.isStreamingRef.value,
           position,
-          editorElement: editorElement || undefined,
+          editorElement: editorRoot,
           "onUpdate:visible": (val: boolean) => {
             this.visibleRef.value = val;
           },
@@ -554,11 +554,10 @@ class AiSuggestionManager {
     const { view } = this.editor;
     const start = view.coordsAtPos(from);
     const end = view.coordsAtPos(to);
-    const editorRect = view.dom.getBoundingClientRect();
 
     return {
-      top: end.bottom - editorRect.top + 8,
-      left: start.left - editorRect.left,
+      top: end.bottom + 8,
+      left: start.left,
     };
   }
 }

@@ -39,7 +39,7 @@ const showTooltip = ref(false);
 
 .ye-tooltip {
   position: absolute;
-  z-index: var(--ye-z-bubble);
+  z-index: var(--ye-z-tooltip);
   padding: 6px 10px;
   font-size: 12px;
   line-height: 1.4;

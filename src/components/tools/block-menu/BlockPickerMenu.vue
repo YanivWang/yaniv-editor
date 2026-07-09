@@ -138,7 +138,6 @@ const menuStyle = computed(() => ({
   position: "fixed" as const,
   left: `${position.value.x}px`,
   top: `${position.value.y}px`,
-  zIndex: 1002,
 }));
 
 function isFlatIndex(group: BlockMenuGroupDef, itemIdx: number): number {

@@ -1,7 +1,7 @@
 /* Footer Nav — 底部导航容器（缩放条样式见 @/styles/zoom-toolbar.css） */
 
 .footer-nav-container {
-  z-index: 100;
+  z-index: var(--ye-z-chrome);
   flex-shrink: 0;
   width: 100%;
 }

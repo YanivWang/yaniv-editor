@@ -2,7 +2,7 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="{ duration: 100, placement: 'top', offset: [0, 16] }"
+    :tippy-options="tippyOptions"
     :should-show="shouldShow"
     class="video-bubble-menu"
   >
@@ -47,11 +47,12 @@
 import { EyeOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";
+import { getYeZIndex } from "@/utils/zIndex";
 
 const props = withDefaults(
   defineProps<{
@@ -109,6 +110,13 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
+const tippyOptions = computed(() => ({
+  duration: 100,
+  placement: "top" as const,
+  offset: [0, 16] as [number, number],
+  zIndex: getYeZIndex("--ye-z-bubble-menu"),
+}));
+
 function previewVideo() {
   const { node } = getCurrentVideoInfo();
   if (node?.type.name === "video") {
@@ -155,10 +163,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.video-bubble-menu {
-  z-index: 1001;
-}
-
 .video-menu-content {
   display: flex;
   gap: 4px;

@@ -2,7 +2,7 @@
   <bubble-menu
     v-if="editor"
     :editor="editor"
-    :tippy-options="{ duration: 100, placement: 'top', offset: [0, 8], zIndex: 1002 }"
+    :tippy-options="tippyOptions"
     :should-show="shouldShow"
     class="link-bubble-menu"
   >
@@ -81,6 +81,7 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Input as AInput, Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
+import { getYeZIndex } from "@/utils/zIndex";
 
 const t = useEditorT();
 
@@ -133,6 +134,13 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   shouldShowLinkBubbleMenu(bubbleProps, props.disabled, (href) => {
     currentLinkUrl.value = href;
   });
+
+const tippyOptions = computed(() => ({
+  duration: 100,
+  placement: "top" as const,
+  offset: [0, 8] as [number, number],
+  zIndex: getYeZIndex("--ye-z-bubble-menu"),
+}));
 
 // 监听编辑器选择变化，更新链接URL
 watch(
@@ -249,11 +257,6 @@ function removeLink() {
 </script>
 
 <style scoped>
-/* 链接悬浮框容器 */
-.link-bubble-menu {
-  z-index: 1002; /* 比图片工具栏稍高，确保链接悬浮框显示在上层 */
-}
-
 .link-bubble-menu-content:not(.appearance-notion) {
   display: flex;
   gap: 0;

@@ -2,7 +2,7 @@
   <bubble-menu
     v-if="floatingEditor"
     :editor="floatingEditor!"
-    :tippy-options="{ duration: 100, placement: 'top' }"
+    :tippy-options="tippyOptions"
     :should-show="shouldShow"
     class="floating-menu"
     :class="appearanceClass"
@@ -76,6 +76,7 @@ import { useEditorColorState } from "@/composables/useEditorColorState";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
+import { getYeZIndex } from "@/utils/zIndex";
 
 const t = useEditorT();
 
@@ -109,4 +110,10 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowFloatingTextToolbar(bubbleProps, props.disabled);
+
+const tippyOptions = computed(() => ({
+  duration: 100,
+  placement: "top" as const,
+  zIndex: getYeZIndex("--ye-z-floating-menu"),
+}));
 </script>

@@ -253,10 +253,6 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 <style lang="scss" scoped>
 $dark-selector: '[data-color-mode="dark"] &';
 
-.document-toolbar-container {
-  z-index: 1000;
-}
-
 .document-toolbar {
   // min-height: 52px;
   padding: 6px 12px;

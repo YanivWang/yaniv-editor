@@ -4,7 +4,7 @@
 .yaniv-editor .document-toolbar-container {
   position: sticky;
   top: 0;
-  z-index: var(--ye-z-toolbar, 100);
+  z-index: var(--ye-z-chrome);
 }
 
 .document-toolbar-container {
@@ -16,7 +16,6 @@
 }
 
 .document-toolbar {
-  z-index: 10;
   flex-shrink: 0;
   padding: 6px 12px;
   background: transparent;

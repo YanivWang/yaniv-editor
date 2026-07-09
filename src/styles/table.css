@@ -51,7 +51,7 @@
 .yaniv-editor .ProseMirror table .selectedCell::after {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: var(--ye-z-content-overlay);
   pointer-events: none;
   content: "";
   background: var(--ye-table-selected-bg);
@@ -77,7 +77,7 @@
   top: -1px;
   right: -1.5px;
   bottom: -1px;
-  z-index: 10;
+  z-index: var(--ye-z-content-control);
   width: 3px;
   pointer-events: none;
   background-color: var(--ye-primary);
@@ -92,7 +92,6 @@
 .table-bubble-menu {
   position: absolute !important;
   top: 50px;
-  z-index: 1001 !important;
   display: flex;
   padding: 6px 8px;
   background: var(--ye-bubble-bg);

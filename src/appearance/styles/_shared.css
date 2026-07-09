@@ -7,14 +7,7 @@
  * 架构约定：ProseMirror 正文结构见 src/styles/content.css；此处仅放跨主题 chrome 布局。
  */
 
-/* 工具栏容器边框/背景见 src/styles/toolbar.css */
-
-/* 工具栏仅保留布局（颜色/线条/阴影由全局 token 控制） */
-.yaniv-editor .document-toolbar-container {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+/* 工具栏 sticky / z-index 见 src/styles/toolbar.css */
 
 .yaniv-editor .document-toolbar {
   padding: 6px 12px;

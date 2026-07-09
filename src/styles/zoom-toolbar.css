@@ -74,7 +74,6 @@
 
 /* 底栏位置 */
 .zoom-controls--bottom {
-  z-index: 10;
   flex-shrink: 0;
   width: 100%;
   border-top: var(--ye-border-width) solid var(--ye-footer-divider);

@@ -130,11 +130,26 @@
   --ye-outline-h5-size: 12px;
   --ye-outline-h6-size: 12px;
 
-  /* ===== Z-Index ===== */
-  --ye-z-toolbar: 100;
-  --ye-z-dropdown: 100;
-  --ye-z-bubble: 200;
-  --ye-z-modal: 300;
+  /*
+   * ===== Z-Index（单一层级源）=====
+   * 浮层从高到低：modal > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop
+   * JS 侧请用 getYeZIndex()（src/utils/zIndex.ts）读取同名 token。
+   */
+  --ye-z-content: 1;
+  --ye-z-content-overlay: 2;
+  --ye-z-content-control: 10;
+  --ye-z-editor-ui: 20;
+  --ye-z-editor-rail: 30;
+  --ye-z-chrome: 100;
+  --ye-z-tooltip: 200;
+  --ye-z-overlay-backdrop: 1000;
+  --ye-z-bubble-menu: 1010;
+  --ye-z-floating-menu: 1020;
+  --ye-z-picker-menu: 1030;
+  --ye-z-drag-menu: 1040;
+  --ye-z-drag-submenu: 1041;
+  --ye-z-dropdown: 1050;
+  --ye-z-modal: 2000;
 
   /* ===== Document Layout（default 基线；word/notion 等在 appearance 覆盖） ===== */
   --ye-doc-page-width: 900px;

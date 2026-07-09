@@ -14,7 +14,7 @@
 .drag-handle,
 .drag-handle-plus {
   position: absolute;
-  z-index: 20;
+  z-index: var(--ye-z-editor-ui);
   align-items: center;
   justify-content: center;
   width: 24px;
@@ -70,7 +70,7 @@
 
 .drag-handle-menu {
   position: fixed;
-  z-index: 1003;
+  z-index: var(--ye-z-drag-menu);
   display: none;
   width: 228px;
   max-height: min(460px, calc(100vh - 16px));
@@ -150,7 +150,7 @@
   position: absolute;
   top: 0;
   left: calc(100% + 8px);
-  z-index: 1004;
+  z-index: var(--ye-z-drag-submenu);
   display: none;
   width: 196px;
   padding: 8px;
