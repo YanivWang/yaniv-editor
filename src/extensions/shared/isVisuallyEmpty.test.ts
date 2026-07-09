@@ -1,10 +1,7 @@
 import { Fragment, Schema, type Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { describe, expect, it } from "vitest";
 
-import {
-  CONTAINER_PLACEHOLDER_TYPES,
-  isVisuallyEmpty,
-} from "@/extensions/shared/isVisuallyEmpty";
+import { CONTAINER_PLACEHOLDER_TYPES, isVisuallyEmpty } from "@/extensions/shared/isVisuallyEmpty";
 
 const schema = new Schema({
   nodes: {

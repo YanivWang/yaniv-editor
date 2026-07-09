@@ -10,7 +10,6 @@ export interface SetContentOptions {
   source?: "external" | "phase" | "session-rebuild";
 }
 
-const EMPTY_DOC: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
 const EMPTY_DOC_HTML = "<p></p>";
 
 function htmlToElement(html: string): HTMLElement {
