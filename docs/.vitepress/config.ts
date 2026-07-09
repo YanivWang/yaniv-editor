@@ -24,6 +24,7 @@ const guideSidebar = (prefix: string, en: boolean) => [
       { text: en ? "Preview Mode" : "预览模式", link: `${prefix}/guide/preview-mode` },
       { text: en ? "Internationalization" : "国际化", link: `${prefix}/guide/i18n` },
       { text: en ? "Integration Props" : "集成 Props", link: `${prefix}/guide/integration-props` },
+      { text: en ? "Z-Index & Overlays" : "Z-Index 与浮层", link: `${prefix}/guide/z-index` },
     ],
   },
 ];

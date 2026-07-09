@@ -55,6 +55,18 @@ outline 能力开启时，面板默认**收起**。需要初始展开时：
 
 该 prop 不触发 session rebuild。详见 [大纲目录](../features/outline.md)。
 
+## Z-Index
+
+编辑器浮层默认基准为 `1000`，通过 `zIndexBase` prop 配置（`YanivEditor` / `YanivInlineEditor` 均支持；映射为 `.yaniv-editor` 上的 `--ye-z-base`）。宿主页面有高层级 UI 时可提高：
+
+```vue
+<YanivEditor :z-index-base="1500" />
+```
+
+浮层统一挂载在编辑器内部的 [overlay portal](./z-index.md)（`.yaniv-editor__overlay-portal`），不挂 `document.body`。
+
+完整 token 表、宿主层级协商与自定义 Shell 要求见 **[Z-Index 与浮层挂载](./z-index.md)**。
+
 ## 受控内容
 
 ```vue

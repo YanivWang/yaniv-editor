@@ -61,6 +61,10 @@ Pass `uploadImage` / `uploadVideo`. See [Integration Props](./guide/integration-
 
 `:locale="zh-CN"` or `"en-US"`. See [Internationalization](./guide/i18n.md).
 
+## Host Modal covers editor overlays / how to configure z-index?
+
+Default `zIndexBase` is `1000`; overlays mount inside the editor overlay portal. For host global modals to fully cover the editor, use z-index above `zIndexBase + 100` (default **1100**), or lower the editor `zIndexBase`. See [Z-Index & Overlays](./guide/z-index.md).
+
 ## Custom Inline toolbar?
 
 See [Inline Toolbar](./guide/inline-toolbar.md) and [Inline Composition](./guide/inline-composition.md).

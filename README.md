@@ -105,7 +105,8 @@ Four independent axes plus optional overrides:
 | `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`                      | Color mode                                          |
 | `features`               | `FeatureConfig`                               | preset defaults                | Ability overrides only                              |
 | `initialContent`         | `string \| JSONContent`                       | built-in placeholder paragraph | Initial document                                    |
-| `customAppearanceVars`   | `Record<string, string>`                      | —                              | `--ye-*` tokens when `appearance="custom"`          |
+| `customAppearanceVars`   | `Record<string, string>`                      | —                              | Visual `--ye-*` tokens when `appearance="custom"`   |
+| `zIndexBase`             | `number`                                      | `1000`                         | Overlay z-index base (`--ye-z-base`)                |
 | `uploadImage`            | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                                |
 | `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                                |
 | `galleryImages`          | `GalleryImage[]`                              | images from current doc        | External gallery source                             |
@@ -113,6 +114,8 @@ Four independent axes plus optional overrides:
 | `locale`                 | `string`                                      | `"zh-CN"`                      | Locale code (`zh-CN` \| `en-US`)                    |
 | `defaultOutlineExpanded` | `boolean`                                     | `false`                        | Initial outline panel state when outline gate is on |
 | `aiConfig`               | `YanivEditorAiConfig`                         | —                              | Host-managed AI config                              |
+
+`zIndexBase` defaults to `1000`; overlays mount inside the editor overlay portal. See [`docs/guide/z-index.md`](./docs/guide/z-index.md) (English: [`docs/en/guide/z-index.md`](./docs/en/guide/z-index.md)).
 
 `features` is merged after `preset` via `mergeFeatures`. Only explicitly set keys override the preset; `undefined` does not replace a preset default:
 
@@ -182,6 +185,7 @@ Custom CSS: the root node exposes `data-phase="edit|preview"` (the old `.is-prev
 | `extraExtensions` | `AnyExtension[]`              | `[]`                           | Extra Tiptap extensions     |
 | `editorProps`     | `Record<string, unknown>`     | —                              | Tiptap `editorProps`        |
 | `locale`          | `string`                      | `"zh-CN"`                      | Locale code                 |
+| `zIndexBase`      | `number`                      | `1000`                         | Overlay z-index base        |
 
 Default toolbar:
 

@@ -76,6 +76,11 @@ export interface YanivEditorProps {
   appearance?: EditorAppearance;
   /** custom 外观的 CSS 变量（实例级，不污染全局） */
   customAppearanceVars?: Record<string, string>;
+  /**
+   * 浮层 z-index 基准值，映射为编辑器根节点上的 `--ye-z-base`。
+   * 宿主页面有高层级 UI（如 Ant Design Modal）时可提高此值；默认 1000。
+   */
+  zIndexBase?: number;
   /** 亮色、暗色或跟随系统 */
   colorMode?: EditorColorMode;
   /** 初始内容 — HTML 字符串或 ProseMirror JSON（type: doc） */

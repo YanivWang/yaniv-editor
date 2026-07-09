@@ -1,5 +1,5 @@
 <template>
-  <teleport to="body">
+  <teleport v-if="overlayPortal" :to="overlayPortal">
     <div
       v-if="isVisible"
       ref="menuRef"
@@ -58,7 +58,7 @@ import {
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
-import { useYanivEditor } from "@/core/editorContext";
+import { useOverlayPortal, useYanivEditor } from "@/core/editorContext";
 import type { MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { blockMenuHostKey } from "@/core/shell/useBlockMenuHost";
@@ -103,6 +103,7 @@ const props = defineProps<{
 }>();
 
 const editor = useYanivEditor(() => props.editor);
+const overlayPortal = useOverlayPortal();
 
 const isVisible = ref(false);
 const mode = ref<BlockPickerMode | null>(null);

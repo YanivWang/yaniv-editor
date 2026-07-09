@@ -517,7 +517,7 @@ watch(normalizedColor, (newColor) => {
 
 <style lang="scss" scoped>
 // Dark 模式选择器变量（用于统一管理暗色样式）
-$dark-selector: "[data-color-mode=" dark "] &";
+$dark-selector: '[data-color-mode="dark"] &';
 
 /* ===== 颜色选择按钮 ===== */
 .ye-color-current-btn {
@@ -530,16 +530,12 @@ $dark-selector: "[data-color-mode=" dark "] &";
   height: 32px;
   padding: 0;
   overflow: visible;
-  color: #333;
+  color: var(--ye-toolbar-btn-text);
   cursor: pointer;
   background: transparent;
   border: none;
-  border-radius: 4px;
-  transition: all 0.2s;
-
-  #{$dark-selector} {
-    color: #f0f0f0;
-  }
+  border-radius: var(--ye-radius-sm);
+  transition: all var(--ye-transition-normal);
 
   &.has-icon {
     gap: 2px;
@@ -547,11 +543,8 @@ $dark-selector: "[data-color-mode=" dark "] &";
   }
 
   &:hover {
-    background: #f5f5f5;
-
-    #{$dark-selector} {
-      background: #303030;
-    }
+    color: var(--ye-text);
+    background: var(--ye-toolbar-btn-hover);
   }
 }
 
@@ -571,11 +564,7 @@ $dark-selector: "[data-color-mode=" dark "] &";
   width: 18px;
   height: 16px;
   line-height: 0;
-  color: #262626;
-
-  #{$dark-selector} {
-    color: #f0f0f0;
-  }
+  color: inherit;
 
   :deep(.color-icon) {
     display: inline-flex;

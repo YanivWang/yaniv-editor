@@ -32,7 +32,11 @@
 
 ## 块菜单
 
-斜杠命令与拖拽手柄触发的 BlockPickerMenu（见 [块编辑](./block-editing.md)）。
+斜杠命令与拖拽手柄触发的 BlockPickerMenu（见 [块编辑](./block-editing.md)）。菜单通过 overlay portal 挂载，继承 `.yaniv-editor` 的 z-index token。
+
+## 浮层挂载
+
+bubble menu、BlockPicker、mention 建议、AI popover 等均挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，不使用 `document.body`。层级配置见 [Z-Index 与浮层](../guide/z-index.md)。
 
 ## 移动端
 

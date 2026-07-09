@@ -74,10 +74,10 @@ import { computed, ref } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
-import { getYeZIndex } from "@/utils/zIndex";
 
 // ===== Props =====
 const props = withDefaults(
@@ -202,12 +202,10 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
-const tippyOptions = computed(() => ({
-  duration: 100,
-  placement: "top" as const,
-  offset: [0, 16] as [number, number],
-  zIndex: getYeZIndex("--ye-z-bubble-menu"),
-}));
+const tippyOptions = useOverlayTippyOptions("--ye-z-bubble-menu", {
+  placement: "top",
+  offset: [0, 16],
+});
 
 /**
  * 设置图片对齐方式

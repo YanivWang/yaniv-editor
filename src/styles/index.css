@@ -33,6 +33,7 @@
 @import "./heading-dropdown.css";
 
 /* Menus */
+@import "./overlay-portal.css";
 @import "./floating-menu-toolbar.css";
 
 /* Features */

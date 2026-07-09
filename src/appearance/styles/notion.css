@@ -892,7 +892,7 @@
   color: var(--ye-text-muted);
 }
 
-/* ===== Notion 图片/表格工具条（含 tippy 挂载到 body 的情况） ===== */
+/* ===== Notion 图片/表格工具条（overlay portal 内 Tippy 浮层） ===== */
 .yaniv-editor.appearance-notion .image-bubble-menu,
 .yaniv-editor.appearance-notion .table-bubble-menu,
 .image-bubble-menu.appearance-notion,

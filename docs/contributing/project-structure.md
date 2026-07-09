@@ -12,6 +12,8 @@
 - `src/appearance`：外观和颜色工具。
 - `src/shared`：跨组件共享模块（如 `antd.ts` 局部 Ant Design Vue 注册）。
 - `src/styles`：显式 CSS 入口。
+- `src/utils/zIndex.ts`：从 `.yaniv-editor` 根节点读取 `--ye-z-*` token（Tippy 等 JS API 与 CSS 同步）。
+- `src/composables/useOverlayTippyOptions.ts`：Tippy 浮层统一挂载 overlay portal 并同步 z-index。
 
 Full Editor API 决策位于 `src/core/editorTypes.ts`、`src/configs/editorPreset.ts` 和 `src/core/runtime/resolveEditorProfile.ts`。
 
@@ -25,20 +27,21 @@ Preset 默认能力仅在 `src/core/runtime/resolveEditorProfile.ts` 定义。`e
 
 样式分为结构层、功能 chrome 层和外观层。不要在外观文件中重复结构规则。
 
-| 层级        | 位置                                                    | 职责                                            |
-| ----------- | ------------------------------------------------------- | ----------------------------------------------- |
-| Token       | `src/styles/variables.css`                              | `--ye-*` 设计 token（浅色/深色）                |
-| 结构        | `src/styles/content.css`、`table.css`、`code-block.css` | ProseMirror 边框、背景和交互语义                |
-| 功能 chrome | `src/styles/*.css`、`src/components/tools/**`           | 工具栏、菜单、拖拽手柄、大纲等                  |
-| 外观        | `src/appearance/styles/*.css`                           | 主题 token 和排版（margin、font-size、padding） |
+| 层级        | 位置                                                    | 职责                                                              |
+| ----------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
+| Token       | `src/styles/variables.css`                              | `--ye-*` 设计 token；颜色等在 `:root`，z-index 在 `.yaniv-editor` |
+| 结构        | `src/styles/content.css`、`table.css`、`code-block.css` | ProseMirror 边框、背景和交互语义                                  |
+| 功能 chrome | `src/styles/*.css`、`src/components/tools/**`           | 工具栏、菜单、拖拽手柄、大纲、`overlay-portal.css` 等             |
+| 外观        | `src/appearance/styles/*.css`                           | 主题 token 和排版（margin、font-size、padding）                   |
 
-导入顺序在 `src/styles/index.css`（Full）和 `src/styles/inline.css`（Inline）中定义。两者均在外观 CSS 之前导入 `content.css`。
+导入顺序在 `src/styles/index.css`（Full）和 `src/styles/inline.css`（Inline）中定义。两者均在外观 CSS 之前导入 `content.css` 与 `overlay-portal.css`。
 
 规则：
 
-- 外观文件可覆盖 `--ye-*` token 并调整排版。
+- 外观文件可覆盖 `--ye-*` token 并调整排版（**不要**用 `customAppearanceVars` 覆盖 z-index，请用 `zIndexBase` prop）。
 - 不要在结构文件（`content.css`、`table.css`、`code-block.css`）已拥有的选择器上重复声明 `border` / `background` 简写。
 - `block-hover.css` 随 Full bundle 发布，但仅在 `.appearance-notion` 下生效（Notion 块悬停高亮）。
-- `appearance="custom"` 无主题文件；在编辑器根节点通过 `:custom-appearance-vars` 覆盖 token。
+- `appearance="custom"` 无主题文件；在编辑器根节点通过 `:custom-appearance-vars` 覆盖视觉 token。
+- 全局浮层（bubble menu、BlockPicker、mention、AI popover 等）通过 `EditorShell` 内的 `.yaniv-editor__overlay-portal` 挂载，详见 [Z-Index 与浮层](../guide/z-index.md)。
 
-宿主侧用法见 [外观与颜色](../guide/appearance.md)。
+宿主侧用法见 [外观与颜色](../guide/appearance.md) 与 [集成 Props](../guide/integration-props.md)。

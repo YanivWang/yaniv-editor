@@ -97,22 +97,25 @@ const html = ref("<p>Hello</p>");
 <YanivEditor mode="edit" preset="basic" appearance="word" color-mode="auto" />
 ```
 
-| 属性                     | 类型                                          | 默认值           | 说明                                         |
-| ------------------------ | --------------------------------------------- | ---------------- | -------------------------------------------- |
-| `mode`                   | `"edit" \| "preview"`                         | `"edit"`         | 编辑态 / 只读展示态                          |
-| `preset`                 | `"basic" \| "full" \| "notion"`               | `"basic"`        | 默认能力 + 布局组合                          |
-| `appearance`             | `"default" \| "word" \| "notion" \| "custom"` | `"default"`      | 视觉皮肤                                     |
-| `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`        | 配色模式                                     |
-| `features`               | `FeatureConfig`                               | 跟随 preset      | 仅用于按需覆盖能力开关                       |
-| `initialContent`         | `string \| JSONContent`                       | 内置占位段落     | 初始文档                                     |
-| `customAppearanceVars`   | `Record<string, string>`                      | —                | `appearance="custom"` 时的 `--ye-*` 设计令牌 |
-| `uploadImage`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 图片上传处理函数                             |
-| `uploadVideo`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 视频上传处理函数                             |
-| `galleryImages`          | `GalleryImage[]`                              | 当前文档中的图片 | 外部图库来源                                 |
-| `customTemplates`        | `TemplateItem[]`                              | 内置模板         | 额外的文档模板                               |
-| `locale`                 | `string`                                      | `"zh-CN"`        | 语言代码（`zh-CN` \| `en-US`）               |
-| `defaultOutlineExpanded` | `boolean`                                     | `false`          | outline 能力开启时，大纲面板是否初始展开     |
-| `aiConfig`               | `YanivEditorAiConfig`                         | —                | 宿主侧管理的 AI 配置                         |
+| 属性                     | 类型                                          | 默认值           | 说明                                          |
+| ------------------------ | --------------------------------------------- | ---------------- | --------------------------------------------- |
+| `mode`                   | `"edit" \| "preview"`                         | `"edit"`         | 编辑态 / 只读展示态                           |
+| `preset`                 | `"basic" \| "full" \| "notion"`               | `"basic"`        | 默认能力 + 布局组合                           |
+| `appearance`             | `"default" \| "word" \| "notion" \| "custom"` | `"default"`      | 视觉皮肤                                      |
+| `colorMode`              | `"light" \| "dark" \| "auto"`                 | `"light"`        | 配色模式                                      |
+| `features`               | `FeatureConfig`                               | 跟随 preset      | 仅用于按需覆盖能力开关                        |
+| `initialContent`         | `string \| JSONContent`                       | 内置占位段落     | 初始文档                                      |
+| `customAppearanceVars`   | `Record<string, string>`                      | —                | `appearance="custom"` 时的视觉 `--ye-*` token |
+| `zIndexBase`             | `number`                                      | `1000`           | 浮层 z-index 基准（`--ye-z-base`）            |
+| `uploadImage`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 图片上传处理函数                              |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | 回落到 DataURL   | 视频上传处理函数                              |
+| `galleryImages`          | `GalleryImage[]`                              | 当前文档中的图片 | 外部图库来源                                  |
+| `customTemplates`        | `TemplateItem[]`                              | 内置模板         | 额外的文档模板                                |
+| `locale`                 | `string`                                      | `"zh-CN"`        | 语言代码（`zh-CN` \| `en-US`）                |
+| `defaultOutlineExpanded` | `boolean`                                     | `false`          | outline 能力开启时，大纲面板是否初始展开      |
+| `aiConfig`               | `YanivEditorAiConfig`                         | —                | 宿主侧管理的 AI 配置                          |
+
+`zIndexBase` 默认 `1000`；浮层挂载在编辑器内 overlay portal，详见 [`docs/guide/z-index.md`](./docs/guide/z-index.md)。
 
 `features` 会在 `preset` 之后通过 `mergeFeatures` 合并：只有显式设置的键会覆盖 preset，`undefined` 不会重置默认值。
 
@@ -182,6 +185,7 @@ const { gates } = resolveEditorProfile({ preset: "basic", features: { table: tru
 | `extraExtensions` | `AnyExtension[]`              | `[]`                       | 额外的 Tiptap 扩展                  |
 | `editorProps`     | `Record<string, unknown>`     | —                          | 透传给 Tiptap 的 `editorProps`      |
 | `locale`          | `string`                      | `"zh-CN"`                  | 语言代码                            |
+| `zIndexBase`      | `number`                      | `1000`                     | 浮层 z-index 基准                   |
 
 默认 toolbar：
 

@@ -76,12 +76,12 @@ import { nextTick, ref, watch, computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Input as AInput, Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
-import { getYeZIndex } from "@/utils/zIndex";
 
 const t = useEditorT();
 
@@ -135,12 +135,10 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
     currentLinkUrl.value = href;
   });
 
-const tippyOptions = computed(() => ({
-  duration: 100,
-  placement: "top" as const,
-  offset: [0, 8] as [number, number],
-  zIndex: getYeZIndex("--ye-z-bubble-menu"),
-}));
+const tippyOptions = useOverlayTippyOptions("--ye-z-bubble-menu", {
+  placement: "top",
+  offset: [0, 8],
+});
 
 // 监听编辑器选择变化，更新链接URL
 watch(

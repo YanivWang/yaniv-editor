@@ -1,5 +1,5 @@
 <template>
-  <teleport to="body">
+  <teleport v-if="overlayPortal" :to="overlayPortal">
     <div
       v-if="isVisible"
       class="mention-suggestion-menu"
@@ -30,12 +30,13 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
-import { useYanivEditor } from "@/core/editorContext";
+import { useOverlayPortal, useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { getMentionSuggestions, mentionPluginKey, type MentionItem } from "@/extensions/mention";
 
 const t = useEditorT();
 const editor = useYanivEditor();
+const overlayPortal = useOverlayPortal();
 
 const appearanceCtx = useInjectEditorAppearance();
 const appearanceClass = computed(() =>

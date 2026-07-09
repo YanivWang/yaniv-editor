@@ -8,7 +8,7 @@
 import { provideYanivEditor, useYanivEditor } from "@yanivjs/yaniv-editor";
 ```
 
-自定义工具组件需要访问当前编辑器实例时使用。
+自定义工具组件需要访问当前编辑器实例时使用。编辑器根节点与 overlay portal 由 `EditorShell` 内部 `provideEditorRoot` / `provideOverlayPortal` 注入；自定义 Shell 须自行提供，见 [Z-Index 与浮层](../guide/z-index.md)。
 
 ## 视觉上下文
 
@@ -26,7 +26,7 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-`YanivEditor` 通过 `appearance`、`colorMode` 和可选的 `customAppearanceVars` 驱动视觉状态。
+`YanivEditor` 通过 `appearance`、`colorMode` 和可选的 `customAppearanceVars` 驱动视觉状态。z-index 请使用 `zIndexBase` prop，不要用 `customAppearanceVars` 覆盖 `--ye-z-base`。
 
 ## 气泡菜单辅助
 

@@ -720,6 +720,7 @@ flowchart TB
   EditorShell["EditorShell 根"]
   EditorShell --> runtime["provideEditorRuntime"]
   EditorShell --> editor["provideYanivEditor"]
+  EditorShell --> editorRoot["provideEditorRoot / provideOverlayPortal"]
   EditorShell --> appearance["useEditorAppearance (实例作用域)"]
   EditorShell --> ai["useYanivAiConfig"]
   EditorShell --> blockHost["provideBlockMenuHost"]
@@ -1198,6 +1199,7 @@ src/appearance/
 10. **Inline gates 单一来源** — Inline gates 仅由 `resolveInlineGates(toolbar, capabilities)` 推导；除此之外不得存在 toolbar→gate 的第二条路径。Full gates 仅由 `profile.features` 推导。
 11. **chromeCoupled DOM 注入** — outline 滚动容器通过 `editor.commands.bindOutlineScrollParent(el)` 在 Workspace mount 后注入；`TableOfContents` 的 `scrollParent` 为 getter（`getBoundOutlineScrollParent() ?? window`），**禁止**在 configure 阶段调用 `ctx.outline.scrollParent()`。`boundScrollParent` 为模块级单例，同页多 outline 实例需注意覆盖顺序。
 12. **AI config 动态化** — AI 扩展的所有运行时配置（apiKey / model / endpoint / timeout）必须通过 `getXxx: () => ctx.aiConfig()?.xxx` getter 形式声明，**禁止**在 configure 阶段静态取值。
+13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Tippy 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo `document.body`；`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` / `useYeZIndex(token)` 读取，**禁止** `querySelector` 或 `:root` fallback。
 
 ---
 
@@ -1205,16 +1207,17 @@ src/appearance/
 
 样式分为 token、结构、功能 chrome、appearance 四层（详见 `docs/contributing/project-structure.md`）：
 
-| 层          | 位置                                           | 职责                                            |
-| ----------- | ---------------------------------------------- | ----------------------------------------------- |
-| Token       | `src/styles/variables.css`                     | `--ye-*` 设计 token                             |
-| 结构        | `content.css` / `table.css` / `code-block.css` | ProseMirror 边框、背景、交互语义                |
-| 功能 chrome | `src/styles/*.css`、工具组件 CSS               | 工具栏、菜单、拖拽手柄等                        |
-| Appearance  | `src/appearance/styles/*.css`                  | 仅 token 与排版（margin / font-size / padding） |
+| 层          | 位置                                                   | 职责                                                            |
+| ----------- | ------------------------------------------------------ | --------------------------------------------------------------- |
+| Token       | `src/styles/variables.css`                             | `--ye-*` 设计 token；颜色在 `:root`，z-index 在 `.yaniv-editor` |
+| 结构        | `content.css` / `table.css` / `code-block.css`         | ProseMirror 边框、背景、交互语义                                |
+| 功能 chrome | `src/styles/*.css`、工具组件 CSS、`overlay-portal.css` | 工具栏、菜单、拖拽手柄、浮层挂载容器等                          |
+| Appearance  | `src/appearance/styles/*.css`                          | 仅 token 与排版（margin / font-size / padding）                 |
 
-- `src/styles/index.css` 与 `src/styles/inline.css` 均在 appearance 之前 import `content.css`。
+- `src/styles/index.css` 与 `src/styles/inline.css` 均在 appearance 之前 import `content.css` 与 `overlay-portal.css`。
 - appearance 禁止对结构层已声明的选择器使用 `border` / `background` shorthand 重声明。
 - `block-hover.css` 打入 Full 包，选择器限定 `.appearance-notion`（Notion 块 hover 高亮）。
+- 浮层 z-index 基准 `--ye-z-base` 默认 `1000`，由 `zIndexBase` prop 写入根节点；详见 `docs/guide/z-index.md`。
 
 ---
 

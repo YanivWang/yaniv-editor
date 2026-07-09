@@ -8,7 +8,7 @@ Public composables and advanced runtime helpers are exported from the root packa
 import { provideYanivEditor, useYanivEditor } from "@yanivjs/yaniv-editor";
 ```
 
-Use these when custom tool components need access to the active editor instance.
+Use these when custom tool components need access to the active editor instance. Editor root and overlay portal are provided by `EditorShell` via `provideEditorRoot` / `provideOverlayPortal`; custom shells must set these up—see [Z-Index & Overlays](../guide/z-index.md).
 
 ## Visual Context
 
@@ -26,7 +26,7 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-`YanivEditor` drives visual state with `appearance`, `colorMode`, and optional `customAppearanceVars`.
+`YanivEditor` drives visual state with `appearance`, `colorMode`, and optional `customAppearanceVars`. Use `zIndexBase` for overlay stacking—do not override `--ye-z-base` via `customAppearanceVars`.
 
 ## Bubble Menu Helpers
 

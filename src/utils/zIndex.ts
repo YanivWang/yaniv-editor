@@ -1,7 +1,12 @@
 /**
- * 读取 --ye-z-* design token（唯一定义于 variables.css）。
- * Tippy 等需要数值型 z-index 的 API 通过此函数与 CSS 保持同一层级源。
+ * 读取 --ye-z-* design token（唯一定义于 variables.css，作用域为 .yaniv-editor）。
  */
+
+/** 宿主可覆盖的浮层 z-index 基准 CSS 变量 */
+export const YE_Z_BASE_VAR = "--ye-z-base";
+
+/** 浮层 z-index 默认基准（与 variables.css 中 .yaniv-editor 定义一致） */
+export const YE_Z_INDEX_DEFAULT_BASE = 1000;
 
 export type YeZIndexToken =
   | "--ye-z-chrome"
@@ -14,18 +19,63 @@ export type YeZIndexToken =
   | "--ye-z-dropdown"
   | "--ye-z-modal";
 
-/** 从 :root 读取 z-index token。token 未加载或无效时抛出错误。 */
-export function getYeZIndex(token: YeZIndexToken): number {
+/** 与 variables.css 中 calc(var(--ye-z-base) + N) 保持同步 */
+const YE_Z_BASE_OFFSETS: Partial<Record<YeZIndexToken, number>> = {
+  "--ye-z-overlay-backdrop": 0,
+  "--ye-z-bubble-menu": 10,
+  "--ye-z-floating-menu": 20,
+  "--ye-z-picker-menu": 30,
+  "--ye-z-drag-menu": 40,
+  "--ye-z-dropdown": 50,
+  "--ye-z-modal": 100,
+};
+
+function readYeZBase(root: HTMLElement): number {
+  const raw = getComputedStyle(root).getPropertyValue(YE_Z_BASE_VAR).trim();
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : YE_Z_INDEX_DEFAULT_BASE;
+}
+
+function resolveFromBaseOffset(
+  token: YeZIndexToken,
+  root: HTMLElement,
+  raw: string,
+): number | null {
+  const offset = YE_Z_BASE_OFFSETS[token];
+  if (!raw || offset === undefined) return null;
+  return readYeZBase(root) + offset;
+}
+
+/** 从编辑器根节点读取 z-index token。支持纯数值与 calc(var(...)+N) 等表达式。 */
+export function getYeZIndex(token: YeZIndexToken, root: HTMLElement): number {
   if (typeof document === "undefined") {
     throw new Error(`getYeZIndex("${token}") requires a DOM environment`);
   }
 
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(token).trim();
-  const parsed = Number.parseInt(raw, 10);
-
-  if (!Number.isFinite(parsed)) {
-    throw new Error(`Missing or invalid z-index token: ${token}`);
+  const raw = getComputedStyle(root).getPropertyValue(token).trim();
+  const direct = Number.parseInt(raw, 10);
+  if (Number.isFinite(direct) && /^\d+$/.test(raw)) {
+    return direct;
   }
 
-  return parsed;
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:absolute;visibility:hidden;pointer-events:none;z-index:var(" + token + ")";
+  root.appendChild(probe);
+
+  try {
+    const resolved = Number.parseInt(getComputedStyle(probe).zIndex, 10);
+    if (Number.isFinite(resolved)) {
+      return resolved;
+    }
+  } finally {
+    root.removeChild(probe);
+  }
+
+  const fromOffset = resolveFromBaseOffset(token, root, raw);
+  if (fromOffset !== null) {
+    return fromOffset;
+  }
+
+  throw new Error(`Missing or invalid z-index token: ${token} on editor root`);
 }

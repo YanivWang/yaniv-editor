@@ -60,7 +60,7 @@ Outline expanded state is held by `provideOutlinePanel` and is **not** in chrome
 
 **Triggers rebuild**: extension gates, locale, inline toolbar signature, Inline `placeholder` / `extraExtensions`, schema-related options.
 
-**Does not trigger rebuild**: phase, appearance, colorMode, upload/gallery/aiConfig, `defaultOutlineExpanded`, and other integration props.
+**Does not trigger rebuild**: phase, appearance, colorMode, upload/gallery/aiConfig, `defaultOutlineExpanded`, `zIndexBase`, and other integration props.
 
 Rebuild flow: snapshot content → destroy → loading skeleton → async buildExtensions → create Editor.
 
@@ -93,9 +93,16 @@ Core context is mounted at **EditorShell root** (not unmounted in preview):
 
 - `provideEditorRuntime`
 - `provideYanivEditor`
+- `provideEditorRoot` / `provideOverlayPortal` (z-index tokens and overlay mounting)
 - `provideEditorLocale`
 - `provideBlockMenuHost`
 - `provideOutlinePanel`
+
+## Z-Index and Overlays
+
+- Z-index tokens are scoped to `.yaniv-editor` (`variables.css`); base `--ye-z-base` defaults to `1000`, set via `zIndexBase` prop on the root.
+- `EditorShell` renders `.yaniv-editor__overlay-portal` inside the root; bubble menus, BlockPicker, mention, AI popover, Tippy, etc. mount there—not on `document.body`.
+- See [Z-Index & Overlays](../guide/z-index.md).
 
 ## Architecture Invariants (Summary)
 
@@ -105,8 +112,9 @@ Core context is mounted at **EditorShell root** (not unmounted in preview):
 4. Each instance has independent locale / appearance
 5. Extensions must not call global `t()`—use `ctx.locale`
 6. AI config uses getters; do not capture static values at configure time
+7. Overlays mount to overlay portal; z-index reads from editor root—no `body` mount or global fallback
 
-See root `ARCHITECTURE.md` for all 12 invariants.
+See root `ARCHITECTURE.md` for all invariants.
 
 ## Directory Structure
 

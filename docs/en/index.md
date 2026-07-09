@@ -13,6 +13,7 @@ After installing peer dependencies, you do **not** need global Ant Design Vue re
 | Look up props                 | [YanivEditor API](./api/yaniv-editor.md)                                                         |
 | Notion-style block editing    | [Block Editing](./features/block-editing.md)                                                     |
 | Integrate AI                  | [AI Assistance](./features/ai.md) + [AI Config](./api/ai-config.md)                              |
+| Overlays / z-index            | [Z-Index & Overlays](./guide/z-index.md)                                                         |
 | Understand code structure     | [Architecture](./contributing/architecture.md)                                                   |
 | Try locally                   | Run `pnpm dev` → [localhost:9527](http://localhost:9527)                                         |
 | Live demo                     | [yanivwang.github.io/yaniv-editor/examples/](https://yanivwang.github.io/yaniv-editor/examples/) |
@@ -45,7 +46,7 @@ After installing peer dependencies, you do **not** need global Ant Design Vue re
 
 ## Documentation Structure
 
-- **Guide** — integration, appearance, preview, i18n, integration props
+- **Guide** — integration, appearance, preview, i18n, integration props, z-index & overlays
 - **Features** — per-capability docs and preset matrix
 - **API** — component props, FeatureConfig, composables
 - **Contributing** — project structure and architecture

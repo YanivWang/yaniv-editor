@@ -1,7 +1,8 @@
 /**
  * Yaniv Editor — Design Tokens（唯一变量源）
  *
- * - 浅色：:root
+ * - 浅色：:root（颜色等全局 token）
+ * - Z-Index：.yaniv-editor（实例级，宿主覆盖 --ye-z-base）
  * - 深色：[data-color-mode="dark"]（由 YanivEditor colorMode 设置在编辑器根节点）
  * - 设计 token 前缀：--ye-*（视觉外观见 src/appearance/styles/）
  */
@@ -130,27 +131,6 @@
   --ye-outline-h5-size: 12px;
   --ye-outline-h6-size: 12px;
 
-  /*
-   * ===== Z-Index（单一层级源）=====
-   * 浮层从高到低：modal > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop
-   * JS 侧请用 getYeZIndex()（src/utils/zIndex.ts）读取同名 token。
-   */
-  --ye-z-content: 1;
-  --ye-z-content-overlay: 2;
-  --ye-z-content-control: 10;
-  --ye-z-editor-ui: 20;
-  --ye-z-editor-rail: 30;
-  --ye-z-chrome: 100;
-  --ye-z-tooltip: 200;
-  --ye-z-overlay-backdrop: 1000;
-  --ye-z-bubble-menu: 1010;
-  --ye-z-floating-menu: 1020;
-  --ye-z-picker-menu: 1030;
-  --ye-z-drag-menu: 1040;
-  --ye-z-drag-submenu: 1041;
-  --ye-z-dropdown: 1050;
-  --ye-z-modal: 2000;
-
   /* ===== Document Layout（default 基线；word/notion 等在 appearance 覆盖） ===== */
   --ye-doc-page-width: 900px;
   --ye-doc-page-min-height: 480px;
@@ -160,6 +140,34 @@
   --ye-doc-page-padding: 0;
   --ye-doc-page-cut-height: 16px;
   --ye-doc-container-padding-y: 0;
+}
+
+/*
+ * ===== Z-Index（单一层级源，作用域限定在 .yaniv-editor）=====
+ * 宿主通过 zIndexBase prop 覆盖 --ye-z-base；浮层挂载见 overlay-portal.css。
+ * JS 侧：getYeZIndex(token, root)（src/utils/zIndex.ts）、useYeZIndex(token)（src/composables/useYeZIndex.ts）。
+ */
+.yaniv-editor {
+  --ye-z-base: 1000;
+
+  /* 文档内部 stacking context */
+  --ye-z-content: 1;
+  --ye-z-content-overlay: 2;
+  --ye-z-content-control: 10;
+  --ye-z-editor-ui: 20;
+  --ye-z-editor-rail: 30;
+  --ye-z-chrome: 40;
+  --ye-z-tooltip: 50;
+
+  /* overlay portal 内浮层：基于 base 偏移 */
+  --ye-z-overlay-backdrop: var(--ye-z-base);
+  --ye-z-bubble-menu: calc(var(--ye-z-base) + 10);
+  --ye-z-floating-menu: calc(var(--ye-z-base) + 20);
+  --ye-z-picker-menu: calc(var(--ye-z-base) + 30);
+  --ye-z-drag-menu: calc(var(--ye-z-base) + 40);
+  --ye-z-drag-submenu: calc(var(--ye-z-base) + 41);
+  --ye-z-dropdown: calc(var(--ye-z-base) + 50);
+  --ye-z-modal: calc(var(--ye-z-base) + 100);
 }
 
 /* ===== Dark Mode（唯一约定：data-color-mode="dark"） ===== */

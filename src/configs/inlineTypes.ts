@@ -31,6 +31,11 @@ export interface YanivInlineEditorProps {
   extraExtensions?: AnyExtension[];
   editorProps?: Record<string, unknown>;
   colorMode?: EditorColorMode;
+  /**
+   * 浮层 z-index 基准值，映射为编辑器根节点上的 `--ye-z-base`。
+   * 宿主页面有高层级 UI 时可提高此值；默认 1000。
+   */
+  zIndexBase?: number;
 }
 
 export interface YanivInlineEditorExpose {

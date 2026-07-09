@@ -47,12 +47,12 @@
 import { EyeOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 
 import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";
-import { getYeZIndex } from "@/utils/zIndex";
 
 const props = withDefaults(
   defineProps<{
@@ -110,12 +110,10 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
-const tippyOptions = computed(() => ({
-  duration: 100,
-  placement: "top" as const,
-  offset: [0, 16] as [number, number],
-  zIndex: getYeZIndex("--ye-z-bubble-menu"),
-}));
+const tippyOptions = useOverlayTippyOptions("--ye-z-bubble-menu", {
+  placement: "top",
+  offset: [0, 16],
+});
 
 function previewVideo() {
   const { node } = getCurrentVideoInfo();

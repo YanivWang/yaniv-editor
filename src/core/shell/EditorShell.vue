@@ -45,6 +45,8 @@
       {{ sessionError }}
       <button type="button" @click="retrySession">重试</button>
     </div>
+
+    <div ref="overlayPortalRef" :class="OVERLAY_PORTAL_CLASS" />
   </div>
 </template>
 
@@ -56,9 +58,10 @@ import { computed, onBeforeUnmount, ref, shallowRef, watch, type Ref } from "vue
 import { getAppearanceClassName, useEditorAppearance } from "@/appearance";
 import { provideOutlinePanel } from "@/components/editor/outline";
 import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
-import { provideYanivEditor } from "@/core/editorContext";
+import { provideEditorRoot, provideOverlayPortal, provideYanivEditor } from "@/core/editorContext";
 import type { YanivEditorProps, YanivEditorExpose } from "@/core/editorTypes";
 import { provideEditorLocale, resolveLocaleMessages } from "@/core/infra/useEditorLocale";
+import { OVERLAY_PORTAL_CLASS } from "@/core/overlayPortal";
 import type { EditorShellHost, FullChromePolicy, InlineChromePolicy } from "@/core/runtime/types";
 import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
 import { useControlledContent } from "@/core/session/useControlledContent";
@@ -66,6 +69,7 @@ import { useEditorSession } from "@/core/session/useEditorSession";
 import { useEditorPagination } from "@/core/useEditorPagination";
 import { useYanivAiConfig } from "@/core/useYanivAiConfig";
 import type { TiptapLocale } from "@/locales/types";
+import { YE_Z_BASE_VAR, YE_Z_INDEX_DEFAULT_BASE } from "@/utils/zIndex";
 
 import EditorEditChrome from "./EditorEditChrome.vue";
 import EditorStatusChrome from "./EditorStatusChrome.vue";
@@ -91,8 +95,28 @@ const fullProps = computed(() => props.fullProps);
 const inlineProps = computed(() => props.inlineProps);
 
 const rootRef = ref<HTMLElement | null>(null);
+const overlayPortalRef = ref<HTMLElement | null>(null);
 const workspaceRef = ref<EditorWorkspaceExpose | null>(null);
 const localeMessages = shallowRef<TiptapLocale | null>(null);
+
+provideEditorRoot(rootRef);
+provideOverlayPortal(overlayPortalRef);
+
+const zIndexBase = computed(
+  () =>
+    (isFull.value ? fullProps.value?.zIndexBase : inlineProps.value?.zIndexBase) ??
+    YE_Z_INDEX_DEFAULT_BASE,
+);
+
+watch(
+  [rootRef, zIndexBase],
+  () => {
+    const el = rootRef.value;
+    if (!el) return;
+    el.style.setProperty(YE_Z_BASE_VAR, String(zIndexBase.value));
+  },
+  { immediate: true },
+);
 
 const localeSource = computed(() =>
   isFull.value ? fullProps.value?.locale : inlineProps.value?.locale,

@@ -32,7 +32,11 @@ Appears when text is selected or at the start of an empty line. Provides formatt
 
 ## Block Menu
 
-BlockPickerMenu triggered by slash command and drag handle (see [Block Editing](./block-editing.md)).
+BlockPickerMenu triggered by slash command and drag handle (see [Block Editing](./block-editing.md)). Menus mount via the overlay portal and inherit `.yaniv-editor` z-index tokens.
+
+## Overlay Mounting
+
+Bubble menus, BlockPicker, mention suggestions, AI popover, etc. mount inside `.yaniv-editor__overlay-portal` on `EditorShell`—not on `document.body`. See [Z-Index & Overlays](../guide/z-index.md).
 
 ## Mobile
 

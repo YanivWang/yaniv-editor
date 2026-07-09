@@ -2,6 +2,7 @@ import { notification } from "ant-design-vue";
 import { createApp, h, provide, ref } from "vue";
 
 import { editorLocaleKey } from "@/core/infra/useEditorLocale";
+import { resolveOverlayPortal } from "@/core/overlayPortal";
 import { aiClient } from "@/features/ai/client";
 import type { createAiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
@@ -465,19 +466,24 @@ class AiSuggestionManager {
 
     this.container = document.createElement("div");
 
+    const editorRoot = this.editor.view.dom.closest(".yaniv-editor");
+    if (!(editorRoot instanceof HTMLElement)) {
+      throw new Error("AI suggestion popover requires an editor root (.yaniv-editor)");
+    }
+
+    const overlayPortal = resolveOverlayPortal(editorRoot);
+
     Object.assign(this.container.style, {
       position: "fixed",
       top: "0",
       left: "0",
       width: "0",
       height: "0",
-      zIndex: String(getYeZIndex("--ye-z-picker-menu")),
+      zIndex: String(getYeZIndex("--ye-z-picker-menu", editorRoot)),
     });
 
-    document.body.append(this.container);
+    overlayPortal.append(this.container);
 
-    const editorRoot =
-      (this.editor.view.dom.closest(".yaniv-editor")) ?? undefined;
     const position = this.calculatePopoverPosition();
     const isCustom = this.mode === "custom";
     const translate = this.getLocaleText.bind(this);

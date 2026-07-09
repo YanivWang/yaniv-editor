@@ -55,6 +55,18 @@ When the outline gate is on, the panel is **collapsed** by default. To open it i
 
 This prop does not trigger session rebuild. See [Outline](../features/outline.md).
 
+## Z-Index
+
+Default overlay base is `1000`, configured via `zIndexBase` on **both** `YanivEditor` and `YanivInlineEditor` (written to `--ye-z-base` on `.yaniv-editor`). Raise it when the host page has high-stacking UI:
+
+```vue
+<YanivEditor :z-index-base="1500" />
+```
+
+Overlays mount inside the editor [overlay portal](./z-index.md) (`.yaniv-editor__overlay-portal`), not on `document.body`.
+
+See **[Z-Index and Overlay Mounting](./z-index.md)** for the full token table, host stacking guidance, and custom-shell requirements.
+
 ## Controlled Content
 
 ```vue

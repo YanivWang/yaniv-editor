@@ -19,8 +19,11 @@ import "@yanivjs/yaniv-editor/inline.css";
 | `extraExtensions` | `AnyExtension[]`              | `[]`                           | Additional Tiptap extensions             |
 | `editorProps`     | `Record<string, unknown>`     | none                           | Tiptap editor props                      |
 | `locale`          | `string`                      | `"zh-CN"`                      | Locale code                              |
+| `zIndexBase`      | `number`                      | `1000`                         | Overlay z-index base; no session rebuild |
 
 Changing `placeholder` or `extraExtensions` updates `sessionKey` and triggers session rebuild (content is snapshotted first).
+
+See [Z-Index & Overlays](../guide/z-index.md) for overlay mounting and tokens.
 
 ## Examples
 

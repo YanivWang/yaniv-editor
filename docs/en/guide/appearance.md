@@ -31,6 +31,8 @@ Use `appearance="custom"` with `customAppearanceVars` on the editor instance:
 />
 ```
 
+Use `customAppearanceVars` for visual tokens (colors, spacing, etc.). For overlay z-index, use the `zIndexBase` prop—do not override `--ye-z-base` via `customAppearanceVars`. See [Z-Index & Overlays](./z-index.md).
+
 ## Utilities
 
 ```ts
@@ -52,4 +54,6 @@ ProseMirror structure styles (paragraphs, lists, blockquote, inline code, tables
 
 Notion block hover highlight is in `src/styles/block-hover.css` and activates only when the root has `appearance-notion`.
 
-For contributor rules and file layout, see [Project Structure — CSS Layering](../contributing/project-structure.md#css-layering).
+For contributor rules and file layout, see [Project Structure — CSS Layers](../contributing/project-structure.md#css-layers).
+
+Z-index token scope and overlay portal: [Z-Index & Overlays](./z-index.md).

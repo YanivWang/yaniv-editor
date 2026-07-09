@@ -1,0 +1,15 @@
+/**
+ * 编辑器浮层挂载点（teleport / Tippy appendTo 目标）
+ * 位于 .yaniv-editor 内，继承 --ye-z-* token，避免挂 body 后 CSS 变量失效。
+ */
+
+.yaniv-editor__overlay-portal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--ye-z-overlay-backdrop);
+  pointer-events: none;
+}
+
+.yaniv-editor__overlay-portal > * {
+  pointer-events: auto;
+}

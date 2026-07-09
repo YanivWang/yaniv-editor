@@ -9,18 +9,21 @@ import "@yanivjs/yaniv-editor/inline.css";
 
 ## Props
 
-| Prop              | 类型                          | 默认值                      | 说明                              |
-| ----------------- | ----------------------------- | --------------------------- | --------------------------------- |
-| `content`         | `string`                      | `"<p></p>"`                 | HTML 内容，支持 `v-model:content` |
-| `mode`            | `"edit" \| "preview"`         | `"edit"`                    | 运行状态                          |
-| `colorMode`       | `"light" \| "dark" \| "auto"` | `"light"`                   | 颜色模式                          |
-| `toolbar`         | `InlineToolbarConfig`         | 撤销/重做 + 文本格式 + 链接 | 工具栏控件                        |
-| `placeholder`     | `string`                      | 无                          | 空段落提示                        |
-| `extraExtensions` | `AnyExtension[]`              | `[]`                        | 额外 Tiptap 扩展                  |
-| `editorProps`     | `Record<string, unknown>`     | 无                          | Tiptap editor props               |
-| `locale`          | `string`                      | `"zh-CN"`                   | 语言代码                          |
+| Prop              | 类型                          | 默认值                      | 说明                                   |
+| ----------------- | ----------------------------- | --------------------------- | -------------------------------------- |
+| `content`         | `string`                      | `"<p></p>"`                 | HTML 内容，支持 `v-model:content`      |
+| `mode`            | `"edit" \| "preview"`         | `"edit"`                    | 运行状态                               |
+| `colorMode`       | `"light" \| "dark" \| "auto"` | `"light"`                   | 颜色模式                               |
+| `toolbar`         | `InlineToolbarConfig`         | 撤销/重做 + 文本格式 + 链接 | 工具栏控件                             |
+| `placeholder`     | `string`                      | 无                          | 空段落提示                             |
+| `extraExtensions` | `AnyExtension[]`              | `[]`                        | 额外 Tiptap 扩展                       |
+| `editorProps`     | `Record<string, unknown>`     | 无                          | Tiptap editor props                    |
+| `locale`          | `string`                      | `"zh-CN"`                   | 语言代码                               |
+| `zIndexBase`      | `number`                      | `1000`                      | 浮层 z-index 基准；不触发 session 重建 |
 
 `placeholder` 与 `extraExtensions` 变化会更新 `sessionKey` 并触发 session 重建（内容会快照保留）。
+
+浮层挂载与 token 详见 [Z-Index 与浮层](../guide/z-index.md)。
 
 ## 示例
 

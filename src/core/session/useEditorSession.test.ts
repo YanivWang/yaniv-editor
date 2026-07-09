@@ -1,8 +1,18 @@
 import StarterKit from "@tiptap/starter-kit";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { computed, effectScope, nextTick, ref, type EffectScope } from "vue";
+import {
+  computed,
+  effectScope,
+  nextTick,
+  ref,
+  type ComputedRef,
+  type EffectScope,
+  type Ref,
+} from "vue";
 
+import type { BuildExtensionsCtx } from "@/capabilities/types";
 import { resolveEditorProfile } from "@/core/runtime/resolveEditorProfile";
+import type { EditorRuntimeProfile } from "@/core/runtime/types";
 import type { BlockMenuHost } from "@/core/shell/useBlockMenuHost";
 import { zhCN } from "@/locales/zh-CN";
 
@@ -42,8 +52,29 @@ function releaseNextBuild(): void {
 interface TestSession {
   scope: EffectScope;
   session: ReturnType<typeof useEditorSession>;
-  profile: ReturnType<typeof computed<ReturnType<typeof resolveEditorProfile>>>;
-  sessionKey: ReturnType<typeof ref<string>>;
+  profile: ComputedRef<EditorRuntimeProfile>;
+  sessionKey: Ref<string>;
+}
+
+function createTestBuildCtx(): Omit<
+  BuildExtensionsCtx,
+  "locale" | "gates" | "isEditable" | "blockMenuHost"
+> {
+  return {
+    upload: {
+      image: () => undefined,
+      video: () => undefined,
+    },
+    galleryImages: () => [],
+    officePaste: {
+      onPasteFromOfficeWithImages: () => undefined,
+    },
+    outline: {
+      scrollParent: () => null,
+      bindScrollParent: () => {},
+    },
+    aiConfig: () => undefined,
+  };
 }
 
 function createTestSession(initialMode: "edit" | "preview" = "edit"): TestSession {
@@ -59,7 +90,7 @@ function createTestSession(initialMode: "edit" | "preview" = "edit"): TestSessio
       sessionKey: computed(() => sessionKey.value),
       locale: computed(() => zhCN),
       blockMenuHost,
-      buildCtx: () => ({}),
+      buildCtx: createTestBuildCtx,
     });
   });
 

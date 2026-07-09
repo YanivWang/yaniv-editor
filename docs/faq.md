@@ -61,6 +61,10 @@ v0.1.0 起 basic 默认仅 **image**。恢复旧行为：
 
 `:locale="zh-CN"` 或 `"en-US"`，见 [国际化](./guide/i18n.md)。
 
+## 浮层被宿主 Modal 挡住 / 如何配置 z-index？
+
+默认 `zIndexBase` 为 `1000`，浮层挂载在编辑器内 overlay portal。宿主全局 Modal 需完全盖住编辑器时，z-index 应高于 `zIndexBase + 100`（默认 **1100**），或降低编辑器的 `zIndexBase`。详见 [Z-Index 与浮层](./guide/z-index.md)。
+
 ## 自定义 Inline 工具栏？
 
 见 [Inline 工具栏](./guide/inline-toolbar.md) 与 [Inline 按需拼装](./guide/inline-composition.md)。
