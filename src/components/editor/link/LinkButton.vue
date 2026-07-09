@@ -13,6 +13,8 @@
     v-model:open="linkModalOpen"
     :title="t('editor.insertLink')"
     width="400px"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
     @ok="applyLink"
   >
     <a-input
@@ -33,6 +35,7 @@ import { message } from "ant-design-vue";
 import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Input as AInput, Modal as AModal } from "@/shared/antd";
@@ -43,6 +46,7 @@ import { normalizeSafeUrl } from "@/utils/safeUrl";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 // ===== Props =====
 interface Props {

@@ -1199,7 +1199,7 @@ src/appearance/
 10. **Inline gates 单一来源** — Inline gates 仅由 `resolveInlineGates(toolbar, capabilities)` 推导；除此之外不得存在 toolbar→gate 的第二条路径。Full gates 仅由 `profile.features` 推导。
 11. **chromeCoupled DOM 注入** — outline 滚动容器通过 `editor.commands.bindOutlineScrollParent(el)` 在 Workspace mount 后注入；`TableOfContents` 的 `scrollParent` 为 getter（`getBoundOutlineScrollParent() ?? window`），**禁止**在 configure 阶段调用 `ctx.outline.scrollParent()`。`boundScrollParent` 为模块级单例，同页多 outline 实例需注意覆盖顺序。
 12. **AI config 动态化** — AI 扩展的所有运行时配置（apiKey / model / endpoint / timeout）必须通过 `getXxx: () => ctx.aiConfig()?.xxx` getter 形式声明，**禁止**在 configure 阶段静态取值。
-13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Tippy 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo `document.body`；`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` / `useYeZIndex(token)` 读取，**禁止** `querySelector` 或 `:root` fallback。
+13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Ant Design Dropdown/Select/Popover/Modal/Tooltip 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo / `getPopupContainer` / `getContainer` 回退到 `document.body`（HTML5 drag preview 与隐藏 file input 除外）；`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` / `useYeZIndex(token)` 读取，**禁止** `:root` fallback。统一入口：`useOverlayMountTarget` / `useOverlayBubbleMenu`（`src/composables/useOverlayMount.ts`）。
 
 ---
 

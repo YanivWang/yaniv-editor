@@ -7,7 +7,12 @@
     :get-popup-container="getPopupContainer"
     @open-change="handleOpenChange"
   >
-    <a-tooltip :title="title" placement="top" :open="dropdownOpen ? false : undefined">
+    <a-tooltip
+      :title="title"
+      placement="top"
+      :open="dropdownOpen ? false : undefined"
+      :get-popup-container="getPopupContainer"
+    >
       <a-button type="text" :class="['ye-dropdown-btn', { 'is-active': active }]">
         <span class="ye-dropdown-btn__content">
           <component :is="icon" v-if="icon" class="ye-dropdown-btn__icon" />
@@ -126,6 +131,7 @@
 import { CheckOutlined, DownOutlined, RightOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import {
   Button as AButton,
@@ -247,13 +253,7 @@ function handleOpenChange(open: boolean) {
   }
 }
 
-function getPopupContainer(triggerNode?: HTMLElement): HTMLElement {
-  if (triggerNode) {
-    const editor = triggerNode.closest(".yaniv-editor");
-    if (editor) return editor as HTMLElement;
-  }
-  return document.body;
-}
+const getPopupContainer = useOverlayMountTarget();
 
 function onMenuClick(info: MenuInfo) {
   const key = String(info.key);

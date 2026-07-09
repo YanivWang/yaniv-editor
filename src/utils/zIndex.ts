@@ -1,5 +1,8 @@
 /**
  * 读取 --ye-z-* design token（唯一定义于 variables.css，作用域为 .yaniv-editor）。
+ *
+ * CSS 使用 calc(var(--ye-z-base) + N)；浏览器可解析 calc 时以探针为准。
+ * jsdom 等环境无法解析 calc 时，用 YE_Z_BASE_OFFSETS 回退（须与 variables.css 同步）。
  */
 
 /** 宿主可覆盖的浮层 z-index 基准 CSS 变量 */
@@ -19,8 +22,8 @@ export type YeZIndexToken =
   | "--ye-z-dropdown"
   | "--ye-z-modal";
 
-/** 与 variables.css 中 calc(var(--ye-z-base) + N) 保持同步 */
-const YE_Z_BASE_OFFSETS: Partial<Record<YeZIndexToken, number>> = {
+/** 与 variables.css 中 calc(var(--ye-z-base) + N) 保持同步（仅作 calc 不可解析时的回退） */
+export const YE_Z_BASE_OFFSETS: Partial<Record<YeZIndexToken, number>> = {
   "--ye-z-overlay-backdrop": 0,
   "--ye-z-bubble-menu": 10,
   "--ye-z-floating-menu": 20,
@@ -34,16 +37,6 @@ function readYeZBase(root: HTMLElement): number {
   const raw = getComputedStyle(root).getPropertyValue(YE_Z_BASE_VAR).trim();
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) ? parsed : YE_Z_INDEX_DEFAULT_BASE;
-}
-
-function resolveFromBaseOffset(
-  token: YeZIndexToken,
-  root: HTMLElement,
-  raw: string,
-): number | null {
-  const offset = YE_Z_BASE_OFFSETS[token];
-  if (!raw || offset === undefined) return null;
-  return readYeZBase(root) + offset;
 }
 
 /** 从编辑器根节点读取 z-index token。支持纯数值与 calc(var(...)+N) 等表达式。 */
@@ -72,9 +65,9 @@ export function getYeZIndex(token: YeZIndexToken, root: HTMLElement): number {
     root.removeChild(probe);
   }
 
-  const fromOffset = resolveFromBaseOffset(token, root, raw);
-  if (fromOffset !== null) {
-    return fromOffset;
+  const offset = YE_Z_BASE_OFFSETS[token];
+  if (raw && offset !== undefined) {
+    return readYeZBase(root) + offset;
   }
 
   throw new Error(`Missing or invalid z-index token: ${token} on editor root`);

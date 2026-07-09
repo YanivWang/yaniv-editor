@@ -1,6 +1,11 @@
 <template>
   <ToolbarGroup>
-    <Popover v-model:open="tableDropdownOpen" trigger="click" placement="bottomLeft">
+    <Popover
+      v-model:open="tableDropdownOpen"
+      trigger="click"
+      placement="bottomLeft"
+      :get-popup-container="getPopupContainer"
+    >
       <template #content>
         <div class="table-insert-panel">
           <div class="grid" @mouseleave="resetGridHover">
@@ -111,6 +116,7 @@ import {
 import { ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Checkbox as ACheckbox, Popover } from "@/shared/antd";
@@ -120,6 +126,7 @@ import { createStateCheckers } from "@/utils/editorState";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getPopupContainer = useOverlayMountTarget();
 
 // ===== Props =====
 interface Props {

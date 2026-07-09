@@ -12,6 +12,7 @@ import {
 } from "@tiptap/pm/model";
 import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
+import { resolveOverlayPortalFromNode } from "@/core/overlayPortal";
 import {
   FLOATING_MENU_VIEWPORT_MARGIN,
   getBlockMenuAnchorPosition,
@@ -987,7 +988,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
           handleRoot.appendChild(plusButton);
           handleRoot.appendChild(handle);
-          document.body.appendChild(menu);
+          resolveOverlayPortalFromNode(view.dom).appendChild(menu);
           handle.addEventListener("mouseenter", keepHandleVisible);
           plusButton.addEventListener("mouseenter", keepHandleVisible);
           handleRoot.addEventListener("mousemove", handleMouseMove);

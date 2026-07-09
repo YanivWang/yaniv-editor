@@ -9,12 +9,20 @@
   </ToolbarGroup>
 
   <!-- 网络上传图片模态框 -->
-  <a-modal v-model:open="imageModalOpen" :title="t('editor.insertImage')" @ok="applyImage">
+  <a-modal
+v-model:open="imageModalOpen" :title="t('editor.insertImage')" :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
+    @ok="applyImage"
+  >
     <a-input v-model:value="imageUrl" :placeholder="t('editor.imagePlaceholder')" />
   </a-modal>
 
   <!-- 本地上传图片（拖拽上传，支持批量） -->
-  <a-modal v-model:open="localUploadOpen" :title="t('editor.localUploadImage')" :footer="null">
+  <a-modal
+v-model:open="localUploadOpen" :title="t('editor.localUploadImage')" :footer="null"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
+  >
     <a-upload-dragger
       :show-upload-list="false"
       :custom-request="handleLocalUpload"
@@ -45,6 +53,7 @@ import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -56,6 +65,7 @@ import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 // ===== Props =====
 interface Props {

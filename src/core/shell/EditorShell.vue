@@ -62,7 +62,7 @@ import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideEditorRoot, provideOverlayPortal, provideYanivEditor } from "@/core/editorContext";
 import type { YanivEditorProps, YanivEditorExpose } from "@/core/editorTypes";
 import { provideEditorLocale, resolveLocaleMessages } from "@/core/infra/useEditorLocale";
-import { OVERLAY_PORTAL_CLASS } from "@/core/overlayPortal";
+import { OVERLAY_PORTAL_CLASS, resolveOverlayPortal } from "@/core/overlayPortal";
 import type { EditorShellHost, FullChromePolicy, InlineChromePolicy } from "@/core/runtime/types";
 import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
 import { useControlledContent } from "@/core/session/useControlledContent";
@@ -217,6 +217,12 @@ const {
         Modal.info({
           title: localeContext.t("editor.officePasteImageTitle"),
           content: localeContext.t("editor.officePasteImageBody"),
+          getContainer: () => {
+            if (overlayPortalRef.value) return overlayPortalRef.value;
+            if (rootRef.value) return resolveOverlayPortal(rootRef.value);
+            throw new Error("Overlay portal is not mounted");
+          },
+          wrapClassName: "yaniv-editor-modal",
         }),
     },
     outline: {

@@ -15,6 +15,7 @@
     trigger="click"
     placement="bottomLeft"
     overlay-class-name="ye-color-picker-popover"
+    :get-popup-container="getPopupContainer"
   >
     <!-- Popover 内容：颜色选择面板 -->
     <template #content>
@@ -136,7 +137,12 @@
       </div>
     </template>
     <!-- Popover 触发器：颜色选择按钮 -->
-    <Tooltip :title="buttonTitle" placement="top" :open="showPicker ? false : undefined">
+    <Tooltip
+      :title="buttonTitle"
+      placement="top"
+      :open="showPicker ? false : undefined"
+      :get-popup-container="getPopupContainer"
+    >
       <div
         class="ye-color-current-btn"
         :class="{
@@ -160,7 +166,6 @@
 
 <script setup lang="ts">
 import { StopOutlined } from "@ant-design/icons-vue";
-import { Popover, Tooltip } from "ant-design-vue";
 import { ref, computed, watch } from "vue";
 
 import {
@@ -169,11 +174,14 @@ import {
   NOTION_DEFAULT_TEXT,
   NOTION_TEXT_COLORS,
 } from "@/appearance/notionColors";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { Popover, Tooltip } from "@/shared/antd";
 import { normalizeColor } from "@/utils/color";
 
 import type { Component } from "vue";
 
+const getPopupContainer = useOverlayMountTarget();
 const t = useEditorT();
 
 /**

@@ -46,7 +46,7 @@ import { computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowTableBubbleMenu } from "@/composables/bubbleMenuShouldShow";
-import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
+import { useOverlayBubbleMenu } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Tooltip as ATooltip } from "@/shared/antd";
@@ -190,8 +190,8 @@ const menuTools: TableToolItem[] = [
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowTableBubbleMenu(bubbleProps, props.disabled, props.showMode);
 
-const bubbleBindings = useOverlayTippyOptions("--ye-z-bubble-menu", {
+const bubbleBindings = useOverlayBubbleMenu({
   placement: "top",
-  offset: [0, 16],
+  offset: 16,
 });
 </script>

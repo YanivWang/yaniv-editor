@@ -12,8 +12,8 @@
 - `src/appearance`：外观和颜色工具。
 - `src/shared`：跨组件共享模块（如 `antd.ts` 局部 Ant Design Vue 注册）。
 - `src/styles`：显式 CSS 入口。
-- `src/utils/zIndex.ts`：从 `.yaniv-editor` 根节点读取 `--ye-z-*` token（Tippy 等 JS API 与 CSS 同步）。
-- `src/composables/useOverlayTippyOptions.ts`：Tippy 浮层统一挂载 overlay portal 并同步 z-index。
+- `src/utils/zIndex.ts`：从 `.yaniv-editor` 根节点读取 `--ye-z-*` token。
+- `src/composables/useOverlayMount.ts`：`useOverlayMountTarget` / `useOverlayBubbleMenu`，浮层统一挂载 overlay portal。
 
 Full Editor API 决策位于 `src/core/editorTypes.ts`、`src/configs/editorPreset.ts` 和 `src/core/runtime/resolveEditorProfile.ts`。
 

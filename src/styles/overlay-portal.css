@@ -1,6 +1,6 @@
 /**
- * 编辑器浮层挂载点（teleport / Tippy appendTo 目标）
- * 位于 .yaniv-editor 内，继承 --ye-z-* token，避免挂 body 后 CSS 变量失效。
+ * 编辑器浮层挂载点（BubbleMenu / teleport / Ant Design getPopupContainer 目标）
+ * 位于 .yaniv-editor 内，继承 --ye-z-* token，禁止挂 document.body。
  */
 
 .yaniv-editor__overlay-portal {
@@ -14,7 +14,7 @@
   pointer-events: auto;
 }
 
-/* BubbleMenu 根节点 z-index（Floating UI 不再提供 tippy zIndex） */
+/* BubbleMenu 根节点 z-index（Floating UI） */
 .yaniv-editor__overlay-portal .link-bubble-menu,
 .yaniv-editor__overlay-portal .image-bubble-menu,
 .yaniv-editor__overlay-portal .video-bubble-menu,
@@ -24,4 +24,32 @@
 
 .yaniv-editor__overlay-portal .floating-menu {
   z-index: var(--ye-z-floating-menu);
+}
+
+/* Ant Design 浮层（挂到 portal 后需显式 token，否则走 antd 默认全局层级） */
+.yaniv-editor__overlay-portal .ant-dropdown,
+.yaniv-editor__overlay-portal .ant-select-dropdown,
+.yaniv-editor__overlay-portal .ye-dropdown-overlay {
+  z-index: var(--ye-z-dropdown) !important;
+}
+
+.yaniv-editor__overlay-portal .ant-popover,
+.yaniv-editor__overlay-portal .ye-color-picker-popover,
+.yaniv-editor__overlay-portal .ai-suggestion-popover,
+.yaniv-editor__overlay-portal .custom-ai-popover {
+  z-index: var(--ye-z-picker-menu) !important;
+}
+
+.yaniv-editor__overlay-portal .ant-modal-root,
+.yaniv-editor__overlay-portal .ant-modal-wrap,
+.yaniv-editor__overlay-portal .yaniv-editor-modal {
+  z-index: var(--ye-z-modal) !important;
+}
+
+.yaniv-editor__overlay-portal .ant-tooltip {
+  z-index: var(--ye-z-tooltip) !important;
+}
+
+.yaniv-editor__overlay-portal .drag-handle-menu {
+  z-index: var(--ye-z-drag-menu);
 }

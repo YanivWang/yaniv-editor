@@ -2,8 +2,7 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { OVERLAY_PORTAL_CLASS } from "@/core/overlayPortal";
-import { YE_Z_INDEX_DEFAULT_BASE, getYeZIndex } from "@/utils/zIndex";
+import { YE_Z_INDEX_DEFAULT_BASE, YE_Z_BASE_OFFSETS, getYeZIndex } from "@/utils/zIndex";
 
 function createEditorRoot(tokens: Record<string, string> = {}): HTMLElement {
   const root = document.createElement("div");
@@ -57,7 +56,13 @@ describe("getYeZIndex", () => {
     expect(YE_Z_INDEX_DEFAULT_BASE).toBe(1000);
   });
 
-  it("defines overlay portal class for editor shell", () => {
-    expect(OVERLAY_PORTAL_CLASS).toBe("yaniv-editor__overlay-portal");
+  it("exports base offsets aligned with variables.css calc offsets", () => {
+    expect(YE_Z_BASE_OFFSETS["--ye-z-overlay-backdrop"]).toBe(0);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-bubble-menu"]).toBe(10);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-floating-menu"]).toBe(20);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-picker-menu"]).toBe(30);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-drag-menu"]).toBe(40);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-dropdown"]).toBe(50);
+    expect(YE_Z_BASE_OFFSETS["--ye-z-modal"]).toBe(100);
   });
 });

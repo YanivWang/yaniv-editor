@@ -15,6 +15,7 @@ export {
   Modal,
   Popover,
   Select,
+  Space,
   SubMenu,
   Switch,
   Textarea,

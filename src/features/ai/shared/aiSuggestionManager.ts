@@ -8,7 +8,6 @@ import type { createAiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
 import type { LocaleCode } from "@/locales/manager";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
-import { getYeZIndex } from "@/utils/zIndex";
 
 import {
   addAiHighlight,
@@ -479,7 +478,6 @@ class AiSuggestionManager {
       left: "0",
       width: "0",
       height: "0",
-      zIndex: String(getYeZIndex("--ye-z-picker-menu", editorRoot)),
     });
 
     overlayPortal.append(this.container);
@@ -487,6 +485,7 @@ class AiSuggestionManager {
     const position = this.calculatePopoverPosition();
     const isCustom = this.mode === "custom";
     const translate = this.getLocaleText.bind(this);
+    const getPopupContainer = () => overlayPortal;
 
     this.popoverApp = createApp({
       setup() {
@@ -505,7 +504,7 @@ class AiSuggestionManager {
             isStreaming: this.isStreamingRef.value,
             isExecuting: this.isExecutingRef.value,
             position,
-            editorElement: editorRoot,
+            getPopupContainer,
             "onUpdate:visible": (val: boolean) => {
               this.visibleRef.value = val;
             },
@@ -525,7 +524,7 @@ class AiSuggestionManager {
           suggestedText: this.suggestedTextRef.value,
           isStreaming: this.isStreamingRef.value,
           position,
-          editorElement: editorRoot,
+          getPopupContainer,
           "onUpdate:visible": (val: boolean) => {
             this.visibleRef.value = val;
           },

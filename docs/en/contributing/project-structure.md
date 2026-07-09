@@ -12,8 +12,8 @@ Main source directories:
 - `src/appearance` — appearance and color utilities
 - `src/shared` — shared modules (e.g. local Ant Design Vue registration in `antd.ts`)
 - `src/styles` — explicit CSS entry points
-- `src/utils/zIndex.ts` — read `--ye-z-*` tokens from `.yaniv-editor` root (keeps JS APIs in sync with CSS)
-- `src/composables/useOverlayTippyOptions.ts` — Tippy overlays mount to overlay portal with synced z-index
+- `src/utils/zIndex.ts` — read `--ye-z-*` tokens from the `.yaniv-editor` root
+- `src/composables/useOverlayMount.ts` — `useOverlayMountTarget` / `useOverlayBubbleMenu` for overlay portal mounting
 
 Full Editor API decisions live in `src/core/editorTypes.ts`, `src/configs/editorPreset.ts`, and `src/core/runtime/resolveEditorProfile.ts`.
 

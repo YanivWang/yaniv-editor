@@ -8,7 +8,11 @@
   </ToolbarGroup>
 
   <!-- 本地上传视频（拖拽上传，支持批量） -->
-  <a-modal v-model:open="videoUploadOpen" :title="t('editor.localUploadVideo')" :footer="null">
+  <a-modal
+v-model:open="videoUploadOpen" :title="t('editor.localUploadVideo')" :footer="null"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
+  >
     <a-upload-dragger
       :show-upload-list="false"
       :custom-request="handleVideoUpload"
@@ -33,6 +37,7 @@ import { InboxOutlined, VideoCameraOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal, UploadDragger as AUploadDragger } from "@/shared/antd";
@@ -42,6 +47,7 @@ import { resolveMediaUrl } from "@/utils/mediaUpload";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 interface Props {
   editor?: Editor | null;

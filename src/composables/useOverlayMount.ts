@@ -2,7 +2,22 @@ import { computed, type ComputedRef } from "vue";
 
 import { useEditorRoot, useOverlayPortal } from "@/core/editorContext";
 import { resolveOverlayPortal } from "@/core/overlayPortal";
-import type { YeZIndexToken } from "@/utils/zIndex";
+
+/**
+ * Ant Design / BubbleMenu 等浮层挂载目标：始终指向 EditorShell overlay portal。
+ * 禁止回退到 document.body。
+ */
+export function useOverlayMountTarget(): ComputedRef<() => HTMLElement> {
+  const overlayPortal = useOverlayPortal();
+  const editorRoot = useEditorRoot();
+
+  return computed(() => () => {
+    if (overlayPortal.value) return overlayPortal.value;
+    const root = editorRoot.value;
+    if (root) return resolveOverlayPortal(root);
+    throw new Error("Overlay portal is not mounted");
+  });
+}
 
 export type OverlayBubblePlacement =
   | "top"
@@ -20,12 +35,8 @@ export type OverlayBubblePlacement =
 
 export interface OverlayBubbleMenuOptions {
   placement?: OverlayBubblePlacement;
-  /**
-   * Floating UI offset：
-   * - number → mainAxis
-   * - [skidding, distance]（兼容旧 tippy 写法）→ crossAxis / mainAxis
-   */
-  offset?: number | [number, number];
+  /** Floating UI offset：number → mainAxis；或 { mainAxis, crossAxis } */
+  offset?: number | { mainAxis?: number; crossAxis?: number };
 }
 
 export interface OverlayBubbleMenuBindings {
@@ -39,42 +50,23 @@ export interface OverlayBubbleMenuBindings {
   appendTo: () => HTMLElement;
 }
 
-function resolveOffset(
-  offset: OverlayBubbleMenuOptions["offset"],
-): number | { mainAxis?: number; crossAxis?: number } {
-  if (offset == null) return 8;
-  if (typeof offset === "number") return offset;
-  const [skidding, distance] = offset;
-  return { mainAxis: distance, crossAxis: skidding };
-}
-
 /**
  * Tiptap 3 BubbleMenu（Floating UI）绑定：
  * - appendTo → overlay portal
  * - options → placement / offset / strategy
- * z-index 由 CSS token（.floating-menu 等）继承，无需 tippy zIndex。
+ * z-index 由 CSS token（.floating-menu 等）继承。
  */
 export function useOverlayBubbleMenu(
-  _token: YeZIndexToken,
   menuOptions: OverlayBubbleMenuOptions = {},
 ): ComputedRef<OverlayBubbleMenuBindings> {
-  const overlayPortal = useOverlayPortal();
-  const editorRoot = useEditorRoot();
+  const getMountTarget = useOverlayMountTarget();
 
   return computed(() => ({
     options: {
       strategy: "fixed" as const,
       placement: menuOptions.placement ?? "top",
-      offset: resolveOffset(menuOptions.offset),
+      offset: menuOptions.offset ?? 8,
     },
-    appendTo: () => {
-      if (overlayPortal.value) return overlayPortal.value;
-      const root = editorRoot.value;
-      if (root) return resolveOverlayPortal(root);
-      throw new Error("Overlay portal is not mounted");
-    },
+    appendTo: getMountTarget.value,
   }));
 }
-
-/** @deprecated 使用 useOverlayBubbleMenu */
-export const useOverlayTippyOptions = useOverlayBubbleMenu;

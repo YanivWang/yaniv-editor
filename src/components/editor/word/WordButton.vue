@@ -9,7 +9,11 @@
   </ToolbarGroup>
 
   <!-- 导入 Word 文件（拖拽上传） -->
-  <a-modal v-model:open="importModalOpen" :title="t('editor.importWord')" :footer="null">
+  <a-modal
+v-model:open="importModalOpen" :title="t('editor.importWord')" :footer="null"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
+  >
     <a-upload-dragger
       :show-upload-list="false"
       :custom-request="handleImport"
@@ -32,6 +36,8 @@
     v-model:open="exportModalOpen"
     :title="t('editor.exportWord')"
     :ok-button-props="{ disabled: exporting }"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
     @ok="doExport"
   >
     <a-input
@@ -61,6 +67,7 @@ import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -69,6 +76,7 @@ import { Input as AInput, Modal as AModal, UploadDragger as AUploadDragger } fro
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 // ===== Props =====
 interface Props {

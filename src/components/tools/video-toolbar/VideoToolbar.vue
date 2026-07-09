@@ -27,6 +27,8 @@
       :footer="null"
       :width="800"
       centered
+      :get-container="getOverlayContainer"
+      wrap-class-name="yaniv-editor-modal"
       @cancel="closePreview"
     >
       <video
@@ -51,7 +53,7 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { onBeforeUnmount, ref, watch } from "vue";
 
 import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
-import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
+import { useOverlayBubbleMenu, useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { Modal as AModal } from "@/shared/antd";
 
@@ -111,10 +113,11 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
   return true;
 };
 
-const bubbleBindings = useOverlayTippyOptions("--ye-z-bubble-menu", {
+const bubbleBindings = useOverlayBubbleMenu({
   placement: "top",
-  offset: [0, 16],
+  offset: 16,
 });
+const getOverlayContainer = useOverlayMountTarget();
 
 function previewVideo() {
   const { node } = getCurrentVideoInfo();

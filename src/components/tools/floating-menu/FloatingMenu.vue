@@ -74,7 +74,7 @@ import { ListTools } from "@/components/editor/list";
 import { TextFormatButtons } from "@/components/editor/text-format";
 import { shouldShowFloatingTextToolbar } from "@/composables/bubbleMenuShouldShow";
 import { useEditorColorState } from "@/composables/useEditorColorState";
-import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
+import { useOverlayBubbleMenu } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
@@ -112,7 +112,7 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowFloatingTextToolbar(bubbleProps, props.disabled);
 
-const bubbleBindings = useOverlayTippyOptions("--ye-z-floating-menu", {
+const bubbleBindings = useOverlayBubbleMenu({
   placement: "top",
 });
 </script>

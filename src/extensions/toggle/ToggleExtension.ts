@@ -1,4 +1,6 @@
-import { isNodeEmpty, Node, mergeAttributes } from "@tiptap/core";
+import { Node, mergeAttributes } from "@tiptap/core";
+
+import { isVisuallyEmpty } from "@/extensions/shared/isVisuallyEmpty";
 
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
@@ -9,19 +11,6 @@ declare module "@tiptap/core" {
       toggleToggleOpen: () => ReturnType;
     };
   }
-}
-
-function isVisuallyEmptyContainer(node: ProseMirrorNode): boolean {
-  if (isNodeEmpty(node)) return true;
-  let empty = true;
-  node.forEach((child) => {
-    if (child.isTextblock) {
-      if (child.content.size > 0) empty = false;
-      return;
-    }
-    if (!isVisuallyEmptyContainer(child)) empty = false;
-  });
-  return empty;
 }
 
 export const ToggleBlock = Node.create({
@@ -128,7 +117,7 @@ export const ToggleBlock = Node.create({
       };
 
       const syncEmptyState = (current: ProseMirrorNode) => {
-        const empty = isVisuallyEmptyContainer(current);
+        const empty = isVisuallyEmpty(current);
         dom.className = empty ? "toggle-block is-empty" : "toggle-block";
         if (empty) {
           const pos = typeof getPos === "function" ? (getPos() ?? 0) : 0;

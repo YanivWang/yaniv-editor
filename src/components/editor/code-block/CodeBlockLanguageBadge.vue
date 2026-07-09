@@ -27,6 +27,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { CODE_LANGUAGES, DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
 import { useYanivEditor } from "@/core/editorContext";
 import { Select as ASelect } from "@/shared/antd";
@@ -57,9 +58,7 @@ const currentLanguage = computed(() => {
   return typeof lang === "string" && lang ? lang : DEFAULT_CODE_BLOCK_LANGUAGE;
 });
 
-function getPopupContainer(): HTMLElement {
-  return document.body;
-}
+const getPopupContainer = useOverlayMountTarget();
 
 function findActivePre(editor: Editor): HTMLElement | null {
   const depth = findCodeBlockDepth(editor);

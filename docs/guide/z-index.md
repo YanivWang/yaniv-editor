@@ -1,6 +1,11 @@
 # Z-Index 与浮层挂载
 
-编辑器所有**全局浮层**（bubble menu、BlockPicker、mention 建议、AI popover、Ant Design 下拉等）统一挂载在 `EditorShell` 根节点内的 **overlay portal**（`.yaniv-editor__overlay-portal`），而不是 `document.body`。这样浮层始终在 `.yaniv-editor` 作用域内，能正确继承 `--ye-z-*` CSS token。
+编辑器所有**全局浮层**（bubble menu、BlockPicker、mention 建议、AI popover、Ant Design Dropdown / Select / Popover / Modal / Tooltip 等）统一挂载在 `EditorShell` 根节点内的 **overlay portal**（`.yaniv-editor__overlay-portal`），**禁止**挂到 `document.body`。这样浮层始终在 `.yaniv-editor` 作用域内，能正确继承 `--ye-z-*` CSS token。
+
+例外（非视觉浮层）：
+
+- HTML5 拖拽预览节点（`setDragImage`）
+- 隐藏的 `<input type="file">`
 
 ## 宿主配置
 
@@ -55,10 +60,15 @@
 1. 根节点带 `yaniv-editor` class；
 2. 根内包含 `.yaniv-editor__overlay-portal`（见 `src/styles/overlay-portal.css`）；
 3. 调用 `provideEditorRoot` / `provideOverlayPortal`（`src/core/editorContext.ts`）；
-4. 所有 teleport / Tippy `appendTo` 指向 overlay portal；
+4. 所有 teleport / BubbleMenu `appendTo` / Ant Design `getPopupContainer` / `getContainer` 指向 overlay portal；
 5. JS 侧通过 `getYeZIndex(token, root)` 或组件内 `useYeZIndex(token)` 读取 token（`src/utils/zIndex.ts`），**必须**传入编辑器根节点，无全局 fallback。
 
-Tippy 浮层在库内通过 `useOverlayTippyOptions()`（`src/composables/useOverlayTippyOptions.ts`）统一配置。
+库内统一入口：
+
+- `useOverlayMountTarget()` — Ant Design `getPopupContainer` / Modal `getContainer`
+- `useOverlayBubbleMenu()` — Tiptap 3 BubbleMenu（Floating UI）的 `appendTo` + `options`
+
+均位于 `src/composables/useOverlayMount.ts`。
 
 ## 相关
 

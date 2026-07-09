@@ -101,7 +101,7 @@ Extension tier：
 ## Z-Index 与浮层
 
 - z-index token 定义在 `.yaniv-editor`（`variables.css`），基准 `--ye-z-base` 默认 `1000`，由 `zIndexBase` prop 写入根节点。
-- `EditorShell` 在根内渲染 `.yaniv-editor__overlay-portal`；bubble menu、BlockPicker、mention、AI popover、Tippy 等均挂载于此，**不**使用 `document.body`。
+- `EditorShell` 在根内渲染 `.yaniv-editor__overlay-portal`；bubble menu、BlockPicker、mention、AI popover、Ant Design 浮层等均挂载于此，**不**使用 `document.body`（drag preview / 隐藏 file input 除外）。
 - 详见 [Z-Index 与浮层](../guide/z-index.md)。
 
 ## 架构不变量（摘要）

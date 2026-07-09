@@ -1,5 +1,5 @@
 <template>
-  <a-tooltip :title="title" placement="top">
+  <a-tooltip :title="title" placement="top" :get-popup-container="getPopupContainer">
     <button
       :class="[
         'ye-toolbar-button',
@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { Tooltip as ATooltip } from "@/shared/antd";
 
 import type { Component } from "vue";
@@ -42,6 +43,8 @@ const props = withDefaults(defineProps<Props>(), {
   danger: false,
   size: "medium",
 });
+
+const getPopupContainer = useOverlayMountTarget();
 
 const emit = defineEmits<{ (e: "click"): void; (e: "dblclick"): void }>();
 

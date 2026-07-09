@@ -13,6 +13,8 @@
     :title="t('editor.insertTemplate')"
     :footer="null"
     width="640px"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
   >
     <div class="template-list">
       <div
@@ -42,6 +44,7 @@ import { SnippetsOutlined, FileTextOutlined } from "@ant-design/icons-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal } from "@/shared/antd";
@@ -53,6 +56,7 @@ import type { TemplateItem } from "./templates";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 // ===== Props =====
 interface Props {

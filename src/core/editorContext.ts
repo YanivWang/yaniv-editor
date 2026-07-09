@@ -9,12 +9,24 @@ import {
   toValue,
 } from "vue";
 
-import { OVERLAY_PORTAL_CLASS, resolveOverlayPortal } from "@/core/overlayPortal";
+import {
+  EDITOR_ROOT_CLASS,
+  OVERLAY_PORTAL_CLASS,
+  resolveEditorRootFromNode,
+  resolveOverlayPortal,
+  resolveOverlayPortalFromNode,
+} from "@/core/overlayPortal";
 
 import type { Editor } from "@tiptap/core";
 import type { Editor as VueEditor } from "@tiptap/vue-3";
 
-export { OVERLAY_PORTAL_CLASS, resolveOverlayPortal };
+export {
+  EDITOR_ROOT_CLASS,
+  OVERLAY_PORTAL_CLASS,
+  resolveEditorRootFromNode,
+  resolveOverlayPortal,
+  resolveOverlayPortalFromNode,
+};
 
 const YANIV_EDITOR_KEY: InjectionKey<Ref<Editor | null>> = Symbol("yanivEditor");
 const EDITOR_ROOT_KEY: InjectionKey<Ref<HTMLElement | null>> = Symbol("yanivEditorRoot");

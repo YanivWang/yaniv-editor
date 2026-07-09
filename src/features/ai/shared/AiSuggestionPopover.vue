@@ -69,7 +69,8 @@ export interface AiSuggestionPopoverProps {
   suggestedText?: string;
   isStreaming?: boolean;
   position?: { top: number; left: number };
-  editorElement?: HTMLElement;
+  /** Ant Design Popover 挂载容器（必须为 overlay portal） */
+  getPopupContainer: () => HTMLElement;
 }
 
 const props = withDefaults(defineProps<AiSuggestionPopoverProps>(), {
@@ -113,9 +114,7 @@ const anchorStyle = computed(() => {
   };
 });
 
-const getPopupContainer = () => {
-  return props.editorElement || document.body;
-};
+const getPopupContainer = () => props.getPopupContainer();
 
 const handleAccept = () => {
   suppressCloseCancel = true;

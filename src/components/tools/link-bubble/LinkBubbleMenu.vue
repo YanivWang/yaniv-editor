@@ -54,6 +54,8 @@
       v-model:open="linkModalOpen"
       :title="t('editor.editLink')"
       width="400px"
+      :get-container="getOverlayContainer"
+      wrap-class-name="yaniv-editor-modal"
       @ok="applyLink"
     >
       <a-input
@@ -77,7 +79,7 @@ import { nextTick, ref, watch, computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
-import { useOverlayTippyOptions } from "@/composables/useOverlayTippyOptions";
+import { useOverlayBubbleMenu, useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Input as AInput, Modal as AModal } from "@/shared/antd";
@@ -136,10 +138,11 @@ const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: nu
     currentLinkUrl.value = href;
   });
 
-const bubbleBindings = useOverlayTippyOptions("--ye-z-bubble-menu", {
+const bubbleBindings = useOverlayBubbleMenu({
   placement: "top",
-  offset: [0, 8],
+  offset: 8,
 });
+const getOverlayContainer = useOverlayMountTarget();
 
 // 监听编辑器选择变化，更新链接URL
 watch(

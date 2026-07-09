@@ -5,6 +5,8 @@
     :width="520"
     :footer="null"
     class="ai-settings-modal"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
     @cancel="handleClose"
   >
     <div class="ai-settings">
@@ -15,6 +17,7 @@
           v-model:value="formData.provider"
           :options="providerOptions"
           class="ai-settings__select"
+          :get-popup-container="getOverlayContainer"
           @change="onProviderChange"
         />
         <p v-if="currentProviderInfo?.docsUrl" class="ai-settings__hint">
@@ -30,6 +33,7 @@
           v-model:value="formData.storageMode"
           :options="storageModeOptions"
           class="ai-settings__select"
+          :get-popup-container="getOverlayContainer"
         />
         <p class="ai-settings__hint">生产环境推荐使用后端代理，避免在浏览器长期保存密钥。</p>
       </div>
@@ -114,6 +118,7 @@
 import { ApiOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons-vue";
 import { ref, reactive, computed, watch } from "vue";
 
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import {
   Button as AButton,
@@ -122,8 +127,6 @@ import {
   Select as ASelect,
   Switch as ASwitch,
 } from "@/shared/antd";
-
-const t = useEditorT();
 
 import {
   type AiProvider,
@@ -134,6 +137,9 @@ import {
   DEFAULT_CONFIG,
 } from "../config/types";
 import { useAiConfig } from "../config/useAiConfig";
+
+const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 const AInputPassword = AInput.Password;
 

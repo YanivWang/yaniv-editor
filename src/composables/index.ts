@@ -11,3 +11,11 @@ export {
 } from "./bubbleMenuShouldShow";
 export type { BubbleMenuShowProps } from "./bubbleMenuShouldShow";
 export { scrollEditorSelectionIntoView } from "./scrollEditorSelectionIntoView";
+export {
+  useOverlayBubbleMenu,
+  useOverlayMountTarget,
+  type OverlayBubbleMenuBindings,
+  type OverlayBubbleMenuOptions,
+  type OverlayBubblePlacement,
+} from "./useOverlayMount";
+export { useYeZIndex } from "./useYeZIndex";

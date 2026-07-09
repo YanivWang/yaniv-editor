@@ -49,4 +49,39 @@ test.describe("Overlay portal & z-index", () => {
 
     assertNoRuntimeErrors(errors, "link bubble menu");
   });
+
+  test("toolbar dropdown mounts inside overlay portal", async ({ page }) => {
+    const errors = attachPageDiagnostics(page);
+
+    await page.locator(".yaniv-editor .ye-dropdown-btn").first().click();
+    const dropdown = page.locator(".yaniv-editor__overlay-portal .ant-dropdown").first();
+    await expect(dropdown).toBeVisible({ timeout: 10_000 });
+
+    assertNoRuntimeErrors(errors, "toolbar dropdown");
+  });
+
+  test("editor modal mounts inside overlay portal", async ({ page }) => {
+    const errors = attachPageDiagnostics(page);
+
+    // 图库按钮打开 Modal（title 中英均可）
+    const galleryBtn = page
+      .locator(".yaniv-editor .ye-toolbar-button")
+      .filter({ has: page.locator(".anticon-appstore, .anticon-AppstoreOutlined") })
+      .first();
+
+    if ((await galleryBtn.count()) === 0) {
+      // fallback：通过 title 属性
+      await page
+        .locator('.yaniv-editor [title*="图库"], .yaniv-editor [title*="Gallery"]')
+        .first()
+        .click();
+    } else {
+      await galleryBtn.click();
+    }
+
+    const modal = page.locator(".yaniv-editor__overlay-portal .ant-modal-wrap").first();
+    await expect(modal).toBeVisible({ timeout: 10_000 });
+
+    assertNoRuntimeErrors(errors, "editor modal");
+  });
 });

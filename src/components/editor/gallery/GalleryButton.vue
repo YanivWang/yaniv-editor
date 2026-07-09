@@ -13,6 +13,8 @@
     :title="t('editor.imageGallery')"
     :footer="null"
     width="720px"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
   >
     <!-- 空状态 -->
     <div v-if="galleryImages.length === 0" class="gallery-empty">
@@ -61,6 +63,7 @@ import { AppstoreOutlined, FileImageOutlined, CheckCircleFilled } from "@ant-des
 import { ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
+import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Modal as AModal } from "@/shared/antd";
@@ -69,6 +72,7 @@ import { createCommandRunner } from "@/utils/editorCommands";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const getOverlayContainer = useOverlayMountTarget();
 
 interface GalleryImage {
   src: string;
