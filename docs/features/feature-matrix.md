@@ -4,22 +4,22 @@
 
 ## FeatureConfig 能力键
 
-| 能力键          | basic | full | notion | 入口（full 顶栏） | 入口（notion） |
-| --------------- | :---: | :--: | :----: | ----------------- | -------------- |
-| `image`         |  ✅   |  ✅  |   ✅   | 顶栏图片          | `/` 或悬浮菜单 |
-| `video`         |  ❌   |  ✅  |   ✅   | 顶栏视频          | `/` 或悬浮菜单 |
-| `table`         |  ❌   |  ✅  |   ✅   | 顶栏表格          | `/` 或悬浮菜单 |
-| `math`          |  ❌   |  ✅  |   ✅   | 顶栏公式          | `/`            |
-| `ai`            |  ❌   | ❌\* |   ✅   | 悬浮菜单 AI†      | 悬浮菜单 AI    |
-| `formatPainter` |  ❌   |  ✅  |   ❌   | 顶栏格式刷        | —              |
-| `outline`       |  ❌   |  ✅  |   ✅   | 顶栏大纲          | 左侧大纲面板   |
-| `searchReplace` |  ❌   |  ✅  |   ✅   | 顶栏 / Ctrl+F     | Ctrl/Cmd+F     |
-| `officePaste`   |  ❌   |  ✅  |   ✅   | 粘贴即用          | 粘贴即用       |
-| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                 | 空行输入 `/`   |
-| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                 | 段落左侧六点   |
+| 能力键          | basic | full | notion | 入口（full 顶栏）   | 入口（notion） |
+| --------------- | :---: | :--: | :----: | ------------------- | -------------- |
+| `image`         |  ✅   |  ✅  |   ✅   | 顶栏图片            | `/` 或悬浮菜单 |
+| `video`         |  ❌   |  ✅  |   ✅   | 顶栏视频            | `/` 或悬浮菜单 |
+| `table`         |  ❌   |  ✅  |   ✅   | 顶栏表格            | `/` 或悬浮菜单 |
+| `math`          |  ❌   |  ✅  |   ✅   | 顶栏公式            | `/`            |
+| `ai`            |  ❌   | ❌\* |   ✅   | 顶栏 AI + 悬浮菜单† | 悬浮菜单 AI    |
+| `formatPainter` |  ❌   |  ✅  |   ❌   | 顶栏格式刷          | —              |
+| `outline`       |  ❌   |  ✅  |   ✅   | 顶栏大纲            | 左侧大纲面板   |
+| `searchReplace` |  ❌   |  ✅  |   ✅   | 顶栏 / Ctrl+F       | Ctrl/Cmd+F     |
+| `officePaste`   |  ❌   |  ✅  |   ✅   | 粘贴即用            | 粘贴即用       |
+| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                   | 空行输入 `/`   |
+| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                   | 段落左侧六点   |
 
 \* full 需 `:features="{ ai: true }"` 并传入 `:ai-config`  
-† full 默认关闭 AI gate，开启后顶栏无独立 AI 按钮，主要通过悬浮菜单
+† full 默认关闭 AI gate；开启后顶栏「智能」区显示 `AiMenuButton`，悬浮菜单亦有 AI 入口
 
 ## 非 FeatureConfig 能力（preset 工具栏）
 

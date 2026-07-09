@@ -32,7 +32,8 @@ export const BACKGROUND_COLORS = [
 ] as const;
 
 /**
- * 表格单元格背景颜色选项
+ * 表格单元格背景颜色选项（与 BACKGROUND_COLORS 相同）。
+ * schema（TableCellWithBackground.backgroundColor）已支持；当前 TableToolbar 未挂取色 UI。
  */
 export const TABLE_CELL_COLORS = BACKGROUND_COLORS;
 

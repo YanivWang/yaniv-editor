@@ -4,16 +4,18 @@ Beyond fixed header/footer, the editor shows contextual tools based on selection
 
 ## Fixed Layout (Layout Chrome)
 
-Determined by preset, **not** toggled via `features`:
+Determined by preset `layout`. Header/footer/floating menu/shortcut hints **cannot** be re-enabled by `features` alone. The table context bar also requires `features.table` (`uiFlags.tableTools = layout.tableTools && gates.table`).
 
-| Component               | basic | full | notion |
-| ----------------------- | :---: | :--: | :----: |
-| Header                  |  ✅   |  ✅  |   ❌   |
-| Footer                  |  ✅   |  ✅  |   ❌   |
-| Floating text menu      |  ❌   |  ✅  |   ✅   |
-| Link bubble             |  ✅   |  ✅  |   ✅   |
-| Table tools             |  ✅   |  ✅  |   ✅   |
-| Keyboard shortcut hints |  ❌   |  ✅  |   ❌   |
+| Component               | basic | full | notion | Notes                                           |
+| ----------------------- | :---: | :--: | :----: | ----------------------------------------------- |
+| Header                  |  ✅   |  ✅  |   ❌   | preset layout                                   |
+| Footer                  |  ✅   |  ✅  |   ❌   | preset layout                                   |
+| Floating text menu      |  ❌   |  ✅  |   ✅   | preset layout                                   |
+| Link bubble             |  ✅   |  ✅  |   ✅   | preset layout                                   |
+| Table tools             | ❌\*  |  ✅  |   ✅   | needs `gates.table`; \*basic defaults table off |
+| Keyboard shortcut hints |  ❌   |  ✅  |   ❌   | preset layout                                   |
+
+\* basic also shows the table context bar when `:features="{ table: true }"` (layout already enables `tableTools`).
 
 Footer (basic / full): zoom 50–200%, page count, character count; full includes keyboard shortcut hints.
 
@@ -23,12 +25,12 @@ Appears when text is selected or at the start of an empty line. Provides formatt
 
 ## Bubbles / Context Bars
 
-| Selection type | UI                                                     |
-| -------------- | ------------------------------------------------------ |
-| Link           | Link bubble — edit URL, remove link                    |
-| Image          | Image context bar — alignment, preview, delete, resize |
-| Video          | Video context bar — preview playback, delete           |
-| Table cell     | Table context bar — row/column ops, merge/split        |
+| Selection type | UI                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| Link           | Link bubble — edit URL, remove link                                                                            |
+| Image          | Image context bar — alignment, preview, delete, resize                                                         |
+| Video          | Video context bar — preview playback, delete                                                                   |
+| Table cell     | Table context bar — add/remove rows/cols, merge/split, header row/column, delete table (no cell background UI) |
 
 ## Block Menu
 

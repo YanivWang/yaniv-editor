@@ -18,7 +18,7 @@ When AI is disabled, AI extensions and all AI UI entry points are unavailable.
 
 ## Five Actions
 
-After selecting text, trigger via floating menu or AI entry:
+After selecting text, trigger via the floating menu; with `full` preset and AI enabled, the header assistant row also shows `AiMenuButton`:
 
 | Action           | Extension                | Description           |
 | ---------------- | ------------------------ | --------------------- |

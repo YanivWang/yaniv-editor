@@ -131,7 +131,7 @@ Example:
 <YanivEditor preset="full" :features="{ table: false }" />
 ```
 
-Disabling a capability removes its extension registration and toolbar entry points. Toggling features at runtime triggers a session rebuild; content nodes unsupported by the new schema may be dropped.
+Disabling a capability removes its extension registration and toolbar entry points. Toggling features at runtime triggers a session rebuild; nodes unsupported by the new schema are handled by `adaptJsonToSchema` (structure stripped, children lifted — e.g. table cell text kept as paragraphs).
 
 ### Presets
 

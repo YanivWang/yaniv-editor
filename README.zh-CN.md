@@ -131,7 +131,7 @@ const { gates } = resolveEditorProfile({ preset: "basic", features: { table: tru
 <YanivEditor preset="full" :features="{ table: false }" />
 ```
 
-关闭某项能力时，对应的 Tiptap 扩展不会注册，工具栏入口也会自动隐藏。运行时切换 features 会触发一次 session 重建；新 schema 不支持的节点会被丢弃。
+关闭某项能力时，对应的 Tiptap 扩展不会注册，工具栏入口也会自动隐藏。运行时切换 features 会触发一次 session 重建；新 schema 不支持的节点会经 `adaptJsonToSchema` 剥离结构并提升子内容（例如关闭 table 后单元格文本保留为段落）。
 
 ### Preset 说明
 

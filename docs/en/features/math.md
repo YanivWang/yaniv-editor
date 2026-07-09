@@ -25,7 +25,7 @@ import "katex/dist/katex.min.css";
 
 ## InputRule
 
-Specific input patterns can shortcut formula insertion (defined inside the extension).
+Typing `$...$` on an empty line inserts an inline formula; block formulas are inserted from the header or `/` menu.
 
 ## Related
 

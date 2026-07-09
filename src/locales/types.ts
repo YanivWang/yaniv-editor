@@ -6,7 +6,7 @@
  * - messages.*     Toast / 通知类反馈（成功、失败、警告）
  * - placeholder.*  编辑器内容区占位符
  * - stats.*        状态栏统计与缩放
- * - table.*        表格上下文菜单
+ * - table.*        表格上下文菜单（部分键为 schema/命令预留，当前 UI 未全部使用）
  * - slashCommand.* 斜杠命令 / 块选择菜单
  * - dragMenu.*     拖拽手柄块菜单
  * - codeBlock.*    代码块控件

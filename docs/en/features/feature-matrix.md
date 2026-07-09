@@ -4,22 +4,22 @@ Editor capabilities and entry points summarized by preset. `features` can overri
 
 ## FeatureConfig Keys
 
-| Key             | basic | full | notion | Entry (full header)   | Entry (notion)               |
-| --------------- | :---: | :--: | :----: | --------------------- | ---------------------------- |
-| `image`         |  ✅   |  ✅  |   ✅   | Header image          | `/` or floating menu         |
-| `video`         |  ❌   |  ✅  |   ✅   | Header video          | `/` or floating menu         |
-| `table`         |  ❌   |  ✅  |   ✅   | Header table          | `/` or floating menu         |
-| `math`          |  ❌   |  ✅  |   ✅   | Header formula        | `/`                          |
-| `ai`            |  ❌   | ❌\* |   ✅   | Floating menu AI†     | Floating menu AI             |
-| `formatPainter` |  ❌   |  ✅  |   ❌   | Header format painter | —                            |
-| `outline`       |  ❌   |  ✅  |   ✅   | Header outline        | Left outline panel           |
-| `searchReplace` |  ❌   |  ✅  |   ✅   | Header / Ctrl+F       | Ctrl/Cmd+F                   |
-| `officePaste`   |  ❌   |  ✅  |   ✅   | Paste as-is           | Paste as-is                  |
-| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                     | Type `/` on empty line       |
-| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                     | Six-dot handle on block left |
+| Key             | basic | full | notion | Entry (full header)        | Entry (notion)               |
+| --------------- | :---: | :--: | :----: | -------------------------- | ---------------------------- |
+| `image`         |  ✅   |  ✅  |   ✅   | Header image               | `/` or floating menu         |
+| `video`         |  ❌   |  ✅  |   ✅   | Header video               | `/` or floating menu         |
+| `table`         |  ❌   |  ✅  |   ✅   | Header table               | `/` or floating menu         |
+| `math`          |  ❌   |  ✅  |   ✅   | Header formula             | `/`                          |
+| `ai`            |  ❌   | ❌\* |   ✅   | Header AI + floating menu† | Floating menu AI             |
+| `formatPainter` |  ❌   |  ✅  |   ❌   | Header format painter      | —                            |
+| `outline`       |  ❌   |  ✅  |   ✅   | Header outline             | Left outline panel           |
+| `searchReplace` |  ❌   |  ✅  |   ✅   | Header / Ctrl+F            | Ctrl/Cmd+F                   |
+| `officePaste`   |  ❌   |  ✅  |   ✅   | Paste as-is                | Paste as-is                  |
+| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                          | Type `/` on empty line       |
+| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                          | Six-dot handle on block left |
 
 \* full requires `:features="{ ai: true }"` and `:ai-config`  
-† full disables the AI gate by default; when enabled, there is no dedicated header AI button—AI is mainly accessed via the floating menu
+† full disables the AI gate by default; when enabled, the header shows `AiMenuButton` in the assistant row, and the floating menu also exposes AI
 
 ## Non–FeatureConfig Capabilities (Preset Toolbar)
 

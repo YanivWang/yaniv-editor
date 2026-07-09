@@ -214,13 +214,13 @@ Shell 模板通过 `policy.host === 'full'` narrowing 后才能访问 host-speci
 
 能力在 Registry 中标注 tier，决定注册与 phase 行为：
 
-| Tier            | 示例                                   | 注册            | Phase                                                         |
-| --------------- | -------------------------------------- | --------------- | ------------------------------------------------------------- |
-| `core`          | StarterKit、Link、Placeholder          | gate 开即注册   | 无影响                                                        |
-| `content`       | Image、Video、Table、Math、OfficePaste | gate 开即注册   | preview 仍展示                                                |
-| `interaction`   | DragHandle、Slash、FormatPainter       | gate 开即注册   | 不卸载；由 `buildExtensions` **统一**注入 `withEditableGuard` |
-| `auxiliary`     | SearchReplace                          | gate 开即注册   | phase 切换时由订阅方清状态（见下）                            |
-| `chromeCoupled` | Outline                                | gate + 宿主 ctx | 无影响                                                        |
+| Tier            | 示例                                   | 注册            | Phase                                                            |
+| --------------- | -------------------------------------- | --------------- | ---------------------------------------------------------------- |
+| `core`          | StarterKit、Link、Placeholder          | gate 开即注册   | 无影响                                                           |
+| `content`       | Image、Video、Table、Math、OfficePaste | gate 开即注册   | preview 仍展示                                                   |
+| `interaction`   | DragHandle、Slash、FormatPainter       | gate 开即注册   | 不卸载；由 `buildExtensions` **统一**注入 `withTransactionGuard` |
+| `auxiliary`     | SearchReplace                          | gate 开即注册   | phase 切换时由订阅方清状态（见下）                               |
+| `chromeCoupled` | Outline                                | gate + 宿主 ctx | 无影响                                                           |
 
 > **OfficePaste 归 `content` tier**：OfficePaste 是 paste pipeline 扩展，不依赖 chrome 渲染，paste 行为与 phase 无关；宿主回调通过 `ctx.officePaste` 注入（不进 sessionKey）。`chromeCoupled` 仅保留真正依赖滚动容器等外部宿主 ctx 的扩展（如 Outline）。
 
@@ -339,16 +339,8 @@ function setContent(
 ): void {
   const view = editor.view;
 
-  let doc: ProseMirrorNode;
-  try {
-    doc =
-      typeof content === "string"
-        ? DOMParser.fromSchema(view.state.schema).parse(htmlToElement(content))
-        : view.state.schema.nodeFromJSON(content);
-  } catch {
-    console.warn("[ContentAdapter] Failed to parse content, using empty doc");
-    doc = view.state.schema.nodes.doc.create(null, [view.state.schema.nodes.paragraph.create()]);
-  }
+  // JSON 路径先 adaptJsonToSchema，再 nodeFromJSON；HTML 走 DOMParser
+  const doc = parseContentToDoc(content, view.state.schema);
 
   const tr = view.state.tr
     .setMeta(BYPASS_GUARD_META, true) // ← 必须打 meta（Symbol）
@@ -657,7 +649,7 @@ onBeforeUnmount(() => {
 > - `flush: 'pre'`（Vue 3 默认值）在组件更新前异步触发，已经早于 EditorContent 子组件 unmount 看到 `editor.value === null` 的 patch，足以保证 `getJSON()` 在旧 editor 还可读时执行；
 > - 唯一前置约束：sessionKey 变化的 watcher 回调内**禁止再写其他 reactive ref**（避免循环触发）；快照只取、不派发。
 >
-> **关闭某 capability 时（如关闭 table），新 schema 不认识对应节点 → 静默丢失，by design。**此行为须列入 `CHANGELOG.md`。
+> **关闭某 capability 时（如关闭 table），JSON 快照中的未知节点由 `adaptJsonToSchema` 剥离结构并提升子内容（单元格文本保留为段落），不是整段内容消失。**此行为须列入 `CHANGELOG.md`。
 
 #### sessionStatus 状态机
 
@@ -836,7 +828,7 @@ async function buildExtensions(
 
 此函数同时服务 Full / Inline，通过 `host` 过滤 capability、通过 `tier` 决定是否包装守卫，**禁止在 Full / Inline 各自维护独立的扩展 builder**。
 
-NodeView（如 TableCellWithBackground）迁入 `extensions/`，禁止 `extensions/` import `@/components/`。
+扩展实现（含自定义节点扩展如 `TableCellWithBackground`）放在 `extensions/`，禁止 `extensions/` import `@/components/`。
 
 ### Inline gates 推导规则（Normative）
 
@@ -1103,7 +1095,7 @@ type EditorShellHost = "full" | "inline";
 Inline 编辑器对外 props **仅接受 HTML**（`content?: string`，`v-model:content`）；Full 编辑器使用 JSON（`initialContent` + `@update`）。`ContentAdapter.setContent` 统一处理两种输入：
 
 1. **HTML 字符串**（Inline 主路径 / Full 也可传 HTML）：`DOMParser.fromSchema(view.state.schema).parse(...)`。Inline schema 是 Full 子集；不识别的 mark/node **静默丢弃**（保留文字，丢失格式）。**Inline toolbar 关闭某类格式 = 对应 mark/node 不被保留**。
-2. **JSON 对象**（仅 Full 受控回写路径）：`view.state.schema.nodeFromJSON(content)`。Inline 公共 API 不接受 JSON；库内**未**实现 `generateHTML(json, fullExtensions)` 自动降级。若宿主需向 Inline 传入 Full 专有节点（Table、Math 等），须自行先用 Full schema 序列化为 HTML，或改用 Full 编辑器。
+2. **JSON 对象**（仅 Full 受控回写 / session rebuild 路径）：先 `adaptJsonToSchema(content, schema)`（剥离未知 mark；未知节点提升子内容并 `coalesceInlines`），再 `schema.nodeFromJSON(...)`。`prepareEditorContent` 在 `new Editor` 前对 JSON 做同样清洗。Inline 公共 API 不接受 JSON；库内**未**实现 `generateHTML(json, fullExtensions)` 自动降级。若宿主需向 Inline 传入 Full 专有节点（Table、Math 等），须自行先用 Full schema 序列化为 HTML，或改用 Full 编辑器。
 3. **解析失败**：任何解析异常均 fallback 到空段落，并 `console.warn("[ContentAdapter] Failed to parse content, using empty doc")`，不抛出。
 
 ---
@@ -1149,7 +1141,7 @@ src/appearance/
 | 新增导出                   | 见 `CHANGELOG.md`「新增导出」：`EditorRuntimeProfile`、`ResolvedChromePolicy`、`SessionStatus`、`EditorShellHost`、`resolveEditorProfile`、`buildExtensions`、`CAPABILITIES` 等 |
 | **CSS Breaking**           | 删除 `.is-preview` class，外部宿主如有基于 `.is-preview` 的自定义样式覆盖，须迁移到 `[data-phase="preview"]` 选择器                                                             |
 | **Preset Breaking**        | `basic` 默认能力收紧（去掉 `table` / `video`），详见"Preset 默认能力映射"章节                                                                                                   |
-| **Capability Breaking**    | 关闭 capability 后内容中对应节点静默丢失（如关闭 table 后 JSON 中 table 节点丢失）                                                                                              |
+| **Capability Breaking**    | 关闭 capability 后，未知节点经 `adaptJsonToSchema` 剥离结构并提升子内容（如关闭 table 后 table 结构消失，单元格文本保留为段落）                                                 |
 | **Inline schema Breaking** | Inline toolbar 关闭某格式 = 对应 mark/node 不被保留，不再"序列化为 `<p>`"                                                                                                       |
 
 同步更新：`package.json` exports、`vite.config.ts` 多入口、`CHANGELOG.md`。

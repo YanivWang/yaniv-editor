@@ -10,7 +10,7 @@ Controlled by `features.table`.
 <YanivEditor preset="full" :features="{ table: false }" />
 ```
 
-When `table` is disabled, table extensions and all table editing entry points are unavailable; existing table nodes in document JSON may be **silently lost** after rebuild.
+When `table` is disabled, table extensions and all table editing entry points are unavailable. On session rebuild, unknown `table` / `tableRow` / `tableCell` nodes in the JSON snapshot are handled by `ContentAdapter.adaptJsonToSchema`: **structure is stripped and children are lifted** (cell text is kept as paragraphs), rather than dropping the entire content.
 
 ## Insert
 
@@ -19,16 +19,18 @@ When `table` is disabled, table extensions and all table editing entry points ar
 
 ## Edit
 
-When the cursor is inside a table, a **table context bar** appears:
+When the cursor is inside a table, a **table context bar** (`TableToolbar`) appears:
 
 - Add/remove rows and columns
 - Merge / split cells
 - Toggle header row / column
 - Delete entire table
 
+Column resize is provided by `Table.configure({ resizable: true })`.
+
 ## Cells
 
-The `TableCellWithBackground` extension supports cell background and other schema attributes; some advanced styles are schema-first with limited UI coverage.
+`TableCellWithBackground` adds schema attributes `backgroundColor` and `textAlign` (parsed from and rendered to HTML/JSON). The **current context bar has no UI** for setting background or alignment; these attributes mainly preserve paste/import round-trips.
 
 ## Related
 

@@ -10,7 +10,7 @@
 <YanivEditor preset="full" :features="{ table: false }" />
 ```
 
-关闭 `table` 后，表格扩展与所有表格编辑入口不可用；文档 JSON 中已有 table 节点在 rebuild 后可能**静默丢失**。
+关闭 `table` 后，表格扩展与所有表格编辑入口不可用。session rebuild 时，JSON 快照中的 `table` / `tableRow` / `tableCell` 等未知节点会经 `ContentAdapter.adaptJsonToSchema` **剥离结构并提升子内容**（单元格内文本保留为段落），而不是整段内容消失。
 
 ## 插入
 
@@ -19,16 +19,18 @@
 
 ## 编辑
 
-光标在表格内时出现**表格上下文条**：
+光标在表格内时出现**表格上下文条**（`TableToolbar`）：
 
 - 增删行 / 列
 - 合并 / 拆分单元格
 - 表头行 / 列切换
 - 删除整张表
 
+列宽拖拽由 `Table.configure({ resizable: true })` 提供。
+
 ## 单元格
 
-`TableCellWithBackground` 扩展支持单元格背景等 schema 属性；部分高级样式以 schema 为主，UI 覆盖有限。
+`TableCellWithBackground` 在 schema 层支持 `backgroundColor`、`textAlign`（可从 HTML/JSON 解析并渲染）。**当前上下文条不提供**设置背景色或对齐的 UI；这些属性主要用于粘贴/导入内容的往返保留。
 
 ## 相关
 
