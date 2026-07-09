@@ -12,7 +12,11 @@ import {
 } from "@tiptap/pm/model";
 import { NodeSelection, Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 
-import { resolveOverlayPortalFromNode } from "@/core/overlayPortal";
+import {
+  EDITOR_ROOT_CLASS,
+  OVERLAY_PORTAL_CLASS,
+  resolveOverlayPortal,
+} from "@/core/overlayPortal";
 import {
   FLOATING_MENU_VIEWPORT_MARGIN,
   getBlockMenuAnchorPosition,
@@ -28,8 +32,37 @@ const APPEARANCE_MENU_CLASSES = [
   "appearance-custom",
 ] as const;
 
+/**
+ * Editor 构造时 view.dom 可能尚未挂入 `.yaniv-editor`（Vue EditorContent 后挂载）。
+ * 延迟把菜单挂到 overlay portal，避免 session rebuild 抛错。
+ */
+function mountMenuWhenPortalReady(menu: HTMLElement, view: EditorView): () => void {
+  let cancelled = false;
+  let rafId = 0;
+
+  const tryMount = () => {
+    if (cancelled) return;
+    if (menu.parentElement?.classList.contains(OVERLAY_PORTAL_CLASS)) return;
+
+    const root = view.dom.closest(`.${EDITOR_ROOT_CLASS}`);
+    if (root instanceof HTMLElement) {
+      resolveOverlayPortal(root).appendChild(menu);
+      return;
+    }
+
+    rafId = requestAnimationFrame(tryMount);
+  };
+
+  tryMount();
+
+  return () => {
+    cancelled = true;
+    cancelAnimationFrame(rafId);
+  };
+}
+
 function syncDragHandleMenuAppearance(menu: HTMLElement, view: EditorView): void {
-  const editorRoot = view.dom.closest(".yaniv-editor");
+  const editorRoot = view.dom.closest(`.${EDITOR_ROOT_CLASS}`);
   menu.classList.remove(...APPEARANCE_MENU_CLASSES);
   const matched = APPEARANCE_MENU_CLASSES.find((cls) => editorRoot?.classList.contains(cls));
   menu.classList.add(matched ?? "appearance-default");
@@ -988,7 +1021,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
           handleRoot.appendChild(plusButton);
           handleRoot.appendChild(handle);
-          resolveOverlayPortalFromNode(view.dom).appendChild(menu);
+          const cancelPortalMount = mountMenuWhenPortalReady(menu, view);
           handle.addEventListener("mouseenter", keepHandleVisible);
           plusButton.addEventListener("mouseenter", keepHandleVisible);
           handleRoot.addEventListener("mousemove", handleMouseMove);
@@ -999,6 +1032,14 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
           return {
             update(updatedView) {
+              // EditorContent 挂载后补挂菜单（若 create 时 portal 尚不可用）
+              if (!menu.parentElement?.classList.contains(OVERLAY_PORTAL_CLASS)) {
+                const root = updatedView.dom.closest(`.${EDITOR_ROOT_CLASS}`);
+                if (root instanceof HTMLElement) {
+                  resolveOverlayPortal(root).appendChild(menu);
+                }
+              }
+
               if (!updatedView.editable) {
                 deactivateInteractive();
                 return;
@@ -1018,6 +1059,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             },
 
             destroy() {
+              cancelPortalMount();
               handle.removeEventListener("mouseenter", keepHandleVisible);
               plusButton.removeEventListener("mouseenter", keepHandleVisible);
               handleRoot.removeEventListener("mousemove", handleMouseMove);

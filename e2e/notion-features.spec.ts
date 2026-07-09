@@ -1,22 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-async function setDemoSelect(page: Page, label: string, optionTitle: string) {
-  const field = page.locator(".demo-controls__field").filter({
-    has: page.locator(".demo-controls__label", { hasText: label }),
-  });
-  await field.locator(".ant-select-selector").click();
-  const dropdown = page.locator(".ant-select-dropdown").last();
-  await dropdown.locator(`.ant-select-item-option[title="${optionTitle}"]`).click();
-  await page.keyboard.press("Escape");
-}
+import { expectEditorReady, focusEditorEnd, setDemoSelect } from "./helpers";
 
-async function focusEditorEnd(page: Page) {
-  const editor = page.locator(".ProseMirror");
-  await editor.click();
-  await page.keyboard.press("Meta+ArrowDown");
-}
-
-async function openSlashMenu(page: Page) {
+async function openSlashMenu(page: Parameters<typeof focusEditorEnd>[0]) {
   await focusEditorEnd(page);
   await page.keyboard.press("Enter");
   await page.keyboard.type("/");
@@ -27,10 +13,16 @@ test.describe("Notion preset + appearance", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/#/full-editor");
     await expect(page.locator(".demo-controls")).toBeVisible();
+    await expectEditorReady(page);
+
     await setDemoSelect(page, "方案", "Notion");
     await setDemoSelect(page, "外观", "Notion");
+
+    // preset / appearance 切换会重建 session；等可见下拉收起且编辑器就绪
+    await expect(page.locator(".ant-select-dropdown:visible")).toHaveCount(0);
     await expect(page.locator(".yaniv-editor")).toHaveClass(/appearance-notion/);
     await expect(page.locator(".editor-header, .toolbar-nav")).toHaveCount(0);
+    await expectEditorReady(page);
   });
 
   test("slash menu lists Notion block group", async ({ page }) => {

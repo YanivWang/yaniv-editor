@@ -28,9 +28,9 @@ export async function setDemoSelect(page: Page, label: string, optionTitle: stri
     has: page.locator(".demo-controls__label", { hasText: label }),
   });
   await field.locator(".ant-select-selector").click();
-  const dropdown = page.locator(".ant-select-dropdown").last();
+  const dropdown = page.locator(".ant-select-dropdown:visible").last();
   await dropdown.locator(`.ant-select-item-option[title="${optionTitle}"]`).click();
-  await page.keyboard.press("Escape");
+  await expect(page.locator(".ant-select-dropdown:visible")).toHaveCount(0);
 }
 
 export async function focusEditorEnd(page: Page) {
