@@ -11,25 +11,30 @@ export const YE_Z_BASE_VAR = "--ye-z-base";
 /** 浮层 z-index 默认基准（与 variables.css 中 .yaniv-editor 定义一致） */
 export const YE_Z_INDEX_DEFAULT_BASE = 1000;
 
+/** portal 内浮层 token（均基于 --ye-z-base） */
 export type YeZIndexToken =
-  | "--ye-z-chrome"
-  | "--ye-z-tooltip"
   | "--ye-z-overlay-backdrop"
   | "--ye-z-bubble-menu"
   | "--ye-z-floating-menu"
   | "--ye-z-picker-menu"
   | "--ye-z-drag-menu"
+  | "--ye-z-drag-submenu"
   | "--ye-z-dropdown"
+  | "--ye-z-tooltip"
+  | "--ye-z-toast"
   | "--ye-z-modal";
 
 /** 与 variables.css 中 calc(var(--ye-z-base) + N) 保持同步（仅作 calc 不可解析时的回退） */
-export const YE_Z_BASE_OFFSETS: Partial<Record<YeZIndexToken, number>> = {
+export const YE_Z_BASE_OFFSETS: Record<YeZIndexToken, number> = {
   "--ye-z-overlay-backdrop": 0,
   "--ye-z-bubble-menu": 10,
   "--ye-z-floating-menu": 20,
   "--ye-z-picker-menu": 30,
   "--ye-z-drag-menu": 40,
+  "--ye-z-drag-submenu": 41,
   "--ye-z-dropdown": 50,
+  "--ye-z-tooltip": 60,
+  "--ye-z-toast": 80,
   "--ye-z-modal": 100,
 };
 

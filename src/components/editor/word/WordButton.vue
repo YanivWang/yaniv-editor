@@ -10,7 +10,9 @@
 
   <!-- 导入 Word 文件（拖拽上传） -->
   <a-modal
-v-model:open="importModalOpen" :title="t('editor.importWord')" :footer="null"
+    v-model:open="importModalOpen"
+    :title="t('editor.importWord')"
+    :footer="null"
     :get-container="getOverlayContainer"
     wrap-class-name="yaniv-editor-modal"
   >
@@ -63,10 +65,10 @@ import {
   ExportOutlined,
   InboxOutlined,
 } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
@@ -77,6 +79,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
 const getOverlayContainer = useOverlayMountTarget();
+const feedback = useOverlayFeedback();
 
 // ===== Props =====
 interface Props {
@@ -127,11 +130,11 @@ async function handleImport(options: any) {
     const { importWordFile } = await import("./wordImport");
     await importWordFile(e, file as File);
     importModalOpen.value = false;
-    message.success(t("messages.wordImportSuccess"));
+    feedback.toast(t("messages.wordImportSuccess"), "success");
     onSuccess?.({});
   } catch (err) {
     console.error("[WordButton] Import failed:", err);
-    message.error(t("messages.wordImportFailed"));
+    feedback.toast(t("messages.wordImportFailed"), "error");
     onError?.(err);
   } finally {
     importing.value = false;
@@ -152,10 +155,10 @@ async function doExport() {
     const name = exportFilename.value.trim() || "document";
     await exportToWord(html, name);
     exportModalOpen.value = false;
-    message.success(t("messages.wordExportSuccess"));
+    feedback.toast(t("messages.wordExportSuccess"), "success");
   } catch (err) {
     console.error("[WordButton] Export failed:", err);
-    message.error(t("messages.wordExportFailed"));
+    feedback.toast(t("messages.wordExportFailed"), "error");
   } finally {
     exporting.value = false;
   }

@@ -31,10 +31,10 @@
  * @description 可复用的链接按钮组件，包含链接插入/编辑功能
  */
 import { LinkOutlined } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
 import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -47,6 +47,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
 const getOverlayContainer = useOverlayMountTarget();
+const feedback = useOverlayFeedback();
 
 // ===== Props =====
 interface Props {
@@ -111,7 +112,7 @@ function applyLink() {
 
   const safeUrl = normalizeSafeUrl(rawUrl);
   if (!safeUrl) {
-    message.warning(t("editor.enterValidLink"));
+    feedback.toast(t("editor.enterValidLink"), "warning");
     return;
   }
 

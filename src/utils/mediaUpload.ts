@@ -1,6 +1,5 @@
-import { notification } from "ant-design-vue";
-
 import type { MediaUploadHandler } from "@/core/editorTypes";
+import { showOverlayNotice } from "@/core/overlayFeedback";
 import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export type MediaKind = "image" | "video";
@@ -10,6 +9,8 @@ export interface ResolveMediaUrlOptions {
   kind: MediaKind;
   upload?: MediaUploadHandler;
   translate?: (key: string) => string;
+  /** 未配置 upload 时的提示挂载点（overlay portal） */
+  overlayPortal: HTMLElement;
 }
 
 export async function resolveMediaUrl({
@@ -17,6 +18,7 @@ export async function resolveMediaUrl({
   kind,
   upload,
   translate,
+  overlayPortal,
 }: ResolveMediaUrlOptions): Promise<string> {
   if (upload) {
     const uploadedUrl = await upload(file);
@@ -28,10 +30,10 @@ export async function resolveMediaUrl({
   const label =
     translate?.(`messages.${kind}UploadNotConfigured`) ?? `messages.${kind}UploadNotConfigured`;
 
-  notification.warning({
+  showOverlayNotice(overlayPortal, {
     message: label,
+    kind: "warning",
     duration: 5,
-    placement: "topRight",
   });
 
   return normalizeSafeMediaUrl(URL.createObjectURL(file), kind)!;

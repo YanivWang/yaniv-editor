@@ -14,6 +14,7 @@ Main source directories:
 - `src/styles` — explicit CSS entry points
 - `src/utils/zIndex.ts` — read `--ye-z-*` tokens from the `.yaniv-editor` root
 - `src/composables/useOverlayMount.ts` — `useOverlayMountTarget` / `useOverlayBubbleMenu` for overlay portal mounting
+- `src/composables/useOverlayFeedback.ts` / `src/core/overlayFeedback.ts` — Toast / Notice on overlay portal (no Ant Design static message/notification)
 
 Full Editor API decisions live in `src/core/editorTypes.ts`, `src/configs/editorPreset.ts`, and `src/core/runtime/resolveEditorProfile.ts`.
 

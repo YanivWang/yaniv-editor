@@ -42,6 +42,21 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
+## Overlay Mounting & Feedback
+
+```ts
+import {
+  useOverlayMountTarget,
+  useOverlayBubbleMenu,
+  useOverlayFeedback,
+} from "@yanivjs/yaniv-editor";
+```
+
+- `useOverlayMountTarget` / `useOverlayBubbleMenu` — Ant Design / BubbleMenu mount to overlay portal.
+- `useOverlayFeedback` — Toast / Notice (replaces Ant Design static `message` / `notification`).
+
+See [Z-Index & Overlays](../guide/z-index.md).
+
 ## Editor State Helpers
 
 ```ts

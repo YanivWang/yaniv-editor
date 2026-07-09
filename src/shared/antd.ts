@@ -1,8 +1,9 @@
 /**
- * Ant Design Vue components used by yaniv-editor UI shells.
+ * Ant Design Vue 组件 / 静态 API 的唯一入口。
  *
- * Each consuming `.vue` file should import the components it needs from here so
- * templates can use `<a-*>` tags without requiring `app.use(Antd)` in the host app.
+ * - 组件：各 `.vue` 局部 import，宿主无需 `app.use(Antd)`。
+ * - Toast：禁止使用 antd 静态 `message` / `notification`（全局单例 + body）；
+ *   一律走 `showOverlayToast` / `showOverlayNotice` / `useOverlayFeedback`。
  */
 export {
   Button,

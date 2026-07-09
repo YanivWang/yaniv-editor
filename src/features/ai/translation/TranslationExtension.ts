@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
-import { notification } from "ant-design-vue";
 
+import { showEditorNotice } from "@/core/overlayFeedback";
 import {
   createConfiguredAiClient,
   localeText,
@@ -42,11 +42,11 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
           const selectedText = state.doc.textBetween(from, to, " ");
 
           if (!selectedText.trim()) {
-            notification.warning({
+            showEditorNotice(editor, {
               message: localeText(this.options, "editor.pleaseSelectText"),
               description: localeText(this.options, "editor.translateRequiresSelection"),
+              kind: "warning",
               duration: 3,
-              placement: "topRight",
             });
             return false;
           }

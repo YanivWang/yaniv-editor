@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
-import { notification } from "ant-design-vue";
 
+import { showEditorNotice } from "@/core/overlayFeedback";
 import { aiSuggestionManager } from "@/features/ai/shared/aiSuggestionManager";
 import {
   createConfiguredAiClient,
@@ -32,11 +32,11 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
           const selectedText = state.doc.textBetween(from, to, " ");
 
           if (!selectedText.trim()) {
-            notification.warning({
+            showEditorNotice(editor, {
               message: localeText(this.options, "editor.pleaseSelectText"),
               description: localeText(this.options, "editor.customAiRequiresSelection"),
+              kind: "warning",
               duration: 2,
-              placement: "topRight",
             });
             return false;
           }

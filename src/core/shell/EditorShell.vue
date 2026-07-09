@@ -53,7 +53,6 @@
 
 <script setup lang="ts">
 import { EditorContent } from "@tiptap/vue-3";
-import { Modal } from "ant-design-vue";
 import { computed, onBeforeUnmount, ref, shallowRef, watch, type Ref } from "vue";
 
 import { getAppearanceClassName, useEditorAppearance } from "@/appearance";
@@ -70,6 +69,7 @@ import { useEditorSession } from "@/core/session/useEditorSession";
 import { useEditorPagination } from "@/core/useEditorPagination";
 import { useYanivAiConfig } from "@/core/useYanivAiConfig";
 import type { TiptapLocale } from "@/locales/types";
+import { Modal } from "@/shared/antd";
 import { YE_Z_BASE_VAR, YE_Z_INDEX_DEFAULT_BASE } from "@/utils/zIndex";
 
 import EditorEditChrome from "./EditorEditChrome.vue";

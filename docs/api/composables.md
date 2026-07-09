@@ -42,6 +42,21 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
+## 浮层挂载与反馈
+
+```ts
+import {
+  useOverlayMountTarget,
+  useOverlayBubbleMenu,
+  useOverlayFeedback,
+} from "@yanivjs/yaniv-editor";
+```
+
+- `useOverlayMountTarget` / `useOverlayBubbleMenu`：Ant Design / BubbleMenu 挂载到 overlay portal。
+- `useOverlayFeedback`：Toast / Notice（替代 antd 静态 `message` / `notification`）。
+
+详见 [Z-Index 与浮层](../guide/z-index.md)。
+
 ## 编辑器状态辅助
 
 ```ts

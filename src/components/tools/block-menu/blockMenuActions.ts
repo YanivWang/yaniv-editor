@@ -160,6 +160,7 @@ export function pickMediaUrl(
   kind: MediaKind,
   upload: MediaUploadHandler | undefined,
   translate: (key: string) => string,
+  overlayPortal: HTMLElement,
 ): Promise<string | null> {
   return new Promise((resolve) => {
     const input = document.createElement("input");
@@ -176,7 +177,7 @@ export function pickMediaUrl(
         resolve(null);
         return;
       }
-      void resolveMediaUrl({ file, kind, upload, translate })
+      void resolveMediaUrl({ file, kind, upload, translate, overlayPortal })
         .then(resolve)
         .catch(() => resolve(null));
     });

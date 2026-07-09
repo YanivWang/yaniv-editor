@@ -101,7 +101,7 @@ Core context is mounted at **EditorShell root** (not unmounted in preview):
 ## Z-Index and Overlays
 
 - Z-index tokens are scoped to `.yaniv-editor` (`variables.css`); base `--ye-z-base` defaults to `1000`, set via `zIndexBase` prop on the root.
-- `EditorShell` renders `.yaniv-editor__overlay-portal` inside the root; bubble menus, BlockPicker, mention, AI popover, Ant Design overlays, etc. mount there—not on `document.body` (except drag preview / hidden file inputs).
+- `EditorShell` renders `.yaniv-editor__overlay-portal` inside the root; bubble menus, BlockPicker, mention, AI popover, Ant Design overlays, custom Toast/Notice, etc. mount there—not on `document.body` (except drag preview / hidden file inputs). **Do not** use Ant Design static `message` / `notification`.
 - See [Z-Index & Overlays](../guide/z-index.md).
 
 ## Architecture Invariants (Summary)

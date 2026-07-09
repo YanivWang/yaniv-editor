@@ -1,7 +1,7 @@
-import { notification } from "ant-design-vue";
 import { createApp, h, provide, ref } from "vue";
 
 import { editorLocaleKey } from "@/core/infra/useEditorLocale";
+import { showEditorNotice } from "@/core/overlayFeedback";
 import { resolveOverlayPortal } from "@/core/overlayPortal";
 import { aiClient } from "@/features/ai/client";
 import type { createAiClient } from "@/features/ai/client";
@@ -180,12 +180,14 @@ class AiSuggestionManager {
           console.error("[Custom AI]", error);
           this.isExecutingRef.value = false;
           this.hide();
-          notification.error({
-            message: this.getLocaleText("messages.customAiFailed"),
-            description: error.message,
-            duration: 3,
-            placement: "topRight",
-          });
+          if (this.editor) {
+            showEditorNotice(this.editor, {
+              message: this.getLocaleText("messages.customAiFailed"),
+              description: error.message,
+              kind: "error",
+              duration: 3,
+            });
+          }
         },
         signal: abortController.signal,
       },

@@ -30,7 +30,7 @@
   position: absolute;
   bottom: 100%;
   left: 50%;
-  z-index: var(--ye-z-tooltip);
+  z-index: var(--ye-z-chrome-tooltip);
   padding: 4px 8px;
   margin-bottom: 4px;
   font-size: 12px;

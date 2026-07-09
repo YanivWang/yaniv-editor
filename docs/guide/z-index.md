@@ -1,6 +1,6 @@
 # Z-Index 与浮层挂载
 
-编辑器所有**全局浮层**（bubble menu、BlockPicker、mention 建议、AI popover、Ant Design Dropdown / Select / Popover / Modal / Tooltip 等）统一挂载在 `EditorShell` 根节点内的 **overlay portal**（`.yaniv-editor__overlay-portal`），**禁止**挂到 `document.body`。这样浮层始终在 `.yaniv-editor` 作用域内，能正确继承 `--ye-z-*` CSS token。
+编辑器所有**全局浮层**（bubble menu、BlockPicker、mention 建议、AI popover、Ant Design Dropdown / Select / Popover / Modal / Tooltip、自建 Toast / Notice 等）统一挂载在 `EditorShell` 根节点内的 **overlay portal**（`.yaniv-editor__overlay-portal`），**禁止**挂到 `document.body`。这样浮层始终在 `.yaniv-editor` 作用域内，能正确继承 `--ye-z-*` CSS token。
 
 例外（非视觉浮层）：
 
@@ -33,25 +33,38 @@
 
 颜色等 token 定义在 `:root`；**z-index token 仅定义在 `.yaniv-editor`**：
 
-| Token                     | 计算（默认 base=1000） | 用途                             |
-| ------------------------- | ---------------------- | -------------------------------- |
-| `--ye-z-content`          | `1`                    | 文档内基础层                     |
-| `--ye-z-content-overlay`  | `2`                    | 表格选区等                       |
-| `--ye-z-content-control`  | `10`                   | 图片列宽手柄等                   |
-| `--ye-z-editor-ui`        | `20`                   | 拖拽手柄                         |
-| `--ye-z-editor-rail`      | `30`                   | 大纲栏                           |
-| `--ye-z-chrome`           | `40`                   | 顶栏 / 底栏                      |
-| `--ye-z-tooltip`          | `50`                   | 工具栏 tooltip                   |
-| `--ye-z-overlay-backdrop` | `base`                 | 块选择器遮罩                     |
-| `--ye-z-bubble-menu`      | `base + 10`            | 链接 / 图片 / 表格 bubble        |
-| `--ye-z-floating-menu`    | `base + 20`            | 选中文本浮动菜单                 |
-| `--ye-z-picker-menu`      | `base + 30`            | BlockPicker、mention、AI popover |
-| `--ye-z-drag-menu`        | `base + 40`            | 拖拽块菜单                       |
-| `--ye-z-drag-submenu`     | `base + 41`            | 拖拽子菜单                       |
-| `--ye-z-dropdown`         | `base + 50`            | Ant Design 下拉                  |
-| `--ye-z-modal`            | `base + 100`           | 编辑器内 Modal                   |
+| Token                     | 计算（默认 base=1000） | 用途                                   |
+| ------------------------- | ---------------------- | -------------------------------------- |
+| `--ye-z-content`          | `1`                    | 文档内基础层                           |
+| `--ye-z-content-overlay`  | `2`                    | 表格选区等                             |
+| `--ye-z-content-control`  | `10`                   | 图片列宽手柄等                         |
+| `--ye-z-editor-ui`        | `20`                   | 拖拽手柄                               |
+| `--ye-z-editor-rail`      | `30`                   | 大纲栏                                 |
+| `--ye-z-chrome`           | `40`                   | 顶栏 / 底栏                            |
+| `--ye-z-chrome-tooltip`   | `50`                   | 文档内自建 tooltip（`BaseTooltip` 等） |
+| `--ye-z-overlay-backdrop` | `base`                 | 块选择器遮罩                           |
+| `--ye-z-bubble-menu`      | `base + 10`            | 链接 / 图片 / 表格 bubble              |
+| `--ye-z-floating-menu`    | `base + 20`            | 选中文本浮动菜单                       |
+| `--ye-z-picker-menu`      | `base + 30`            | BlockPicker、mention、AI popover       |
+| `--ye-z-drag-menu`        | `base + 40`            | 拖拽块菜单                             |
+| `--ye-z-drag-submenu`     | `base + 41`            | 拖拽子菜单                             |
+| `--ye-z-dropdown`         | `base + 50`            | Ant Design 下拉                        |
+| `--ye-z-tooltip`          | `base + 60`            | portal 内 Ant Design Tooltip           |
+| `--ye-z-toast`            | `base + 80`            | 自建 Toast / Notice                    |
+| `--ye-z-modal`            | `base + 100`           | 编辑器内 Modal                         |
 
-浮层相对顺序：`modal > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop`。
+浮层相对顺序：`modal > toast > tooltip > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop`。
+
+## Toast / Notice
+
+**禁止**使用 Ant Design 静态 `message` / `notification`（全局单例，默认挂 `document.body`，多实例不安全）。
+
+统一入口：
+
+- Vue 组件：`useOverlayFeedback()`（`src/composables/useOverlayFeedback.ts`）
+- 非组件 / 扩展：`showEditorToast` / `showEditorNotice`（`src/core/overlayFeedback.ts`）
+
+均挂载到当前编辑器的 overlay portal。
 
 ## 实现要点（自定义 Shell）
 
@@ -61,14 +74,13 @@
 2. 根内包含 `.yaniv-editor__overlay-portal`（见 `src/styles/overlay-portal.css`）；
 3. 调用 `provideEditorRoot` / `provideOverlayPortal`（`src/core/editorContext.ts`）；
 4. 所有 teleport / BubbleMenu `appendTo` / Ant Design `getPopupContainer` / `getContainer` 指向 overlay portal；
-5. JS 侧通过 `getYeZIndex(token, root)` 或组件内 `useYeZIndex(token)` 读取 token（`src/utils/zIndex.ts`），**必须**传入编辑器根节点，无全局 fallback。
+5. JS 侧通过 `getYeZIndex(token, root)` 读取 portal token（`src/utils/zIndex.ts`），**必须**传入编辑器根节点，无全局 fallback。
 
 库内统一入口：
 
 - `useOverlayMountTarget()` — Ant Design `getPopupContainer` / Modal `getContainer`
 - `useOverlayBubbleMenu()` — Tiptap 3 BubbleMenu（Floating UI）的 `appendTo` + `options`
-
-均位于 `src/composables/useOverlayMount.ts`。
+- `useOverlayFeedback()` / `showOverlayToast` / `showOverlayNotice` — Toast / Notice
 
 ## 相关
 

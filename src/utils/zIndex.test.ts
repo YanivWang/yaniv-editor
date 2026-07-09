@@ -57,12 +57,17 @@ describe("getYeZIndex", () => {
   });
 
   it("exports base offsets aligned with variables.css calc offsets", () => {
-    expect(YE_Z_BASE_OFFSETS["--ye-z-overlay-backdrop"]).toBe(0);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-bubble-menu"]).toBe(10);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-floating-menu"]).toBe(20);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-picker-menu"]).toBe(30);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-drag-menu"]).toBe(40);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-dropdown"]).toBe(50);
-    expect(YE_Z_BASE_OFFSETS["--ye-z-modal"]).toBe(100);
+    expect(YE_Z_BASE_OFFSETS).toEqual({
+      "--ye-z-overlay-backdrop": 0,
+      "--ye-z-bubble-menu": 10,
+      "--ye-z-floating-menu": 20,
+      "--ye-z-picker-menu": 30,
+      "--ye-z-drag-menu": 40,
+      "--ye-z-drag-submenu": 41,
+      "--ye-z-dropdown": 50,
+      "--ye-z-tooltip": 60,
+      "--ye-z-toast": 80,
+      "--ye-z-modal": 100,
+    });
   });
 });

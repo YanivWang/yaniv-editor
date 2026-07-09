@@ -1,5 +1,4 @@
-import { notification } from "ant-design-vue";
-
+import { showEditorNotice } from "@/core/overlayFeedback";
 import type { createAiClient } from "@/features/ai/client";
 
 import { removeAiHighlight } from "./AiHighlightMark";
@@ -47,11 +46,11 @@ function runStream(
       console.error(`[${errorTitle}]`, error);
       handlers.onError?.(error);
       aiSuggestionManager.hide();
-      notification.error({
+      showEditorNotice(editor, {
         message: errorTitle,
         description: error.message,
+        kind: "error",
         duration: 3,
-        placement: "topRight",
       });
     },
     signal: abortController.signal,

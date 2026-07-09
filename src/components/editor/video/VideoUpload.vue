@@ -9,7 +9,9 @@
 
   <!-- 本地上传视频（拖拽上传，支持批量） -->
   <a-modal
-v-model:open="videoUploadOpen" :title="t('editor.localUploadVideo')" :footer="null"
+    v-model:open="videoUploadOpen"
+    :title="t('editor.localUploadVideo')"
+    :footer="null"
     :get-container="getOverlayContainer"
     wrap-class-name="yaniv-editor-modal"
   >
@@ -76,6 +78,7 @@ async function handleVideoUpload(options: any) {
       kind: "video",
       upload: props.uploadVideo,
       translate: t,
+      overlayPortal: getOverlayContainer.value(),
     });
     // 插入视频
     runCommand((chain) => chain.insertContent({ type: "video", attrs: { src: url } }))();

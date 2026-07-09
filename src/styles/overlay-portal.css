@@ -53,3 +53,101 @@
 .yaniv-editor__overlay-portal .drag-handle-menu {
   z-index: var(--ye-z-drag-menu);
 }
+
+/* 自建 toast / notice（替代 antd 静态 message / notification） */
+.yaniv-editor__overlay-portal > .ye-overlay-toast-host,
+.yaniv-editor__overlay-portal > .ye-overlay-notice-host {
+  position: fixed;
+  z-index: var(--ye-z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.yaniv-editor__overlay-portal > .ye-overlay-toast-host {
+  top: 24px;
+  left: 50%;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.yaniv-editor__overlay-portal > .ye-overlay-notice-host {
+  top: 24px;
+  right: 24px;
+  align-items: flex-end;
+  max-width: min(360px, calc(100vw - 48px));
+}
+
+.ye-overlay-toast,
+.ye-overlay-notice {
+  box-sizing: border-box;
+  color: var(--ye-text, #1a1a1a);
+  pointer-events: auto;
+  background: var(--ye-bg, #fff);
+  border: 1px solid var(--ye-border, #e9eaec);
+  border-radius: 8px;
+  box-shadow: var(--ye-shadow-md, 0 4px 16px rgb(0 0 0 / 12%));
+  animation: ye-overlay-feedback-in 0.16s ease-out;
+}
+
+.ye-overlay-toast.is-leaving,
+.ye-overlay-notice.is-leaving {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.16s ease-in,
+    transform 0.16s ease-in;
+}
+
+.ye-overlay-toast {
+  max-width: min(420px, calc(100vw - 48px));
+  padding: 8px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ye-overlay-notice {
+  width: 100%;
+  padding: 12px 14px;
+}
+
+.ye-overlay-notice__title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ye-overlay-notice__desc {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ye-text-secondary, #666);
+}
+
+.ye-overlay-toast--success,
+.ye-overlay-notice--success {
+  border-color: color-mix(in srgb, #22c55e 35%, var(--ye-border, #e9eaec));
+}
+
+.ye-overlay-toast--warning,
+.ye-overlay-notice--warning {
+  border-color: color-mix(in srgb, #f59e0b 40%, var(--ye-border, #e9eaec));
+}
+
+.ye-overlay-toast--error,
+.ye-overlay-notice--error {
+  border-color: color-mix(in srgb, var(--ye-danger, #ef4444) 40%, var(--ye-border, #e9eaec));
+}
+
+@keyframes ye-overlay-feedback-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

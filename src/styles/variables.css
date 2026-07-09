@@ -145,7 +145,7 @@
 /*
  * ===== Z-Index（单一层级源，作用域限定在 .yaniv-editor）=====
  * 宿主通过 zIndexBase prop 覆盖 --ye-z-base；浮层挂载见 overlay-portal.css。
- * JS 侧：getYeZIndex(token, root)（src/utils/zIndex.ts）、useYeZIndex(token)（src/composables/useYeZIndex.ts）。
+ * JS 侧：getYeZIndex(token, root)（src/utils/zIndex.ts）。Toast/Notice：showOverlayToast / showOverlayNotice。
  */
 .yaniv-editor {
   --ye-z-base: 1000;
@@ -157,7 +157,7 @@
   --ye-z-editor-ui: 20;
   --ye-z-editor-rail: 30;
   --ye-z-chrome: 40;
-  --ye-z-tooltip: 50;
+  --ye-z-chrome-tooltip: 50;
 
   /* overlay portal 内浮层：基于 base 偏移 */
   --ye-z-overlay-backdrop: var(--ye-z-base);
@@ -167,6 +167,8 @@
   --ye-z-drag-menu: calc(var(--ye-z-base) + 40);
   --ye-z-drag-submenu: calc(var(--ye-z-base) + 41);
   --ye-z-dropdown: calc(var(--ye-z-base) + 50);
+  --ye-z-tooltip: calc(var(--ye-z-base) + 60);
+  --ye-z-toast: calc(var(--ye-z-base) + 80);
   --ye-z-modal: calc(var(--ye-z-base) + 100);
 }
 

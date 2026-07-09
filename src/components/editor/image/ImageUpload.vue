@@ -10,7 +10,9 @@
 
   <!-- 网络上传图片模态框 -->
   <a-modal
-v-model:open="imageModalOpen" :title="t('editor.insertImage')" :get-container="getOverlayContainer"
+    v-model:open="imageModalOpen"
+    :title="t('editor.insertImage')"
+    :get-container="getOverlayContainer"
     wrap-class-name="yaniv-editor-modal"
     @ok="applyImage"
   >
@@ -19,7 +21,9 @@ v-model:open="imageModalOpen" :title="t('editor.insertImage')" :get-container="g
 
   <!-- 本地上传图片（拖拽上传，支持批量） -->
   <a-modal
-v-model:open="localUploadOpen" :title="t('editor.localUploadImage')" :footer="null"
+    v-model:open="localUploadOpen"
+    :title="t('editor.localUploadImage')"
+    :footer="null"
     :get-container="getOverlayContainer"
     wrap-class-name="yaniv-editor-modal"
   >
@@ -49,10 +53,10 @@ import {
   LinkOutlined,
   InboxOutlined,
 } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
 import { useYanivEditor } from "@/core/editorContext";
@@ -66,6 +70,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
 const getOverlayContainer = useOverlayMountTarget();
+const feedback = useOverlayFeedback();
 
 // ===== Props =====
 interface Props {
@@ -108,7 +113,7 @@ const imageMenuItems = computed<MenuItemConfig[]>(() => [
 function applyImage() {
   const safeUrl = normalizeSafeMediaUrl(imageUrl.value, "image");
   if (imageUrl.value && !safeUrl) {
-    message.warning(t("editor.enterValidLink"));
+    feedback.toast(t("editor.enterValidLink"), "warning");
     return;
   }
 
@@ -132,6 +137,7 @@ async function handleLocalUpload(options: any) {
       kind: "image",
       upload: props.uploadImage,
       translate: t,
+      overlayPortal: getOverlayContainer.value(),
     });
     // 插入图片
     runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: url } }))();

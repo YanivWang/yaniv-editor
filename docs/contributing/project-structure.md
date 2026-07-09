@@ -14,6 +14,7 @@
 - `src/styles`：显式 CSS 入口。
 - `src/utils/zIndex.ts`：从 `.yaniv-editor` 根节点读取 `--ye-z-*` token。
 - `src/composables/useOverlayMount.ts`：`useOverlayMountTarget` / `useOverlayBubbleMenu`，浮层统一挂载 overlay portal。
+- `src/composables/useOverlayFeedback.ts` / `src/core/overlayFeedback.ts`：Toast / Notice 统一挂载 overlay portal（禁止 antd 静态 message/notification）。
 
 Full Editor API 决策位于 `src/core/editorTypes.ts`、`src/configs/editorPreset.ts` 和 `src/core/runtime/resolveEditorProfile.ts`。
 

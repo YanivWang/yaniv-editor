@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
-import { notification } from "ant-design-vue";
 
+import { showEditorNotice } from "@/core/overlayFeedback";
 import {
   createConfiguredAiClient,
   localeText,
@@ -39,11 +39,11 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
           }
 
           if (!selectedText.trim()) {
-            notification.warning({
+            showEditorNotice(editor, {
               message: localeText(this.options, "editor.pleaseSelectText"),
               description: localeText(this.options, "editor.summarizeRequiresSelection"),
+              kind: "warning",
               duration: 3,
-              placement: "topRight",
             });
             return false;
           }

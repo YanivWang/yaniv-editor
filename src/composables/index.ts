@@ -18,4 +18,4 @@ export {
   type OverlayBubbleMenuOptions,
   type OverlayBubblePlacement,
 } from "./useOverlayMount";
-export { useYeZIndex } from "./useYeZIndex";
+export { useOverlayFeedback, type OverlayFeedbackApi } from "./useOverlayFeedback";

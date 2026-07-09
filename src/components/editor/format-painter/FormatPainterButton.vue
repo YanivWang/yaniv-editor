@@ -16,10 +16,10 @@
  * 支持单击单次模式和双击连续模式
  */
 import { FormatPainterOutlined } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
 import { computed, ref, watch, onBeforeUnmount } from "vue";
 
 import { ToolbarButton } from "@/components/base";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import type { FormatPainterStorage } from "@/extensions/formatPainter";
@@ -27,6 +27,7 @@ import type { FormatPainterStorage } from "@/extensions/formatPainter";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+const feedback = useOverlayFeedback();
 
 // ===== Props =====
 interface Props {
@@ -119,7 +120,7 @@ function toggleFormatPainter() {
 
   // 检查是否禁用，如果禁用则提示
   if (isDisabled.value) {
-    message.warning(t("editor.formatPainterDisabled"));
+    feedback.toast(t("editor.formatPainterDisabled"), "warning");
     return;
   }
 
@@ -130,25 +131,25 @@ function toggleFormatPainter() {
     try {
       const selection = e.state.selection;
       if (!selection || selection.empty) {
-        message.warning(t("editor.formatPainterSelectTextFirst"));
+        feedback.toast(t("editor.formatPainterSelectTextFirst"), "warning");
         return;
       }
     } catch (error) {
-      message.warning(t("editor.formatPainterSelectTextHint"));
+      feedback.toast(t("editor.formatPainterSelectTextHint"), "warning");
       return;
     }
 
     // 采样格式并激活格式刷（单次模式）
     const success = e.commands.startFormatPainting();
     if (success) {
-      message.success(t("editor.formatPainterAppliedOnce"));
+      feedback.toast(t("editor.formatPainterAppliedOnce"), "success");
       updateFormatPainterActive();
     }
   } else {
     // 格式刷已激活：取消格式刷状态
     e.commands.cancelFormatPainting();
     updateFormatPainterActive();
-    message.info(t("editor.formatPainterExited"));
+    feedback.toast(t("editor.formatPainterExited"), "info");
   }
 }
 
@@ -162,7 +163,7 @@ function toggleFormatPainterContinuous() {
 
   // 检查是否禁用，如果禁用则提示
   if (isDisabled.value) {
-    message.warning(t("editor.formatPainterDisabled"));
+    feedback.toast(t("editor.formatPainterDisabled"), "warning");
     return;
   }
 
@@ -173,25 +174,25 @@ function toggleFormatPainterContinuous() {
     try {
       const selection = e.state.selection;
       if (!selection || selection.empty) {
-        message.warning(t("editor.formatPainterDoubleClickSelect"));
+        feedback.toast(t("editor.formatPainterDoubleClickSelect"), "warning");
         return;
       }
     } catch (error) {
-      message.warning(t("editor.formatPainterSelectTextHint"));
+      feedback.toast(t("editor.formatPainterSelectTextHint"), "warning");
       return;
     }
 
     // 采样格式并激活格式刷（连续模式）
     const success = e.commands.startContinuousFormatPainting();
     if (success) {
-      message.success(t("editor.formatPainterAppliedMulti"));
+      feedback.toast(t("editor.formatPainterAppliedMulti"), "success");
       updateFormatPainterActive();
     }
   } else {
     // 格式刷已激活：取消格式刷
     e.commands.cancelFormatPainting();
     updateFormatPainterActive();
-    message.info(t("editor.formatPainterExited"));
+    feedback.toast(t("editor.formatPainterExited"), "info");
   }
 }
 </script>

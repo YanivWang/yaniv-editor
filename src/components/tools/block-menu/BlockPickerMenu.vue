@@ -206,7 +206,7 @@ function selectItem(item: BlockMenuItemDef) {
 
       hide();
 
-      void pickMediaUrl(accept, blockId, upload, t).then((src) => {
+      void pickMediaUrl(accept, blockId, upload, t, overlayPortal.value!).then((src) => {
         if (!src) return;
         insertBlockMediaAt(e, insertPos, blockId, src);
       });
@@ -216,7 +216,7 @@ function selectItem(item: BlockMenuItemDef) {
 
     hide();
 
-    void pickMediaUrl(accept, blockId, upload, t).then((src) => {
+    void pickMediaUrl(accept, blockId, upload, t, overlayPortal.value!).then((src) => {
       if (!src) return;
       if (context) {
         insertBlockMediaAt(e, context.insertPos, blockId, src);
