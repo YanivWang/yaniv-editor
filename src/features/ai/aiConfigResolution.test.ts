@@ -1,0 +1,121 @@
+import { describe, expect, test } from "vitest";
+
+import { resolveAiExtensionOptions } from "@/features/ai/shared/extensionOptions";
+import type { AiExtensionConfigureOptions } from "@/features/ai/shared/extensionOptions";
+
+/**
+ * 回归护栏：扩展 getter 层**不得**为缺省字段填兜底值。
+ *
+ * 一旦这里返回了带 provider 的对象，`client.ts` 的 `getAiConfig()` 就会认定
+ * "宿主已托管"，从而跳过 localStorage / `.env` 回退分支——这正是此前
+ * AI 设置弹窗存的配置完全不生效的原因。
+ */
+describe("resolveAiExtensionOptions", () => {
+  const localeOnly: AiExtensionConfigureOptions = {
+    getLocaleText: (key) => key,
+  };
+
+  test("宿主未注入 ai-config 时返回 null，让 client 继续走回退链", () => {
+    expect(resolveAiExtensionOptions(localeOnly)).toBeNull();
+  });
+
+  test("getProvider 返回 undefined 时同样返回 null", () => {
+    const options: AiExtensionConfigureOptions = {
+      getProvider: () => undefined,
+      getApiKey: () => "sk-should-be-ignored",
+    };
+    expect(resolveAiExtensionOptions(options)).toBeNull();
+  });
+
+  test("宿主注入 provider 后原样透传，不补 endpoint / model / timeout", () => {
+    const options: AiExtensionConfigureOptions = {
+      getProvider: () => "deepseek",
+      getApiKey: () => "sk-test",
+    };
+
+    expect(resolveAiExtensionOptions(options)).toEqual({
+      provider: "deepseek",
+      apiKey: "sk-test",
+      endpoint: undefined,
+      model: undefined,
+      timeout: undefined,
+      storageMode: undefined,
+    });
+  });
+
+  test("proxy 模式透传 storageMode，供 isAiConfigured 放行空 apiKey", () => {
+    const options: AiExtensionConfigureOptions = {
+      getProvider: () => "openai",
+      getEndpoint: () => "https://my-proxy.internal/v1",
+      getStorageMode: () => "proxy",
+    };
+
+    expect(resolveAiExtensionOptions(options)).toMatchObject({
+      provider: "openai",
+      endpoint: "https://my-proxy.internal/v1",
+      storageMode: "proxy",
+      apiKey: undefined,
+    });
+  });
+
+  test("每次调用都现取，宿主改 model 后下次请求即生效", () => {
+    let model = "gpt-4o-mini";
+    const options: AiExtensionConfigureOptions = {
+      getProvider: () => "openai",
+      getModel: () => model,
+    };
+
+    expect(resolveAiExtensionOptions(options)?.model).toBe("gpt-4o-mini");
+    model = "gpt-4o";
+    expect(resolveAiExtensionOptions(options)?.model).toBe("gpt-4o");
+  });
+});
+
+describe("registry 的 AI capability getter", () => {
+  async function configuredAiOptions(aiConfig: unknown) {
+    const { CAPABILITIES } = await import("@/capabilities/registry");
+    const { zhCN } = await import("@/locales/zh-CN");
+
+    const aiCapability = CAPABILITIES.find((cap) => cap.id === "ai");
+    expect(aiCapability).toBeDefined();
+
+    const ctx = {
+      locale: zhCN,
+      gates: { ai: true },
+      aiConfig: () => aiConfig,
+    } as never;
+
+    const extensions = await aiCapability!.extensions(ctx);
+    // AiHighlightMark 无 AI options，取第一个带 getProvider 的扩展
+    const withGetters = extensions.find(
+      (ext) => typeof (ext.options as { getProvider?: unknown })?.getProvider === "function",
+    );
+    expect(withGetters).toBeDefined();
+    return withGetters!.options as AiExtensionConfigureOptions;
+  }
+
+  test("未传 ai-config 时 getProvider 返回 undefined（而非默认 openai）", async () => {
+    const options = await configuredAiOptions(undefined);
+
+    expect(options.getProvider?.()).toBeUndefined();
+    expect(options.getTimeout?.()).toBeUndefined();
+    // 这是关键：整体解析为 null，client 才会去读 localStorage / .env
+    expect(resolveAiExtensionOptions(options)).toBeNull();
+  });
+
+  test("传入 ai-config 时按原值透传", async () => {
+    const options = await configuredAiOptions({
+      provider: "deepseek",
+      apiKey: "sk-host",
+      model: "deepseek-chat",
+      storageMode: "memory",
+    });
+
+    expect(resolveAiExtensionOptions(options)).toMatchObject({
+      provider: "deepseek",
+      apiKey: "sk-host",
+      model: "deepseek-chat",
+      storageMode: "memory",
+    });
+  });
+});

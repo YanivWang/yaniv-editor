@@ -50,11 +50,16 @@ export function provideOverlayPortal(portal: Ref<HTMLElement | null>): void {
 }
 
 export function useEditorRoot(): Ref<HTMLElement | null> {
-  const root = inject(EDITOR_ROOT_KEY, null);
+  const root = useEditorRootOptional();
   if (!root) {
     throw new Error("useEditorRoot() must be used within EditorShell");
   }
   return root;
+}
+
+/** 宽松版：不在 EditorShell 内时返回 null，供可回退到自定义容器的场景使用 */
+export function useEditorRootOptional(): Ref<HTMLElement | null> | null {
+  return inject(EDITOR_ROOT_KEY, null);
 }
 
 export function useOverlayPortal(): Ref<HTMLElement | null> {

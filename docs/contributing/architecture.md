@@ -73,6 +73,8 @@ schema 收窄（如关闭 `table`）时，JSON 快照可能含未知节点；统
 - edit → preview：**先 emit 清理**，再 `setEditable(false)`
 - preview → edit：**先** `setEditable(true)`，**再 emit**
 
+> `EditorShell` 的订阅只做 `blockMenuHost.hide()`。SearchReplace / FormatPainter 的状态复位不走 phase 订阅，而是各自在 ProseMirror plugin 的 `view.update` 中检测 `view.editable` 变化后自清 —— 状态归谁所有，清理就归谁。详见根目录 `ARCHITECTURE.md` 的「ExtensionTier 与 Phase 策略」。
+
 `ContentAdapter` 用 raw transaction + `BYPASS_GUARD_META`，禁止 `commands.setContent`。写入前经 schema-aware 解析（HTML 走 DOMParser；JSON 走 `adaptJsonToSchema`）。
 
 ## Capability Registry
@@ -81,13 +83,13 @@ schema 收窄（如关闭 `table`）时，JSON 快照可能含未知节点；统
 
 Extension tier：
 
-| Tier          | 示例              | Phase 行为       |
-| ------------- | ----------------- | ---------------- |
-| core          | StarterKit, Link  | 始终             |
-| content       | Image, Table, AI  | preview 仍展示   |
-| interaction   | DragHandle, Slash | editable 守卫    |
-| auxiliary     | SearchReplace     | phase 切换清状态 |
-| chromeCoupled | Outline           | DOM late-binding |
+| Tier          | 示例              | Phase 行为                                         |
+| ------------- | ----------------- | -------------------------------------------------- |
+| core          | StarterKit, Link  | 始终                                               |
+| content       | Image, Table, AI  | preview 仍展示                                     |
+| interaction   | DragHandle, Slash | editable 守卫                                      |
+| auxiliary     | SearchReplace     | 扩展在 plugin `view.update` 检测 editable 变化自清 |
+| chromeCoupled | Outline           | DOM late-binding（写读统一走 `ctx.outline`）       |
 
 ## Provide 树
 

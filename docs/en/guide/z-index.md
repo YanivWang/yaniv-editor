@@ -59,12 +59,17 @@ Order: `modal > toast > tooltip > dropdown > drag-menu > picker-menu > floating-
 
 **Do not** use Ant Design static `message` / `notification` (global singleton, mounts to `document.body`, unsafe with multiple instances).
 
-Unified APIs:
+Unified APIs (in `src/core/overlayFeedback.ts` / `src/composables/useOverlayFeedback.ts`):
 
-- Vue components: `useOverlayFeedback()` (`src/composables/useOverlayFeedback.ts`)
-- Non-Vue / extensions: `showEditorToast` / `showEditorNotice` (`src/core/overlayFeedback.ts`)
+| Context                | Entry point                              | How the portal is located                       |
+| ---------------------- | ---------------------------------------- | ----------------------------------------------- |
+| Vue components         | `useOverlayFeedback()`                   | `useOverlayMountTarget()` (injected portal)     |
+| Tiptap extensions      | `showEditorToast` / `showEditorNotice`   | `resolveOverlayPortalFromNode(editor.view.dom)` |
+| Portal already in hand | `showOverlayToast` / `showOverlayNotice` | pass the `HTMLElement` directly                 |
 
-All mount into the current editor's overlay portal.
+`showEditorToast` / `showEditorNotice` are thin wrappers over `showOverlayToast` / `showOverlayNotice` that resolve the portal from the editor DOM first. All three end up in the current editor's overlay portal. Default durations: toast 2.5s, notice 3s.
+
+Of these, only `useOverlayFeedback` is part of the package's public exports; `showOverlayToast` / `showEditorToast` and friends are library-internal today.
 
 ## Custom Shell checklist
 
@@ -81,6 +86,10 @@ Library entry points:
 - `useOverlayMountTarget()` — Ant Design `getPopupContainer` / Modal `getContainer`
 - `useOverlayBubbleMenu()` — Tiptap 3 BubbleMenu (Floating UI) `appendTo` + `options`
 - `useOverlayFeedback()` / `showOverlayToast` / `showOverlayNotice` — Toast / Notice
+
+::: warning Building your own shell currently requires a fork
+`provideEditorRoot` / `provideOverlayPortal` / `getYeZIndex` in the checklist above are **not** exported from `@yanivjs/yaniv-editor` (the public surface has only `useOverlayMountTarget` / `useOverlayBubbleMenu` / `useOverlayFeedback`). Replacing `EditorShell` wholesale therefore means forking the repo; writing custom tool components on top of the existing editors is unaffected.
+:::
 
 ## Related
 

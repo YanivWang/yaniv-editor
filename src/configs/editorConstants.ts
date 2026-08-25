@@ -67,6 +67,8 @@ export const FONT_SIZES = [
 
 /**
  * 行间距选项
+ * @remarks 当前没有独立的行高工具栏控件；仅经 `components/editor/font` 转出，
+ * 供宿主自行拼装 UI，以及 `LineHeightOption` 类型推导。
  */
 export const LINE_HEIGHTS = [
   { label: "1.0", value: "1" },
@@ -93,7 +95,9 @@ export const HEADING_OPTIONS = [
 export const DEFAULT_CODE_BLOCK_LANGUAGE = "javascript";
 
 /**
- * 代码块语言选项
+ * 代码块语言选项 — 语言选择器（`CodeBlockDropdown` / `CodeBlockLanguageBadge`）的可选项。
+ * @remarks 这是 UI 列表，不是高亮能力范围：实际高亮由 lowlight `common` 语言包提供，
+ * 覆盖面更广；`html` 是 `codeBlockLowlight.ts` 为 `xml` 额外注册的别名。
  */
 export const CODE_LANGUAGES = [
   "javascript",
@@ -120,6 +124,8 @@ export const CODE_LANGUAGES = [
 
 /**
  * 对齐方式选项
+ * @deprecated 未被任何组件使用。`AlignDropdown` 直接读 i18n key（`editor.alignLeft` 等），
+ * 因此这里的中文 label 不会出现在 UI 上。保留仅为兼容外部引用。
  */
 export const TEXT_ALIGN_OPTIONS = [
   { label: "左对齐", value: "left" },
@@ -130,6 +136,8 @@ export const TEXT_ALIGN_OPTIONS = [
 
 /**
  * 表格边框样式选项
+ * @remarks 目前只被 `toolbarTypes.ts` 用于推导 `TableBorderStyle` 类型；
+ * `TableToolbar` 没有挂载边框样式切换 UI，label 不会被渲染。
  */
 export const TABLE_BORDER_STYLES = [
   { label: "默认边框", value: "default" },
@@ -139,6 +147,8 @@ export const TABLE_BORDER_STYLES = [
 
 /**
  * 默认配置值
+ * @remarks 当前只有 `fontFamily` / `fontSize` 被 `FontFamilySelect` / `FontSizeSelect` 使用，
+ * 作为读取不到当前 mark 时的回显值；其余字段无消费方。
  */
 export const DEFAULT_VALUES = {
   /** 默认字体 */
@@ -159,6 +169,8 @@ export const DEFAULT_VALUES = {
 
 /**
  * 编辑器限制
+ * @deprecated 未被任何运行时代码引用。缩放上下限与步长实际写在
+ * `FooterNav` / `ZoomBar` 的 props 默认值里（50 / 200 / 10），改这里不会生效。
  */
 export const EDITOR_LIMITS = {
   /** 最小缩放比例 */
@@ -175,6 +187,8 @@ export const EDITOR_LIMITS = {
 
 /**
  * 快捷键配置
+ * @deprecated 未被任何运行时代码引用，仅作文档性清单。真实快捷键由 StarterKit
+ * 与各扩展的 `addKeyboardShortcuts()` 注册，改这里不会改变实际绑定。
  */
 export const KEYBOARD_SHORTCUTS = {
   bold: "Mod-b",

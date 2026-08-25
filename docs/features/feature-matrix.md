@@ -12,14 +12,15 @@
 | `math`          |  ❌   |  ✅  |   ✅   | 顶栏公式            | `/`            |
 | `ai`            |  ❌   | ❌\* |   ✅   | 顶栏 AI + 悬浮菜单† | 悬浮菜单 AI    |
 | `formatPainter` |  ❌   |  ✅  |   ❌   | 顶栏格式刷          | —              |
-| `outline`       |  ❌   |  ✅  |   ✅   | 顶栏大纲            | 左侧大纲面板   |
-| `searchReplace` |  ❌   |  ✅  |   ✅   | 顶栏 / Ctrl+F       | Ctrl/Cmd+F     |
+| `outline`       |  ❌   |  ✅  |  ✅‡   | 顶栏大纲            | 无入口‡        |
+| `searchReplace` |  ❌   |  ✅  |  ✅‡   | 顶栏 / Ctrl+F       | 无入口‡        |
 | `officePaste`   |  ❌   |  ✅  |   ✅   | 粘贴即用            | 粘贴即用       |
 | `slashCommand`  |  ❌   |  ❌  |   ✅   | —                   | 空行输入 `/`   |
 | `dragHandle`    |  ❌   |  ❌  |   ✅   | —                   | 段落左侧六点   |
 
 \* full 需 `:features="{ ai: true }"` 并传入 `:ai-config`  
-† full 默认关闭 AI gate；开启后顶栏「智能」区显示 `AiMenuButton`，悬浮菜单亦有 AI 入口
+† full 默认关闭 AI gate；开启后顶栏「智能」区显示 `AiMenuButton`，悬浮菜单亦有 AI 入口  
+‡ notion 的 gate 默认开启（扩展会注册），但大纲开关与查找替换按钮**只存在于顶栏**，而 notion 隐藏了顶栏；且 notion 的顶栏配置里 `outline` / `searchReplace` 本身也是 `false`。因此 notion 下大纲面板不会渲染、Ctrl/Cmd+F 也不会被绑定（快捷键由 `FindReplaceButton` 注册）。详见 [大纲目录](./outline.md) 与 [查找替换](./find-replace.md)。
 
 ## 非 FeatureConfig 能力（preset 工具栏）
 

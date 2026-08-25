@@ -39,15 +39,29 @@ const aiConfig: YanivEditorAiConfig = {
 </template>
 ```
 
+## 字段默认值
+
+`ai-config` 只有 `provider` 必填，其余字段的兜底顺序如下（见 `capabilities/registry.ts` 与 `features/ai/shared/extensionOptions.ts`）：
+
+| 字段           | 未传时                                            |
+| -------------- | ------------------------------------------------- |
+| `apiKey`       | `""`                                              |
+| `endpoint`     | `AI_PROVIDERS` 中该 provider 的 `defaultEndpoint` |
+| `model`        | `AI_PROVIDERS` 中该 provider 的 `defaultModel`    |
+| `timeout`      | `60000`（`getAiConfig()` 的 `DEFAULT_TIMEOUT`）   |
+| `enabled`      | `true`（`enabled !== false`）                     |
+| `storageMode`  | `"memory"`                                        |
+| `showSettings` | 有 `ai-config` 时 `false`，否则 `true`            |
+
 ## 配置模式对比
 
-| 模式     | 来源         | AI 设置 UI   | 典型场景        |
-| -------- | ------------ | ------------ | --------------- |
-| 宿主托管 | `:ai-config` | 默认隐藏     | 生产集成        |
-| 用户配置 | localStorage | 显示         | Demo / 内部工具 |
-| 环境变量 | `VITE_AI_*`  | 视 demo 模式 | 本地开发        |
+| 模式     | 来源         | AI 设置 UI | 优先级 | 典型场景        |
+| -------- | ------------ | ---------- | :----: | --------------- |
+| 宿主托管 | `:ai-config` | 默认隐藏   |   1    | 生产集成        |
+| 用户配置 | localStorage | 显示       |   2    | Demo / 内部工具 |
+| 环境变量 | `VITE_AI_*`  | 显示       |   3    | 本地开发        |
 
-传入 `ai-config` 后**忽略** localStorage 与 `.env` 中的用户配置。
+传入 `ai-config` 后即视为宿主托管，后两级不再参与解析。未传时按 2 → 3 依次回退。
 
 ## 子包 API
 

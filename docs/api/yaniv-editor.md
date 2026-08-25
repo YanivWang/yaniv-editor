@@ -29,6 +29,20 @@ import "@yanivjs/yaniv-editor/style.css";
 
 `zIndexBase` 与浮层挂载详见 [Z-Index 与浮层](../guide/z-index.md)。
 
+`initialContent` 名为「初始」，但它同时是**受控源**：`useControlledContent` 会 watch 它，值变化且与当前文档签名不同时通过 `ContentAdapter.setContent` 写回编辑器（`addToHistory: false`）。因此 `:initial-content="doc" @update="doc = $event"` 是可用的受控写法，签名去重会避免 emit 回流导致光标跳动。
+
+## Events
+
+| 事件     | 载荷          | 说明                                              |
+| -------- | ------------- | ------------------------------------------------- |
+| `update` | `JSONContent` | 编辑器 `update` 时派发当前文档的 ProseMirror JSON |
+
+```vue
+<YanivEditor :initial-content="doc" @update="doc = $event" />
+```
+
+Full Editor 的内容协议是 **JSON**；`initialContent` 可以传 HTML 字符串或 `JSONContent`，但 `@update` 始终派发 `JSONContent`。
+
 ## 示例
 
 ```vue

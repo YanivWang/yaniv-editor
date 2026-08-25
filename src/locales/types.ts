@@ -189,6 +189,20 @@ export interface TiptapLocale {
     outlineEmpty: string;
     outlineClose: string;
 
+    /** 媒体上下文条 */
+    mediaPreview: string;
+    imageDelete: string;
+    videoDelete: string;
+
+    /** 拖拽手柄 aria-label */
+    dragHandleAddBlock: string;
+    dragHandleOpenMenu: string;
+
+    /** Session 状态 */
+    sessionLoading: string;
+    sessionRetry: string;
+    sessionInitFailed: string;
+
     toolbarLabel: string;
     toolbarSectionHistory: string;
     toolbarSectionTypography: string;

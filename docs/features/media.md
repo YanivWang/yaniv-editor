@@ -27,14 +27,19 @@
 ## 图片
 
 - **插入**：full 顶栏 / notion 的 `/` 或悬浮菜单
-- **选中后**：图片上下文条 — 左/中/右对齐、预览、删除、拖拽缩放
-- **粘贴**：支持粘贴图片（`image` gate 开启时）
+- **选中后**：图片上下文条（`ImageToolbar`）— 左 / 居中 / 右对齐、预览（Modal）、删除
+- **缩放**：拖拽缩放由 `ResizableImage`（`enableResize: true`）的节点手柄提供，不在上下文条里
+- **粘贴**：`PasteImage` 扩展随 `image` gate 一起注册，支持直接粘贴图片
 
 ## 视频
 
 - **插入**：full 顶栏 / notion 块菜单
-- **选中后**：视频上下文条 — 预览播放、删除
+- **选中后**：视频上下文条（`VideoToolbar`）— 预览播放（Modal）、删除
 - 预览模式（`mode="preview"`）下视频仍可播放
+
+::: warning 媒体上下文条尚未接入 i18n
+`ImageToolbar` / `VideoToolbar` 的按钮 `title`（「预览」「删除图片」「左对齐」等）是硬编码中文，没有走 `useEditorT()`。设 `locale="en-US"` 时这些 tooltip 仍显示中文。
+:::
 
 ## 图库
 

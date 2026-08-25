@@ -21,14 +21,16 @@
 
 ## 浮动文本菜单
 
-选中文本或空行行首出现，提供格式、颜色、链接、列表等（notion / full）。AI 入口在 AI gate 开启时出现。
+仅在**存在非空文本选区**时出现（`shouldShowFloatingTextToolbar`），位置跟随选区；空行光标不触发。以下情形也会抑制它：选中的是 NodeSelection、光标位于代码块 / 表格 / 图片 / 视频 / 链接内、选区贴着媒体节点，或块拖拽进行中（`isBubbleMenuBlocked`）。
+
+内容：标题下拉、粗/斜/下划线/删除线、文字色与高亮、链接、列表；AI gate 开启时追加 `AiMenuButton`。**不含**对齐与清除格式。
 
 ## 气泡 / 上下文条
 
 | 选区类型   | UI                                                                           |
 | ---------- | ---------------------------------------------------------------------------- |
 | 链接       | 链接气泡 — 编辑 URL、取消链接                                                |
-| 图片       | 图片上下文条 — 对齐、预览、删除、缩放                                        |
+| 图片       | 图片上下文条 — 对齐、预览、删除（拖拽缩放来自节点手柄，不在此条内）          |
 | 视频       | 视频上下文条 — 播放预览、删除                                                |
 | 表格单元格 | 表格上下文条 — 增删行列、合并/拆分、表头行/列、删除整表（无单元格背景色 UI） |
 
@@ -42,7 +44,9 @@ bubble menu、BlockPicker、mention 建议、AI popover 等均挂载在 `EditorS
 
 ## 移动端
 
-视口 ≤768px 时顶栏自动回退 **COMPACT** 布局（ToolbarNav）。
+视口 ≤768px 时（`matchMedia("(width <= 768px)")`），`ToolbarNav` 会把 `COMPACT_TOOLBAR_CONFIG` 作为掩码叠加到 preset 配置上，收敛为精简工具带。
+
+COMPACT 在这里是**掩码**（取交集），只能进一步收窄工具带，不会重新打开 gate 已关闭的能力——例如 `preset="basic"`（AI gate 关闭）在窄屏下不会渲染 `AiMenuButton`。
 
 ## Session Loading
 

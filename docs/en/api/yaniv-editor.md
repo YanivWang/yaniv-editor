@@ -29,6 +29,20 @@ import "@yanivjs/yaniv-editor/style.css";
 
 See [Z-Index & Overlays](../guide/z-index.md) for `zIndexBase` and overlay mounting.
 
+Despite its name, `initialContent` is also a **controlled source**: `useControlledContent` watches it and, when the incoming value differs from the current document signature, writes it back through `ContentAdapter.setContent` (with `addToHistory: false`). So `:initial-content="doc" @update="doc = $event"` is a valid controlled pattern — signature de-duplication prevents the emit round-trip from moving the caret.
+
+## Events
+
+| Event    | Payload       | Description                                                                    |
+| -------- | ------------- | ------------------------------------------------------------------------------ |
+| `update` | `JSONContent` | Emitted on the editor's `update` with the current document as ProseMirror JSON |
+
+```vue
+<YanivEditor :initial-content="doc" @update="doc = $event" />
+```
+
+Full Editor's content protocol is **JSON**. `initialContent` accepts an HTML string or `JSONContent`, but `@update` always emits `JSONContent`.
+
 ## Examples
 
 ```vue

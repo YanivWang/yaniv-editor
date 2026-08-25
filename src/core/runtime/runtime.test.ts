@@ -6,7 +6,11 @@ import { applyGatesToToolbarConfig } from "@/capabilities/applyGatesToToolbarCon
 import { buildExtensions } from "@/capabilities/buildExtensions";
 import { CAPABILITIES } from "@/capabilities/registry";
 import { resolveShowInlineToolbar } from "@/capabilities/resolveShowInlineToolbar";
-import { FULL_TOOLBAR_CONFIG } from "@/components/tools/header-nav/toolbarConfig";
+import {
+  COMPACT_TOOLBAR_CONFIG,
+  FULL_TOOLBAR_CONFIG,
+  type ToolbarToolsConfig,
+} from "@/components/tools/header-nav/toolbarConfig";
 import { computeSessionKey } from "@/core/runtime/computeSessionKey";
 import { mergeFeatures } from "@/core/runtime/mergeFeatures";
 import { resolveChromePolicy } from "@/core/runtime/resolveChromePolicy";
@@ -315,5 +319,44 @@ describe("buildExtensions", () => {
     });
 
     expect(extensions.some((extension) => extension.name === "customInlineExtension")).toBe(true);
+  });
+});
+
+describe("ToolbarNav 移动端掩码", () => {
+  /**
+   * 回归护栏：移动端的 COMPACT 合并必须是「取交集」而非「覆盖」。
+   * 直接 spread COMPACT 会让其中硬编码为 true 的 image / ai 绕过 gate 过滤，
+   * 渲染出没有扩展支撑的按钮。
+   */
+  function applyMobileMask(base: ToolbarToolsConfig): ToolbarToolsConfig {
+    const masked: ToolbarToolsConfig = {};
+    for (const key of Object.keys(base) as Array<keyof ToolbarToolsConfig>) {
+      masked[key] = base[key] === true && COMPACT_TOOLBAR_CONFIG[key] === true;
+    }
+    return masked;
+  }
+
+  test("gate 关闭的 ai 不会被 COMPACT 重新打开", () => {
+    const profile = resolveEditorProfile({ preset: "basic" });
+    const gated = applyGatesToToolbarConfig(
+      { ...FULL_TOOLBAR_CONFIG, ...COMPACT_TOOLBAR_CONFIG },
+      profile.gates,
+    );
+    expect(gated.ai).toBe(false);
+    expect(applyMobileMask(gated).ai).toBe(false);
+  });
+
+  test("gate 关闭的 image 不会被 COMPACT 重新打开", () => {
+    const profile = resolveEditorProfile({ preset: "basic", features: { image: false } });
+    const gated = applyGatesToToolbarConfig({ ...FULL_TOOLBAR_CONFIG }, profile.gates);
+    expect(gated.image).toBe(false);
+    expect(applyMobileMask(gated).image).toBe(false);
+  });
+
+  test("掩码只收窄：COMPACT 未包含的 word 在移动端关闭", () => {
+    const profile = resolveEditorProfile({ preset: "full" });
+    const gated = applyGatesToToolbarConfig({ ...FULL_TOOLBAR_CONFIG }, profile.gates);
+    expect(gated.word).toBe(true);
+    expect(applyMobileMask(gated).word).toBe(false);
   });
 });

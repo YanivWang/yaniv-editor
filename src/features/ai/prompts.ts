@@ -1,6 +1,11 @@
 /**
  * AI Prompts
- * System prompts for various AI features
+ * System prompts for various AI features.
+ *
+ * @remarks 调用方（`client.ts`）目前只读 `*.system`（中文模板）与
+ * `translate.targetLanguages`；各条目上的 `en` 变体没有任何引用，改 `locale`
+ * 也不会切换到英文 prompt。中文 system prompt 都要求「使用与原文相同的语言」，
+ * 所以英文输入仍会得到英文输出。
  */
 
 export const AI_PROMPTS = {
@@ -70,6 +75,11 @@ Output the summary directly.`,
 - 保持原文风格
 - 处理好文化差异
 直接输出翻译结果，不要添加解释。`,
+    /**
+     * 目标语言展示名。仅覆盖 `LANGUAGE_CODES`（14 种）中的 8 种；
+     * 未收录的 code（th / pt / vi / ru / hi / id）由 `client.ts` 中
+     * `translateTargetLabel` 的 `|| targetLang` 兜底，直接把语言代码写进 prompt。
+     */
     targetLanguages: {
       "zh-CN": "简体中文",
       "zh-TW": "繁體中文",

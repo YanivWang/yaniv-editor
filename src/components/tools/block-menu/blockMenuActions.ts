@@ -220,6 +220,10 @@ export function insertBlockEmbedAt(editor: Editor, insertPos: number, url: strin
     .run();
 }
 
+/**
+ * @param item 默认值是**占位内容**（会写进文档，可由用户改写），不是 UI 文案，
+ * 故不走 i18n；宿主接入真实的页面/人员数据时应显式传入。
+ */
 export function insertBlockMentionAt(
   editor: Editor,
   insertPos: number,

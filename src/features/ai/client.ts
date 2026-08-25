@@ -9,14 +9,29 @@ import { loadAiConfig } from "./envConfig";
 import { createAiAdapter } from "./factory";
 import { AI_PROMPTS } from "./prompts";
 
-import type { AiProvider } from "./config/types";
+import type { AiProvider, AiStorageMode } from "./config/types";
 import type { AiAdapter, AiMessage, AiStreamCallbacks } from "./types";
 
 export interface CreateAiClientOptions {
   /** 传入时始终使用该 adapter，不走全局配置 / demo */
   adapter?: AiAdapter;
-  /** 扩展 configure getter：每次请求时现取最新 aiConfig */
-  resolveConfig?: () => (Partial<ResolvedAiConfig> & { endpoint?: string }) | null;
+  /**
+   * 扩展 configure getter：每次请求时现取最新 aiConfig。
+   * 返回 `null`（或不含 provider）表示"本层无配置"，交由 `getAiConfig()` 继续走
+   * localStorage / 宿主托管 / `.env` 回退链。
+   */
+  resolveConfig?: () => AiRuntimeConfigOverride | null;
+}
+
+/** 扩展层透传的宿主原值，字段可缺省，缺省部分由 `getAiConfig()` 补齐 */
+export interface AiRuntimeConfigOverride {
+  provider?: AiProvider;
+  apiKey?: string;
+  endpoint?: string;
+  baseUrl?: string;
+  model?: string;
+  timeout?: number;
+  storageMode?: AiStorageMode;
 }
 
 type AiDemoType = "continue" | "polish" | "summarize" | "translate" | "custom";
@@ -27,6 +42,8 @@ interface ResolvedAiConfig {
   baseUrl: string;
   model: string;
   timeout: number;
+  /** proxy 表示密钥由后端保管，前端无需 apiKey；参与 `isAiConfigured` 判定 */
+  storageMode?: AiStorageMode;
 }
 
 const DEFAULT_TIMEOUT = 60000;
@@ -42,22 +59,26 @@ export function normalizeAiError(error: unknown): Error {
   return new Error("AI 请求失败");
 }
 
-function getAiConfig(resolveOverride?: () => Partial<ResolvedAiConfig> | null): ResolvedAiConfig {
+/**
+ * 配置解析的**唯一入口**。优先级：
+ * 1. `resolveOverride()` — 宿主 `ai-config` prop（经扩展 getter 透传）
+ * 2. `getAiRequestConfig()` — localStorage 用户配置 / 宿主托管副本
+ * 3. `loadAiConfig()` — 构建期 `VITE_AI_*`
+ *
+ * 上游各层**不得**自行填兜底值：一旦 override 带上了 provider，就意味着"宿主已托管"，
+ * 后两级回退将被跳过。缺省值一律在本函数内补齐。
+ */
+function getAiConfig(resolveOverride?: () => AiRuntimeConfigOverride | null): ResolvedAiConfig {
   const runtime = resolveOverride?.();
   if (runtime?.provider) {
     const providerInfo = getProviderInfo(runtime.provider);
-    const endpoint =
-      "endpoint" in runtime && typeof runtime.endpoint === "string" ? runtime.endpoint : undefined;
     return {
       provider: runtime.provider,
-      apiKey: typeof runtime.apiKey === "string" ? runtime.apiKey : "",
-      baseUrl:
-        (typeof runtime.baseUrl === "string" ? runtime.baseUrl : undefined) ??
-        endpoint ??
-        providerInfo?.defaultEndpoint ??
-        "",
+      apiKey: runtime.apiKey ?? "",
+      baseUrl: runtime.baseUrl ?? runtime.endpoint ?? providerInfo?.defaultEndpoint ?? "",
       model: runtime.model ?? providerInfo?.defaultModel ?? "gpt-4o-mini",
       timeout: runtime.timeout ?? DEFAULT_TIMEOUT,
+      storageMode: runtime.storageMode,
     };
   }
 
@@ -69,6 +90,8 @@ function getAiConfig(resolveOverride?: () => Partial<ResolvedAiConfig> | null): 
       baseUrl: userConfig.endpoint,
       model: userConfig.model,
       timeout: userConfig.timeout,
+      // getAiRequestConfig 内部已按 storageMode 校验过 apiKey，到这里即视为合格
+      storageMode: "proxy",
     };
   }
 
@@ -99,6 +122,11 @@ function isAiConfigured(config: ResolvedAiConfig): boolean {
   const providerInfo = getProviderInfo(config.provider);
   if (!providerInfo) return false;
 
+  // proxy：密钥由后端保管，前端不应有 apiKey，只要有可达 endpoint 即视为已配置
+  if (config.storageMode === "proxy") {
+    return Boolean(config.baseUrl?.trim());
+  }
+
   if (providerInfo.requiresApiKey) {
     return Boolean(config.apiKey?.trim());
   }
@@ -112,7 +140,7 @@ function isAiConfigured(config: ResolvedAiConfig): boolean {
 
 function resolveAdapter(
   explicit?: AiAdapter,
-  resolveOverride?: () => Partial<ResolvedAiConfig> | null,
+  resolveOverride?: () => AiRuntimeConfigOverride | null,
 ): AiAdapter {
   if (explicit) return explicit;
 

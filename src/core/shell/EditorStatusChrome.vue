@@ -5,7 +5,7 @@
     :total-pages="totalPages"
     :show-char-count="true"
     :show-shortcut-hints="chrome.showStatusHints"
-    :zoom-bar-placement="presetLayout.zoomPlacement"
+    :placement="presetLayout.zoomPlacement"
   />
 </template>
 

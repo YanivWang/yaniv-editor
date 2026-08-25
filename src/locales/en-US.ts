@@ -175,6 +175,17 @@ export const enUS: TiptapLocale = {
     outlineEmpty: "No headings yet. Add H1–H6 to build an outline.",
     outlineClose: "Close outline",
 
+    mediaPreview: "Preview",
+    imageDelete: "Delete image",
+    videoDelete: "Delete video",
+
+    dragHandleAddBlock: "Add block",
+    dragHandleOpenMenu: "Open block menu or drag to reorder",
+
+    sessionLoading: "Loading editor...",
+    sessionRetry: "Retry",
+    sessionInitFailed: "Failed to initialize the editor",
+
     toolbarLabel: "Editor toolbar",
     toolbarSectionHistory: "History",
     toolbarSectionTypography: "Font",

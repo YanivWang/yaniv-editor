@@ -29,7 +29,7 @@ import { ListShortcuts } from "@/extensions/listShortcuts";
 import { NotionMarkdownInput } from "@/extensions/markdownInput/NotionMarkdownInput";
 import { Mention } from "@/extensions/mention";
 import { OfficePaste } from "@/extensions/office-paste";
-import { OutlineScrollParentBinder } from "@/extensions/outlineScrollParentBinder";
+import { createOutlineScrollParentBinder } from "@/extensions/outlineScrollParentBinder";
 import { PasteImage } from "@/extensions/pasteImage";
 import { ResizableImage } from "@/extensions/resizableImage";
 import { SearchReplace } from "@/extensions/search-replace";
@@ -150,7 +150,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
           ctx.outline.scrollParent() ??
           (typeof window !== "undefined" ? window : (null as unknown as Window)),
       }),
-      OutlineScrollParentBinder,
+      createOutlineScrollParentBinder({ bindScrollParent: ctx.outline.bindScrollParent }),
     ],
   },
   {
@@ -200,12 +200,16 @@ export const CAPABILITIES: CapabilityDefinition[] = [
     schemaSignature: (profile) => (profile.gates.ai ? "ai" : ""),
     fullToolbarSlugs: ["ai"],
     extensions: (ctx) => {
+      // 全部 getter 直透宿主 ai-config 原值，不填兜底：
+      // 兜底与 localStorage / .env 回退链由 client.ts 的 getAiConfig() 统一负责。
+      // 这里若给 provider 填默认值，getAiConfig() 会误判宿主已托管而跳过回退分支。
       const aiOpts = {
-        getProvider: () => ctx.aiConfig()?.provider ?? "openai",
+        getProvider: () => ctx.aiConfig()?.provider,
         getApiKey: () => ctx.aiConfig()?.apiKey,
         getModel: () => ctx.aiConfig()?.model,
         getEndpoint: () => ctx.aiConfig()?.endpoint,
-        getTimeout: () => ctx.aiConfig()?.timeout ?? 30_000,
+        getTimeout: () => ctx.aiConfig()?.timeout,
+        getStorageMode: () => ctx.aiConfig()?.storageMode,
         getLocaleText: (key: string) => {
           const parts = key.split(".");
           let cur: unknown = ctx.locale;

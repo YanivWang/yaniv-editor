@@ -322,23 +322,23 @@ function findTargetFromCoords(view: EditorView, event: MouseEvent): DragTarget |
   return null;
 }
 
-function createPlusButtonElement(): HTMLButtonElement {
+function createPlusButtonElement(ariaLabel: string): HTMLButtonElement {
   const plusButton = document.createElement("button");
   plusButton.type = "button";
   plusButton.className = "drag-handle-plus";
   plusButton.contentEditable = "false";
-  plusButton.setAttribute("aria-label", "添加块");
+  plusButton.setAttribute("aria-label", ariaLabel);
   plusButton.innerHTML =
     '<svg class="drag-handle-plus__icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>';
   return plusButton;
 }
 
-function createHandleElement(): HTMLElement {
+function createHandleElement(ariaLabel: string): HTMLElement {
   const handle = document.createElement("div");
   handle.className = "drag-handle";
   handle.contentEditable = "false";
   handle.draggable = true;
-  handle.setAttribute("aria-label", "打开块菜单或拖拽排序");
+  handle.setAttribute("aria-label", ariaLabel);
   handle.setAttribute("role", "button");
   handle.setAttribute("tabindex", "0");
 
@@ -729,8 +729,9 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
         key: dragHandleKey,
 
         view(view) {
-          const plusButton = createPlusButtonElement();
-          const handle = createHandleElement();
+          // aria-label 走实例 locale：扩展拿不到 Vue inject，统一经 getMenuLabel 解析
+          const plusButton = createPlusButtonElement(getMenuLabel("editor.dragHandleAddBlock"));
+          const handle = createHandleElement(getMenuLabel("editor.dragHandleOpenMenu"));
           const menu = createBlockMenuElement();
           const handleRoot = view.dom.parentElement ?? view.dom;
           let currentTarget: DragTarget | null = null;

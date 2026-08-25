@@ -46,7 +46,11 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-所有内置外观 CSS 由 `@yanivjs/yaniv-editor/style.css` 提供。`loadAppearance` 和 `preloadAppearances` 保持公共 API 异步，但仅标记内置外观为就绪。
+所有内置外观 CSS 由 `@yanivjs/yaniv-editor/style.css` 一次性提供。`loadAppearance` / `preloadAppearances` 保留异步签名以维持 API 形态，实际只把外观记进一个 `Set` 标记为就绪，不做动态 `import()`。
+
+::: tip Inline Editor 没有 appearance
+`appearance` / `customAppearanceVars` 是 `YanivEditor` 独有的 prop。`EditorShell` 在 inline host 下固定按 `"default"` 处理，`inline.css` 也不打包任何 `appearance/styles/*.css`。`YanivInlineEditor` 只支持 `colorMode`。
+:::
 
 ## CSS 架构
 

@@ -35,7 +35,7 @@ Styles split into structure, functional chrome, and appearance. Do not duplicate
 | Functional chrome | `src/styles/*.css`, `src/components/tools/**`           | Toolbar, menus, drag handle, outline, `overlay-portal.css`, etc. |
 | Appearance        | `src/appearance/styles/*.css`                           | Theme tokens and typography (margin, font-size, padding)         |
 
-Import order is defined in `src/styles/index.css` (Full) and `src/styles/inline.css` (Inline). Both import `content.css` and `overlay-portal.css` before appearance CSS.
+Import order is defined in `src/styles/index.css` (Full) and `src/styles/inline.css` (Inline). Both start with `variables.css` and import `content.css` and `overlay-portal.css` ahead of other rules. Only `index.css` imports `appearance/styles/*.css` at the end; `inline.css` contains **no appearance files at all** (Inline has no `appearance` prop).
 
 Rules:
 

@@ -49,15 +49,26 @@ The block menu is filtered by gates and schema (e.g., table item hidden when `ta
 
 ## Markdown Input Rules
 
-Under the `notion` scheme, partial Markdown shortcuts are supported:
+`NotionMarkdownInput` is registered by the `notionBlocks` capability, whose `featureKey` is **`slashCommand`** — so these rules come with `slashCommand`, not with the `notion` preset specifically:
 
-- `[]` / `[x]` → task list
-- `>` → callout block
-- `---` → horizontal rule
+| Input          | Result                                                                        |
+| -------------- | ----------------------------------------------------------------------------- |
+| `[] ` / `[x] ` | Task list (a space is required after the brackets; `[x]` is case-insensitive) |
+| `> `           | Callout block (falls back to blockquote when the schema has no callout)       |
+| `---`          | Horizontal rule (no trailing space needed)                                    |
 
-## Line-Start Floating Menu
+StarterKit's own rules (`#`, `- `, `1. `, ` ``` `, …) work under every preset and are unaffected by this gate.
 
-`full` and `notion` show `+` or format buttons at the start of empty lines, complementing the block menu.
+## Line-Start `+` Button
+
+The `+` to the left of a paragraph (`drag-handle-plus`) is provided by the **dragHandle capability** and opens the insert menu. It is a different thing from the floating text menu:
+
+| UI                                | Provided by                   | Trigger                                                  |
+| --------------------------------- | ----------------------------- | -------------------------------------------------------- |
+| Line-start `+` / six-dot handle   | the `dragHandle` gate         | hovering a block                                         |
+| Floating text menu (FloatingMenu) | preset layout (full / notion) | a **non-empty text selection**; an empty cursor does not |
+
+See [Contextual UI](./contextual-ui.md).
 
 ## Preview Mode
 

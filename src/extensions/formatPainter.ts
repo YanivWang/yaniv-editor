@@ -364,6 +364,32 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
             },
           },
         },
+
+        /**
+         * 退出编辑态时自清格式刷状态。
+         *
+         * 激活标志、采样到的 formats 与写在编辑区上的光标样式都归本扩展所有，
+         * 复位责任因此也在这里：格式刷按钮是随顶栏一起被 `v-if` 卸载的，
+         * 卸载路径不会调用 cancelFormatPainting，否则残留的激活态与 painter
+         * 光标会一直带进 preview。
+         */
+        view() {
+          let wasEditable: boolean | null = null;
+
+          return {
+            update(view) {
+              const isEditable = view.editable;
+              if (wasEditable === isEditable) return;
+
+              const leftEditMode = wasEditable === true && !isEditable;
+              wasEditable = isEditable;
+
+              if (leftEditMode && storage.isActive && editor) {
+                editor.commands.cancelFormatPainting();
+              }
+            },
+          };
+        },
       }),
     ];
   },

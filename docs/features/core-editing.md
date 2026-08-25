@@ -18,9 +18,10 @@ Full Editor 的 **core** 层扩展在各 preset 下始终注册，不通过 `Fea
 
 ## 代码块
 
-- 语法高亮（lowlight，20+ 语言）
+- 语法高亮：lowlight `common` 语言包（额外把 `xml` 注册了一个 `html` 别名）
+- 语言选择器提供 20 种常用语言（`CODE_LANGUAGES`），默认 `javascript`
 - full / notion：顶栏或 `/` 插入
-- 代码块语言可在块角标切换
+- 代码块语言可在块角标（`CodeBlockLanguageBadge`）切换
 
 ## 字体与排版（full 顶栏）
 
@@ -30,7 +31,7 @@ Full Editor 的 **core** 层扩展在各 preset 下始终注册，不通过 `Fea
 
 ## 字符计数
 
-底栏（basic / full）显示字数；由 CharacterCount 扩展提供。
+底栏（basic / full）显示字符数、词数与页数；字符/词数由 CharacterCount 扩展提供，页数由 `useEditorPagination` 估算。底栏同时提供 50%–200%（步长 10）的缩放控制。
 
 ## Inline Editor
 

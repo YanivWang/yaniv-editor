@@ -23,7 +23,9 @@
 
 ## 配置
 
-扩展内部支持逐项关闭 HTML transform（`htmlTransforms` 配置，高级集成场景）。
+`OfficePaste` 扩展本身支持逐项关闭 HTML transform（`htmlTransforms`：`lists` / `bookmarks` / `msoStyles` / `msoHtmlClasses` / `lineNumber` / `imagePlaceholder`，默认全开）以及 `excelTablePaste` 开关。
+
+但 registry 注册时只传了 `onPasteFromOfficeWithImages`，**`YanivEditor` 没有暴露透传这些选项的 prop**。要调整流水线，只能自行 `OfficePaste.configure({ ... })` 并接管扩展注册（自建 Shell / fork）。相关 transform 函数从 `src/extensions/office-paste` 导出，便于单测。
 
 ## 相关
 

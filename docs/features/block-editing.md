@@ -49,15 +49,26 @@ Notion 风格块编辑由 `slashCommand` 和 `dragHandle` 能力驱动，**`noti
 
 ## Markdown 输入规则
 
-`notion` 方案下支持部分 Markdown 快捷输入：
+`NotionMarkdownInput` 由 `notionBlocks` capability 注册，其 `featureKey` 是 **`slashCommand`** —— 也就是说开了 `slashCommand` 就有这些规则，不限于 `notion` preset：
 
-- `[]` / `[x]` → 任务列表
-- `>` → 标注块
-- `---` → 分割线
+| 输入           | 结果                                               |
+| -------------- | -------------------------------------------------- |
+| `[] ` / `[x] ` | 任务列表（方括号后需一个空格，`[x]` 大小写不敏感） |
+| `> `           | 标注块 Callout（schema 无 callout 时退化为引用块） |
+| `---`          | 分割线（无需空格）                                 |
 
-## 行首悬浮菜单
+StarterKit 自带的 `#`、`- `、`1. `、` ``` ` 等规则在所有 preset 下都可用，不受此 gate 影响。
 
-`full` 与 `notion` 在空行行首显示 `+` 或格式按钮，与块菜单互补。
+## 行首 `+` 按钮
+
+段落左侧的 `+`（`drag-handle-plus`）由 **dragHandle 能力**提供，点击打开插入菜单。它和「浮动文本菜单」是两个不同的东西：
+
+| UI                        | 由谁提供                       | 触发条件                             |
+| ------------------------- | ------------------------------ | ------------------------------------ |
+| 行首 `+` / 六点手柄       | `dragHandle` gate              | 鼠标悬停到块上                       |
+| 浮动文本菜单 FloatingMenu | preset layout（full / notion） | **存在非空文本选区**，空行光标不触发 |
+
+详见 [上下文 UI](./contextual-ui.md)。
 
 ## 预览模式
 

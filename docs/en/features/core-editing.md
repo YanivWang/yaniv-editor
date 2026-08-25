@@ -18,9 +18,10 @@ Full Editor **core** extensions are always registered across presets and are not
 
 ## Code Blocks
 
-- Syntax highlighting (lowlight, 20+ languages)
+- Syntax highlighting: the lowlight `common` language pack (plus an `html` alias registered for `xml`)
+- The language picker offers 20 common languages (`CODE_LANGUAGES`), defaulting to `javascript`
 - full / notion: insert from header or `/`
-- Code block language can be switched via the block badge
+- Code block language can be switched via the block badge (`CodeBlockLanguageBadge`)
 
 ## Font and Typography (full header)
 
@@ -30,7 +31,7 @@ Full Editor **core** extensions are always registered across presets and are not
 
 ## Character Count
 
-The footer (basic / full) shows word count, powered by the CharacterCount extension.
+The footer (basic / full) shows character count, word count, and page count. Characters/words come from the CharacterCount extension; pages are estimated by `useEditorPagination`. The footer also provides a 50%–200% zoom control (step 10).
 
 ## Inline Editor
 

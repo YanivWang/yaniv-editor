@@ -32,11 +32,17 @@ UX: **AiSuggestionPopover** streams suggestions with accept/reject; **AiHighligh
 
 ## Config Sources (Priority)
 
-1. **Host-managed**: `:ai-config` prop — ignores localStorage / `.env`, hides "AI Settings" by default
-2. **User config**: localStorage + `useAiConfig` (when no ai-config)
-3. **Build-time**: `VITE_AI_*` env vars (demo mode)
+`getAiConfig()` in `client.ts` is the single resolution entry point. Highest priority first:
 
-`ai-config` field changes **do not** trigger session rebuild; extensions read dynamically via getters.
+1. **Host-managed** — the `:ai-config` prop, forwarded through the registry's getters (read fresh on every request)
+2. **User config** — localStorage (written by `AiSettingsModal`, read by `getAiRequestConfig()`)
+3. **Build-time** — `VITE_AI_*` environment variables
+
+Upstream layers (registry getters, `resolveAiExtensionOptions`) **only forward the host's raw values and never fill in defaults**: without `:ai-config`, `resolveAiExtensionOptions` returns `null` and resolution falls through to levels 2 and 3. Defaults (the provider's default endpoint / model, a 60s `timeout`) are filled in inside `getAiConfig()`.
+
+`ai-config` field changes **do not** trigger a session rebuild; changing `model` takes effect on the next request.
+
+With `storageMode: "proxy"` the key is held by your backend, so an omitted `apiKey` still counts as configured as long as there is a reachable endpoint.
 
 ## Providers
 

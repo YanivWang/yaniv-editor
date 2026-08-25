@@ -21,9 +21,13 @@
 
 ## 实现要点
 
-- `chromePolicy.showEditChrome=false`
+- `chromePolicy.showEditChrome=false`；编辑 chrome（顶栏、底栏、上下文条、块菜单）整体 `v-if` 卸载
 - 扩展注册集合**不因** phase 变化；interaction 扩展通过 `isEditable` 守卫 + 事务过滤器拦截
-- 切到 preview 前先 emit phase 事件清理格式刷、查找等状态，再 `setEditable(false)`
+- `applyPhaseTransition` 的顺序是「edit → preview：先 emit 再 `setEditable(false)`；preview → edit：先 `setEditable(true)` 再 emit」，保证订阅方的清理命令在 `editable=true` 时刻执行
+
+::: tip 当前只有一个 phase 订阅方
+`EditorShell` 订阅 `onPhaseChange`，切到 preview 时只做 `blockMenuHost.hide()`。格式刷、查找替换等**没有**注册 phase 清理回调——它们的状态复位依赖对应按钮组件随顶栏一起卸载。详见 [格式刷](../features/format-painter.md#预览切换) 与 [查找替换](../features/find-replace.md#预览切换)。
+:::
 
 ## CSS 选择器
 

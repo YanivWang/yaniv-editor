@@ -328,6 +328,38 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
             return searchReplacePluginKey.getState(state) ?? DecorationSet.empty;
           },
         },
+        /**
+         * 退出编辑态时自清搜索状态。
+         *
+         * 搜索词、命中集合与高亮装饰都归本扩展所有，因此复位责任也在这里，
+         * 不依赖外部（Shell / 工具栏按钮）代为清理：查找面板是随顶栏一起被
+         * `v-if` 卸载的，卸载路径不会触发面板的 onClose，残留的搜索词会让
+         * 命中高亮一直显示到 preview 里。
+         */
+        view() {
+          let wasEditable: boolean | null = null;
+
+          return {
+            update(view) {
+              const isEditable = view.editable;
+              if (wasEditable === isEditable) return;
+
+              const leftEditMode = wasEditable === true && !isEditable;
+              wasEditable = isEditable;
+              if (!leftEditMode) return;
+
+              const storage = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
+                .searchReplace;
+              if (!storage.searchTerm && !storage.replaceTerm) return;
+
+              storage.searchTerm = "";
+              storage.replaceTerm = "";
+              storage.resultIndex = 0;
+              // 触发一次 apply 重算，清掉已渲染的高亮装饰
+              editor.view.dispatch(bumpTransaction(editor.state));
+            },
+          };
+        },
       }),
     ];
   },

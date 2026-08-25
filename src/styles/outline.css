@@ -27,6 +27,45 @@
   pointer-events: auto;
 }
 
+/*
+ * 收起态展开把手：面板收起时占据 rail 的锚点位置。
+ * 顶栏的 OutlineToggleButton 只在 full preset 存在，notion 隐藏顶栏后
+ * 这里是唯一的展开入口，因此不能依赖 toolbarConfig。
+ */
+.outline-rail__handle {
+  position: absolute;
+  top: 0;
+  z-index: var(--ye-z-content);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--ye-text-muted);
+  pointer-events: auto;
+  cursor: pointer;
+  background: var(--ye-bg);
+  border: var(--ye-border-width) solid var(--ye-border);
+  border-radius: var(--ye-radius-sm, 4px);
+  transition:
+    color var(--ye-transition-fast),
+    background var(--ye-transition-fast);
+}
+
+.outline-rail__handle:hover {
+  color: var(--ye-text);
+  background: var(--ye-bg-hover);
+}
+
+.outline-rail__handle--top-left {
+  left: 0;
+}
+
+.outline-rail__handle--top-right {
+  right: 0;
+}
+
 /* 大纲面板：结构与定位（视觉皮肤见 appearance/styles/） */
 .outline-panel {
   position: absolute;

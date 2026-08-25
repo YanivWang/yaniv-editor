@@ -106,10 +106,7 @@
           :aria-label="t('editor.toolbarSectionTools')"
         >
           <div v-if="config.searchReplace || config.outline" class="tool-row">
-            <FindReplaceButton
-              v-if="config.searchReplace"
-              :hotkeys-enabled="!!config.searchReplace"
-            />
+            <FindReplaceButton v-if="config.searchReplace" />
             <OutlineToggleButton v-if="config.outline" />
           </div>
         </section>
@@ -153,7 +150,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
 import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
-import FindReplaceButton from "@/components/editor/find-replace/FindReplaceButton.vue";
+import { FindReplaceButton } from "@/components/editor/find-replace";
 import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";
 import { FormatPainterButton } from "@/components/editor/format-painter";
@@ -217,18 +214,24 @@ onBeforeUnmount(() => {
   mobileToolbarQuery = null;
 });
 
-const config = computed(() => {
-  const baseConfig = {
+const config = computed<ToolbarToolsConfig>(() => {
+  // props.config 已由 applyGatesToToolbarConfig 按 gates 收敛过；
+  // 这里用 FULL 补全宿主可能缺省的键，显式 false 仍会覆盖 FULL 的 true。
+  const baseConfig: ToolbarToolsConfig = {
     ...FULL_TOOLBAR_CONFIG,
     ...props.config,
   };
 
-  return isMobileToolbar.value
-    ? {
-        ...baseConfig,
-        ...COMPACT_TOOLBAR_CONFIG,
-      }
-    : baseConfig;
+  if (!isMobileToolbar.value) return baseConfig;
+
+  // 移动端把 COMPACT 当**掩码**用（取交集），而非覆盖：
+  // COMPACT 只能进一步收窄工具带，不能重新打开 gate 已关闭的能力
+  // （直接 spread 会让 COMPACT 中硬编码为 true 的 image / ai 绕过 gate 过滤）。
+  const masked: ToolbarToolsConfig = {};
+  for (const key of Object.keys(baseConfig) as Array<keyof ToolbarToolsConfig>) {
+    masked[key] = baseConfig[key] === true && COMPACT_TOOLBAR_CONFIG[key] === true;
+  }
+  return masked;
 });
 
 /** 平铺信息架构：history | typography | paragraph | insert | document | tools | assistant */

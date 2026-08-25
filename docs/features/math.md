@@ -23,9 +23,18 @@ import "katex/dist/katex.min.css";
 - 支持行内与块级公式
 - 选中公式块可编辑 LaTeX 源码
 
-## InputRule
+## InputRule 与快捷键
 
-空行输入 `$...$` 可快捷插入行内公式；块级公式通过顶栏或 `/` 菜单插入。
+输入 `$latex$` 即可就地转成行内公式（`find: /\$([^$]+)\$$/`，匹配光标前的文本，不要求整行为空）。块级公式通过顶栏、`/` 菜单或快捷键插入。
+
+| 快捷键                 | 命令               |
+| ---------------------- | ------------------ |
+| `Ctrl/Cmd + M`         | `insertInlineMath` |
+| `Ctrl/Cmd + Shift + M` | `insertBlockMath`  |
+
+::: tip 按需加载
+`math` capability 的 `extensions` 是 `async`，`MathExtension` 通过动态 `import()` 懒加载；未开启 `features.math` 时 KaTeX 相关代码不会进入首屏 chunk。
+:::
 
 ## 相关
 

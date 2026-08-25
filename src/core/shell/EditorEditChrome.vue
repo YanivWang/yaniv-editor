@@ -8,6 +8,9 @@
     :custom-templates="customTemplates"
   />
 
+  <!-- 面板与 Ctrl/Cmd+F 只依赖能力 gate，不依赖顶栏是否显示 -->
+  <FindReplaceDialog v-if="profile.gates.searchReplace && editor" />
+
   <LinkBubbleMenu v-if="uiFlags.linkBubble && editor" />
 
   <TableToolbar v-if="uiFlags.tableTools && editor" :show-mode="presetLayout.tableToolsShowMode" />
@@ -29,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+import { FindReplaceDialog } from "@/components/editor/find-replace";
 import type { TemplateItem } from "@/components/editor/template/templates";
 import { BlockPickerMenu } from "@/components/tools/block-menu";
 import { FloatingMenu } from "@/components/tools/floating-menu";

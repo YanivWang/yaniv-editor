@@ -12,14 +12,15 @@ Editor capabilities and entry points summarized by preset. `features` can overri
 | `math`          |  ❌   |  ✅  |   ✅   | Header formula             | `/`                          |
 | `ai`            |  ❌   | ❌\* |   ✅   | Header AI + floating menu† | Floating menu AI             |
 | `formatPainter` |  ❌   |  ✅  |   ❌   | Header format painter      | —                            |
-| `outline`       |  ❌   |  ✅  |   ✅   | Header outline             | Left outline panel           |
-| `searchReplace` |  ❌   |  ✅  |   ✅   | Header / Ctrl+F            | Ctrl/Cmd+F                   |
+| `outline`       |  ❌   |  ✅  |  ✅‡   | Header outline             | No entry point‡              |
+| `searchReplace` |  ❌   |  ✅  |  ✅‡   | Header / Ctrl+F            | No entry point‡              |
 | `officePaste`   |  ❌   |  ✅  |   ✅   | Paste as-is                | Paste as-is                  |
 | `slashCommand`  |  ❌   |  ❌  |   ✅   | —                          | Type `/` on empty line       |
 | `dragHandle`    |  ❌   |  ❌  |   ✅   | —                          | Six-dot handle on block left |
 
 \* full requires `:features="{ ai: true }"` and `:ai-config`  
-† full disables the AI gate by default; when enabled, the header shows `AiMenuButton` in the assistant row, and the floating menu also exposes AI
+† full disables the AI gate by default; when enabled, the header shows `AiMenuButton` in the assistant row, and the floating menu also exposes AI  
+‡ notion enables the gate by default (the extensions register), but the outline toggle and find/replace buttons exist **only in the header**, which notion hides; notion's toolbar config also leaves `outline` / `searchReplace` at `false`. So under notion the outline panel never renders and Ctrl/Cmd+F is never bound (the shortcut is registered by `FindReplaceButton`). See [Outline](./outline.md) and [Find and Replace](./find-replace.md).
 
 ## Non–FeatureConfig Capabilities (Preset Toolbar)
 

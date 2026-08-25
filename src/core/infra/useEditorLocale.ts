@@ -1,4 +1,4 @@
-import { computed, inject, provide, watch, type InjectionKey, type Ref } from "vue";
+import { computed, inject, provide, shallowRef, watch, type InjectionKey, type Ref } from "vue";
 
 import {
   ensureLocalesLoaded,
@@ -32,7 +32,10 @@ function getNested(obj: TiptapLocale | null, key: string): string | undefined {
 
 export function provideEditorLocale(localeSource: Ref<string | undefined>): EditorLocaleContext {
   const locale = computed(() => normalizeLocaleCode(localeSource.value));
-  const messagesRef = { value: null as TiptapLocale | null };
+  // 必须是响应式的：locale 包是异步加载的，先渲染的组件调用 t() 时 messages 还是 null，
+  // 只有 shallowRef 才能在加载完成后触发这些组件重渲、把 key 换成真实文案。
+  // （用普通对象会让 t() 永久停留在返回 key 的状态。）
+  const messagesRef = shallowRef<TiptapLocale | null>(null);
 
   watch(
     locale,

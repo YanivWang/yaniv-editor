@@ -23,7 +23,9 @@ No extra setup: copy from an Office app and **Ctrl/Cmd+V** in the editor. When t
 
 ## Configuration
 
-The extension supports disabling individual HTML transforms (`htmlTransforms` config, for advanced integration scenarios).
+The `OfficePaste` extension itself supports disabling individual HTML transforms (`htmlTransforms`: `lists` / `bookmarks` / `msoStyles` / `msoHtmlClasses` / `lineNumber` / `imagePlaceholder`, all on by default) plus an `excelTablePaste` switch.
+
+However, the registry only passes `onPasteFromOfficeWithImages`, and **`YanivEditor` exposes no prop to forward these options**. Tuning the pipeline requires calling `OfficePaste.configure({ ... })` yourself and taking over extension registration (custom shell / fork). The individual transform functions are exported from `src/extensions/office-paste` to keep them unit-testable.
 
 ## Related
 

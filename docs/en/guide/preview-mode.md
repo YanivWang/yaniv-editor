@@ -21,9 +21,13 @@
 
 ## Implementation Notes
 
-- `chromePolicy.showEditChrome=false`
+- `chromePolicy.showEditChrome=false`; the whole edit chrome (header, footer, contextual bars, block menu) is unmounted with `v-if`
 - Extension registration set **does not change** with phase; interaction extensions use `isEditable` guards + transaction filters
-- Before switching to preview: emit phase event to clear format painter, find/replace, etc., then `setEditable(false)`
+- `applyPhaseTransition` ordering is "edit → preview: emit first, then `setEditable(false)`; preview → edit: `setEditable(true)` first, then emit", so any subscriber cleanup command runs while `editable` is still true
+
+::: tip There is currently only one phase subscriber
+`EditorShell` subscribes to `onPhaseChange` and only calls `blockMenuHost.hide()` when switching to preview. Format painter and find/replace do **not** register phase cleanup callbacks — their state resets rely on their button components being unmounted together with the header. See [Format Painter](../features/format-painter.md#preview-transition) and [Find and Replace](../features/find-replace.md#preview-transition).
+:::
 
 ## CSS Selector
 

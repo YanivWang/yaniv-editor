@@ -2,7 +2,7 @@
 
 Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
 
-> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；v0.1.1 / v0.1.2 的增量变更（大纲默认收起、Ant Design Vue 局部注册等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
+> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；v0.1.1 – v0.1.4 的增量变更（大纲默认收起、Ant Design Vue 局部注册、z-index 治理与 overlay portal 收口、tsconfig 路径修复等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
 
 ## 实施约定
 
@@ -122,8 +122,8 @@ flowchart TB
 `{ ...preset, ...overrides }` spread 会让 `overrides[key] = undefined` **覆盖** preset 的值，与"undefined 继承"承诺不符。必须使用下列规范实现：
 
 ```ts
-// runtime/resolveEditorProfile.ts
-function mergeFeatures(
+// runtime/mergeFeatures.ts（由 resolveEditorProfile 调用，并从主入口导出）
+export function mergeFeatures(
   preset: Required<FeatureConfig>,
   overrides?: FeatureConfig,
 ): Required<FeatureConfig> {
@@ -219,7 +219,7 @@ Shell 模板通过 `policy.host === 'full'` narrowing 后才能访问 host-speci
 | `core`          | StarterKit、Link、Placeholder          | gate 开即注册   | 无影响                                                           |
 | `content`       | Image、Video、Table、Math、OfficePaste | gate 开即注册   | preview 仍展示                                                   |
 | `interaction`   | DragHandle、Slash、FormatPainter       | gate 开即注册   | 不卸载；由 `buildExtensions` **统一**注入 `withTransactionGuard` |
-| `auxiliary`     | SearchReplace                          | gate 开即注册   | phase 切换时由订阅方清状态（见下）                               |
+| `auxiliary`     | SearchReplace                          | gate 开即注册   | 扩展自身在 plugin `view.update` 检测 editable 变化并自清状态     |
 | `chromeCoupled` | Outline                                | gate + 宿主 ctx | 无影响                                                           |
 
 > **OfficePaste 归 `content` tier**：OfficePaste 是 paste pipeline 扩展，不依赖 chrome 渲染，paste 行为与 phase 无关；宿主回调通过 `ctx.officePaste` 注入（不进 sessionKey）。`chromeCoupled` 仅保留真正依赖滚动容器等外部宿主 ctx 的扩展（如 Outline）。
@@ -391,7 +391,7 @@ watch(
 
 **A2 修订 — phase 切换顺序：emit 先，setEditable 后**：
 
-切到 preview 时，订阅方的清理命令（`cancelFormatPainting`、`clearSearch` 等）在 `editable=true` 状态下执行，才不会被守卫拦截。反之，切回 edit 时先 setEditable 再 emit。
+切到 preview 时，订阅方的清理命令（如 `cancelFormatPainting`、`setSearchReplaceTerm("")`）在 `editable=true` 状态下执行，才不会被守卫拦截。反之，切回 edit 时先 setEditable 再 emit。顺序本身已实现（见 `session/applyPhaseTransition.ts`），当前只是还没有订阅方利用它。
 
 ```ts
 // Session 层 —— applyPhaseTransition
@@ -477,23 +477,27 @@ interface PhaseChangeEvent {
 > - Phase 切换链路一律走 `requestPhaseTransition`，**禁止** Shell 层直接调用 `editor.setEditable`。
 
 ```ts
-// Shell 层（EditorShell）订阅：
-onPhaseChange(({ to, reason }) => {
+// Shell 层（EditorShell）订阅 —— 当前代码中唯一的订阅方：
+const offPhaseChange = onPhaseChange(({ to, reason }) => {
   if (reason === "ready") return; // 首次 ready 不需要 hide
   if (to === "preview") blockMenuHost.hide();
-});
-
-// auxiliary 扩展（SearchReplace / FormatPainter）订阅：
-onPhaseChange(({ to, editor, reason }) => {
-  if (reason === "ready") return; // 首次 ready 不做清理，由扩展自身 onCreate 处理
-  if (to === "preview") {
-    editor.commands.clearSearch?.();
-    editor.commands.cancelFormatPainting?.();
-  }
 });
 ```
 
 `onPhaseChange` 注册接口由 `useEditorSession` 暴露，通过 provide/inject 传递给各订阅方。
+
+> **状态清理归属：扩展自身，而非外部订阅。**
+> `SearchReplace` / `FormatPainter` 的搜索词、命中集合、格式刷激活态与光标样式都归各自扩展所有，
+> 因此复位也在扩展内部完成：其 ProseMirror plugin 的 `view.update` 检测 `view.editable`
+> 由 `true` 变为 `false` 时执行清理。
+>
+> 这样做而非让 Shell 订阅 `onPhaseChange` 逐个调命令，有三个好处：
+> ① Shell 不需要知道具体有哪些扩展（避免层次污染）；
+> ② 自定义 Shell / 直接用 `buildExtensions` 的集成方同样受益；
+> ③ 顶栏在 preview 下被 `v-if` 卸载时不会走面板的 onClose，外部订阅本就容易漏。
+>
+> `applyPhaseTransition` 的「先 emit 再 setEditable」顺序仍然保留，供需要在 editable
+> 尚为 true 时执行命令的订阅方使用；目前 Shell 的订阅只做 `blockMenuHost.hide()`。
 
 **生命周期规范**：
 
@@ -512,12 +516,12 @@ onBeforeUnmount(() => offPhaseChange());
 2. session 重建（sessionKey 变化）**不会**使订阅失效，无需重新注册
 3. **必须调用 `off` 函数**取消订阅；composable 内部通过 `onBeforeUnmount` 自动注册 off 是推荐写法
 
-| 触发                | Session 层动作                             | 各层钩子响应                     |
-| ------------------- | ------------------------------------------ | -------------------------------- |
-| edit → preview      | emit `phase:change` → `setEditable(false)` | Shell hide blockMenu；扩展清状态 |
-| preview → edit      | `setEditable(true)` → emit `phase:change`  | —                                |
-| sessionKey 变化     | destroy → 快照 → create                    | —                                |
-| 外部 initialContent | 签名去重 → ContentAdapter.setContent       | —                                |
+| 触发                | Session 层动作                             | 各层钩子响应                                    |
+| ------------------- | ------------------------------------------ | ----------------------------------------------- |
+| edit → preview      | emit `phase:change` → `setEditable(false)` | Shell hide blockMenu；扩展经 `view.update` 自清 |
+| preview → edit      | `setEditable(true)` → emit `phase:change`  | —                                               |
+| sessionKey 变化     | destroy → 快照 → create                    | —                                               |
+| 外部 initialContent | 签名去重 → ContentAdapter.setContent       | —                                               |
 
 ---
 
@@ -579,8 +583,10 @@ interface CapabilityDefinition {
   schemaSignature?: (profile: EditorRuntimeProfile) => string;
   extensions: (ctx: BuildExtensionsCtx) => AnyExtension[] | Promise<AnyExtension[]>;
   fullToolbarSlugs?: string[];
-  inlineToolbarSlugs?: string[];
+  inlineToolbarSlugs?: ReadonlyArray<string>;
   chrome?: string[];
+  /** Inline host 下始终注册（当前仅 inline-starter） */
+  inlineAlways?: boolean;
 }
 ```
 
@@ -616,32 +622,40 @@ async function rebuild() {
   status.value = 'ready';
 }
 
-// sessionKey 变化时的处理（在 watch 回调的同步部分完成快照与 destroy）
-watch(sessionKey, (newKey, oldKey) => {
+// sessionKey 变化时的处理（快照同步完成，destroy 延后到 nextTick）
+watch(sessionKey, async (newKey, oldKey) => {
   if (!oldKey || !newKey || newKey === oldKey) return;
 
-  // ① 同步快照内容（editor 尚未 destroy；getJSON 是纯读取，零副作用）
+  // ① 同步快照内容（editor 尚未 destroy；getJSON/getHTML 是纯读取，零副作用）
+  //    full 存 JSON（属性更完整），inline 存 HTML
   if (editor.value) {
-    contentSnapshot = editor.value.getJSON();
+    contentSnapshot = host === 'inline' ? editor.value.getHTML() : editor.value.getJSON();
   }
 
-  // ② 同步 destroy 旧 editor，立即切换 editor.value = null（chrome 模板由 sessionStatus 控制 v-show）
-  editor.value?.destroy();
+  // ② 先切断引用并进 loading，等一次 nextTick 让 EditorContent 先卸载，
+  //    再 destroy —— 避免在子组件仍持有旧 view 时解绑 DOM
+  const oldEditor = editor.value;
   editor.value = null;
+  status.value = 'loading';
+  await nextTick();
+  if (disposed) return;
+  oldEditor?.destroy();
 
   // ③ 异步 rebuild
   void rebuild();
-}, { flush: 'pre' });
+});   // flush 用 Vue 默认的 'pre'
 
-onBeforeUnmount(() => {
+onScopeDispose(() => {
   disposed = true;
   generation += 1;        // 让任何 in-flight resolve 都失效
   editor.value?.destroy();
   editor.value = null;
+  status.value = 'idle';
+  phaseHandlers.clear();
 });
 ```
 
-> **A3 修订说明**：sessionKey 变化时必须在 destroy 之前同步调用 `editor.getJSON()` 做快照，否则 destroy 后无法取得内容。快照在 watch 回调的同步部分完成，早于任何 async 操作。
+> **A3 修订说明**：sessionKey 变化时必须在 destroy 之前调用 `editor.getJSON()` / `getHTML()` 做快照，否则 destroy 后无法取得内容。快照在 watch 回调的**同步部分**完成，早于 `await nextTick()` 与任何 async 操作；destroy 本身则被推迟到 nextTick 之后。
 >
 > **`flush: 'pre'` 而非 `'sync'` 的取舍**：
 >
@@ -653,14 +667,14 @@ onBeforeUnmount(() => {
 
 #### sessionStatus 状态机
 
-| from      | event             | to        | editor.value                                   |
-| --------- | ----------------- | --------- | ---------------------------------------------- |
-| `idle`    | mount             | `loading` | `null`                                         |
-| `loading` | build success     | `ready`   | new Editor                                     |
-| `loading` | build fail        | `error`   | `null`                                         |
-| `ready`   | sessionKey change | `loading` | `null`（先快照→destroy，与 skeleton 占位配合） |
-| `error`   | `retrySession()`  | `loading` | `null`                                         |
-| 任意      | unmount           | `idle`    | `null`（disposed=true）                        |
+| from      | event             | to        | editor.value                                                    |
+| --------- | ----------------- | --------- | --------------------------------------------------------------- |
+| `idle`    | mount             | `loading` | `null`                                                          |
+| `loading` | build success     | `ready`   | new Editor                                                      |
+| `loading` | build fail        | `error`   | `null`                                                          |
+| `ready`   | sessionKey change | `loading` | `null`（先快照→置 null→nextTick→destroy，与 skeleton 占位配合） |
+| `error`   | `retrySession()`  | `loading` | `null`                                                          |
+| 任意      | unmount           | `idle`    | `null`（disposed=true）                                         |
 
 > sessionKey 变化时**先快照→destroy 旧 editor → 进 loading → skeleton 占位 → ready**，不保留旧 editor 做"无缝切换"（避免新旧扩展 schema 冲突 + 内存峰值）。
 
@@ -675,9 +689,9 @@ sessionKey 变化触发 destroy → rebuild，此期间 `editor = null`，禁止
   <!-- ... -->
 </div>
 <!-- loading 期间显示占位，尺寸与编辑区等高，避免布局抖动 -->
-<div v-if="sessionStatus === 'loading'" class="yaniv-editor__skeleton" />
+<div v-if="sessionStatus === 'loading'" class="yaniv-editor__skeleton">正在加载编辑器...</div>
 <div v-if="sessionStatus === 'error'" class="yaniv-editor__error">
-  {{ sessionError }} <button @click="retrySession">重试</button>
+  {{ sessionError }} <button type="button" @click="retrySession">重试</button>
 </div>
 ```
 
@@ -685,21 +699,22 @@ sessionKey 变化触发 destroy → rebuild，此期间 `editor = null`，禁止
 
 ### Teardown 顺序
 
-**`editor.destroy()` 必须在 `onBeforeUnmount` 中调用**，不得放入 `onUnmounted`。原因：ProseMirror/Tiptap 的 `destroy()` 需要 unmount 各 NodeView 实例（NodeView 要访问自身 DOM 节点、解绑事件监听器）；`onUnmounted` 触发时 Vue 已将组件 DOM 从页面移除，此时调用 `destroy()` 会触发 `Cannot read properties of null` 报错并造成事件监听器泄漏。
+**`editor.destroy()` 必须在组件 DOM 仍存在时调用**，不得放入 `onUnmounted`。实现里 `useEditorSession` 用 `onScopeDispose` 注册销毁逻辑（组件 effect scope 停止时触发，DOM 仍可访问），效果等价且不要求 composable 一定在 `setup()` 顶层的组件上下文里使用。原因：ProseMirror/Tiptap 的 `destroy()` 需要 unmount 各 NodeView 实例（NodeView 要访问自身 DOM 节点、解绑事件监听器）；`onUnmounted` 触发时 Vue 已将组件 DOM 从页面移除，此时调用 `destroy()` 会触发 `Cannot read properties of null` 报错并造成事件监听器泄漏。
 
 正确顺序（均在 `onBeforeUnmount` 阶段，DOM 仍在）：
 
-1. **Session（`onBeforeUnmount`，同步入口，内部 async）**：
-   - `blockMenuHost.hide()` — 同步，先关弹层
+1. **Session（`onScopeDispose`，同步）**：
+   - `disposed = true` + `generation += 1` — 让任何 in-flight `buildExtensions` resolve 失效
    - `editor.destroy()` — 同步，ProseMirror 解绑 DOM 事件
    - `editor = null` — 同步，切断 provide 引用
-   - `void nextTick()` — 可选：若需等待 Vue 渲染清理，fire-and-forget 即可
+   - `status = 'idle'`、`phaseHandlers.clear()`
 
 2. **Shell（`onBeforeUnmount`，同步）**：
-   - 调用 `offPhaseChange()` 取消所有 `onPhaseChange` 订阅
+   - 调用 `offPhaseChange()` 取消 `onPhaseChange` 订阅
+   - `useYanivAiConfig` 内部的 `onBeforeUnmount` 归还 `setHostAiConfig(null, owner)`（owner 隔离，不会误清其他实例）
    - Appearance composable 的所有 listener / cleanup **在 composable 内部完成**，Shell 不需要任何手动 teardown 调用（见 Appearance 章节）
 
-> Session 的 `useEditorSession` composable 通过 Vue 内部 `onBeforeUnmount` 自动注册销毁逻辑，Shell 无需手动调用；两者通过 provide/inject 共享 `editor` ref，Shell 读到 `null` 即视为已销毁。
+> Session 的 `useEditorSession` composable 通过 `onScopeDispose` 自动注册销毁逻辑，Shell 无需手动调用；两者通过 provide/inject 共享 `editor` ref，Shell 读到 `null` 即视为已销毁。`blockMenuHost.hide()` 由 `BlockPickerMenu` 自身的 `registerInstance(null)` 覆盖，Session 层不再重复调用。
 
 ---
 
@@ -844,21 +859,39 @@ interface CapabilityDefinition {
   // ...
 }
 
-// runtime/resolveInlineGates.ts
+// core/runtime/resolveInlineGates.ts
 function resolveInlineGates(
   toolbar: InlineToolbarConfig,
   capabilities: ReadonlyArray<CapabilityDefinition>,
 ): ExtensionGates {
-  const gates = {} as Record<string, boolean>;
+  const gates = {} as ExtensionGates & Record<string, boolean>;
+
   for (const cap of capabilities) {
     if (!cap.inlineToolbarSlugs?.length) continue; // 仅声明 inline slug 的 capability 参与
-    const enabled = cap.inlineToolbarSlugs.some((slug) => toolbar[slug] === true);
-    if (cap.featureKey) gates[cap.featureKey] = enabled;
-    else gates[cap.id] = enabled; // 无 featureKey 的 capability 用 id 作 gate key
+
+    // ① 每个 slug 自身也写成 gate key —— buildExtensions 的 inline 分支与
+    //    inline-starter 内部（g.heading / g.list / g.textFormat ...）直接读它们
+    for (const slug of cap.inlineToolbarSlugs) {
+      gates[slug] = toolbar[slug as keyof InlineToolbarConfig] === true;
+    }
+
+    // ② capability 级 gate：任一 slug 为 true 即开启
+    const enabled = cap.inlineToolbarSlugs.some(
+      (slug) => toolbar[slug as keyof InlineToolbarConfig] === true,
+    );
+    if (cap.featureKey) {
+      gates[cap.featureKey] = enabled;
+    } else if (!cap.id.startsWith("inline-")) {
+      // inline-* capability 不再额外写 id gate（其 slug gate 已足够）
+      gates[cap.id] = enabled;
+    }
   }
-  return gates as ExtensionGates;
+
+  return gates;
 }
 ```
+
+> 注意 ①：`buildExtensions` 的 inline 分支判断的是 `ctx.gates[slug]`（slug 级），不是 capability id；`inline-starter` 还会读 `gates.heading` / `gates.list` / `gates.textFormat` / `gates.undoRedo` 决定 StarterKit 内部子扩展开关。因此 slug 级 gate 是必需的，不能只写 capability 级。
 
 **单一规则**：`gates[capability]` 在 Full 下由 `profile.features[featureKey]` 决定，在 Inline 下由 `toolbar[inlineToolbarSlugs].some(true)` 决定；除此之外**不得**存在第三种 gate 推导路径。`computeSessionKey` 接收的 profile 在 Inline 路径下应已经过 `resolveInlineGates` 写入 `profile.gates`，因此 `sessionKey` 计算逻辑保持 host 无关。
 
@@ -867,12 +900,19 @@ function resolveInlineGates(
 `BuildExtensionsCtx` 中所有可能在运行期变化（不进 sessionKey）的入参，**一律用 getter 函数包装**，避免扩展闭包持有旧引用：
 
 ```ts
+// capabilities/types.ts（此处与实现逐字对齐）
 interface BuildExtensionsCtx {
   /** 当前实例的完整消息对象（静态快照，非响应式；locale 在 sessionKey 中，切换会 rebuild） */
   locale: TiptapLocale;
 
+  /** 由 profile.features（Full）或 resolveInlineGates（Inline）推导 */
+  gates: ExtensionGates;
+
   /** 响应式可编辑标志，interaction 扩展在 DOM 事件入口检查；withTransactionGuard 也消费它 */
   isEditable: Readonly<Ref<boolean>>;
+
+  /** 块菜单宿主，供 SlashCommand / DragHandle 调用（Inline 下不触发） */
+  blockMenuHost: BlockMenuHost;
 
   /** 媒体上传回调 — getter 模式，每次调用现取最新引用，避免 stale closure */
   upload: {
@@ -888,13 +928,20 @@ interface BuildExtensionsCtx {
     onPasteFromOfficeWithImages: () => (() => void) | undefined;
   };
 
-  /** 大纲滚动容器（chromeCoupled 扩展使用） — late-binding getter，见下文 */
+  /** 大纲滚动容器（chromeCoupled 扩展使用） — late-binding getter + setter，见下文 */
   outline: {
     scrollParent: () => HTMLElement | null;
+    bindScrollParent: (el: HTMLElement | null) => void;
   };
 
-  /** AI 配置（仅 ai gate 开启时存在） — getter 模式，见下文响应式契约 */
-  aiConfig: () => AiConfig | undefined;
+  /** AI 配置（宿主 ai-config prop） — getter 模式，见下文响应式契约 */
+  aiConfig: () => YanivEditorAiConfig | undefined;
+
+  /** Inline 专用：placeholder 文案，非空时注册 inline-placeholder capability */
+  inlinePlaceholder?: string;
+
+  /** Inline 专用：追加到扩展列表末尾（仅 host === 'inline' 生效） */
+  extraExtensions?: AnyExtension[];
 }
 ```
 
@@ -909,13 +956,21 @@ interface BuildExtensionsCtx {
 ```ts
 extensions: (ctx) => [
   YanivPlaceholder.configure({
-    placeholder: ctx.locale.editor.placeholder, // ← 静态快照，直接读
+    // 按节点类型返回不同占位；ctx.locale 是静态快照，直接读
+    placeholder: ({ node }) =>
+      node.type.name === "heading"
+        ? ctx.locale.placeholder.heading
+        : ctx.gates.slashCommand
+          ? ctx.locale.placeholder.paragraphWithSlash
+          : ctx.locale.placeholder.paragraph,
   }),
-  DragHandle.configure({
-    getMenuLabel: (key) => ctx.locale.dragMenu[key], // ← 同上
+  DragHandleExtension.configure({
+    // 实现里是 dot-path 解析（"dragMenu.deleteBlock" → ctx.locale.dragMenu.deleteBlock），
+    // 查不到时原样返回 key
+    getMenuLabel: (key: string) => resolveDotPath(ctx.locale, key),
     onOpenInsertMenu: (context) => {
-      const upload = ctx.upload.image(); // ← getter，事件触发时现取
-      // ...
+      if (!ctx.isEditable.value) return; // ← 事件入口守卫
+      ctx.blockMenuHost.openInsert(context);
     },
   }),
 ];
@@ -930,28 +985,36 @@ outline capability 定义在 `capabilities/registry.ts`（无独立 `outline.ts`
 {
   id: "outline",
   tier: "chromeCoupled",
+  order: 60,
   featureKey: "outline",
-  extensions: () => [
+  schemaSignature: () => "outline",
+  fullToolbarSlugs: ["outline"],
+  chrome: ["outlinePanel"],
+  extensions: (ctx) => [
     UniqueID.configure({ types: ["heading"] }),
     TableOfContents.configure({
       anchorTypes: ["heading"],
       // getter：bind 前 fallback 到 window，避免 null 导致 TOC 初始化失败
       scrollParent: () =>
-        getBoundOutlineScrollParent() ??
+        ctx.outline.scrollParent() ??
         (typeof window !== "undefined" ? window : (null as unknown as Window)),
     }),
     OutlineScrollParentBinder, // 暴露 bindOutlineScrollParent command
   ],
 }
-
-// extensions/outlineScrollParentBinder.ts — 模块级 boundScrollParent
-// EditorWorkspace.vue — mount / ref 变化时 bind
-editor.value.commands.bindOutlineScrollParent(documentContainerRef.value);
 ```
 
-> **禁止**：在 outline 扩展 `configure` 阶段直接调用 `ctx.outline.scrollParent()`。`ctx.outline.scrollParent()` 仅供运行时按需读取（如手动滚动定位 API）。
+> **禁止**：在 outline 扩展 `configure` **求值阶段**直接调用 `ctx.outline.scrollParent()`；只能放进 getter 里、运行时再取。
+
+> **单一存储：写读都走 `ctx.outline`（实例作用域）。**
+> `createOutlineScrollParentBinder({ bindScrollParent })` 由 registry 注入
+> `ctx.outline.bindScrollParent`；`EditorWorkspace` mount 后调用
+> `editor.commands.bindOutlineScrollParent(el)` 写入，registry 的 `scrollParent`
+> getter 从同一处读取，未绑定前回退 `window`。扩展 `onDestroy` 时归还 `null`。
 >
-> **多实例注意**：`boundScrollParent` 为模块级单例（`outlineScrollParentBinder.ts`）。同页多个 Full 编辑器且均开启 outline 时，后 bind 的实例会覆盖前者；多实例场景应限制每页仅一个 outline 编辑器，或后续改为 per-editor 存储。
+> 早期版本曾用 `outlineScrollParentBinder.ts` 的模块级 `boundScrollParent` 存储，
+> 与 getter 读的 `ctx.outline` 互不相通（导致 scrollParent 恒为 `window`），
+> 且同页多个开启 outline 的编辑器会互相覆盖 —— 该模块级单例已删除。
 
 ### AI 配置的响应式下发路径（Normative）
 
@@ -960,7 +1023,7 @@ AI 扩展（CustomAiExtension / ContinueWritingExtension 等）的 `apiKey` / `m
 **规范**：AI 扩展的所有动态配置**通过函数形式声明**，扩展内部在调用点（如发请求时）才 invoke：
 
 ```ts
-// capabilities/ai.ts
+// capabilities/registry.ts — ai capability
 {
   id: 'ai',
   tier: 'content',
@@ -981,9 +1044,22 @@ AI 扩展（CustomAiExtension / ContinueWritingExtension 等）的 `apiKey` / `m
 }
 ```
 
-**禁止**在 AI 扩展 setup 时 capture aiConfig 原始值；所有内部 fetch / SDK 调用必须现取 `this.options.getXxx()`。
+**禁止**在 AI 扩展 setup 时 capture aiConfig 原始值；所有内部 fetch / SDK 调用必须现取 `this.options.getXxx()`（实现见 `features/ai/shared/extensionOptions.ts` 的 `createConfiguredAiClient`）。
 
 `ai` gate 本身（开 / 关）仍进 sessionKey（关闭后扩展卸载），但 gate 开启状态下的 config 字段变化不触发 rebuild。
+
+> **兜底只能有一处：`getAiConfig()`。**
+> `client.ts` 的 `getAiConfig()` 是配置解析的唯一入口，优先级为
+> `resolveConfig()`（宿主 `ai-config`）→ `getAiRequestConfig()`（localStorage / 宿主托管）
+> → `loadAiConfig()`（`VITE_AI_*`）。它靠 override 返回值**是否带 provider**判断"宿主已托管"。
+>
+> 因此上游各层（registry getter、`resolveAiExtensionOptions`）**禁止**填兜底值：
+> 早期 `getProvider` 写了 `?? "openai"`，使 override 恒带 provider，后两级回退永远走不到，
+> AI 设置弹窗存进 localStorage 的配置完全不生效。现在 getter 一律直透宿主原值，
+> `resolveAiExtensionOptions` 在无 provider 时返回 `null`。
+>
+> 缺省值（provider 默认 endpoint / model、`timeout` 60s）统一在 `getAiConfig()` 内补齐。
+> 回归护栏见 `src/features/ai/aiConfigResolution.test.ts`。
 
 ---
 
@@ -1034,12 +1110,10 @@ function useEditorAppearance(options: UseEditorAppearanceOptions): UseEditorAppe
 
   return {
     resolvedMode,
+    /** provide 出去的 appearance context（含 registerCustom） */
+    appearanceContext,
     /** 注册自定义外观（实例方法，不影响其他编辑器实例） */
-    registerCustomAppearance(name: string, vars: Record<string, string>): void {
-      activeCustomName = name;
-      customAppearances.set(name, vars);
-      if (options.appearance.value === "custom") syncDom();
-    },
+    registerCustomAppearance: appearanceContext.registerCustom!,
   };
 }
 ```
@@ -1180,7 +1254,7 @@ src/appearance/
 1. **DOM** — 根 class 只来自 Vue `:class`；data attribute 只来自 Vue `:attr` 声明式绑定；`applyAppearanceToElement` 只写 `data-color-mode` 与 CSS vars；**禁止**命令式 `setAttribute` 或模块级全局 appearance 状态。根节点的 data attribute 规范：
    - `data-color-mode="light|dark"`：由 `applyAppearanceToElement` 写入
    - `data-phase="edit|preview"`：由 EditorShell 模板 `:data-phase="profile.mode"` 声明式绑定，随 props 响应式更新；宿主可用 `[data-phase="preview"]` 替代已删除的 `.is-preview` 做样式覆盖
-2. **Session** — 仅 sessionKey 触发 rebuild；先快照→destroy → loading → create；content 快照在 destroy 之前同步完成（watcher `flush: 'pre'`，回调内 getJSON 早于 EditorContent 卸载）。
+2. **Session** — 仅 sessionKey 触发 rebuild；先快照 → loading → nextTick → destroy → create；content 快照在 watcher 回调的同步部分完成（`flush: 'pre'`，getJSON/getHTML 早于任何 await）。
 3. **Chrome** — 显隐只读 chromePolicy；单一 `v-if`，仅 session loading 骨架允许 `v-show`；`v-show` 内子组件必须能处理 `editor === null`。`outlinePanelExpanded` 不进 chromePolicy，由 `provideOutlinePanel` 直接持有。
 4. **Provide** — 核心 context 挂在 EditorShell 根，不沉入会被 preview 卸载的子树；`provideOutlinePanel` 必须提升至 EditorShell 根。
 5. **Appearance 实例隔离** — `customAppearances` Map 与相关状态禁止作为模块级单例，移入 `useEditorAppearance` 实例作用域；`watchSystemColorMode` 生命周期由 composable 内部 `onWatcherCleanup` 自动管理，Shell 无需手动 teardown。
@@ -1189,7 +1263,7 @@ src/appearance/
 8. **零顶层 DOM 副作用** — `runtime/` 与 `capabilities/registry.ts` 模块顶层禁止访问 `window` / `document`；扩展内部 DOM 操作限于 ProseMirror Plugin view 阶段。
 9. **Phase 入口单一** — Shell 与扩展**禁止**直接调 `editor.setEditable`；一律通过 `useEditorSession.requestPhaseTransition(nextPhase)`；Session 层负责 buffer（editor 未 ready 时）与首次 `reason: 'ready'` 同步 emit。
 10. **Inline gates 单一来源** — Inline gates 仅由 `resolveInlineGates(toolbar, capabilities)` 推导；除此之外不得存在 toolbar→gate 的第二条路径。Full gates 仅由 `profile.features` 推导。
-11. **chromeCoupled DOM 注入** — outline 滚动容器通过 `editor.commands.bindOutlineScrollParent(el)` 在 Workspace mount 后注入；`TableOfContents` 的 `scrollParent` 为 getter（`getBoundOutlineScrollParent() ?? window`），**禁止**在 configure 阶段调用 `ctx.outline.scrollParent()`。`boundScrollParent` 为模块级单例，同页多 outline 实例需注意覆盖顺序。
+11. **chromeCoupled DOM 注入** — outline 滚动容器在 Workspace mount 后经 `editor.commands.bindOutlineScrollParent(el)` 注入，写读统一走 `ctx.outline`（实例作用域，禁止模块级单例）；`TableOfContents` 的 `scrollParent` 必须是 getter（`ctx.outline.scrollParent() ?? window`），**禁止**在 configure 求值阶段直接取值。
 12. **AI config 动态化** — AI 扩展的所有运行时配置（apiKey / model / endpoint / timeout）必须通过 `getXxx: () => ctx.aiConfig()?.xxx` getter 形式声明，**禁止**在 configure 阶段静态取值。
 13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Ant Design Dropdown/Select/Popover/Modal/Tooltip、自建 Toast/Notice 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo / `getPopupContainer` / `getContainer` 回退到 `document.body`（HTML5 drag preview 与隐藏 file input 除外）；**禁止** Ant Design 静态 `message` / `notification`（全局单例 + body）。`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` 读取 portal token，**禁止** `:root` fallback。统一入口：`useOverlayMountTarget` / `useOverlayBubbleMenu`（`src/composables/useOverlayMount.ts`）、`useOverlayFeedback` / `showOverlayToast` / `showOverlayNotice`（`src/core/overlayFeedback.ts`）。
 
@@ -1386,20 +1460,23 @@ test("onBeforeUnmount 后 buildExtensions resolve 被 discard", async () => {
 
 - [x] preview ↔ edit：Chrome 正确、内容不丢、无 ghost DOM — demo `#/full-editor`：`data-phase` 随模式切换；preview 下顶栏/底栏隐藏、`contenteditable=false`
 - [x] 冷启动 preview → edit：DragHandle / Slash 可用 — `useEditorSession` rebuild 后 `requestPhaseTransition` flush；BlockPicker `registerInstance` 重绑
-- [x] edit → preview：BlockPicker / SearchReplace / FormatPainter 状态已清；preview 下光标可点击选中文字 — `onPhaseChange` + `blockMenuHost.hide()`；扩展层 `ctx.isEditable` 守卫（DragHandle DOM 仍挂载，交互被守卫拦截）
+- [x] edit → preview：BlockPicker 已关闭；preview 下光标可点击选中文字 — `onPhaseChange` + `blockMenuHost.hide()`；扩展层 `ctx.isEditable` 守卫（DragHandle DOM 仍挂载，交互被守卫拦截）
+- [x] edit → preview：SearchReplace / FormatPainter 状态已清 — 扩展在 plugin `view.update` 中检测 editable 变化自清（demo 手验：带搜索词切 preview 后 `.search-result` 装饰数归零）
 - [x] preset / features 快速切换：无竞态，内容保留（content 快照正确） — `useEditorSession` generation + `flush:'pre'` 快照
 - [x] Inline toolbar 变化：扩展同步更新 — demo `#/inline-editor` toolbar 开关与 `resolveInlineGates` / `sessionKey` 联动
 - [x] 同页两编辑器不同 locale：互不覆盖 — demo `#/multi-instance`：A 顶栏中文 / B 顶栏 English
 - [x] 同页两编辑器各自 custom appearance：CSS vars 互不覆盖，切换一个不影响另一个 — demo `#/multi-instance`：A `#6366f1`+light / B `#059669`+dark 实时探测
 - [x] colorMode=auto：正确跟随系统亮暗，切换不影响其他编辑器实例 — `useEditorAppearance` + `onWatcherCleanup`（手验可在 `#/multi-instance` 将单实例设为 auto）
 - [x] ContentAdapter 受控回写在 preview 模式下正常生效（不被守卫拦截） — vitest `contentAdapter.test.ts`
-- [x] edit → preview 清理命令（cancelFormatPainting、clearSearch）正常执行 — `applyPhaseTransition` 先 emit 再 `setEditable(false)`
+- [x] `applyPhaseTransition` 顺序正确（edit → preview 先 emit 再 `setEditable(false)`） — vitest `applyPhaseTransition.test.ts`
+- [x] edit → preview 清理命令（cancelFormatPainting / 清空搜索词）正常执行 — 由扩展自身在 `view.update` 触发
 - [x] upload / gallery 回调在不重建 session 情况下变化后，下次上传/打开图库使用新引用 — `buildCtx` getter 模式
 - [x] **mode=preview 初始挂载**：editor 创建后 editable=false，无 NPE，无未捕获 phase 切换 — `new Editor({ editable: profile.mode === 'edit' })` + `pendingPhase` buffer
 - [x] **同时改 preset + mode**：session loading 期间 phase 切换被 buffer，rebuild 完成后正确生效 — `pendingPhase` + rebuild flush
 - [x] **session ready 后自动派发 `reason: 'ready'`**：auxiliary 扩展能完成初始化（idempotent） — `phaseEmitter.emit({ reason: 'ready' })`
 - [x] **`props.initialContent` 受控回写**：父组件接收 emit 后回写同样内容，编辑器不再次 setContent，光标稳定 — `useControlledContent` 签名去重
-- [x] **outline scrollParent late-binding**：Workspace mount 后 outline 跟随滚动正常工作，无 "scroll container not ready" 警告 — `bindOutlineScrollParent` in `EditorWorkspace.vue`
+- [x] **outline 面板跟随滚动**：Workspace mount 后大纲高亮与点击跳转正常 — `OutlinePanel` 的 `:scroll-parent` prop 路径
+- [x] outline 扩展 scrollParent late-binding — `createOutlineScrollParentBinder` 写回 `ctx.outline`，单测见 `outlineScrollParentBinder.test.ts`
 - [x] **AI config 热更新**：宿主修改 `aiConfig.model` 后下次发请求使用新 model，无需重建 session — registry `getModel: () => ctx.aiConfig()?.model`
 - [x] **BlockPicker 卸载→重建**：preview → edit 切换后 `host.registerInstance` 重新绑定，SlashCommand 可弹出菜单 — `BlockPickerMenu.vue` `onBeforeUnmount → registerInstance(null)`
 

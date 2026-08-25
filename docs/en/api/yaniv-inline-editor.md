@@ -25,6 +25,30 @@ Changing `placeholder` or `extraExtensions` updates `sessionKey` and triggers se
 
 See [Z-Index & Overlays](../guide/z-index.md) for overlay mounting and tokens.
 
+## Events
+
+| Event            | Payload  | Description                                              |
+| ---------------- | -------- | -------------------------------------------------------- |
+| `update:content` | `string` | Emitted on the editor's `update` with `editor.getHTML()` |
+
+`content` + `update:content` form `v-model:content`. Inline's content protocol is an **HTML string**; it does not accept `JSONContent`.
+
+## Slots
+
+| Slot      | Scope                                                     | Description                                                              |
+| --------- | --------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `toolbar` | `{ editor: Editor \| null, config: InlineToolbarConfig }` | Replaces the built-in `InlineToolbar`; omitted, the built-in one renders |
+
+```vue
+<YanivInlineEditor v-model:content="html">
+  <template #toolbar="{ editor, config }">
+    <InlineToolbar v-if="editor && config" :editor="editor" :config="config" />
+  </template>
+</YanivInlineEditor>
+```
+
+The slot renders only when `chromePolicy.showInlineToolbar` is true — that is, `mode="edit"` **and** at least one registry-declared slug in `toolbar` is `true`.
+
 ## Examples
 
 ```vue

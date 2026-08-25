@@ -73,6 +73,8 @@ Unified entry `requestPhaseTransition`:
 - edit → preview: **emit cleanup first**, then `setEditable(false)`
 - preview → edit: **`setEditable(true)` first**, then emit
 
+> `EditorShell`'s subscription only calls `blockMenuHost.hide()`. SearchReplace / FormatPainter do not reset through a phase subscription — each self-clears in its ProseMirror plugin's `view.update` when `view.editable` flips. Whoever owns the state owns the cleanup. See "ExtensionTier and Phase strategy" in the root `ARCHITECTURE.md`.
+
 `ContentAdapter` uses raw transactions + `BYPASS_GUARD_META`; do not use `commands.setContent`. Writes are schema-aware: HTML via DOMParser; JSON via `adaptJsonToSchema`.
 
 ## Capability Registry
@@ -81,13 +83,13 @@ Unified entry `requestPhaseTransition`:
 
 Extension tiers:
 
-| Tier          | Examples          | Phase behavior              |
-| ------------- | ----------------- | --------------------------- |
-| core          | StarterKit, Link  | always                      |
-| content       | Image, Table, AI  | still shown in preview      |
-| interaction   | DragHandle, Slash | editable guards             |
-| auxiliary     | SearchReplace     | clear state on phase switch |
-| chromeCoupled | Outline           | DOM late-binding            |
+| Tier          | Examples          | Phase behavior                                                  |
+| ------------- | ----------------- | --------------------------------------------------------------- |
+| core          | StarterKit, Link  | always                                                          |
+| content       | Image, Table, AI  | still shown in preview                                          |
+| interaction   | DragHandle, Slash | editable guards                                                 |
+| auxiliary     | SearchReplace     | the extension self-clears via its plugin's `view.update`        |
+| chromeCoupled | Outline           | DOM late-binding (write and read both go through `ctx.outline`) |
 
 ## Provide Tree
 

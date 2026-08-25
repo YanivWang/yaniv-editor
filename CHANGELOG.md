@@ -4,6 +4,44 @@
 
 ### Fixed
 
+- **AI 配置回退链失效**：registry 的 `getProvider` 兜底为 `"openai"`，使 `client.ts` 的 `getAiConfig()` 恒判定"宿主已托管"，localStorage（AI 设置弹窗）与 `VITE_AI_*` 两级回退永远走不到。改为各 getter 只透传宿主原值，缺省值统一在 `getAiConfig()` 补齐；`resolveAiExtensionOptions` 无 provider 时返回 `null`。同时统一 timeout 默认值为 60s，并让 `storageMode: "proxy"` 在无 apiKey 时也判定为已配置。
+- **notion preset 下大纲与查找替换不可达**：两项 gate 默认开启但 UI 只挂在顶栏，而 notion 隐藏顶栏。现在大纲面板不再耦合 `toolbarConfig.outline`，收起时在 rail 渲染展开把手；查找面板与 Ctrl/Cmd+F 拆分到 `FindReplaceDialog`（挂 `EditorEditChrome`，只看 `gates.searchReplace`），顶栏按钮退化为纯触发入口。
+- **移动端工具栏绕过 gate 过滤**：`ToolbarNav` 在 ≤768px 时把 `COMPACT_TOOLBAR_CONFIG` spread 覆盖到已过滤的配置上，使 COMPACT 中硬编码为 `true` 的 `image` / `ai` 重新出现（`preset="basic"` 窄屏下会渲染无扩展支撑的 AI 按钮）。改为取交集的掩码合并。
+- **outline `scrollParent` late-binding 断链**：`bindOutlineScrollParent` command 写模块级单例，而 registry 的 getter 读 `ctx.outline`，两者互不相通导致 `TableOfContents` 恒回退 `window`；模块级存储还会让同页多实例互相覆盖。改为 `createOutlineScrollParentBinder(ctx.outline.bindScrollParent)`，写回实例作用域。
+- **phase 切换不清理扩展状态**：`SearchReplace` / `FormatPainter` 现在各自在 plugin `view.update` 中检测 `view.editable` 由 true 变 false 并自清（搜索词与命中高亮、格式刷激活态与光标样式），不再依赖顶栏卸载这一副作用。
+- **实例 locale 非响应式**：`provideEditorLocale` 的 `messagesRef` 是普通对象，语言包异步加载完成后不触发重渲，先渲染的组件会永久显示原始 key（如 `editor.outlineToggle`）。改为 `shallowRef`。
+- **Ctrl/Cmd+F 快捷键是全局的**：`useFindReplaceHotkey` 用 hotkeys-js 注册全局快捷键，同页多实例下按一次会同时弹出多个查找面板；`hotkeys.unbind("ctrl+f,command+f")` 解绑的是全部 handler，一个实例卸载会废掉其他实例；`hotkeys.filter = () => true` 的全局覆盖还会影响宿主自己用 hotkeys-js 注册的快捷键。改为在编辑器根节点监听 `keydown`：天然按实例隔离，且焦点在编辑器之外时不再劫持浏览器原生查找。
+- **`FooterNav` 缩放条位置 prop 名不匹配**：`EditorStatusChrome` 传 `:zoom-bar-placement`，组件声明的是 `placement`，导致 `presetLayout.zoomPlacement` 是死配置。同时删除从未被读取的 `editor` prop。
+
+### Removed
+
+- **peer dependency `hotkeys-js`**：查找快捷键改为原生 `keydown` 监听后已无引用，接入方可少装一个包。若宿主自身用到 hotkeys-js，请自行加入依赖。
+
+### Changed
+
+- `useFindReplaceHotkey` 新增可选 `target` 参数（默认取 `EditorShell` 根节点），自建 shell 可显式指定监听容器。
+- i18n 覆盖补齐：图片 / 视频上下文条按钮、拖拽手柄 `aria-label`、session 骨架与错误态文案改为走实例 locale，新增 `editor.mediaPreview` / `imageDelete` / `videoDelete` / `dragHandleAddBlock` / `dragHandleOpenMenu` / `sessionLoading` / `sessionRetry` / `sessionInitFailed`。
+- `editorConstants.ts` 中 `TEXT_ALIGN_OPTIONS` / `EDITOR_LIMITS` / `KEYBOARD_SHORTCUTS` 标记为 `@deprecated`（无运行时引用，真实值分别在 `AlignDropdown` 的 i18n key、`ZoomBar` props 默认值与各扩展的 `addKeyboardShortcuts()`）。
+
+### Docs
+
+- 全量校对文档与源码，补全 `update` / `update:content` 事件与 Inline `#toolbar` 插槽的 API 文档；修正 preset 能力描述、inline 工具栏扩展对照表、`buildExtensions` 示例参数、代码块语言数量、浮动菜单触发条件等。
+- 说明 `createI18n({ messages })` 不影响编辑器文案（自定义文案只被全局 `t()` 读取），并列出仍为中文的占位内容。
+
+## [0.1.4] — 2026-07-09
+
+### Fixed
+
+- `tsconfig.json`：移除 `baseUrl`，`paths` 改为 `./` 相对写法，修复部分工具链下路径别名解析异常。
+
+### Changed
+
+- 清理 `contentAdapter.ts` 中未使用的 `EMPTY_DOC` 常量；统一 `isVisuallyEmpty.test.ts` 的 import 格式。
+
+## [0.1.3] — 2026-07-09
+
+### Fixed
+
 - DragHandle：Editor 构造时 `view.dom` 尚未挂入 `.yaniv-editor` 时不再同步解析 overlay portal，改为延迟挂载；修复切换到 Notion preset（启用 dragHandle）时 session 重建失败。
 
 ### Changed

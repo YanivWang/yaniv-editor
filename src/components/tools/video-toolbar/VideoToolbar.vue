@@ -9,13 +9,17 @@
   >
     <div class="video-menu-content">
       <div class="video-menu-group">
-        <button class="video-menu-btn" title="预览" @click="previewVideo">
+        <button class="video-menu-btn" :title="t('editor.mediaPreview')" @click="previewVideo">
           <EyeOutlined />
         </button>
       </div>
 
       <div class="video-menu-group">
-        <button class="video-menu-btn video-menu-btn--danger" title="删除视频" @click="deleteVideo">
+        <button
+          class="video-menu-btn video-menu-btn--danger"
+          :title="t('editor.videoDelete')"
+          @click="deleteVideo"
+        >
           <DeleteOutlined />
         </button>
       </div>
@@ -55,6 +59,7 @@ import { onBeforeUnmount, ref, watch } from "vue";
 import { shouldShowVideoBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useOverlayBubbleMenu, useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal } from "@/shared/antd";
 
 const props = withDefaults(
@@ -66,6 +71,7 @@ const props = withDefaults(
   },
 );
 
+const t = useEditorT();
 const editor = useYanivEditor();
 const previewVisible = ref(false);
 const previewVideoRef = ref<HTMLVideoElement | null>(null);

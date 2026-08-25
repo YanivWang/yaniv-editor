@@ -21,14 +21,16 @@ Footer (basic / full): zoom 50–200%, page count, character count; full include
 
 ## Floating Text Menu
 
-Appears when text is selected or at the start of an empty line. Provides formatting, color, links, lists, etc. (notion / full). AI entry appears when the AI gate is enabled.
+Appears only when there is a **non-empty text selection** (`shouldShowFloatingTextToolbar`), positioned near that selection; an empty cursor does not trigger it. It is also suppressed when the selection is a NodeSelection, when the cursor is inside a code block / table / image / video / link, when the selection abuts a media node, or while a block drag is in progress (`isBubbleMenuBlocked`).
+
+Contents: heading dropdown, bold/italic/underline/strike, text color and highlight, link, lists; plus `AiMenuButton` when the AI gate is on. It does **not** include alignment or clear formatting.
 
 ## Bubbles / Context Bars
 
 | Selection type | UI                                                                                                             |
 | -------------- | -------------------------------------------------------------------------------------------------------------- |
 | Link           | Link bubble — edit URL, remove link                                                                            |
-| Image          | Image context bar — alignment, preview, delete, resize                                                         |
+| Image          | Image context bar — alignment, preview, delete (drag-resize comes from the node handles, not this bar)         |
 | Video          | Video context bar — preview playback, delete                                                                   |
 | Table cell     | Table context bar — add/remove rows/cols, merge/split, header row/column, delete table (no cell background UI) |
 
@@ -42,7 +44,9 @@ Bubble menus, BlockPicker, mention suggestions, AI popover, etc. mount inside `.
 
 ## Mobile
 
-When viewport ≤768px, the header automatically falls back to **COMPACT** layout (ToolbarNav).
+When the viewport is ≤768px (`matchMedia("(width <= 768px)")`), `ToolbarNav` intersects the preset config with `COMPACT_TOOLBAR_CONFIG`, collapsing the header to the compact tool band.
+
+COMPACT acts as a **mask** here (an intersection): it can only narrow the tool band further, never re-open a capability the gate turned off — e.g. `preset="basic"` (AI gate off) does not render `AiMenuButton` on a narrow viewport.
 
 ## Session Loading
 

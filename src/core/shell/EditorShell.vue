@@ -43,10 +43,14 @@
       />
     </div>
 
-    <div v-if="sessionStatus === 'loading'" class="yaniv-editor__skeleton">正在加载编辑器...</div>
+    <div v-if="sessionStatus === 'loading'" class="yaniv-editor__skeleton">
+      {{ localeContext.t("editor.sessionLoading") }}
+    </div>
     <div v-if="sessionStatus === 'error'" class="yaniv-editor__error">
       {{ sessionError }}
-      <button type="button" @click="retrySession">重试</button>
+      <button type="button" @click="retrySession">
+        {{ localeContext.t("editor.sessionRetry") }}
+      </button>
     </div>
   </div>
 </template>
@@ -56,6 +60,7 @@ import { EditorContent } from "@tiptap/vue-3";
 import { computed, onBeforeUnmount, ref, shallowRef, watch, type Ref } from "vue";
 
 import { getAppearanceClassName, useEditorAppearance } from "@/appearance";
+import { provideFindReplacePanel } from "@/components/editor/find-replace";
 import { provideOutlinePanel } from "@/components/editor/outline";
 import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideEditorRoot, provideOverlayPortal, provideYanivEditor } from "@/core/editorContext";
@@ -147,6 +152,7 @@ useEditorAppearance({
 useYanivAiConfig(fullProps);
 
 provideOutlinePanel(fullProps.value?.defaultOutlineExpanded ?? false);
+provideFindReplacePanel();
 const blockMenuHost = provideBlockMenuHost();
 
 const runtime = isFull.value

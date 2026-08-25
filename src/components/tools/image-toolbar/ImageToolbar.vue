@@ -17,7 +17,7 @@
           :key="alignOption.value"
           class="image-menu-btn"
           :class="{ active: currentAlign === alignOption.value }"
-          :title="alignOption.title"
+          :title="t(alignOption.titleKey)"
           @click="setAlign(alignOption.value)"
         >
           <component :is="alignOption.icon" />
@@ -26,14 +26,18 @@
 
       <!-- 预览 -->
       <div class="image-menu-group">
-        <button class="image-menu-btn" title="预览" @click="previewImage">
+        <button class="image-menu-btn" :title="t('editor.mediaPreview')" @click="previewImage">
           <EyeOutlined />
         </button>
       </div>
 
       <!-- 删除 -->
       <div class="image-menu-group">
-        <button class="image-menu-btn image-menu-btn--danger" title="删除图片" @click="deleteImage">
+        <button
+          class="image-menu-btn image-menu-btn--danger"
+          :title="t('editor.imageDelete')"
+          @click="deleteImage"
+        >
           <DeleteOutlined />
         </button>
       </div>
@@ -52,7 +56,7 @@
       <img
         v-if="currentImageSrc"
         :src="currentImageSrc"
-        alt="预览"
+        :alt="t('editor.mediaPreview')"
         style="width: 100%; height: auto"
       />
     </a-modal>
@@ -79,6 +83,7 @@ import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance"
 import { shouldShowImageBubbleMenu } from "@/composables/bubbleMenuShouldShow";
 import { useOverlayBubbleMenu, useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
+import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
 
@@ -92,6 +97,7 @@ const props = withDefaults(
   },
 );
 
+const t = useEditorT();
 const editor = useYanivEditor();
 const runCommand = createCommandRunner(editor);
 
@@ -108,9 +114,9 @@ const currentAlign = ref<"left" | "center" | "right" | null>(null);
 
 // ===== 对齐选项配置 =====
 const alignOptions = [
-  { value: "left" as const, icon: AlignLeftOutlined, title: "左对齐" },
-  { value: "center" as const, icon: AlignCenterOutlined, title: "居中" },
-  { value: "right" as const, icon: AlignRightOutlined, title: "右对齐" },
+  { value: "left" as const, icon: AlignLeftOutlined, titleKey: "editor.alignLeft" },
+  { value: "center" as const, icon: AlignCenterOutlined, titleKey: "editor.alignCenter" },
+  { value: "right" as const, icon: AlignRightOutlined, titleKey: "editor.alignRight" },
 ];
 
 // ===== 工具函数 =====

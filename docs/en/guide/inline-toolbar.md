@@ -10,19 +10,21 @@ The Inline Editor controls toolbar and extension registration via `toolbar: Inli
 
 ## All Switches
 
-| Key           | Extension / UI               | Description                      |
-| ------------- | ---------------------------- | -------------------------------- |
-| `undoRedo`    | StarterKit history           | Undo / redo                      |
-| `heading`     | StarterKit heading           | Heading levels                   |
-| `textFormat`  | bold/italic/underline/strike | Text formatting                  |
-| `list`        | TaskList                     | Ordered / unordered / task lists |
-| `align`       | TextAlign                    | Alignment                        |
-| `link`        | Link + link bubble           | Insert link                      |
-| `clearFormat` | —                            | Clear formatting                 |
-| `font`        | FontFamily + FontSize        | Font family and size             |
-| `codeBlock`   | codeBlockLowlight            | Code block                       |
+| Key           | Registered extensions                                       | Description                      |
+| ------------- | ----------------------------------------------------------- | -------------------------------- |
+| `undoRedo`    | StarterKit `undoRedo`                                       | Undo / redo                      |
+| `heading`     | StarterKit `heading` (levels 1–6)                           | Heading levels                   |
+| `textFormat`  | StarterKit `bold` / `italic` / `strike` + `Underline`       | Text formatting                  |
+| `list`        | StarterKit `bulletList` / `orderedList` + TaskList/TaskItem | Ordered / unordered / task lists |
+| `align`       | TextAlign (heading + paragraph)                             | Alignment                        |
+| `link`        | Link extension + link bubble (`showLinkBubble`)             | Insert link                      |
+| `clearFormat` | — (button only, no extra extension)                         | Clear formatting                 |
+| `font`        | TextStyle + FontFamily + FontSize                           | Font family and size             |
+| `codeBlock`   | codeBlockLowlight                                           | Code block                       |
 
-**Rule**: when `toolbar.x !== true`, the corresponding button is hidden and the extension is not registered.
+**Rule**: when `toolbar.x !== true`, the corresponding button is hidden and the extension is not registered. Gates are derived by `resolveInlineGates` from the registry's `inlineToolbarSlugs`; `undoRedo` / `heading` / `clearFormat` share the `inline-starter` capability, which carries `inlineAlways: true`, so the StarterKit base is always registered and only its sub-extensions are gated.
+
+Separately, a non-empty `placeholder` prop registers `inline-placeholder` (`YanivPlaceholder`), which is not controlled by `toolbar`.
 
 ## Example
 

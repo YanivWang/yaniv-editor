@@ -8,7 +8,9 @@
 import { provideYanivEditor, useYanivEditor } from "@yanivjs/yaniv-editor";
 ```
 
-自定义工具组件需要访问当前编辑器实例时使用。编辑器根节点与 overlay portal 由 `EditorShell` 内部 `provideEditorRoot` / `provideOverlayPortal` 注入；自定义 Shell 须自行提供，见 [Z-Index 与浮层](../guide/z-index.md)。
+自定义工具组件需要访问当前编辑器实例时使用。
+
+编辑器根节点与 overlay portal 由 `EditorShell` 内部的 `provideEditorRoot` / `provideOverlayPortal` 注入。**这两个函数以及 `useEditorRoot` / `useOverlayPortal` / `getYeZIndex` 目前不在包的公共导出里**（只存在于 `src/core/editorContext.ts` 与 `src/utils/zIndex.ts`），因此完全自建 Shell 需要 fork 仓库；基于 `YanivEditor` / `YanivInlineEditor` 之上做自定义工具组件则不受影响。相关约定见 [Z-Index 与浮层](../guide/z-index.md)。
 
 ## 视觉上下文
 
@@ -16,15 +18,21 @@ import { provideYanivEditor, useYanivEditor } from "@yanivjs/yaniv-editor";
 import {
   loadAppearance,
   preloadAppearances,
+  isLoadableAppearance,
   applyCustomAppearanceToElement,
   applyAppearanceToElement,
+  getAppearanceClassName,
   resolveColorMode,
   useResolvedColorMode,
   watchSystemColorMode,
+  useEditorAppearance,
   editorAppearanceInjectionKey,
   useInjectEditorAppearance,
+  EDITOR_APPEARANCES,
 } from "@yanivjs/yaniv-editor";
 ```
+
+`EDITOR_APPEARANCES` 只列出有 CSS 文件的三种外观（`default` / `notion` / `word`），不含 `custom`。
 
 `YanivEditor` 通过 `appearance`、`colorMode` 和可选的 `customAppearanceVars` 驱动视觉状态。z-index 请使用 `zIndexBase` prop，不要用 `customAppearanceVars` 覆盖 `--ye-z-base`。
 
@@ -33,6 +41,7 @@ import {
 ```ts
 import {
   isBubbleMenuBlocked,
+  findLinkHrefInSelection,
   shouldShowFloatingTextToolbar,
   shouldShowImageBubbleMenu,
   shouldShowLinkBubbleMenu,
@@ -63,6 +72,12 @@ import {
 import { useEditorColorState, useFindReplaceHotkey } from "@yanivjs/yaniv-editor";
 ```
 
+`useFindReplaceHotkey({ enabled, onOpen, target? })` 在**编辑器根节点**上监听 `keydown`，而不是全局 document：
+
+- 快捷键按实例隔离，同页多个编辑器互不串扰；
+- 焦点在编辑器之外时不拦截 Ctrl/Cmd+F，留给浏览器原生查找；
+- 默认从 `EditorShell` inject 根节点，自建 shell 可显式传 `target: Ref<HTMLElement | null>`。
+
 ## 运行时与能力
 
 高级集成可组合与内置组件相同的运行时管线：
@@ -80,12 +95,16 @@ import {
   resolveShowInlineToolbar,
   ContentAdapter,
   adaptJsonToSchema,
+  parseContentToDoc,
   prepareEditorContent,
   applyPhaseTransition,
+  BYPASS_GUARD_META,
 } from "@yanivjs/yaniv-editor";
 ```
 
-`ContentAdapter` / `adaptJsonToSchema` / `prepareEditorContent`：跨 schema 写入时清洗未知节点与 mark（session rebuild、受控 JSON）。
+- `ContentAdapter` / `adaptJsonToSchema` / `prepareEditorContent`：跨 schema 写入时清洗未知节点与 mark（session rebuild、受控 JSON）。
+- `parseContentToDoc(content, schema)`：把 HTML 或 JSON 解析成合法的 ProseMirror doc，解析失败回退空段落。
+- `BYPASS_GUARD_META`：打在事务 meta 上以绕过 `withTransactionGuard`；`ContentAdapter.setContent` 内部已自动打上。
 
 ## 国际化
 
@@ -97,8 +116,11 @@ import {
   loadLocale,
   normalizeLocaleCode,
   ensureLocalesLoaded,
+  BUILTIN_LOCALE_CODES,
 } from "@yanivjs/yaniv-editor";
 ```
+
+全局 `t()` / `createI18n()` 走的是 `locales/manager.ts` 的模块级 `currentLocale`，**仅供非组件/兜底场景**。编辑器内部的 chrome 组件读的是 `provideEditorLocale` 注入的实例 locale，因此对同页多实例，改全局 locale 不会影响已挂载的编辑器 —— 请用 `locale` prop。
 
 ## AI 子包
 

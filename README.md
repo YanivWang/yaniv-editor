@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Vue 3 + Tiptap 3 rich-text editor library (**v0.1.2**).
+Vue 3 + Tiptap 3 rich-text editor library (**v0.1.4**).
 
 | Shape               | Import                         | Use case                       |
 | ------------------- | ------------------------------ | ------------------------------ |
@@ -151,7 +151,9 @@ To keep pre–v0.1.0 basic behavior (table + video):
 <YanivEditor preset="full" :features="{ ai: true }" :ai-config="aiConfig" />
 ```
 
-`notion` focuses on block editing (slash command, drag handle) plus video, math, outline, find/replace, Office paste, and AI. Format painter stays off. It uses floating/block interactions and does not show the fixed top toolbar or footer.
+`notion` focuses on block editing (slash command, drag handle) plus image, video, table, math, outline, find/replace, Office paste, and AI. Format painter stays off. It uses floating/block interactions and does not show the fixed top toolbar or footer.
+
+Because the header is hidden, the outline toggle and the find/replace button (both header-only) are unreachable under `notion` — those two gates register their extensions but expose no UI. Use `preset="full"` if you need them.
 
 ## Preview mode
 

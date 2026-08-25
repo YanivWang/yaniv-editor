@@ -32,11 +32,17 @@
 
 ## 配置来源（优先级）
 
-1. **宿主托管**：`:ai-config` prop — 忽略 localStorage / `.env`，默认隐藏「AI 设置」
-2. **用户配置**：localStorage + `useAiConfig`（无 ai-config 时）
-3. **构建时**：`VITE_AI_*` 环境变量（demo 模式）
+配置解析的唯一入口是 `client.ts` 的 `getAiConfig()`，优先级从高到低：
 
-`ai-config` 字段变化**不触发** session 重建；扩展通过 getter 动态读取。
+1. **宿主托管** — `:ai-config` prop，经 registry 的 getter 透传（每次请求现取）
+2. **用户配置** — localStorage（`AiSettingsModal` 写入，`getAiRequestConfig()` 读取）
+3. **构建时** — `VITE_AI_*` 环境变量
+
+上游各层（registry getter、`resolveAiExtensionOptions`）**只透传宿主原值、不填兜底**：未传 `:ai-config` 时 `resolveAiExtensionOptions` 返回 `null`，解析继续下沉到第 2、3 级。缺省值（provider 默认 endpoint / model、`timeout` 60s）统一在 `getAiConfig()` 内补齐。
+
+`ai-config` 字段变化**不触发** session 重建；改 `model` 后下次请求即生效。
+
+`storageMode: "proxy"` 时密钥由后端保管，前端不传 `apiKey` 也会被判定为「已配置」（只要有可达 endpoint）。
 
 ## 提供商
 

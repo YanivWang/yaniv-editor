@@ -46,7 +46,11 @@ import {
 } from "@yanivjs/yaniv-editor";
 ```
 
-All built-in appearance CSS is provided by `@yanivjs/yaniv-editor/style.css`. `loadAppearance` and `preloadAppearances` keep the public API asynchronous but only mark built-in appearances as ready.
+All built-in appearance CSS ships in `@yanivjs/yaniv-editor/style.css` in one go. `loadAppearance` / `preloadAppearances` keep their async signatures to preserve the API shape, but all they do is record the appearance in a `Set` as ready — there is no dynamic `import()`.
+
+::: tip Inline Editor has no appearance
+`appearance` / `customAppearanceVars` are `YanivEditor`-only props. Under the inline host, `EditorShell` always treats the appearance as `"default"`, and `inline.css` bundles no `appearance/styles/*.css`. `YanivInlineEditor` supports `colorMode` only.
+:::
 
 ## CSS Architecture
 

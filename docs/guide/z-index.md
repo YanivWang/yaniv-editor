@@ -59,12 +59,17 @@
 
 **禁止**使用 Ant Design 静态 `message` / `notification`（全局单例，默认挂 `document.body`，多实例不安全）。
 
-统一入口：
+统一入口（均在 `src/core/overlayFeedback.ts` / `src/composables/useOverlayFeedback.ts`）：
 
-- Vue 组件：`useOverlayFeedback()`（`src/composables/useOverlayFeedback.ts`）
-- 非组件 / 扩展：`showEditorToast` / `showEditorNotice`（`src/core/overlayFeedback.ts`）
+| 场景          | 入口                                     | 定位 portal 的方式                              |
+| ------------- | ---------------------------------------- | ----------------------------------------------- |
+| Vue 组件      | `useOverlayFeedback()`                   | `useOverlayMountTarget()`（inject 到 portal）   |
+| Tiptap 扩展   | `showEditorToast` / `showEditorNotice`   | `resolveOverlayPortalFromNode(editor.view.dom)` |
+| 已持有 portal | `showOverlayToast` / `showOverlayNotice` | 直接传入 `HTMLElement`                          |
 
-均挂载到当前编辑器的 overlay portal。
+`showEditorToast` / `showEditorNotice` 是 `showOverlayToast` / `showOverlayNotice` 的便捷包装（先从 editor DOM 反查 portal）。三者最终都挂载到当前编辑器的 overlay portal。默认时长：toast 2.5s，notice 3s。
+
+其中只有 `useOverlayFeedback` 在包的公共导出里；`showOverlayToast` / `showEditorToast` 等目前仅供库内使用。
 
 ## 实现要点（自定义 Shell）
 
@@ -81,6 +86,10 @@
 - `useOverlayMountTarget()` — Ant Design `getPopupContainer` / Modal `getContainer`
 - `useOverlayBubbleMenu()` — Tiptap 3 BubbleMenu（Floating UI）的 `appendTo` + `options`
 - `useOverlayFeedback()` / `showOverlayToast` / `showOverlayNotice` — Toast / Notice
+
+::: warning 自建 Shell 目前需要 fork
+上表中 `provideEditorRoot` / `provideOverlayPortal` / `getYeZIndex` 都**没有**从 `@yanivjs/yaniv-editor` 导出（公共导出里只有 `useOverlayMountTarget` / `useOverlayBubbleMenu` / `useOverlayFeedback`）。因此完整替换 `EditorShell` 需要 fork 仓库；在现有编辑器之上写自定义工具组件不受影响。
+:::
 
 ## 相关
 

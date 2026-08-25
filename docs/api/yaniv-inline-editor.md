@@ -25,6 +25,30 @@ import "@yanivjs/yaniv-editor/inline.css";
 
 浮层挂载与 token 详见 [Z-Index 与浮层](../guide/z-index.md)。
 
+## Events
+
+| 事件             | 载荷     | 说明                                      |
+| ---------------- | -------- | ----------------------------------------- |
+| `update:content` | `string` | 编辑器 `update` 时派发 `editor.getHTML()` |
+
+`content` + `update:content` 构成 `v-model:content`。Inline 的内容协议是 **HTML 字符串**，不接受 `JSONContent`。
+
+## Slots
+
+| 插槽      | 作用域                                                    | 说明                                           |
+| --------- | --------------------------------------------------------- | ---------------------------------------------- |
+| `toolbar` | `{ editor: Editor \| null, config: InlineToolbarConfig }` | 替换内置 `InlineToolbar`；不传时渲染内置工具栏 |
+
+```vue
+<YanivInlineEditor v-model:content="html">
+  <template #toolbar="{ editor, config }">
+    <InlineToolbar v-if="editor && config" :editor="editor" :config="config" />
+  </template>
+</YanivInlineEditor>
+```
+
+插槽只在 `chromePolicy.showInlineToolbar` 为 true 时渲染，即 `mode="edit"` **且** `toolbar` 中至少有一个 Registry 声明过的 slug 为 `true`。
+
 ## 示例
 
 ```vue

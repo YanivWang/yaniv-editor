@@ -140,7 +140,8 @@ export function useEditorSession(options: UseEditorSessionOptions) {
     } catch (error) {
       if (disposed || myGen !== generation) return;
       console.error("[useEditorSession] rebuild failed:", error);
-      sessionError.value = error instanceof Error ? error.message : "编辑器初始化失败";
+      sessionError.value =
+        error instanceof Error ? error.message : locale.value.editor.sessionInitFailed;
       status.value = "error";
       editor.value = null;
     }

@@ -172,6 +172,17 @@ export const zhCN: TiptapLocale = {
     outlineEmpty: "暂无标题，插入 H1–H6 标题后将自动生成大纲。",
     outlineClose: "关闭大纲",
 
+    mediaPreview: "预览",
+    imageDelete: "删除图片",
+    videoDelete: "删除视频",
+
+    dragHandleAddBlock: "添加块",
+    dragHandleOpenMenu: "打开块菜单或拖拽排序",
+
+    sessionLoading: "正在加载编辑器...",
+    sessionRetry: "重试",
+    sessionInitFailed: "编辑器初始化失败",
+
     toolbarLabel: "编辑器工具栏",
     toolbarSectionHistory: "历史记录",
     toolbarSectionTypography: "字体",
