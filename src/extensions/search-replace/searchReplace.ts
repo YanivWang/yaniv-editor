@@ -344,9 +344,14 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
               const isEditable = view.editable;
               if (wasEditable === isEditable) return;
 
+              // 只在 true → false 这一次翻转时清理；wasEditable 先更新，避免同一状态重复处理
               const leftEditMode = wasEditable === true && !isEditable;
               wasEditable = isEditable;
               if (!leftEditMode) return;
+
+              // destroy 之后访问 `editor.view` 会抛错（Tiptap 会报 "editor view is not available"）。
+              // 正常 update 路径下 view 必然存在，这里把该前提显式化，防止将来调用路径变化。
+              if (editor.isDestroyed) return;
 
               const storage = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
                 .searchReplace;

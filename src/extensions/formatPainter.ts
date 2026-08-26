@@ -381,10 +381,11 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
               const isEditable = view.editable;
               if (wasEditable === isEditable) return;
 
+              // 只在 true → false 这一次翻转时清理；wasEditable 先更新，避免同一状态重复处理
               const leftEditMode = wasEditable === true && !isEditable;
               wasEditable = isEditable;
 
-              if (leftEditMode && storage.isActive && editor) {
+              if (leftEditMode && storage.isActive && editor && !editor.isDestroyed) {
                 editor.commands.cancelFormatPainting();
               }
             },
