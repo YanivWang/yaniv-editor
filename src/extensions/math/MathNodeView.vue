@@ -12,6 +12,7 @@
         ref="textareaRef"
         v-model="latexInput"
         class="math-editor__input"
+        :aria-label="t('editor.mathLatexInput')"
         :placeholder="t('editor.mathPlaceholder')"
         @keydown.enter.ctrl="saveAndClose"
         @keydown.escape="cancelEdit"
@@ -32,10 +33,12 @@
     </div>
 
     <!-- 显示模式 -->
-    <span
+    <button
       v-else
+      type="button"
       class="math-display"
       :class="{ 'math-empty': !node.attrs.latex }"
+      :aria-label="t('editor.mathEdit')"
       @dblclick="startEdit"
       @click="handleClick"
       v-html="displayHtml"
@@ -171,8 +174,14 @@ watch(
 }
 
 .math-node-wrapper.is-selected .math-display {
+  /* 由 span 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式 */
+  font: inherit;
+  color: inherit;
+  appearance: none;
   outline: 2px solid var(--ye-primary);
   outline-offset: 2px;
+  background: none;
+  border: none;
   border-radius: 4px;
 }
 

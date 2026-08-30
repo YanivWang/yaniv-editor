@@ -13,14 +13,17 @@
     <div class="find-replace-form">
       <Space direction="vertical" style="width: 100%">
         <Input
+          ref="termInputRef"
           v-model:value="term"
           :placeholder="t('editor.findPlaceholder')"
+          :aria-label="t('editor.findPlaceholder')"
           allow-clear
           @press-enter="handleFindNext"
         />
         <Input
           v-model:value="replaceWith"
           :placeholder="t('editor.replacePlaceholder')"
+          :aria-label="t('editor.replacePlaceholder')"
           allow-clear
         />
         <Checkbox v-model:checked="caseSens">{{ t("editor.findReplaceMatchCase") }}</Checkbox>
@@ -47,7 +50,7 @@
  * Ctrl/Cmd+F 快捷键也在这里注册，因此隐藏顶栏的 preset 同样可用。
  * 打开入口通过 `useFindReplacePanel()` 共享，顶栏按钮只负责调用 `open()`。
  */
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 
 import { useInjectEditorAppearance } from "@/appearance";
 import { useFindReplaceHotkey } from "@/composables/useFindReplaceHotkey";
@@ -69,6 +72,7 @@ const modalWrapClass = computed(() => {
 
 const editor = useYanivEditor();
 const { visible, open, close } = useFindReplacePanel();
+const termInputRef = ref<{ focus: () => void } | null>(null);
 
 const term = ref("");
 const replaceWith = ref("");
@@ -119,14 +123,36 @@ useFindReplaceHotkey({
   },
 });
 
+/**
+ * 焦点管理。
+ *
+ * Ant Design Modal 自带焦点陷阱，但两端仍需接管：
+ * - **打开时**默认焦点落在对话框容器上，用户还要多按一次 Tab 才能开始输入；
+ * - **关闭时**它会把焦点还给"触发元素"，而本面板可由 Ctrl/Cmd+F 唤起（无触发元素），
+ *   此时焦点会掉到 body，键盘用户失去上下文。这里显式还给正文。
+ */
+function focusTermInput() {
+  void nextTick(() => termInputRef.value?.focus());
+}
+
+function restoreFocusToEditor() {
+  editor.value?.commands.focus();
+}
+
 function onClose() {
   const e = editor.value;
   if (e) e.commands.setSearchReplaceTerm("");
   close();
+  restoreFocusToEditor();
 }
 
 function onAfterOpenChange(opened: boolean) {
-  if (opened) syncStorageToVue();
+  if (opened) {
+    syncStorageToVue();
+    focusTermInput();
+  } else {
+    restoreFocusToEditor();
+  }
 }
 
 /** 替换后文档变化，需重新选中当前索引对应命中（扩展内已含视口滚动） */

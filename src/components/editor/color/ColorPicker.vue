@@ -123,6 +123,7 @@
               v-model="advancedColor"
               type="color"
               class="ye-color-picker-color-input"
+              :aria-label="t('editor.colorPickCustom')"
               @change="handleAdvancedColorChange"
             />
             <input
@@ -130,6 +131,7 @@
               type="text"
               class="ye-color-picker-color-text"
               placeholder="#000000"
+              :aria-label="t('editor.colorHexInput')"
               @input="handleAdvancedColorInput"
             />
           </div>

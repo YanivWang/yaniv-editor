@@ -25,17 +25,20 @@
 
     <!-- 图片网格 -->
     <div v-else class="gallery-grid">
-      <div
+      <button
         v-for="(img, index) in galleryImages"
         :key="index"
+        type="button"
         :class="['gallery-item', { 'is-selected': selectedImages.has(index) }]"
+        :aria-pressed="selectedImages.has(index)"
+        :aria-label="img.alt || `${t('editor.galleryImage')} ${index + 1}`"
         @click="toggleSelect(index)"
       >
         <img :src="img.src" :alt="img.alt || ''" class="gallery-item__img" />
-        <div v-if="selectedImages.has(index)" class="gallery-item__check">
+        <div v-if="selectedImages.has(index)" class="gallery-item__check" aria-hidden="true">
           <CheckCircleFilled />
         </div>
-      </div>
+      </button>
     </div>
 
     <!-- 底部操作栏 -->
@@ -232,7 +235,13 @@ function insertSelected() {
 .gallery-item {
   position: relative;
   aspect-ratio: 1;
+
+  /* 由 div 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式 */
+  padding: 0;
   overflow: hidden;
+  font: inherit;
+  color: inherit;
+  appearance: none;
   cursor: pointer;
   background: #f5f5f5;
   border: 2px solid transparent;

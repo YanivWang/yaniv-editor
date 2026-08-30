@@ -35,6 +35,12 @@
       wrap-class-name="yaniv-editor-modal"
       @cancel="closePreview"
     >
+      <!--
+        视频源来自接入方上传，编辑器无从获知字幕轨道；此处不做假的空 <track>
+        （空轨道对屏幕阅读器反而是噪音）。字幕属于内容侧责任，接入方应在
+        uploadVideo 返回的资源上自行挂载 WebVTT，详见 docs/features/media.md。
+      -->
+      <!-- eslint-disable-next-line vuejs-accessibility/media-has-caption -->
       <video
         v-if="currentVideoSrc"
         ref="previewVideoRef"

@@ -226,6 +226,13 @@ export const enUS: TiptapLocale = {
     galleryEmptyHint: "No images have been inserted in this document yet",
     galleryCount: "{total} total, {selected} selected",
     galleryInsert: "Insert Selected",
+    galleryImage: "Image",
+    tableSizePick: "Pick table size",
+    mathLatexInput: "LaTeX formula content",
+    mathEdit: "Edit formula",
+    colorPickCustom: "Custom color",
+    colorHexInput: "Hex color value",
+    submenuExpand: "Expand submenu",
 
     continueWriting: "Continue Writing",
     polish: "Polish Text",
@@ -276,6 +283,8 @@ export const enUS: TiptapLocale = {
   },
 
   slashCommand: {
+    menuLabel: "Block type picker",
+    mentionMenuLabel: "Mention suggestions",
     noResults: "No results",
     basicBlocks: "Basic Blocks",
     lists: "Lists",

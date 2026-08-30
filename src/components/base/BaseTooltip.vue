@@ -1,16 +1,27 @@
 <template>
+  <!--
+    悬浮/聚焦提示的透传容器：自身无语义、不可聚焦，真正的交互元素在 slot 里。
+    focus / blur 不冒泡，用它们监听子元素聚焦永远不会触发（键盘用户看不到提示），
+    因此改用会冒泡的 focusin / focusout。
+  -->
+  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     class="ye-tooltip-wrapper"
     @mouseenter="showTooltip = true"
     @mouseleave="showTooltip = false"
-    @focus="showTooltip = true"
-    @blur="showTooltip = false"
+    @focusin="showTooltip = true"
+    @focusout="showTooltip = false"
   >
     <slot />
     <Transition name="ye-tooltip-fade">
-      <div v-if="showTooltip && title" class="ye-tooltip" :class="`ye-tooltip--${placement}`">
+      <div
+        v-if="showTooltip && title"
+        class="ye-tooltip"
+        role="tooltip"
+        :class="`ye-tooltip--${placement}`"
+      >
         {{ title }}
-        <div class="ye-tooltip__arrow" />
+        <div class="ye-tooltip__arrow" aria-hidden="true" />
       </div>
     </Transition>
   </div>

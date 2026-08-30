@@ -13,7 +13,13 @@
       :open="dropdownOpen ? false : undefined"
       :get-popup-container="getPopupContainer"
     >
-      <a-button type="text" :class="['ye-dropdown-btn', { 'is-active': active }]">
+      <a-button
+        type="text"
+        :class="['ye-dropdown-btn', { 'is-active': active }]"
+        :aria-label="title"
+        aria-haspopup="menu"
+        :aria-expanded="dropdownOpen"
+      >
         <span class="ye-dropdown-btn__content">
           <component :is="icon" v-if="icon" class="ye-dropdown-btn__icon" />
           <span v-if="label" class="ye-dropdown-btn__label">{{ label }}</span>
@@ -34,15 +40,26 @@
               :on-primary-click="() => onSplitPrimary(item)"
               :on-child-select="onSplitChildSelect"
             >
+              <!--
+                分裂菜单项容器：自身无语义，鼠标进出仅用于控制子菜单延时开合；
+                键盘路径由内部两个 button 的 focusin / focusout 承担。
+              -->
+              <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
               <div
                 class="ye-dropdown-split"
                 @mouseenter="onSplitRowEnter(item)"
                 @mouseleave="onSplitRowLeave(item)"
+                @focusin="onSplitRowEnter(item)"
+                @focusout="onSplitRowLeave(item)"
               >
-                <span class="ye-dropdown-split__main" @click.stop="onSplitPrimary(item)">
+                <button
+                  type="button"
+                  class="ye-dropdown-split__main"
+                  @click.stop="onSplitPrimary(item)"
+                >
                   <component :is="item.icon" v-if="item.icon" class="ye-dropdown-menu-item__icon" />
                   <span class="ye-dropdown-menu-item__label">{{ item.label }}</span>
-                </span>
+                </button>
                 <a-dropdown
                   :trigger="hasSplitSelection(item) ? ['hover'] : []"
                   placement="topRight"
@@ -50,17 +67,26 @@
                   :get-popup-container="getPopupContainer"
                   @open-change="(open: boolean) => onSplitOverlayOpenChange(item, open)"
                 >
-                  <span
+                  <button
+                    type="button"
                     class="ye-dropdown-split__arrow"
                     :title="item.splitArrowTitle || splitHoverArrowTitle"
+                    :aria-label="item.splitArrowTitle || splitHoverArrowTitle"
+                    aria-haspopup="menu"
+                    :aria-expanded="isSplitOverlayOpen(item)"
+                    @click.stop="onSplitOverlayOpenChange(item, !isSplitOverlayOpen(item))"
                   >
                     <RightOutlined />
-                  </span>
+                  </button>
                   <template #overlay>
+                    <!-- 子菜单浮层容器：仅用于保持鼠标移入时不关闭，内部 a-menu 自带语义 -->
+                    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
                     <div
                       class="ye-dropdown-split-overlay"
                       @mouseenter="cancelSplitClose"
                       @mouseleave="scheduleSplitClose(item)"
+                      @focusin="cancelSplitClose"
+                      @focusout="scheduleSplitClose(item)"
                     >
                       <a-menu
                         class="ye-dropdown-overlay"

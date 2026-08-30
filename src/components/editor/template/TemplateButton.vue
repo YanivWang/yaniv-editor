@@ -17,9 +17,10 @@
     wrap-class-name="yaniv-editor-modal"
   >
     <div class="template-list">
-      <div
+      <button
         v-for="tpl in allTemplates"
         :key="tpl.key"
+        type="button"
         class="template-card"
         @click="insertTemplate(tpl)"
       >
@@ -30,7 +31,7 @@
           <div class="template-card__name">{{ t(tpl.nameKey as any) }}</div>
           <div class="template-card__desc">{{ t(tpl.descKey as any) }}</div>
         </div>
-      </div>
+      </button>
     </div>
   </a-modal>
 </template>
@@ -103,6 +104,12 @@ function insertTemplate(tpl: TemplateItem) {
   gap: 12px;
   align-items: flex-start;
   padding: 14px;
+
+  /* 由 div 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式 */
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  appearance: none;
   cursor: pointer;
   border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;

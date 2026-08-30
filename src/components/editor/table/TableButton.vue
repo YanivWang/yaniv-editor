@@ -8,15 +8,29 @@
     >
       <template #content>
         <div class="table-insert-panel">
-          <div class="grid" @mouseleave="resetGridHover">
+          <!--
+            尺寸选择器容器：语义是一组按钮（每格都是可聚焦 button，名称为「行 × 列」）。
+            这里的 mouseleave / focusout 只用于复位预览高亮，不产生任何激活行为。
+          -->
+          <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+          <div
+            class="grid"
+            role="group"
+            :aria-label="t('editor.tableSizePick')"
+            @mouseleave="resetGridHover"
+            @focusout="resetGridHover"
+          >
             <div v-for="r in gridRows" :key="'r-' + r" class="grid-row">
-              <div
+              <button
                 v-for="c in gridCols"
                 :key="'c-' + r + '-' + c"
+                type="button"
                 :class="['grid-cell', r <= hoverRows && c <= hoverCols ? 'active' : '']"
+                :aria-label="`${r} × ${c}`"
                 @mouseenter="setHover(r, c)"
+                @focus="setHover(r, c)"
                 @click="applyCreateTable(r, c)"
-              ></div>
+              ></button>
             </div>
           </div>
           <div class="attrs">
@@ -299,6 +313,10 @@ function deleteTable() {
 .grid-cell {
   width: 18px;
   height: 18px;
+
+  /* 由 div 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式 */
+  padding: 0;
+  appearance: none;
   cursor: pointer;
   background: #fff;
   border: var(--ye-border-width) solid var(--ye-border);

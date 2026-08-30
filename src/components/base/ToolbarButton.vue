@@ -8,6 +8,8 @@
       ]"
       :disabled="disabled"
       type="button"
+      :aria-label="title"
+      :aria-pressed="active"
       @mousedown.prevent
       @click="onClick"
       @dblclick="onDblClick"

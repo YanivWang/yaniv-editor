@@ -7,6 +7,7 @@ import prettier from "eslint-config-prettier/flat";
 import importPlugin from "eslint-plugin-import";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
+import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 import vueParser from "vue-eslint-parser";
 
 const tsconfigRootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -73,6 +74,28 @@ export default tseslint.config(
     },
   },
   ...pluginVue.configs["flat/recommended"],
+
+  /**
+   * 无障碍规则（WCAG 2.1 AA 方向）。
+   *
+   * 编辑器是工具栏 / 浮层密集型 UI：图标按钮无可读名称、对话框无 role、
+   * 自定义控件无键盘可达性，会直接卡住政企与海外客户的采购合规审查。
+   * 只覆盖 src（examples 是演示壳，不作为交付物约束）。
+   */
+  ...pluginVueA11y.configs["flat/recommended"].map((config) => ({
+    ...config,
+    files: ["src/**/*.vue"],
+  })),
+  {
+    files: ["src/**/*.vue"],
+    rules: {
+      // 编辑器正文区由 ProseMirror 接管键盘交互，其容器上的鼠标事件无需再补键盘事件
+      "vuejs-accessibility/mouse-events-have-key-events": "warn",
+      "vuejs-accessibility/click-events-have-key-events": "warn",
+      // Ant Design Vue 组件自带 label 关联，静态检查无法追踪
+      "vuejs-accessibility/label-has-for": "off",
+    },
+  },
   {
     files: ["src/**/*.{ts,vue}", "examples/**/*.{ts,vue}"],
     extends: [...tseslint.configs.recommendedTypeChecked],

@@ -9,15 +9,26 @@
       :style="menuStyle"
       @mousedown.prevent
     >
-      <div v-if="filteredGroups.length > 0" class="block-picker-list">
+      <div
+        v-if="filteredGroups.length > 0"
+        :id="popupId"
+        class="block-picker-list"
+        role="listbox"
+        :aria-label="t('slashCommand.menuLabel')"
+      >
         <template v-for="group in filteredGroups" :key="group.id">
-          <div class="block-picker-group-title">{{ group.title }}</div>
+          <div class="block-picker-group-title" role="presentation">{{ group.title }}</div>
           <button
             v-for="(item, itemIdx) in group.items"
+            :id="optionId(isFlatIndex(group, itemIdx))"
             :key="item.id"
+            type="button"
+            role="option"
             class="block-picker-item"
             :class="{ active: isFlatIndex(group, itemIdx) === selectedIndex }"
+            :aria-selected="isFlatIndex(group, itemIdx) === selectedIndex"
             @click="selectItem(item)"
+            @focus="selectedIndex = isFlatIndex(group, itemIdx)"
             @mouseenter="selectedIndex = isFlatIndex(group, itemIdx)"
           >
             <span class="block-picker-item-icon">
@@ -36,7 +47,14 @@
       </div>
     </div>
 
-    <div v-if="isVisible" class="block-picker-backdrop" @mousedown="hide" />
+    <!-- 纯遮罩层：仅承载点击关闭，无语义内容；键盘用户用 Esc 关闭（见 onKeydown） -->
+    <div
+      v-if="isVisible"
+      class="block-picker-backdrop"
+      role="presentation"
+      aria-hidden="true"
+      @mousedown="hide"
+    />
   </teleport>
 </template>
 
@@ -53,11 +71,13 @@ import {
   onMounted,
   onUnmounted,
   ref,
+  useId,
   watch,
 } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
 import { slashCommandKey, type SlashCommandState } from "@/components/tools/slash-command";
+import { useVirtualFocusPopup } from "@/composables/useVirtualFocusPopup";
 import { useOverlayPortal, useYanivEditor } from "@/core/editorContext";
 import type { MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -134,6 +154,18 @@ const filteredGroups = computed<BlockMenuGroupDef[]>(() => {
 });
 
 const flatItems = computed(() => filteredGroups.value.flatMap((group) => group.items));
+
+/**
+ * 虚拟焦点：焦点始终留在正文（弹层 `@mousedown.prevent` 不夺焦，上下键由扩展处理），
+ * 因此用 `aria-activedescendant` 告知辅助技术当前高亮项。
+ */
+const popupId = `yaniv-block-picker-${useId()}`;
+const optionId = (index: number) => `${popupId}-option-${index}`;
+const activeOptionId = computed(() =>
+  isVisible.value && flatItems.value.length ? optionId(selectedIndex.value) : null,
+);
+
+useVirtualFocusPopup({ editor, visible: isVisible, popupId, activeOptionId });
 
 const menuStyle = computed(() => ({
   position: "fixed" as const,

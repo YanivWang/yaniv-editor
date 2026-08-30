@@ -19,3 +19,4 @@ export {
   type OverlayBubblePlacement,
 } from "./useOverlayMount";
 export { useOverlayFeedback, type OverlayFeedbackApi } from "./useOverlayFeedback";
+export { useRovingTabindex } from "./useRovingTabindex";

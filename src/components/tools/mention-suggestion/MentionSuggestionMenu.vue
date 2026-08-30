@@ -2,7 +2,10 @@
   <teleport v-if="overlayPortal" :to="overlayPortal">
     <div
       v-if="isVisible"
+      :id="popupId"
       class="mention-suggestion-menu"
+      role="listbox"
+      :aria-label="t('slashCommand.mentionMenuLabel')"
       :class="appearanceClass"
       :data-color-mode="resolvedColorMode"
       :style="menuStyle"
@@ -10,10 +13,15 @@
     >
       <button
         v-for="(item, index) in suggestions"
+        :id="optionId(index)"
         :key="item.id"
+        type="button"
+        role="option"
         class="mention-suggestion-menu__item"
         :class="{ 'is-active': index === selectedIndex }"
+        :aria-selected="index === selectedIndex"
         @click="selectItem(item)"
+        @focus="selectedIndex = index"
         @mouseenter="selectedIndex = index"
       >
         <span class="mention-suggestion-menu__type">{{ item.type === "user" ? "@" : "#" }}</span>
@@ -27,9 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
+import { useVirtualFocusPopup } from "@/composables/useVirtualFocusPopup";
 import { useOverlayPortal, useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { getMentionSuggestions, mentionPluginKey, type MentionItem } from "@/extensions/mention";
@@ -50,6 +59,15 @@ const selectedIndex = ref(0);
 const position = ref({ x: 0, y: 0 });
 
 const suggestions = computed(() => getMentionSuggestions(query.value));
+
+/** 虚拟焦点：焦点留在正文，用 aria-activedescendant 指向当前候选项 */
+const popupId = `yaniv-mention-menu-${useId()}`;
+const optionId = (index: number) => `${popupId}-option-${index}`;
+const activeOptionId = computed(() =>
+  isVisible.value && suggestions.value.length ? optionId(selectedIndex.value) : null,
+);
+
+useVirtualFocusPopup({ editor, visible: isVisible, popupId, activeOptionId });
 
 const menuStyle = computed(() => ({
   left: `${position.value.x}px`,

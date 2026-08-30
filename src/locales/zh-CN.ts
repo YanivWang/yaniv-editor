@@ -223,6 +223,13 @@ export const zhCN: TiptapLocale = {
     galleryEmptyHint: "当前文档中还没有插入过图片",
     galleryCount: "共 {total} 张，已选 {selected} 张",
     galleryInsert: "插入选中图片",
+    galleryImage: "图片",
+    tableSizePick: "选择表格尺寸",
+    mathLatexInput: "LaTeX 公式内容",
+    mathEdit: "编辑公式",
+    colorPickCustom: "自定义颜色",
+    colorHexInput: "十六进制颜色值",
+    submenuExpand: "展开子菜单",
 
     continueWriting: "继续写作",
     polish: "润色文本",
@@ -273,6 +280,8 @@ export const zhCN: TiptapLocale = {
   },
 
   slashCommand: {
+    menuLabel: "块类型选择",
+    mentionMenuLabel: "提及候选",
     noResults: "无匹配结果",
     basicBlocks: "基础块",
     lists: "列表",

@@ -241,6 +241,20 @@ export interface TiptapLocale {
     galleryEmptyHint: string;
     galleryCount: string;
     galleryInsert: string;
+    /** 无障碍：图库项 aria-label 前缀 */
+    galleryImage: string;
+    /** 无障碍：表格尺寸选择网格 */
+    tableSizePick: string;
+    /** 无障碍：数学公式输入框 label */
+    mathLatexInput: string;
+    /** 无障碍：数学公式显示态可激活编辑 */
+    mathEdit: string;
+    /** 无障碍：颜色选择器取色输入 */
+    colorPickCustom: string;
+    /** 无障碍：颜色十六进制输入 */
+    colorHexInput: string;
+    /** 无障碍：下拉分裂项的子菜单触发 */
+    submenuExpand: string;
 
     continueWriting: string;
     polish: string;
@@ -291,6 +305,10 @@ export interface TiptapLocale {
   };
 
   slashCommand: {
+    /** 无障碍：块选择弹层的 listbox 名称 */
+    menuLabel: string;
+    /** 无障碍：提及候选弹层的 listbox 名称 */
+    mentionMenuLabel: string;
     noResults: string;
     basicBlocks: string;
     lists: string;
