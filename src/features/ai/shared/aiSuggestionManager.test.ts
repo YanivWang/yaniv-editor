@@ -193,6 +193,40 @@ describe("续写模式", () => {
   });
 });
 
+/**
+ * 本类是模块级单例，同页多编辑器共用。切换实例时必须先把上一个复位干净——
+ * 否则上一个实例的 ai-highlight 标记再没人清得掉，且会被序列化进
+ * getHTML() / getJSON()，污染宿主保存的内容。
+ */
+describe("同页多实例切换", () => {
+  it("在第二个编辑器上开会话，会清掉第一个编辑器的残留高亮", () => {
+    const a = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, a);
+    expect(a.getHTML()).toContain("ai-highlight");
+
+    const b = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, b);
+
+    expect(a.getHTML(), "切换实例后第一个编辑器不应残留高亮").not.toContain("ai-highlight");
+    expect(b.getHTML()).toContain("ai-highlight");
+
+    aiSuggestionManager.hide();
+    expect(a.getHTML()).not.toContain("ai-highlight");
+    expect(b.getHTML()).not.toContain("ai-highlight");
+
+    b.destroy();
+  });
+
+  it("同一编辑器重复开会话不会误清自己的高亮", () => {
+    const e = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
+    aiSuggestionManager.show("beta", { from: 7, to: 11 }, e);
+
+    expect(e.getHTML()).toContain("ai-highlight");
+    expect(aiSuggestionManager.isVisible()).toBe(true);
+  });
+});
+
 describe("locale 会话级绑定", () => {
   it("bindLocale 传 undefined 时回退为返回 key 本身", () => {
     expect(() => aiSuggestionManager.bindLocale(undefined)).not.toThrow();

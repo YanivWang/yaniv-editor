@@ -331,12 +331,21 @@ class AiSuggestionManager {
     this.editor = null;
   }
 
+  /**
+   * 绑定本次会话的编辑器；**切换到另一个实例前必须把上一个复位干净**。
+   *
+   * 本类是模块级单例，同页多编辑器共用。旧实现直接 `this.editor = editor` 就换人，
+   * 于是上一个实例的 `ai-highlight` 标记再没人清得掉——`hide()` 之后只作用于新实例。
+   * 这不只是视觉残留：该 mark 会被序列化进 `getHTML()` / `getJSON()`，污染宿主保存的内容。
+   * 同理旧实例的 click handler 也永远摘不掉（`removeClickHandler` 读的是当前 editor 的 dom）。
+   *
+   * `hide()` 一次性完成：中止在途流、移除高亮、卸载弹层、摘监听、复位会话状态。
+   */
   private ensureEditor(editor: Editor): void {
-    if (!this.liveEditor()) {
-      this.init(editor);
-    } else {
-      this.editor = editor;
-    }
+    const current = this.liveEditor();
+    if (current === editor) return;
+    if (current) this.hide();
+    this.init(editor);
   }
 
   private clearAbortController(abortController: AbortController): void {
