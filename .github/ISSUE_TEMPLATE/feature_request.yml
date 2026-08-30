@@ -1,0 +1,35 @@
+name: 功能建议
+description: 提出新能力或改进
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 要解决的问题
+      description: 请描述实际场景，而不是直接给方案
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 期望的方案
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: 涉及层次
+      options:
+        [
+          "能力（capability / 扩展）",
+          "外观（appearance / CSS）",
+          "API（props / expose）",
+          "文档",
+          "不确定",
+        ]
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 已考虑的替代方案

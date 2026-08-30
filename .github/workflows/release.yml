@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只构建与校验，不真正发布"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  # npm provenance 需要 OIDC token：发布的包会附带可验证的来源证明，
+  # 下游可以确认这个 tarball 确实由本仓库的这次 workflow 构建
+  id-token: write
+
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+
+jobs:
+  publish:
+    name: Build & publish to npm
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 发布前必须过完整门禁：npm 上的版本无法真正撤回（unpublish 有 72h 与依赖限制）
+      - name: Verify
+        run: pnpm run verify
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Assert tag matches package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -euo pipefail
+          pkg=$(node -p "require('./package.json').version")
+          tag="${GITHUB_REF_NAME#v}"
+          echo "package.json=${pkg} tag=${tag}"
+          test "$pkg" = "$tag" || { echo "::error::tag 与 package.json 版本不一致"; exit 1; }
+
+      - name: Assert LICENSE ships in the tarball
+        # 上游为 MIT，许可证与版权声明必须随包分发（见 NOTICE）
+        run: |
+          set -euo pipefail
+          pnpm pack --pack-destination /tmp >/dev/null
+          tarball=$(ls /tmp/*.tgz | head -1)
+          tar -tzf "$tarball" | grep -qx "package/LICENSE" || {
+            echo "::error::发布包缺少 LICENSE"; exit 1; }
+          tar -tzf "$tarball" | grep -qx "package/NOTICE" || {
+            echo "::error::发布包缺少 NOTICE"; exit 1; }
+          echo "tarball 内容:"; tar -tzf "$tarball" | head -30
+
+      - name: Publish (dry run)
+        if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+        run: pnpm publish --dry-run --no-git-checks
+
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: pnpm publish --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

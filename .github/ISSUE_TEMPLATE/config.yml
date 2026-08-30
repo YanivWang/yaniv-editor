@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞
+    url: https://github.com/YanivWang/yaniv-editor/security/advisories/new
+    about: 请通过私密渠道报告安全问题，不要提交公开 Issue
+  - name: 使用问题与讨论
+    url: https://github.com/YanivWang/yaniv-editor/discussions
+    about: 接入方式、选型建议等非缺陷问题

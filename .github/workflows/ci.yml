@@ -1,0 +1,209 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # 仓库 .npmrc 指向国内镜像，CI 上走官方源更稳定
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+
+jobs:
+  quality:
+    name: Typecheck / Test / Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Unit tests (with coverage)
+        run: pnpm run test:coverage
+
+      - name: ESLint
+        run: pnpm run lint
+
+      - name: Stylelint
+        run: pnpm run lint:style
+
+      - name: Prettier
+        run: pnpm run format:check
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  build:
+    name: Build (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # engines.node 声明 >=20.19.5；两个 LTS 都要能构建
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build library
+        run: pnpm run build
+
+      - name: Assert published entry points exist
+        run: |
+          set -euo pipefail
+          for f in dist/index.esm.js dist/index.js dist/inline.esm.js dist/inline.js \
+                   dist/ai.esm.js dist/ai.js dist/index.d.ts dist/inline.d.ts dist/ai.d.ts \
+                   dist/style.css dist/inline.css; do
+            test -s "$f" || { echo "::error::缺少产物 $f"; exit 1; }
+          done
+
+      - name: Assert inline.css stays lighter than style.css
+        # inline 入口面向评论/表单等轻量场景；一旦它反超 style.css，
+        # 说明 CSS 按入口拆分的逻辑又退化成了全量合并（见 vite.config.ts）
+        run: |
+          set -euo pipefail
+          style=$(wc -c < dist/style.css)
+          inline=$(wc -c < dist/inline.css)
+          echo "style.css=${style}B inline.css=${inline}B"
+          test "$inline" -lt "$style" || { echo "::error::inline.css 不应大于 style.css"; exit 1; }
+
+      # 体积预算：给 5% 余量，超出必须显式调整预算并说明原因，
+      # 避免"每次多一点"式的无声劣化
+      - name: Enforce bundle size budget (gzip)
+        run: |
+          set -euo pipefail
+          budget() {
+            local file="$1" limit="$2" label="$3"
+            local size
+            size=$(gzip -c "$file" | wc -c | tr -d ' ')
+            echo "${label}: ${size}B (预算 ${limit}B)"
+            if [ "$size" -gt "$limit" ]; then
+              echo "::error::${label} gzip ${size}B 超出预算 ${limit}B"
+              exit 1
+            fi
+          }
+          budget "$(ls dist/EditorShell*.js | head -1)" 46000 "主 chunk (ESM)"
+          budget dist/style.css                          19000 "style.css"
+          budget dist/inline.css                         10500 "inline.css"
+
+      - name: Assert gated capabilities are code-split out of the main chunk
+        # preset/features 必须真正决定打包体积，而不只是运行时是否注册
+        run: |
+          set -euo pipefail
+          chunk=$(ls dist/EditorShell*.js | head -1)
+          echo "main chunk: $chunk"
+          for marker in 'new PluginKey("dragHandle")' 'new PluginKey("slashCommand")' \
+                        'yanivSearchReplace' 'chat/completions'; do
+            if grep -qF "$marker" "$chunk"; then
+              echo "::error::门控能力未拆分，主 chunk 中发现: $marker"
+              exit 1
+            fi
+          done
+
+      - name: Upload dist
+        if: matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E
+        run: pnpm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 阻断门禁：只看本包实际分发的依赖。
+      # 本包 dependencies 为空（全部走 peer/dev），因此这一层等价于「发布物不携带已知漏洞」。
+      - name: Audit production dependencies (blocking)
+        run: pnpm audit --audit-level high --prod
+
+      # 可见性：工具链（devDependencies）的传世漏洞多数要等上游发版才能修，
+      # 不该让每个 PR 因为 commitlint→ajv→fast-uri 这类链路变红；但必须持续可见。
+      - name: Audit full dependency tree (informational)
+        continue-on-error: true
+        run: pnpm audit --audit-level high

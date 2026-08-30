@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    groups:
+      # Tiptap 全家桶必须整体同版本升级，拆成多个 PR 会产生跨包版本漂移
+      tiptap:
+        patterns: ["@tiptap/*"]
+      eslint:
+        patterns: ["eslint", "eslint-*", "@eslint/*", "typescript-eslint"]
+      stylelint:
+        patterns: ["stylelint", "stylelint-*"]
+      vitest:
+        patterns: ["vitest", "@vitest/*", "@vue/test-utils"]
+    ignore:
+      # 主版本升级涉及 breaking change，需人工规划，不由机器人发起
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly

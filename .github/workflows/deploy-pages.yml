@@ -35,6 +35,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # 质量门禁前置：避免把类型/测试/lint 已经红掉的版本部署到线上文档站
+      - name: Verify
+        run: pnpm run verify
+
       - name: Build pages artifact
         run: pnpm pages:build
 

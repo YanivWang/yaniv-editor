@@ -1,0 +1,13 @@
+# 默认所有变更由维护者审阅
+*                                   @YanivWang
+
+# 以下路径改动影响面大，务必人工过一遍：
+/ARCHITECTURE.md                    @YanivWang
+/LICENSE                            @YanivWang
+/NOTICE                             @YanivWang
+/.github/workflows/                 @YanivWang
+/vite.config.ts                     @YanivWang
+/src/capabilities/registry.ts       @YanivWang
+/src/utils/safeUrl.ts               @YanivWang
+/src/core/session/contentAdapter.ts @YanivWang
+/src/publicApi.test.ts              @YanivWang

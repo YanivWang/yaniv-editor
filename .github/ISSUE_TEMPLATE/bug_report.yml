@@ -1,0 +1,53 @@
+name: Bug 报告
+description: 报告一个可复现的缺陷
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        安全漏洞请勿走此处，改用 [私密漏洞报告](https://github.com/YanivWang/yaniv-editor/security/advisories/new)。
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: "@yanivjs/yaniv-editor@0.1.5"
+    validations:
+      required: true
+  - type: dropdown
+    id: entry
+    attributes:
+      label: 入口
+      options: ["YanivEditor (full)", "YanivInlineEditor (inline)", "AI (/ai)", "其他"]
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: 复现配置
+      description: preset / appearance / colorMode / features 等 props
+      render: vue
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. …
+        2. …
+        3. 观察到 …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: "Chrome 120 / macOS 14 / Vue 3.5.13 / Vite 6"
+    validations:
+      required: true
