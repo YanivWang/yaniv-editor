@@ -410,12 +410,7 @@ class AiSuggestionManager {
 
       if (this.isTemporarilyHidden || !this.visibleRef.value) {
         event.stopPropagation();
-        let pos: number;
-        try {
-          pos = this.editor.view.posAtDOM(highlightElement, 0);
-        } catch {
-          pos = this.positionAnchor.from;
-        }
+        const pos = this.posAtDOMOrAnchor(highlightElement);
 
         let data = getAiSuggestionData(this.editor, pos);
         if (!data && this.userContextRange) {
@@ -438,7 +433,7 @@ class AiSuggestionManager {
         return;
       }
 
-      const pos = this.editor.view.posAtDOM(highlightElement, 0);
+      const pos = this.posAtDOMOrAnchor(highlightElement);
       const data = getAiSuggestionData(this.editor, pos);
       if (data && !this.state.visible) {
         this.restoreSuggestion(highlightElement as HTMLElement, data);
@@ -447,6 +442,21 @@ class AiSuggestionManager {
 
     editorClickHandlers.set(editorDom, clickHandler);
     editorDom.addEventListener("click", clickHandler);
+  }
+
+  /**
+   * 取元素在文档中的位置；`posAtDOM` 在节点已脱离视图时会抛错，此时回退到会话锚点。
+   *
+   * 两条点击分支都要走这里：早先只有「已隐藏」那条做了 try/catch，
+   * 「未隐藏」那条裸调 `posAtDOM`，同样的脱链场景照样会把点击回调打断。
+   */
+  private posAtDOMOrAnchor(element: Element): number {
+    if (!this.editor) return this.positionAnchor.from;
+    try {
+      return this.editor.view.posAtDOM(element, 0);
+    } catch {
+      return this.positionAnchor.from;
+    }
   }
 
   private removeClickHandler(): void {
@@ -462,7 +472,9 @@ class AiSuggestionManager {
   private restoreSuggestion(element: HTMLElement, data: AiSuggestionData): void {
     if (!this.editor) return;
 
-    const pos = this.editor.view.posAtDOM(element, 0);
+    const pos = this.posAtDOMOrAnchor(element);
+    if (pos < 0 || pos > this.editor.state.doc.content.size) return;
+
     const node = this.editor.state.doc.nodeAt(pos);
     if (!node) return;
 
@@ -586,20 +598,35 @@ class AiSuggestionManager {
     }
   }
 
+  /**
+   * 计算悬浮层位置。
+   *
+   * `positionAnchor` 是**会话开始时**记下的位置，而用户在流式输出期间可以继续删减文档，
+   * 因此它随时可能越界。`view.coordsAtPos()` 越界会抛 `RangeError: Position N out of range`，
+   * 且本方法的调用链是 `click → remountPopover → mountPopover`，全程无人捕获——
+   * 与 `getAiSuggestionData` 里已经处理过的是同一类过期位置问题，这里同样要收口：
+   * 先按当前文档大小夹取，再对残余异常兜底，位置不可用时退化到左上角而不是让整条回调炸掉。
+   */
   private calculatePopoverPosition(): { top: number; left: number } {
-    if (!this.editor) {
+    const editor = this.liveEditor();
+    if (!editor) {
       return { top: 0, left: 0 };
     }
 
-    const { from, to } = this.positionAnchor;
-    const { view } = this.editor;
-    const start = view.coordsAtPos(from);
-    const end = view.coordsAtPos(to);
+    const { view } = editor;
+    const docSize = editor.state.doc.content.size;
+    const clamp = (pos: number) => Math.max(0, Math.min(pos, docSize));
 
-    return {
-      top: end.bottom + 8,
-      left: start.left,
-    };
+    try {
+      const start = view.coordsAtPos(clamp(this.positionAnchor.from));
+      const end = view.coordsAtPos(clamp(this.positionAnchor.to));
+      return {
+        top: end.bottom + 8,
+        left: start.left,
+      };
+    } catch {
+      return { top: 0, left: 0 };
+    }
   }
 }
 
