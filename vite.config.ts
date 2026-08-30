@@ -298,8 +298,4 @@ export default defineConfig({
     },
     cssCodeSplit: true,
   },
-  define: {
-    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
-    __VERSION__: JSON.stringify(process.env.npm_package_version || "0.1.0"),
-  },
 });

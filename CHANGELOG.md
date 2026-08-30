@@ -4,6 +4,19 @@
 
 ### Fixed
 
+- **同页多编辑器切换 AI 会话会永久遗留高亮标记。** `aiSuggestionManager` 是模块级单例，
+  旧的 `ensureEditor` 直接 `this.editor = editor` 就换人，于是上一个实例的 `ai-highlight`
+  再没人清得掉（`hide()` 之后只作用于新实例）。这不只是视觉残留：该 mark 会被序列化进
+  `getHTML()` / `getJSON()`，污染宿主保存的内容；旧实例的 click handler 也永远摘不掉。
+  现在切换实例前先 `hide()` 把上一个复位干净。
+- **门控组件 chunk 加载失败不再静默。** 代码分割引入了一个新失败模式：部署更新后旧页面
+  请求已被替换的 hash 文件（`Failed to fetch dynamically imported module`）。Vue 默认只渲染空，
+  生产构建里没有任何提示，接入方看到的是"某个按钮莫名不见了"。新增
+  `defineGatedAsyncComponent`（25 处调用点统一接入），失败时打出带组件名与处置建议的
+  `console.error`，并用空占位组件收住错误——否则 `fail()` 会把错误抛给宿主
+  （实测能让测试进程以退出码 1 结束）。这与仓库在 terser 配置里特意保留
+  `console.warn` / `console.error` 的决定一致。
+
 - **`require()` 加载本包彻底修复（CJS 侧此前完全不可用）。** 两处配置各自把 CJS 打穿，
   且都只在 require 侧暴露，ESM 侧一切正常，因此一直没被发现：
   1. `exports.require` 指向 `dist/index.js`，而本包是 `"type": "module"`——Node 把
@@ -33,6 +46,14 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   （只有第一条分支做了 try/catch）也一并收口。
 
 ### Security
+
+- **iframe `allow-same-origin` 收窄到已知播放器。** `allow-scripts` + `allow-same-origin`
+  同时给，等于把 sandbox 让给被嵌页面自己：它保留自身源，一旦与宿主同源就能通过 `parent`
+  反向操作宿主 DOM，甚至摘掉自己 iframe 上的 `sandbox`。而 embed 的 `url` 是内容属性，
+  UGC 场景由使用者控制（粘贴 JSON 即可指定宿主自己的源）。现在只有 YouTube / Vimeo 这类
+  src 被重写成固定官方域名、内容不受使用者控制的播放器才保留该权限，任意地址一律跑在
+  不透明源里。代价是任意第三方嵌入拿不到自己的 cookie / storage——对展示型嵌入，
+  这个取舍优于把宿主 DOM 暴露出去。
 
 - **媒体 src 白名单补齐 JSON 与命令两条入口。** `0.2.0` 在 `parseHTML` / `renderHTML`
   两侧接了 `normalizeSafeMediaUrl`，但这只覆盖 **DOM 边界**；JSON 内容与
@@ -68,6 +89,16 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   健康机器上不受影响。
 
 ### Build / CI
+
+- **移除死配置 `__BUILD_TIME__` / `__VERSION__`。** 两者在 vite.config.ts 与
+  vite.config.demo.ts 里声明，但全仓库无任何引用（demo 那份还硬编码着过期的 `"0.1.0"`）。
+  `__BUILD_TIME__` 用 `new Date()` 求值，会让每次构建产物都不同——对已启用 npm provenance
+  的发布，可复现性是负分。
+- **Playwright 断言超时 5s → 15s。** webServer 的 url 探活只说明 HTML 外壳出得来，而 demo
+  是 dev 模式 SPA：首次进路由时 Vite 还要现场转换懒加载页面模块与十几个门控 chunk。
+  能力按 gate 分割后这部分明显变重，5s 窗口经常撞上冷启动转换耗时（实测冷启动 6 个用例
+  失败、同机预热后 11/11 全过）。放宽不掩盖真失败，且比继续靠 CI 的 retries: 2 把首跑
+  失败重试掉更诚实。
 
 - **`.npmrc` 不再把 registry 钉到 `registry.npmmirror.com`。** 国内镜像属于开发者个人
   环境（`~/.npmrc`），随开源库分发的代价是：`pnpm audit` 对所有人失效（镜像无
