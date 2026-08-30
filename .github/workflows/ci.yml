@@ -95,6 +95,26 @@ jobs:
             test -s "$f" || { echo "::error::缺少产物 $f"; exit 1; }
           done
 
+      - name: Assert type declarations are actually bundled
+        # test -s 只能保证非空：vite-plugin-dts 的打包选项一旦失效（如 5.x 把
+        # rollupTypes 更名为 bundleTypes，旧名被静默忽略），d.ts 会退化成
+        # `export * from './src/index.js'` 这样 41 字节的空壳——指向发布包里
+        # 并不存在的路径，下游拿不到任何类型，而 test -s 照样通过。
+        run: |
+          set -euo pipefail
+          for f in dist/index.d.ts dist/inline.d.ts dist/ai.d.ts; do
+            size=$(wc -c < "$f")
+            echo "${f}: ${size}B"
+            if grep -qE "^export \* from '\./src/" "$f"; then
+              echo "::error::${f} 是未打包的转发空壳，检查 vite.config.ts 的 bundleTypes"
+              exit 1
+            fi
+            if [ "$size" -lt 5000 ]; then
+              echo "::error::${f} 仅 ${size}B，疑似类型打包失效"
+              exit 1
+            fi
+          done
+
       - name: Assert inline.css stays lighter than style.css
         # inline 入口面向评论/表单等轻量场景；一旦它反超 style.css，
         # 说明 CSS 按入口拆分的逻辑又退化成了全量合并（见 vite.config.ts）

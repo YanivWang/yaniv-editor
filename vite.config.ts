@@ -145,8 +145,9 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       outDir: "dist",
-      rollupTypes: true, // Bundle all .d.ts into one file
-      logLevel: "error",
+      // vite-plugin-dts 5（改由 unplugin-dts 驱动）把 rollupTypes 更名为 bundleTypes；
+      // 旧名会被静默忽略，导致 d.ts 退化成 `export * from './src/index.js'` 的空壳。
+      bundleTypes: true, // Bundle all .d.ts into one file
       strictOutput: false,
       // Exclude files that use ant-design-vue Popover (causes vue-types path issues)
       exclude: [
