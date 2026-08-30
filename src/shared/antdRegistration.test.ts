@@ -7,7 +7,9 @@ import CodeBlockLanguageBadge from "@/components/editor/code-block/CodeBlockLang
 import { provideEditorRoot, provideOverlayPortal } from "@/core/editorContext";
 import { OVERLAY_PORTAL_CLASS } from "@/core/overlayPortal";
 
-function collectAntdResolveWarnings(onWarn: ReturnType<typeof vi.spyOn>) {
+import type { MockInstance } from "vitest";
+
+function collectAntdResolveWarnings(onWarn: MockInstance<typeof console.warn>) {
   return onWarn.mock.calls.filter(
     ([message]) =>
       typeof message === "string" && message.includes("Failed to resolve component: a-"),
