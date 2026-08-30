@@ -1,4 +1,4 @@
-import { existsSync, unlinkSync } from "fs";
+import { copyFileSync, existsSync, unlinkSync } from "fs";
 import { resolve } from "path";
 
 import vue from "@vitejs/plugin-vue";
@@ -139,6 +139,26 @@ function removeCssEntryDeclarationsPlugin(): Plugin {
   };
 }
 
+/**
+ * 为 CJS 产物补一份 `.d.cts` 声明。
+ *
+ * 本包是 `"type": "module"`，在 `node16` / `nodenext` 解析下，`.d.ts` 一律被当成 **ESM 类型**。
+ * `exports.require` 若指回 `.d.ts`，CJS 侧接入方会拿到 “这些 import 会编译成 require”
+ * 一类的报错（`arethetypeswrong` 的 Masquerading as ESM）。声明文件已由 `bundleTypes`
+ * 打成自包含的单文件（无任何相对 import），因此直接复制即可，无需重写路径。
+ */
+function emitCjsTypeDeclarationsPlugin(): Plugin {
+  return {
+    name: "yaniv-emit-cjs-type-declarations",
+    closeBundle() {
+      for (const entry of ["index", "inline", "ai"]) {
+        const source = resolve(__dirname, "dist", `${entry}.d.ts`);
+        if (existsSync(source)) copyFileSync(source, resolve(__dirname, "dist", `${entry}.d.cts`));
+      }
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -149,7 +169,12 @@ export default defineConfig({
       // 旧名会被静默忽略，导致 d.ts 退化成 `export * from './src/index.js'` 的空壳。
       bundleTypes: true, // Bundle all .d.ts into one file
       strictOutput: false,
-      // Exclude files that use ant-design-vue Popover (causes vue-types path issues)
+      /**
+       * 这两个弹层组件不从任何入口导出（非公开 API），却会把 ant-design-vue Popover
+       * 的整条类型链拖进声明打包：实测 ai.d.ts +2.2KB、构建耗时 14s → 49s。
+       * 原注释说的 "vue-types path issues" 已不成立（vue-types 直接依赖与对应的
+       * tsconfig paths 映射都已移除），保留排除项的理由是产物体积与构建耗时。
+       */
       exclude: [
         "src/features/ai/shared/CustomAiPopover.vue",
         "src/features/ai/shared/AiSuggestionPopover.vue",
@@ -157,6 +182,7 @@ export default defineConfig({
     }),
     consolidateLibCssPlugin(),
     removeCssEntryDeclarationsPlugin(),
+    emitCjsTypeDeclarationsPlugin(),
   ],
   resolve: {
     alias: {
@@ -184,10 +210,17 @@ export default defineConfig({
       },
       name: "YanivEditor",
       formats: ["es", "cjs"],
+      /**
+       * CJS 产物必须用 `.cjs` 后缀。本包是 `"type": "module"`，Node 会把 `dist/*.js`
+       * 一律当作 ESM 解析——里面的 `exports` / `require` 在 ESM 作用域下不存在，
+       * `require("@yanivjs/yaniv-editor")` 会直接抛
+       * `ReferenceError: exports is not defined in ES module scope`。
+       * （Rollup 对共享 chunk 本来就自动用了 `.cjs`，只有入口被这里覆盖成了 `.js`。）
+       */
       fileName: (format, entryName) => {
-        if (entryName === "index") return format === "es" ? "index.esm.js" : "index.js";
-        if (entryName === "inline") return format === "es" ? "inline.esm.js" : "inline.js";
-        if (entryName === "ai") return format === "es" ? "ai.esm.js" : "ai.js";
+        if (entryName === "index") return format === "es" ? "index.esm.js" : "index.cjs";
+        if (entryName === "inline") return format === "es" ? "inline.esm.js" : "inline.cjs";
+        if (entryName === "ai") return format === "es" ? "ai.esm.js" : "ai.cjs";
         return `${entryName}.js`;
       },
     },
@@ -236,11 +269,24 @@ export default defineConfig({
         "file-saver",
         "katex",
         "mammoth",
-        /^#\/.*/, // Internal APIs
         "lowlight",
         /^prosemirror-.*/,
       ],
       output: {
+        /**
+         * CJS 产物的默认导入互操作方式。
+         *
+         * Rollup 默认是 `"default"`——即假定 external 是纯 CJS、`module.exports` 本身就是
+         * 默认导出，于是 `import X from "pkg"` 直接编译成 `const X = require("pkg")`。
+         * 但 `@tiptap/*`、`ant-design-vue` 等依赖的 CJS 产物都带 `__esModule: true`，
+         * 默认导出挂在 `.default` 上，于是 `X.configure(...)` 在 require 侧直接抛
+         * `TypeError: X.configure is not a function`（ESM 侧完全正常，因此一直没被发现）。
+         *
+         * `"auto"` 即 Babel / TypeScript 的 `__esModule` 探测语义：带标记取 `.default`，
+         * 不带则取 `module.exports`。本仓库全部 external 均符合该约定
+         * （见 scripts/check-dist-entries.mjs 的加载自检）。
+         */
+        interop: "auto",
         globals: {
           vue: "Vue",
         },

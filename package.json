@@ -11,27 +11,43 @@
     "access": "public"
   },
   "packageManager": "pnpm@11.16.0",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./inline": {
-      "types": "./dist/inline.d.ts",
-      "import": "./dist/inline.esm.js",
-      "require": "./dist/inline.js"
+      "import": {
+        "types": "./dist/inline.d.ts",
+        "default": "./dist/inline.esm.js"
+      },
+      "require": {
+        "types": "./dist/inline.d.cts",
+        "default": "./dist/inline.cjs"
+      }
     },
     "./ai": {
-      "types": "./dist/ai.d.ts",
-      "import": "./dist/ai.esm.js",
-      "require": "./dist/ai.js"
+      "import": {
+        "types": "./dist/ai.d.ts",
+        "default": "./dist/ai.esm.js"
+      },
+      "require": {
+        "types": "./dist/ai.d.cts",
+        "default": "./dist/ai.cjs"
+      }
     },
     "./style.css": "./dist/style.css",
-    "./inline.css": "./dist/inline.css"
+    "./inline.css": "./dist/inline.css",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -45,6 +61,7 @@
     "prepare": "husky",
     "dev": "vite",
     "build": "vite build",
+    "build:check": "pnpm build && node scripts/check-dist-entries.mjs",
     "build:demo": "vite build --config vite.config.demo.ts",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -67,7 +84,8 @@
     "verify": "pnpm run typecheck && pnpm run test:coverage && pnpm run lint && pnpm run lint:style && pnpm run format:check",
     "prepublishOnly": "pnpm build",
     "release": "pnpm build && pnpm publish",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "check:dist": "node scripts/check-dist-entries.mjs"
   },
   "lint-staged": {
     "*.{ts,vue,js,mjs,cjs}": "eslint --fix",
