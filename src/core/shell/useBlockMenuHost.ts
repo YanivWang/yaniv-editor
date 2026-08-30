@@ -21,8 +21,7 @@ export interface BlockMenuHost {
 export const blockMenuHostKey: InjectionKey<BlockMenuHost> = Symbol("blockMenuHost");
 
 type PendingOpen =
-  | { kind: "activate"; state: SlashCommandState }
-  | { kind: "insert"; context: BlockInsertContext };
+  { kind: "activate"; state: SlashCommandState } | { kind: "insert"; context: BlockInsertContext };
 
 export function provideBlockMenuHost(): BlockMenuHost {
   const instanceRef = shallowRef<BlockMenuInstance | null>(null);

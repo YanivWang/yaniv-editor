@@ -82,8 +82,7 @@ function syncFromEditor() {
   }
 
   const state = mentionPluginKey.getState(e.state) as
-    | { active: boolean; query: string }
-    | undefined;
+    { active: boolean; query: string } | undefined;
 
   if (!state?.active) {
     isVisible.value = false;

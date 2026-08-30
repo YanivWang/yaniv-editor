@@ -1,16 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 
 export type CalloutColor =
-  | "default"
-  | "gray"
-  | "brown"
-  | "orange"
-  | "yellow"
-  | "green"
-  | "blue"
-  | "purple"
-  | "pink"
-  | "red";
+  "default" | "gray" | "brown" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "red";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

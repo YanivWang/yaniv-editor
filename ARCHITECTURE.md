@@ -1393,15 +1393,11 @@ test("ContentAdapter.setContent 在 editor.setEditable(false) 后仍能写入", 
   editor.setEditable(false);
   ContentAdapter.setContent(editor, {
     type: "doc",
-    content: [
-      /* ... */
-    ],
+    content: [/* ... */],
   });
   expect(editor.getJSON()).toMatchObject({
     type: "doc",
-    content: [
-      /* ... */
-    ],
+    content: [/* ... */],
   });
 });
 test("普通业务 commands 在 editable=false 下被守卫拦截", () => {
