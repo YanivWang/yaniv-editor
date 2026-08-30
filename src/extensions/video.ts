@@ -6,6 +6,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { Plugin, NodeSelection, TextSelection } from "@tiptap/pm/state";
 
+import { createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
 import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export interface VideoOptions {
@@ -230,6 +231,8 @@ export const Video = Node.create<VideoOptions>({
 
   addProseMirrorPlugins() {
     return [
+      // 事务级兜底：命令 / insertContent 不经过 parseHTML，见 mediaSrcPolicy 文件头
+      createMediaSrcGuardPlugin("video"),
       new Plugin({
         props: {
           handleDOMEvents: {

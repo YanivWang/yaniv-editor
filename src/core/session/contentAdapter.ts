@@ -2,6 +2,7 @@ import { getSchema, type Extensions, type JSONContent } from "@tiptap/core";
 import { DOMParser, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/model";
 
 import { BYPASS_GUARD_META } from "@/capabilities/transactionGuard";
+import { sanitizeMediaSrcAttrs } from "@/utils/mediaSrcPolicy";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -95,7 +96,8 @@ function adaptNode(
   }
 
   const adapted: JSONContent = { type };
-  if (node.attrs !== undefined) adapted.attrs = node.attrs;
+  // JSON 不经过 parseHTML，媒体 src 的白名单必须在这里补上（见 mediaSrcPolicy 文件头）
+  if (node.attrs !== undefined) adapted.attrs = sanitizeMediaSrcAttrs(type, node.attrs);
   if (node.text !== undefined) adapted.text = node.text;
 
   const marks = stripUnknownMarks(node.marks, validMarks);

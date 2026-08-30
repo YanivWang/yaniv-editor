@@ -9,6 +9,7 @@
 
 import Image from "@tiptap/extension-image";
 
+import { createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
 import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export interface ResizableImageOptions {
@@ -91,6 +92,12 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
         },
       },
     };
+  },
+
+  addProseMirrorPlugins() {
+    // 事务级兜底：`setImage()` 等命令不经过 parseHTML，见 mediaSrcPolicy 文件头。
+    // 上游 Image 扩展也可能注册插件，必须并上 parent 的结果。
+    return [...(this.parent?.() ?? []), createMediaSrcGuardPlugin("image")];
   },
 
   addNodeView() {
