@@ -15,6 +15,21 @@ pnpm dev          # 示例站 → http://localhost:9527
 pnpm docs:dev     # VitePress 文档
 ```
 
+### 使用镜像源
+
+仓库的 `.npmrc` **不设置 registry**，一律走官方 npm。装包慢请配到自己的全局配置里：
+
+```bash
+npm config set registry https://registry.npmmirror.com/ --location=global
+```
+
+不要把镜像写回仓库 `.npmrc`：`registry.npmmirror.com` 是只读镜像，没有 advisories
+端点，一旦写进项目级配置，`pnpm audit` 会对所有人失效（`ERR_PNPM_AUDIT_ENDPOINT_NOT_EXISTS`），
+发布链路也得靠额外步骤绕开它。
+
+> 注意作用域级配置（如 `@yanivjs:registry`）**优先级高于** `pnpm publish --registry`，
+> 本地手动发布前先确认 `pnpm config get @yanivjs:registry` 的值。
+
 ## 提交前必须通过
 
 ```bash
@@ -23,6 +38,16 @@ pnpm run verify
 
 等价于 `typecheck` + `test:coverage` + `lint` + `lint:style` + `format:check`。
 CI 会跑同一套加上 `build` 与 Playwright E2E。
+
+改动构建配置（`vite.config.ts` / `package.json#exports`）时还要跑产物自检：
+
+```bash
+pnpm run build:check      # = build + scripts/check-dist-entries.mjs
+```
+
+它会按 `exports` 逐条件**真实加载**每个入口（`import` 走 `import()`、`require` 走
+`require()`）。只检查文件存在是不够的——CJS 侧曾因为后缀与 interop 两处配置问题
+整个打穿，而文件一直都在。
 
 `husky` 已挂 `pre-commit`（lint-staged）与 `commit-msg`（commitlint）。
 

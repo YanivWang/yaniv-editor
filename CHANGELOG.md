@@ -1,5 +1,97 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **`require()` 加载本包彻底修复（CJS 侧此前完全不可用）。** 两处配置各自把 CJS 打穿，
+  且都只在 require 侧暴露，ESM 侧一切正常，因此一直没被发现：
+  1. `exports.require` 指向 `dist/index.js`，而本包是 `"type": "module"`——Node 把
+     `dist/*.js` 一律按 ESM 解析，CJS 代码里的 `exports` 在 ESM 作用域下不存在，
+     `require("@yanivjs/yaniv-editor")` 直接抛
+     `ReferenceError: exports is not defined in ES module scope`。
+     现改为 `.cjs` 后缀（`index.cjs` / `inline.cjs` / `ai.cjs`）。
+  2. Rollup 默认 `output.interop: "default"` 假定 external 是纯 CJS、`module.exports`
+     即默认导出；而 `@tiptap/*`、`ant-design-vue` 的 CJS 产物都带 `__esModule: true`，
+     默认导出在 `.default` 上，于是 `CodeBlockLowlight.configure(...)` 在 require 侧抛
+     `TypeError: X.configure is not a function`。现改为 `interop: "auto"`。
+- **补齐 CJS 类型声明 `*.d.cts`。** `"type": "module"` 下 `.d.ts` 在 `node16` /
+  `nodenext` 解析中一律视为 ESM 类型，`exports.require` 指回 `.d.ts` 会让 CJS 接入方
+  报 `TS1479`。`exports` 同时改为 `import` / `require` 各自带 `types` 的标准双包形态，
+  并补上 `"./package.json"` 子路径导出。
+- **链接白名单不再吞掉锚点与站内相对地址。** `normalizeSafeUrl` 对无协议输入一律补
+  `https://`，导致 `#docs` 被判为非法（Link 扩展据此**丢弃整个链接标记**，
+  `<a href="#docs">` 解析后只剩纯文本），`/docs/page` 被补成指向外部主机 `docs` 的
+  `https://docs/page`——站内链接被静默劫持到站外。现与同文件的 `normalizeSafeMediaUrl`
+  对齐：`#` / `?` / `/` / `./` / `../` 原样保留，`//` 仍按协议相对的绝对地址处理。
+  脚本类协议的拦截行为不变。
+- **AI 悬浮层不再因过期位置崩溃。** `calculatePopoverPosition` 用会话开始时记下的
+  `positionAnchor` 调 `view.coordsAtPos()`，用户在流式输出期间删减文档后该位置可能越界，
+  抛 `RangeError: Position N out of range`，且调用链 `click → remountPopover →
+mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData` 是同一类问题，
+  当时漏了这一处。现按文档大小夹取并兜底。点击回调里第二条分支的 `posAtDOM` 裸调用
+  （只有第一条分支做了 try/catch）也一并收口。
+
+### Security
+
+- **媒体 src 白名单补齐 JSON 与命令两条入口。** `0.2.0` 在 `parseHTML` / `renderHTML`
+  两侧接了 `normalizeSafeMediaUrl`，但这只覆盖 **DOM 边界**；JSON 内容与
+  `setImage()` / `setVideo()` / `insertContent()` 根本不经过 DOM。由于 `renderHTML`
+  会把**输出**洗干净，`getHTML()` 完全看不出异常（实测仍是 `<p><img></p>`），
+  而危险值已经进了文档 attrs——`getJSON()` 这个公开 API 会把
+  `src: "javascript:alert(1)"` 原样交给宿主，宿主持久化 JSON 后自行渲染即中招。
+  现新增 `src/utils/mediaSrcPolicy.ts`，在两处补齐强制点：`adaptJsonToSchema`
+  （所有 JSON 内容的唯一漏斗）与 `createMediaSrcGuardPlugin` 的 `appendTransaction`
+  事务级兜底（补偿事务标记 `addToHistory: false`，避免撤销把危险值撤回来）。
+  四条入口逐一断言见 `mediaSrcPolicy.test.ts`。
+
+### Tests
+
+对新增测试做变异测试（把源码改坏看测试是否变红），修补了发现的失效覆盖：
+
+- **`video` 节点此前完全没有测试**，schema 层白名单删掉也全绿 → 新增 `video.test.ts`。
+- **`resizableImage` 的 `parseHTML` 侧无覆盖**：原用例只断言 `getHTML()`，而 `renderHTML`
+  那一侧的白名单会把输出洗干净，`parseHTML` 整个失效照样绿 → 改为断言节点 attrs 与 `getJSON()`。
+- **`formatPainter` 退出编辑态自清无测试** → 新增 `formatPainter.test.ts`。
+- **`bindLocale` 的用例是空断言**：`expect(en).toBeDefined()` 断言的是本用例刚创建的
+  `vi.fn()` 存在，恒真；把 `bindLocale` 改回构建期绑定语义（即 `367dcb9` 要修的多实例串用）
+  测试照样绿 → 改为断言弹层里真的用上了绑定的解析器。
+- **`useRovingTabindex` 的 `MutationObserver` 重扫无覆盖**：短路掉 `observer.observe(...)`
+  原有 6 个用例全绿，因为 `mountEditor` 会等到所有异步组件就绪才断言，掩盖了「按钮晚到」
+  这个真实场景 → 新增挂载后追加控件的用例。
+- **`div[onclick]` 那条无障碍断言恒真**：Vue 的 `@click` 编译成 addEventListener，不反射成
+  `onclick` 内容属性（实测命中数恒为 0），该断言永远不会失败 → 改为断言「声明交互 role 的
+  元素必须可聚焦」，原意图由 `eslint-plugin-vuejs-accessibility` 在 lint 阶段覆盖。
+- 两条测试名与断言不符（斜杠菜单语义、查找替换输入框），改名对齐实际断言范围。
+- `mountEditor` 的就绪预算 10s → 18s：原值只有 `testTimeout` 的一半，繁忙机器上编辑器
+  还在解析十几个门控 chunk 时轮询就先放弃了，明明还剩 10s 没用。轮询一就绪即返回，
+  健康机器上不受影响。
+
+### Build / CI
+
+- **`.npmrc` 不再把 registry 钉到 `registry.npmmirror.com`。** 国内镜像属于开发者个人
+  环境（`~/.npmrc`），随开源库分发的代价是：`pnpm audit` 对所有人失效（镜像无
+  advisories 端点）、发布链路要靠三层保险绕开、六个 CI job 各自 `sed` 改写该文件。
+  移除后这些 workaround 一并删除，CI 回到「默认就是官方源」。镜像用法见 `CONTRIBUTING.md`。
+- **产物断言换成真实加载自检**（`scripts/check-dist-entries.mjs`，`pnpm run build:check`）。
+  旧断言只有 `test -s`（文件非空），上述两个 CJS 缺陷因此全程绿灯。新脚本按
+  `package.json#exports` 逐条件 `import()` / `require()`，并校验声明文件后缀与条件自洽。
+- **订正 registry 相关注释中的失实描述。** 实测 pnpm 11 **既不读 `NPM_CONFIG_REGISTRY`
+  也不读 `npm_config_registry`**（npm 两个都读），此前把它当作"额外一层保险"是无效的。
+  CI 走官方源的真正原因是：仓库 .npmrc 不设 registry、runner 无用户级配置，
+  pnpm 落到内置默认源；发布链路的鉴权与源则由 `actions/setup-node` 写入的 user 级
+  .npmrc 承担。该变量予以保留，但仅覆盖 `npx only-allow pnpm` 这类真正的 npm 调用。
+- **发布前的 registry 断言补上作用域级检查。** 只查 `pnpm config get registry` 会漏掉
+  `@yanivjs:registry`——它的优先级高于通用源，也高于 `pnpm publish --registry` 这个 CLI
+  flag，即真正决定 tarball 发到哪里的是它（本地实测：通用源与命令行都指向官方 npm，
+  publish 仍解析到私有 Verdaccio）。
+- **手动触发不再可能误发布。** `workflow_dispatch` 的下拉框可以选中 tag，此时
+  `github.ref` 同样是 `refs/tags/v*`，勾了「只构建不发布」的手动运行会连真发布一起执行。
+  真发布现在只认 `push` 事件。
+- 清理：移除 `tsconfig.json` 中指向已删除依赖的 `vue-types` 路径映射
+  （随 `vue-types` 一起删掉的遗留项）、`vite.config.ts` 中无任何源码使用的 `/^#\/.*/`
+  external，并订正 dts `exclude` 的失实注释。
+
 ## [0.2.0] — 2026-08-30
 
 ### ⚠️ 许可证更正（License correction）
