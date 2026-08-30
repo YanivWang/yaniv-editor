@@ -18,8 +18,12 @@ permissions:
 
 env:
   # 仓库 .npmrc 把 registry 指向 registry.npmmirror.com（只读镜像，无法发布）。
-  # 注意 actions/setup-node 的 registry-url 只写 **user 级** 配置，优先级低于项目级
-  # .npmrc，因此不能只靠它——发布步骤额外用 CLI flag 钉死目标源（CLI 优先级最高）。
+  # 三层保险，缺一不可：
+  # 1) actions/setup-node 的 registry-url 只写 **user 级** 配置，优先级低于项目级 .npmrc；
+  # 2) NPM_CONFIG_REGISTRY 环境变量在 pnpm 11 下也低于项目级 .npmrc（pnpm 10 时更高，
+  #    升级后 "Assert publish registry" 曾因此解析成镜像而拦下发布）——故增加
+  #    "Pin registry to official npm" 步骤直接改写 .npmrc；
+  # 3) 发布步骤仍用 CLI flag 钉死目标源（CLI 优先级最高）。
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
   PUBLISH_REGISTRY: https://registry.npmjs.org/
 
@@ -30,6 +34,13 @@ jobs:
     environment: npm-publish
     steps:
       - uses: actions/checkout@v7
+
+      - name: Pin registry to official npm
+        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
+        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
+        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
+        # release 的 registry 断言也会解析成镜像而拦下发布。
+        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:

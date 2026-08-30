@@ -14,7 +14,10 @@ permissions:
   contents: read
 
 env:
-  # 仓库 .npmrc 指向国内镜像，CI 上走官方源更稳定
+  # 仓库 .npmrc 指向国内镜像，CI 上走官方源更稳定。
+  # 注意：pnpm 11 起**项目级 .npmrc 的优先级高于本环境变量**，仅设这个已经不生效，
+  # 真正起作用的是各 job 里的 "Pin registry to official npm" 步骤（直接改写 .npmrc）。
+  # 这里保留是为了覆盖不读项目 .npmrc 的其他工具。
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
 
 jobs:
@@ -23,6 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Pin registry to official npm
+        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
+        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
+        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
+        # release 的 registry 断言也会解析成镜像而拦下发布。
+        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
@@ -70,6 +80,13 @@ jobs:
         node: [22, 24]
     steps:
       - uses: actions/checkout@v7
+
+      - name: Pin registry to official npm
+        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
+        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
+        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
+        # release 的 registry 断言也会解析成镜像而拦下发布。
+        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
@@ -172,6 +189,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Pin registry to official npm
+        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
+        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
+        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
+        # release 的 registry 断言也会解析成镜像而拦下发布。
+        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
+
       - uses: pnpm/action-setup@v6
         with:
           version: 11.16.0
@@ -205,6 +229,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+
+      - name: Pin registry to official npm
+        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
+        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
+        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
+        # release 的 registry 断言也会解析成镜像而拦下发布。
+        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
