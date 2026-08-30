@@ -26,6 +26,23 @@ describe("normalizeSafeUrl", () => {
   it("无协议输入补全为 https", () => {
     expect(normalizeSafeUrl("example.com/x")).toBe("https://example.com/x");
   });
+
+  /**
+   * 回归：这些地址一度被「一律补 https://」的逻辑毁掉——
+   * `#docs` 直接判为非法（Link 扩展据此丢弃整个链接标记），
+   * `/docs/page` 被补成指向外部主机 `docs` 的 `https://docs/page`。
+   */
+  it("锚点 / 查询串 / 站内路径原样保留，不补全也不拒绝", () => {
+    expect(normalizeSafeUrl("#docs")).toBe("#docs");
+    expect(normalizeSafeUrl("?q=1")).toBe("?q=1");
+    expect(normalizeSafeUrl("/docs/page")).toBe("/docs/page");
+    expect(normalizeSafeUrl("./rel")).toBe("./rel");
+    expect(normalizeSafeUrl("../up")).toBe("../up");
+  });
+
+  it("协议相对 URL 仍按绝对地址处理，不当作站内路径", () => {
+    expect(normalizeSafeUrl("//evil.com/x")).toBe("https://evil.com/x");
+  });
 });
 
 describe("normalizeSafeMediaUrl", () => {
@@ -74,5 +91,12 @@ describe("normalizeSafeFrameUrl", () => {
   it("不做 https 自动补全 —— 裸串一律拒绝，避免把危险串补成合法 URL", () => {
     expect(normalizeSafeFrameUrl("example.com")).toBeNull();
     expect(normalizeSafeFrameUrl("//example.com")).toBeNull();
+  });
+
+  // 站内相对地址不能进 iframe：那等于把宿主页面自己嵌进来
+  it("拒绝站内相对地址", () => {
+    for (const url of ["#docs", "?q=1", "/embed", "./embed", "../embed"]) {
+      expect(normalizeSafeFrameUrl(url)).toBeNull();
+    }
   });
 });
