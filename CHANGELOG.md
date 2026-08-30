@@ -32,6 +32,10 @@
 
 ### BREAKING CHANGES
 
+- **最低 Node 版本提升至 22.12.0（`engines.node: ">=22.12.0"`）。** Node 20 已于
+  2026-04-30 结束维护，不再接收安全补丁，故从 `engines`、CI 构建矩阵与 `.nvmrc` 中一并移除。
+  仍在 Node 20 上构建的接入方需先升级运行时；本包**运行时代码本身不依赖 Node 22 的新 API**，
+  该约束只作用于安装与构建期。同时 `engines.pnpm` 提升至 `>=11.0.0`（仅影响本仓库贡献者）。
 - **`dist/inline.css` 不再包含 Full Editor 的全量样式。** 此前构建脚本把 `style.css` 整体拼进
   `inline.css`，导致 inline 产物（139KB）反而大于 full（114KB），与 inline 入口「评论 / 表单
   轻量场景」的定位冲突。现在按 rollup 入口可达性拆分，`inline.css` 降至 56KB（gzip 19.1→9.2KB）。
@@ -79,6 +83,10 @@
   改为只清除 `console.log` / `debug` / `info`，保留 `warn` / `error`。
 - **E2E 中 `count() === 0` 的分支判断存在竞态**：`count()` 是瞬时快照、不自动等待，
   门控工具按钮改为按需加载后会随机走进从未被验证过的 fallback 分支。改用自动等待的合并选择器。
+- **`AiSuggestionPopover` 中只写不读的 `anchorRef`。** 模板上以 `ref="anchorRef"` 绑定、
+  脚本里从不读取，组件也没有 `defineExpose`，且 `aiSuggestionManager` 用 `h()` 创建、
+  不持有模板 ref——即 Vue 赋值后无人消费的死状态。升级 vue-tsc 3 后由 TS6133 暴露。
+  定位 Popover 的是 `<span>` 上的 `:style`，与该 ref 无关，移除后 DOM 输出完全一致。
 
 ### Added
 
@@ -108,8 +116,15 @@
   AI 三个适配器与客户端、AI 配置存储、Word 导出、气泡菜单判定、块菜单动作、
   扩展命令（video / toggle / formatPainter / searchReplace）、图片节点、
   AI 高亮 mark、AI 会话管理器、斜杠菜单等模块的测试。
-  **用例数 86 → 421，语句覆盖率 30.9% → 73.7%**，阈值设为
-  statements/lines 72、branches 78、functions 60。
+  **用例数 86 → 421。** 覆盖率阈值设为 statements/lines 56、branches 44、functions 52
+  （实测 57.3 / 58.9 / 45.2 / 53.1）。
+
+  这些数字不可与 0.1.x 直接相比：本版同时升级到 vitest 4，其 v8 provider 改用
+  `ast-v8-to-istanbul` 做 AST 级重映射且无开关可退回。vitest 3 时代 statements 与 lines
+  的分子分母完全一致（都是 10788/14630），说明它其实把行覆盖当语句覆盖在报；换口径后
+  statements 分母 14630 → 6996、branches 2376 → 3987、functions 992 → 1729，
+  三个维度变化方向各不相同。同一批测试、同一份源码，只是量得更准——
+  **不是覆盖劣化，也不是为了让门禁通过而下调阈值**。
 
   `DragHandleExtension` 与浮层定位是纯浏览器几何逻辑，jsdom 无布局引擎，
   强行做单测只能断言自己写的桩。这两块改由 Playwright E2E 验收
@@ -117,9 +132,9 @@
   `vitest.config.ts` 注明——**没有把它们排除出覆盖率分母来修饰数字**。
 
 - **CI 质量门禁**（`.github/workflows/ci.yml`）：typecheck / 覆盖率测试 / ESLint / Stylelint /
-  Prettier、Node 20 与 22 双版本构建、Playwright E2E、`pnpm audit`。
-  构建任务附带产物断言：入口文件齐全、`inline.css` 必须小于 `style.css`、
-  门控能力不得回流主 chunk。`deploy-pages` 部署前也会先跑 `verify`。
+  Prettier、Node 22 与 24 双版本构建、Playwright E2E、`pnpm audit`。
+  构建任务附带产物断言：入口文件齐全、**类型声明确实被打包**、
+  `inline.css` 必须小于 `style.css`、门控能力不得回流主 chunk。`deploy-pages` 部署前也会先跑 `verify`。
 - **公开 API 表面锁**（`src/publicApi.test.ts`）：三个入口的导出名快照。
   这是发布到 npm 的库，导出增删即契约变更；快照让改动必须显式过一次人眼，
   并额外断言 AI 符号不从主入口泄漏。
@@ -146,6 +161,40 @@
 - 构建产物输出 sourcemap，便于接入方调试到库内部。
 - 移除无引用的 devDependencies：`rollup-plugin-obfuscator`、`@tiptap/extension-typography`。
 - `verify` 脚本改用 `test:coverage`，与 CI 保持一致。
+- **工具链升级：pnpm 11 与 Node 22/24。** `packageManager` 与 CI 全线 pnpm 11.16.0；
+  构建矩阵 `[20, 22]` → `[22, 24]`；`deploy-pages` 改用 `.nvmrc` 作为 Node 版本单一来源。
+  新增 `pnpm-workspace.yaml` 的 `allowBuilds`：pnpm 11 起依赖的安装脚本默认不执行，
+  显式登记 `@parcel/watcher` / `core-js` / `esbuild` / `unrs-resolver` 为 `false`
+  （四者均随 optionalDependencies 分发预编译二进制），与 pnpm 10 时期的既有行为一致。
+  `pnpm-lock.yaml` 在 pnpm 11 下零变更，lockfileVersion 9.0 完全兼容。
+- **`@tiptap/*` 3.13.0 → 3.30.5。** 24 个包整体同版本升级，并把 `devDependencies` 中参差的
+  范围统一收敛为 `^3.30.5`——版本漂移会破坏 schema 一致性。`peerDependencies` 仍为 `^3.0.0`，
+  本次无源码适配，对下游依旧兼容整个 3.x。
+- **`katex` 0.16 → 0.18，`peerDependencies` 由 `^0.16.0` 放宽为 `>=0.16.0 <0.19.0`。**
+  这是放宽而非收紧：已在 0.16 的接入方继续满足，同时允许升到 0.17 / 0.18。
+  仓库只用到 `renderToString`，行为与选项均未变；`katex/dist/katex.min.css` 路径不变。
+  katex 0.18 自带类型声明，冗余的 `@types/katex` 已移除。
+- **其余依赖升级**：vitest 4 + jsdom 30、vue-tsc 3、vite-plugin-dts 5、
+  `@vitejs/plugin-vue` 6、commitlint 21、lint-staged 17、`@types/node` 22
+  （对齐 `engines.node`，不跟进 26——类型声明应描述最低支持的运行时）、
+  postcss-html 2、stylelint-config-html 2、eslint-import-resolver-typescript 4、
+  prettier 3.9，以及 vue 3.5.42 等一批同 major 更新。
+  全部 GitHub Actions 升至 node24 运行时（checkout v7、setup-node v7、upload-artifact v7、
+  upload-pages-artifact v5、deploy-pages v5、pnpm/action-setup v6），消除
+  "Node.js 20 is deprecated" 告警。
+- **移除未使用的 `vue-types` 直接依赖。** 全仓库无任何引用，它只是 `ant-design-vue` 的
+  传递依赖（后者要求 `^3.0.0`）；升到 7 反而会让依赖树里同时存在两份。
+- **以下依赖本轮刻意不升，原因如下**：
+  - `typescript` 保持 5.5：TS 7 是 Go 重写版，与 vue-tsc 配合的风险过高。
+  - `vite` 保持 6：到 8 跨两个 major，且 `vite.config.ts` 的自定义 `generateBundle` 插件
+    依赖 rollup 的 `viteMetadata.importedCss` 内部结构（CSS 按入口拆分逻辑），须专门验证。
+  - `eslint` 保持 9：`eslint-plugin-import` 最新版（2.32.0）的 peer 仅到 `^9`，在 ESLint 10 下
+    `import/order` 会因 `sourceCode.getTokenOrCommentAfter` 已被移除而抛 TypeError。
+    危险之处在于 `pnpm run lint` 仍返回 0——只有当规则真要报告/修复某处时才崩溃，
+    现有代码恰好没有违规，CI 会一路绿灯直到有人写出乱序 import。待上游支持
+    （或迁移到 `eslint-plugin-import-x`）再升。
+  - `vue-router` 保持 4：5.x 要求 vite `^7.3.0 || ^8.0.0`，与上面的 vite 决定冲突；
+    且它仅被 examples 使用，对发布产物无影响。
 
 ### Docs
 
