@@ -17,13 +17,16 @@ permissions:
   id-token: write
 
 env:
-  # 仓库 .npmrc 把 registry 指向 registry.npmmirror.com（只读镜像，无法发布）。
-  # 三层保险，缺一不可：
-  # 1) actions/setup-node 的 registry-url 只写 **user 级** 配置，优先级低于项目级 .npmrc；
-  # 2) NPM_CONFIG_REGISTRY 环境变量在 pnpm 11 下也低于项目级 .npmrc（pnpm 10 时更高，
-  #    升级后 "Assert publish registry" 曾因此解析成镜像而拦下发布）——故增加
-  #    "Pin registry to official npm" 步骤直接改写 .npmrc；
-  # 3) 发布步骤仍用 CLI flag 钉死目标源（CLI 优先级最高）。
+  # 发布目标源由谁真正决定（按实际生效顺序，均已实测）：
+  # 1) 仓库 .npmrc 不再设置 registry，runner 上也无用户级镜像，pnpm 因此用内置默认
+  #    源 registry.npmjs.org；
+  # 2) actions/setup-node 的 registry-url 会写 **user 级** .npmrc（pnpm 会读），
+  #    同时写入 //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} 供发布鉴权；
+  # 3) 发布步骤的 --registry flag 作为显式声明。
+  # 注意：作用域级 `@yanivjs:registry` 的优先级**高于**上述全部（含 CLI flag），
+  # 因此 "Assert publish registry" 必须连它一起检查。
+  #
+  # NPM_CONFIG_REGISTRY 对 pnpm 无效（pnpm 11 不读该环境变量），仅覆盖 npm/npx 调用。
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
   PUBLISH_REGISTRY: https://registry.npmjs.org/
 
@@ -34,13 +37,6 @@ jobs:
     environment: npm-publish
     steps:
       - uses: actions/checkout@v7
-
-      - name: Pin registry to official npm
-        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
-        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
-        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
-        # release 的 registry 断言也会解析成镜像而拦下发布。
-        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
@@ -61,6 +57,11 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      # 与 CI 同一把尺子：真的 import()/require() 一遍每个入口，
+      # 避免把 require 侧整个打穿的包发上 npm（npm 版本无法真正撤回）
+      - name: Assert published entry points actually load
+        run: node scripts/check-dist-entries.mjs
 
       - name: Assert tag matches package version
         if: startsWith(github.ref, 'refs/tags/v')
@@ -91,23 +92,34 @@ jobs:
           done
           echo "✅ LICENSE 与 NOTICE 均随包分发"
 
-      # 发布前确认目标源确实是官方 npm，而不是仓库 .npmrc 里的只读镜像
+      # 发布前确认目标源确实是官方 npm。
+      #
+      # 必须同时检查**作用域级** `@yanivjs:registry`：它的优先级高于通用 registry，
+      # 也高于 `pnpm publish --registry` 这个 CLI flag——即真正决定 tarball 发到哪里的
+      # 是它。只查 `pnpm config get registry` 会漏掉这层（本地实测：通用源是官方 npm、
+      # 命令行也带了 --registry，publish 仍然解析到私有 Verdaccio）。
       - name: Assert publish registry
         run: |
           set -euo pipefail
-          resolved=$(pnpm config get registry)
-          echo "resolved registry: ${resolved}"
-          case "$resolved" in
-            https://registry.npmjs.org*) ;;
-            *) echo "::error::registry 解析为 ${resolved}，不是官方 npm"; exit 1 ;;
-          esac
+          for key in registry @yanivjs:registry; do
+            resolved=$(pnpm config get "$key")
+            echo "${key} = ${resolved}"
+            case "$resolved" in
+              https://registry.npmjs.org*) ;;
+              undefined|null|"") ;;   # 未设置作用域源时回落到通用源，符合预期
+              *) echo "::error::${key} 解析为 ${resolved}，不是官方 npm"; exit 1 ;;
+            esac
+          done
 
       - name: Publish (dry run)
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run
         run: pnpm publish --dry-run --no-git-checks --registry "$PUBLISH_REGISTRY"
 
+      # workflow_dispatch 的分支/标签下拉框里**可以选中 tag**，此时 github.ref 同样是
+      # refs/tags/v*。若只判断 ref，勾了"只构建不发布"的手动运行会连真发布一起执行——
+      # 因此这里必须把手动触发排除在外，真发布只认 tag push。
       - name: Publish
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
         run: pnpm publish --provenance --access public --no-git-checks --registry "$PUBLISH_REGISTRY"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

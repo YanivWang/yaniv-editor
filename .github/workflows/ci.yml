@@ -14,10 +14,13 @@ permissions:
   contents: read
 
 env:
-  # 仓库 .npmrc 指向国内镜像，CI 上走官方源更稳定。
-  # 注意：pnpm 11 起**项目级 .npmrc 的优先级高于本环境变量**，仅设这个已经不生效，
-  # 真正起作用的是各 job 里的 "Pin registry to official npm" 步骤（直接改写 .npmrc）。
-  # 这里保留是为了覆盖不读项目 .npmrc 的其他工具。
+  # 仓库 .npmrc 不再设置 registry（镜像属于开发者个人 ~/.npmrc），runner 上也没有用户级
+  # 配置，因此 **pnpm 用的就是它内置的默认源 registry.npmjs.org**——这才是 CI 走官方源的
+  # 真正原因，不需要任何额外步骤。
+  #
+  # 下面这个变量**对 pnpm 无效**（实测 pnpm 11 既不读 NPM_CONFIG_REGISTRY 也不读
+  # npm_config_registry；npm 两个都读）。保留它只为覆盖流程里少数几处真正的 npm/npx
+  # 调用，例如 preinstall 的 `npx only-allow pnpm`。不要依赖它来约束 pnpm 的行为。
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
 
 jobs:
@@ -26,13 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      - name: Pin registry to official npm
-        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
-        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
-        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
-        # release 的 registry 断言也会解析成镜像而拦下发布。
-        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
@@ -81,13 +77,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Pin registry to official npm
-        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
-        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
-        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
-        # release 的 registry 断言也会解析成镜像而拦下发布。
-        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
-
       - uses: pnpm/action-setup@v6
         with:
           version: 11.16.0
@@ -103,23 +92,27 @@ jobs:
       - name: Build library
         run: pnpm run build
 
-      - name: Assert published entry points exist
-        run: |
-          set -euo pipefail
-          for f in dist/index.esm.js dist/index.js dist/inline.esm.js dist/inline.js \
-                   dist/ai.esm.js dist/ai.js dist/index.d.ts dist/inline.d.ts dist/ai.d.ts \
-                   dist/style.css dist/inline.css; do
-            test -s "$f" || { echo "::error::缺少产物 $f"; exit 1; }
-          done
+      # 逐条件真实加载 package.json#exports 的每个入口（import 用 import()，
+      # require 用 require()），而不是只 `test -s` 看文件在不在。
+      #
+      # 旧断言只看文件非空，因此漏掉了两个把 CJS 侧整个打穿的问题：
+      #   1) exports.require 指向 dist/index.js，而本包是 "type":"module"，
+      #      Node 按 ESM 解析 → ReferenceError: exports is not defined
+      #   2) rollup 默认 interop 取 module.exports 作默认导出，而 @tiptap/* 带
+      #      __esModule 标记 → TypeError: X.configure is not a function
+      # 两者在 ESM 侧都完全正常，只有真的 require 一次才会暴露。
+      - name: Assert published entry points actually load
+        run: node scripts/check-dist-entries.mjs
 
       - name: Assert type declarations are actually bundled
-        # test -s 只能保证非空：vite-plugin-dts 的打包选项一旦失效（如 5.x 把
-        # rollupTypes 更名为 bundleTypes，旧名被静默忽略），d.ts 会退化成
-        # `export * from './src/index.js'` 这样 41 字节的空壳——指向发布包里
-        # 并不存在的路径，下游拿不到任何类型，而 test -s 照样通过。
+        # 加载自检已覆盖 d.ts 的存在性与后缀匹配；这里额外拦住"打包失效退化成转发空壳"：
+        # vite-plugin-dts 5.x 把 rollupTypes 更名为 bundleTypes，旧名被静默忽略时
+        # d.ts 会退化成 `export * from './src/index.js'` 这样 41 字节的空壳——
+        # 指向发布包里并不存在的路径，下游拿不到任何类型。
         run: |
           set -euo pipefail
-          for f in dist/index.d.ts dist/inline.d.ts dist/ai.d.ts; do
+          for f in dist/index.d.ts dist/inline.d.ts dist/ai.d.ts \
+                   dist/index.d.cts dist/inline.d.cts dist/ai.d.cts; do
             size=$(wc -c < "$f")
             echo "${f}: ${size}B"
             if grep -qE "^export \* from '\./src/" "$f"; then
@@ -189,13 +182,6 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Pin registry to official npm
-        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
-        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
-        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
-        # release 的 registry 断言也会解析成镜像而拦下发布。
-        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
-
       - uses: pnpm/action-setup@v6
         with:
           version: 11.16.0
@@ -229,13 +215,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-
-      - name: Pin registry to official npm
-        # 仓库 .npmrc 指向国内只读镜像。pnpm 11 起**项目级 .npmrc 的优先级高于
-        # NPM_CONFIG_REGISTRY 环境变量**，仅靠 env 已经改不动，必须直接改写文件：
-        # 否则 pnpm audit 会打到镜像上并不存在的 advisories 端点，
-        # release 的 registry 断言也会解析成镜像而拦下发布。
-        run: sed -i 's#^registry=.*#registry=https://registry.npmjs.org/#' .npmrc
 
       - uses: pnpm/action-setup@v6
         with:
