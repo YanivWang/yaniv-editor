@@ -32,20 +32,41 @@
 </template>
 
 <script setup lang="ts">
-import { FindReplaceDialog } from "@/components/editor/find-replace";
+import { defineAsyncComponent } from "vue";
+
 import type { TemplateItem } from "@/components/editor/template/templates";
-import { BlockPickerMenu } from "@/components/tools/block-menu";
 import { FloatingMenu } from "@/components/tools/floating-menu";
 import { ToolbarNav } from "@/components/tools/header-nav";
 import { ImageToolbar } from "@/components/tools/image-toolbar";
 import { LinkBubbleMenu } from "@/components/tools/link-bubble";
-import { MentionSuggestionMenu } from "@/components/tools/mention-suggestion";
-import { TableToolbar } from "@/components/tools/table-toolbar";
-import { VideoToolbar } from "@/components/tools/video-toolbar";
 import { useYanivEditor } from "@/core/editorContext";
 import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorRuntimeContext } from "@/core/runtime/editorRuntimeContext";
 import type { FullChromePolicy } from "@/core/runtime/types";
+
+/**
+ * 由能力 gate 控制显隐的浮层组件按需加载。
+ *
+ * 这些组件只在对应 gate 打开时渲染，但静态 import 会把它们连同所依赖的扩展模块
+ * （如 BlockPickerMenu → slashCommandKey、MentionSuggestionMenu → mentionPluginKey）
+ * 一并打进主 chunk，使 `preset="basic"` 的接入方仍要下载 notion 块编辑相关代码。
+ * 全部为 `v-if` 门控的叶子组件，无父级 ref 访问，异步化不影响交互时序。
+ */
+const FindReplaceDialog = defineAsyncComponent(() =>
+  import("@/components/editor/find-replace").then((m) => m.FindReplaceDialog),
+);
+const TableToolbar = defineAsyncComponent(() =>
+  import("@/components/tools/table-toolbar").then((m) => m.TableToolbar),
+);
+const VideoToolbar = defineAsyncComponent(() =>
+  import("@/components/tools/video-toolbar").then((m) => m.VideoToolbar),
+);
+const MentionSuggestionMenu = defineAsyncComponent(() =>
+  import("@/components/tools/mention-suggestion").then((m) => m.MentionSuggestionMenu),
+);
+const BlockPickerMenu = defineAsyncComponent(() =>
+  import("@/components/tools/block-menu").then((m) => m.BlockPickerMenu),
+);
 
 defineProps<{
   chrome: FullChromePolicy;

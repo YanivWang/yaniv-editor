@@ -1,6 +1,11 @@
 <template>
   <div class="document-toolbar-container">
-    <div class="document-toolbar" role="toolbar" :aria-label="t('editor.toolbarLabel')">
+    <div
+      ref="toolbarRef"
+      class="document-toolbar"
+      role="toolbar"
+      :aria-label="t('editor.toolbarLabel')"
+    >
       <div class="toolbar-sections">
         <!-- 编辑 -->
         <section
@@ -145,40 +150,74 @@
  * @description 自然换行工具带：编辑 → 字体 → 段落 → 插入 → 文档 → 工具 → 智能
  */
 import { ThunderboltOutlined } from "@ant-design/icons-vue";
-import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
 
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
 import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
-import { FindReplaceButton } from "@/components/editor/find-replace";
 import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";
-import { FormatPainterButton } from "@/components/editor/format-painter";
-import { GalleryButton } from "@/components/editor/gallery";
 import { HeadingControl } from "@/components/editor/heading";
 import { ImageUpload } from "@/components/editor/image";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";
-import { MathButton } from "@/components/editor/math";
-import { OutlineToggleButton } from "@/components/editor/outline";
 import { SubscriptSuperscriptButton } from "@/components/editor/subscript-superscript";
-import { TableButton } from "@/components/editor/table";
-import { TemplateButton } from "@/components/editor/template";
 import type { TemplateItem } from "@/components/editor/template/templates";
 import { TextFormatButtons } from "@/components/editor/text-format";
 import { UndoRedoButton } from "@/components/editor/undo-redo";
-import { VideoUpload } from "@/components/editor/video";
-import WordButton from "@/components/editor/word/WordButton.vue";
 import { useEditorColorState } from "@/composables/useEditorColorState";
+import { useRovingTabindex } from "@/composables/useRovingTabindex";
 import { useYanivEditor } from "@/core/editorContext";
 import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
-import { AiMenuButton } from "@/features/ai";
 
 import { COMPACT_TOOLBAR_CONFIG, FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 
 import type { ToolbarToolsConfig } from "./toolbarConfig";
 import type { Editor } from "@tiptap/vue-3";
+
+/**
+ * gate / toolbar 配置控制显隐的按钮按需加载。
+ *
+ * 这些项在默认 preset（`basic` → COMPACT_TOOLBAR_CONFIG）下均为关闭，静态 import 会让
+ * 它们连同各自依赖（AI 客户端与适配器、docx/mammoth 封装、KaTeX 封装等）进入主 chunk。
+ * 全部为 `v-if` 门控的叶子组件，无父级 ref 访问。
+ */
+const AiMenuButton = defineAsyncComponent(() =>
+  import("@/features/ai").then((m) => m.AiMenuButton),
+);
+const FindReplaceButton = defineAsyncComponent(() =>
+  import("@/components/editor/find-replace").then((m) => m.FindReplaceButton),
+);
+const FormatPainterButton = defineAsyncComponent(() =>
+  import("@/components/editor/format-painter").then((m) => m.FormatPainterButton),
+);
+const GalleryButton = defineAsyncComponent(() =>
+  import("@/components/editor/gallery").then((m) => m.GalleryButton),
+);
+const MathButton = defineAsyncComponent(() =>
+  import("@/components/editor/math").then((m) => m.MathButton),
+);
+const OutlineToggleButton = defineAsyncComponent(() =>
+  import("@/components/editor/outline").then((m) => m.OutlineToggleButton),
+);
+const TableButton = defineAsyncComponent(() =>
+  import("@/components/editor/table").then((m) => m.TableButton),
+);
+const TemplateButton = defineAsyncComponent(() =>
+  import("@/components/editor/template").then((m) => m.TemplateButton),
+);
+const VideoUpload = defineAsyncComponent(() =>
+  import("@/components/editor/video").then((m) => m.VideoUpload),
+);
+const WordButton = defineAsyncComponent(() => import("@/components/editor/word/WordButton.vue"));
+
+/**
+ * 工具栏按 WAI-ARIA APG 的 toolbar 模式收敛为单一 tab stop，内部用方向键移动。
+ * 改动前 full preset 下有 18 个 tab stop，键盘用户需按 18 次 Tab 才能越过工具栏。
+ */
+const toolbarRef = ref<HTMLElement | null>(null);
+useRovingTabindex(toolbarRef);
 
 const t = useEditorT();
 

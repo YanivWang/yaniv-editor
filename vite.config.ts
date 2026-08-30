@@ -1,13 +1,22 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import dts from "vite-plugin-dts";
 import { existsSync, unlinkSync } from "fs";
 import { resolve } from "path";
+
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
+import dts from "vite-plugin-dts";
+
 import type { OutputAsset, OutputBundle, OutputChunk } from "rollup";
 import type { Plugin } from "vite";
 
-// Production build uses obfuscation
-const isProduction = process.env.NODE_ENV === "production";
+/**
+ * 入口分组 → 产出的 CSS 文件名。
+ * `style` / `inline-style` 是纯 CSS 入口（src/styles/*.css），其产物含 variables.css，
+ * 必须排在同组组件 SFC 样式之前，否则 --ye-* token 后定义会被组件样式先读到。
+ */
+const CSS_ENTRY_GROUPS = [
+  { output: "style.css", cssEntry: "style", codeEntries: ["index", "ai"] },
+  { output: "inline.css", cssEntry: "inline-style", codeEntries: ["inline"] },
+] as const;
 
 function getAssetSource(asset: OutputAsset): string {
   return typeof asset.source === "string"
@@ -15,122 +24,106 @@ function getAssetSource(asset: OutputAsset): string {
     : Buffer.from(asset.source as Uint8Array).toString("utf-8");
 }
 
-function isInlineCssAsset(fileName: string): boolean {
-  return (
-    fileName === "inline.css" || fileName.includes("inline-style") || /\/inline[-.]/.test(fileName)
-  );
+/** KaTeX 字体样式由接入方 `import 'katex/dist/katex.min.css'` 提供，不打入包内 */
+function isKatexCss(source: string): boolean {
+  return source.includes("font-family:KaTeX");
 }
 
-function isStyleEntryCssAsset(fileName: string): boolean {
-  return fileName === "style.css" || fileName.startsWith("assets/style-");
+function isCssOnlyEntryChunk(chunk: OutputChunk): boolean {
+  if (!chunk.isEntry) return false;
+  if (chunk.name !== "style" && chunk.name !== "inline-style") return false;
+  return chunk.code.trim() === "";
 }
+
+type ChunkCssMeta = { viteMetadata?: { importedCss?: Set<string> } };
 
 /**
- * lib 构建 CSS 收敛：
- * - 剔除 KaTeX（由接入方 import 'katex/dist/katex.min.css'）
- * - 将全部非 inline 的 CSS 合并为 dist/style.css
- * - 将 inline 相关 CSS 合并为 dist/inline.css
- * - 删除 assets/*.css 孤立文件
+ * 按「入口可达性」把 CSS 资产分配给 style.css / inline.css。
+ *
+ * 背景：Vue SFC 的 `<style>` 会随所属 JS chunk 产出独立 CSS 资产。full 与 inline 两个入口
+ * 共享 EditorShell chunk，因此共享其组件样式；但 inline 不应背上 full 专属的
+ * document-layout / table / outline / drag-handle / appearance 等整包样式。
+ *
+ * 旧实现把 style.css 全量拼进 inline.css（inline.css 139KB > style.css 114KB），
+ * 与 inline 入口「评论 / 表单轻量场景」的定位冲突。这里改为沿 rollup import 图
+ * 从各入口做传递闭包，只收该入口真正可达的 CSS。
  */
 function consolidateLibCssPlugin(): Plugin {
   return {
     name: "yaniv-consolidate-lib-css",
     generateBundle(_, bundle: OutputBundle) {
-      const styleParts: string[] = [];
-      const inlineParts: string[] = [];
-      const deleteKeys: string[] = [];
-      let styleAssetKey: string | null = null;
-      let inlineAssetKey: string | null = null;
+      const chunks = Object.values(bundle).filter(
+        (item): item is OutputChunk => item.type === "chunk",
+      );
+      const chunkByFileName = new Map(chunks.map((chunk) => [chunk.fileName, chunk]));
+
+      /** 从入口 chunk 沿静态 import 做传递闭包，收集途经 chunk 的 importedCss */
+      const reachableCss = (entryName: string): string[] => {
+        const entry = chunks.find((chunk) => chunk.isEntry && chunk.name === entryName);
+        if (!entry) return [];
+
+        const seen = new Set<string>();
+        const queue = [entry.fileName];
+        const css: string[] = [];
+
+        while (queue.length) {
+          const fileName = queue.shift()!;
+          if (seen.has(fileName)) continue;
+          seen.add(fileName);
+
+          const chunk = chunkByFileName.get(fileName);
+          if (!chunk) continue;
+
+          const imported = (chunk as ChunkCssMeta).viteMetadata?.importedCss;
+          if (imported) {
+            for (const name of imported) if (!css.includes(name)) css.push(name);
+          }
+          queue.push(...chunk.imports, ...chunk.dynamicImports);
+        }
+
+        return css;
+      };
+
+      for (const group of CSS_ENTRY_GROUPS) {
+        // 纯 CSS 入口在前（variables.css 必须最先），再按可达顺序追加组件样式
+        const ordered = [
+          ...reachableCss(group.cssEntry),
+          ...group.codeEntries.flatMap((entry) => reachableCss(entry)),
+        ].filter((name, index, all) => all.indexOf(name) === index);
+
+        const parts: string[] = [];
+        for (const fileName of ordered) {
+          const asset = bundle[fileName];
+          if (!asset || asset.type !== "asset") continue;
+          const source = getAssetSource(asset);
+          if (isKatexCss(source)) continue;
+          parts.push(source);
+        }
+
+        if (!parts.length) continue;
+
+        bundle[group.output] = {
+          type: "asset",
+          fileName: group.output,
+          names: [group.output],
+          originalFileNames: [],
+          needsCodeReference: false,
+          source: parts.join("\n"),
+        } as OutputAsset;
+      }
 
       for (const [key, item] of Object.entries(bundle)) {
-        if (item.type === "chunk" && isCssOnlyEntryChunk(item)) {
-          deleteKeys.push(key);
+        if (item.type === "chunk") {
+          if (isCssOnlyEntryChunk(item)) delete bundle[key];
           continue;
         }
-
-        if (item.type !== "asset" || !item.fileName.endsWith(".css")) continue;
-
-        const asset = item as OutputAsset;
-        const source = getAssetSource(asset);
-
-        if (source.includes("font-family:KaTeX")) {
-          deleteKeys.push(key);
-          continue;
+        // 分片 CSS 已并入 style.css / inline.css；未被任一入口引用的孤立 CSS 同样丢弃
+        if (item.fileName.endsWith(".css") && item.fileName.startsWith("assets/")) {
+          delete bundle[key];
         }
-
-        if (isInlineCssAsset(asset.fileName)) {
-          if (asset.fileName === "inline.css") {
-            inlineAssetKey = key;
-            inlineParts.unshift(source);
-          } else {
-            inlineParts.push(source);
-            deleteKeys.push(key);
-          }
-          continue;
-        }
-
-        if (isStyleEntryCssAsset(asset.fileName)) {
-          if (asset.fileName === "style.css") {
-            styleAssetKey = key;
-            styleParts.unshift(source);
-          } else {
-            styleParts.push(source);
-            deleteKeys.push(key);
-          }
-          continue;
-        }
-
-        styleParts.push(source);
-        deleteKeys.push(key);
-      }
-
-      const mergedStyle = styleParts.join("\n");
-      // Inline 入口复用 useEditorLocale 等共享组件：将全量组件样式一并打入 inline.css，保证仅引 inline.css 即可用
-      const mergedInline = inlineParts.length
-        ? `${inlineParts.join("\n")}\n${mergedStyle}`
-        : mergedStyle;
-
-      if (mergedStyle) {
-        if (styleAssetKey && bundle[styleAssetKey]?.type === "asset") {
-          (bundle[styleAssetKey] as OutputAsset).source = mergedStyle;
-          (bundle[styleAssetKey] as OutputAsset).fileName = "style.css";
-        } else {
-          bundle["style.css"] = {
-            type: "asset",
-            fileName: "style.css",
-            names: ["style.css"],
-            source: mergedStyle,
-            needsCodeReference: false,
-          } as OutputAsset;
-        }
-      }
-
-      if (mergedInline) {
-        if (inlineAssetKey && bundle[inlineAssetKey]?.type === "asset") {
-          (bundle[inlineAssetKey] as OutputAsset).source = mergedInline;
-          (bundle[inlineAssetKey] as OutputAsset).fileName = "inline.css";
-        } else {
-          bundle["inline.css"] = {
-            type: "asset",
-            fileName: "inline.css",
-            names: ["inline.css"],
-            source: mergedInline,
-            needsCodeReference: false,
-          } as OutputAsset;
-        }
-      }
-
-      for (const key of deleteKeys) {
-        delete bundle[key];
       }
     },
   };
-}
-
-function isCssOnlyEntryChunk(chunk: OutputChunk) {
-  if (!chunk.isEntry) return false;
-  if (chunk.name !== "style" && chunk.name !== "inline-style") return false;
-  return chunk.code.trim() === "";
 }
 
 /** vite-plugin-dts may emit declarations for CSS-only entries; they are not public API. */
@@ -160,10 +153,6 @@ export default defineConfig({
         "src/features/ai/shared/CustomAiPopover.vue",
         "src/features/ai/shared/AiSuggestionPopover.vue",
       ],
-      beforeWriteFile: (filePath, content) => {
-        // Filter out problematic type references
-        return { filePath, content };
-      },
     }),
     consolidateLibCssPlugin(),
     removeCssEntryDeclarationsPlugin(),
@@ -201,20 +190,36 @@ export default defineConfig({
         return `${entryName}.js`;
       },
     },
-    minify: isProduction ? "terser" : false,
-    terserOptions: isProduction
-      ? {
-          compress: {
-            drop_console: true,
-            drop_debugger: true,
-          },
-          mangle: {
-            properties: {
-              regex: /^_/, // Mangle private properties starting with _
-            },
-          },
-        }
-      : undefined,
+    /**
+     * 压缩策略（以 Vite 6 实际行为为准，不要再加 `NODE_ENV` 条件分支）：
+     *
+     * - **CJS 产物**：由 terser 压缩。
+     * - **ESM 产物**：Vite 的 `vite:terser` 插件对 `build.lib && format === "es"` 直接
+     *   `return null`，**不做压缩**。这是有意设计——保留换行与 `/*#__PURE__*\/` 标注，
+     *   让接入方的打包器能正确 tree-shake 并自行压缩。Vue / React / Tiptap /
+     *   Ant Design Vue 等库同样以未压缩 ESM 发布，属于面向打包器的标准做法。
+     *
+     * 旧配置把压缩挂在 `NODE_ENV === "production"` 上，而 `prepublishOnly` 只跑
+     * `pnpm build`（不带 NODE_ENV），导致连 CJS 也从未被压缩过。
+     */
+    minify: "terser",
+    sourcemap: true,
+    terserOptions: {
+      compress: {
+        // 保留 console.warn / console.error：库的运行时诊断信息对接入方排障有价值，
+        // 旧配置的 `drop_console: true` 会把 session 重建失败等关键告警一并抹掉
+        pure_funcs: ["console.log", "console.debug", "console.info"],
+        drop_debugger: true,
+      },
+      format: {
+        comments: false,
+      },
+      /**
+       * 不做属性名 mangle。Vue（`_ctx` / `__vccOpts` / `__name`）、Tiptap 扩展 options
+       * 与 ProseMirror 插件状态都依赖下划线前缀属性跨包访问，重命名会在运行时断链。
+       */
+      mangle: true,
+    },
     rollupOptions: {
       external: [
         "vue",
@@ -228,7 +233,6 @@ export default defineConfig({
         "@ant-design/icons-vue",
         "docx",
         "file-saver",
-        "hotkeys-js",
         "katex",
         "mammoth",
         /^#\/.*/, // Internal APIs
