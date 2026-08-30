@@ -150,7 +150,7 @@
  * @description 自然换行工具带：编辑 → 字体 → 段落 → 插入 → 文档 → 工具 → 智能
  */
 import { ThunderboltOutlined } from "@ant-design/icons-vue";
-import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
 
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
@@ -170,6 +170,7 @@ import { useRovingTabindex } from "@/composables/useRovingTabindex";
 import { useYanivEditor } from "@/core/editorContext";
 import type { GalleryImage, MediaUploadHandler } from "@/core/editorTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { defineGatedAsyncComponent } from "@/shared/gatedAsyncComponent";
 
 import { COMPACT_TOOLBAR_CONFIG, FULL_TOOLBAR_CONFIG } from "./toolbarConfig";
 
@@ -183,34 +184,37 @@ import type { Editor } from "@tiptap/vue-3";
  * 它们连同各自依赖（AI 客户端与适配器、docx/mammoth 封装、KaTeX 封装等）进入主 chunk。
  * 全部为 `v-if` 门控的叶子组件，无父级 ref 访问。
  */
-const AiMenuButton = defineAsyncComponent(() =>
+const AiMenuButton = defineGatedAsyncComponent("AiMenuButton", () =>
   import("@/features/ai").then((m) => m.AiMenuButton),
 );
-const FindReplaceButton = defineAsyncComponent(() =>
+const FindReplaceButton = defineGatedAsyncComponent("FindReplaceButton", () =>
   import("@/components/editor/find-replace").then((m) => m.FindReplaceButton),
 );
-const FormatPainterButton = defineAsyncComponent(() =>
+const FormatPainterButton = defineGatedAsyncComponent("FormatPainterButton", () =>
   import("@/components/editor/format-painter").then((m) => m.FormatPainterButton),
 );
-const GalleryButton = defineAsyncComponent(() =>
+const GalleryButton = defineGatedAsyncComponent("GalleryButton", () =>
   import("@/components/editor/gallery").then((m) => m.GalleryButton),
 );
-const MathButton = defineAsyncComponent(() =>
+const MathButton = defineGatedAsyncComponent("MathButton", () =>
   import("@/components/editor/math").then((m) => m.MathButton),
 );
-const OutlineToggleButton = defineAsyncComponent(() =>
+const OutlineToggleButton = defineGatedAsyncComponent("OutlineToggleButton", () =>
   import("@/components/editor/outline").then((m) => m.OutlineToggleButton),
 );
-const TableButton = defineAsyncComponent(() =>
+const TableButton = defineGatedAsyncComponent("TableButton", () =>
   import("@/components/editor/table").then((m) => m.TableButton),
 );
-const TemplateButton = defineAsyncComponent(() =>
+const TemplateButton = defineGatedAsyncComponent("TemplateButton", () =>
   import("@/components/editor/template").then((m) => m.TemplateButton),
 );
-const VideoUpload = defineAsyncComponent(() =>
+const VideoUpload = defineGatedAsyncComponent("VideoUpload", () =>
   import("@/components/editor/video").then((m) => m.VideoUpload),
 );
-const WordButton = defineAsyncComponent(() => import("@/components/editor/word/WordButton.vue"));
+const WordButton = defineGatedAsyncComponent(
+  "WordButton",
+  () => import("@/components/editor/word/WordButton.vue"),
+);
 
 /**
  * 工具栏按 WAI-ARIA APG 的 toolbar 模式收敛为单一 tab stop，内部用方向键移动。

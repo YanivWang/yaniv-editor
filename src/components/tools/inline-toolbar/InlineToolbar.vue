@@ -20,10 +20,10 @@
  * InlineToolbar — maps InlineToolbarConfig to /inline toolbar components.
  * Child tools load via async import so disabled toolbar switches stay out of the initial chunk.
  */
-import { defineAsyncComponent } from "vue";
 
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
+import { defineGatedAsyncComponent } from "@/shared/gatedAsyncComponent";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -36,34 +36,34 @@ interface Props {
 
 defineProps<Props>();
 
-const UndoRedoButton = defineAsyncComponent(() =>
+const UndoRedoButton = defineGatedAsyncComponent("UndoRedoButton", () =>
   import("@/components/editor/undo-redo").then((m) => m.UndoRedoButton),
 );
-const HeadingControl = defineAsyncComponent(() =>
+const HeadingControl = defineGatedAsyncComponent("HeadingControl", () =>
   import("@/components/editor/heading").then((m) => m.HeadingControl),
 );
-const TextFormatButtons = defineAsyncComponent(() =>
+const TextFormatButtons = defineGatedAsyncComponent("TextFormatButtons", () =>
   import("@/components/editor/text-format").then((m) => m.TextFormatButtons),
 );
-const ListTools = defineAsyncComponent(() =>
+const ListTools = defineGatedAsyncComponent("ListTools", () =>
   import("@/components/editor/list").then((m) => m.ListTools),
 );
-const AlignDropdown = defineAsyncComponent(() =>
+const AlignDropdown = defineGatedAsyncComponent("AlignDropdown", () =>
   import("@/components/editor/align").then((m) => m.AlignDropdown),
 );
-const LinkButton = defineAsyncComponent(() =>
+const LinkButton = defineGatedAsyncComponent("LinkButton", () =>
   import("@/components/editor/link").then((m) => m.LinkButton),
 );
-const ClearFormatButton = defineAsyncComponent(() =>
+const ClearFormatButton = defineGatedAsyncComponent("ClearFormatButton", () =>
   import("@/components/editor/format-clear").then((m) => m.ClearFormatButton),
 );
-const FontFamilySelect = defineAsyncComponent(() =>
+const FontFamilySelect = defineGatedAsyncComponent("FontFamilySelect", () =>
   import("@/components/editor/font").then((m) => m.FontFamilySelect),
 );
-const FontSizeSelect = defineAsyncComponent(() =>
+const FontSizeSelect = defineGatedAsyncComponent("FontSizeSelect", () =>
   import("@/components/editor/font").then((m) => m.FontSizeSelect),
 );
-const CodeBlockDropdown = defineAsyncComponent(() =>
+const CodeBlockDropdown = defineGatedAsyncComponent("CodeBlockDropdown", () =>
   import("@/components/editor/code-block").then((m) => m.CodeBlockDropdown),
 );
 </script>
