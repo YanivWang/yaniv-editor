@@ -50,13 +50,13 @@
     </template>
 
     <!-- 用一个隐藏的元素来定位 Popover -->
-    <span ref="anchorRef" :style="anchorStyle as any"></span>
+    <span :style="anchorStyle as any"></span>
   </Popover>
 </template>
 
 <script setup lang="ts">
 import { LoadingOutlined, ArrowDownOutlined } from "@ant-design/icons-vue";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Popover } from "@/shared/antd";
@@ -89,8 +89,6 @@ const emit = defineEmits<{
 
 /** 接受/拒绝时会主动关闭 Popover，避免误触发 cancel */
 let suppressCloseCancel = false;
-
-const anchorRef = ref<HTMLElement>();
 
 const anchorStyle = computed(() => {
   if (!props.position) {
