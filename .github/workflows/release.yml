@@ -66,11 +66,19 @@ jobs:
           set -euo pipefail
           pnpm pack --pack-destination /tmp >/dev/null
           tarball=$(ls /tmp/*.tgz | head -1)
-          tar -tzf "$tarball" | grep -qx "package/LICENSE" || {
-            echo "::error::发布包缺少 LICENSE"; exit 1; }
-          tar -tzf "$tarball" | grep -qx "package/NOTICE" || {
-            echo "::error::发布包缺少 NOTICE"; exit 1; }
-          echo "tarball 内容:"; tar -tzf "$tarball" | head -30
+
+          # 先把清单落到文件再匹配：`tar ... | grep -q` 会因 grep 命中后提前退出
+          # 关闭管道，让 tar 收到 SIGPIPE，在 pipefail 下变成整条管道失败——
+          # 即便文件确实存在也会误判为缺失
+          tar -tzf "$tarball" > /tmp/tarball-entries.txt
+
+          echo "tarball 内容:"; head -30 /tmp/tarball-entries.txt
+
+          for required in package/LICENSE package/NOTICE; do
+            grep -qxF "$required" /tmp/tarball-entries.txt || {
+              echo "::error::发布包缺少 ${required#package/}"; exit 1; }
+          done
+          echo "✅ LICENSE 与 NOTICE 均随包分发"
 
       # 发布前确认目标源确实是官方 npm，而不是仓库 .npmrc 里的只读镜像
       - name: Assert publish registry
