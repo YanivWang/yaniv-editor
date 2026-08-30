@@ -26,22 +26,53 @@ function resolveEmbedProvider(url: string): EmbedProvider {
 }
 
 /**
+ * 已知播放器：src 由本文件重写成固定的官方域名，内容不由使用者控制。
+ * 只有这一类才配拿 `allow-same-origin`（见 {@link sandboxFor}）。
+ */
+type IframeTarget = { src: string; knownProvider: boolean };
+
+/**
  * 解析可嵌入的 iframe 地址；不可安全嵌入时返回 `null`（调用方降级为 bookmark 卡片）。
  *
  * `provider` 是节点属性，可由粘贴的 JSON 或 `setEmbed({ provider: "iframe" })` 直接指定，
  * 因此 `resolveEmbedProvider` 的域名判断**不能**作为安全边界——真正的边界是这里的
  * `normalizeSafeFrameUrl`（仅放行 http/https）。
  */
-function resolveIframeSrc(url: string): string | null {
+function resolveIframeSrc(url: string): IframeTarget | null {
   const youtubeMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]+)/i);
-  if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  if (youtubeMatch) {
+    return { src: `https://www.youtube.com/embed/${youtubeMatch[1]}`, knownProvider: true };
+  }
 
   if (/vimeo\.com/i.test(url)) {
     const id = url.split("/").pop();
-    if (id && /^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}`;
+    if (id && /^\d+$/.test(id)) {
+      return { src: `https://player.vimeo.com/video/${id}`, knownProvider: true };
+    }
   }
 
-  return normalizeSafeFrameUrl(url);
+  const safe = normalizeSafeFrameUrl(url);
+  return safe ? { src: safe, knownProvider: false } : null;
+}
+
+/**
+ * sandbox 按来源可信度分级。
+ *
+ * `allow-scripts` + `allow-same-origin` 同时给，等于**把 sandbox 让给了被嵌页面自己**：
+ * 被嵌文档保留自身源，一旦它与宿主同源，就能通过 `parent` 反向操作宿主 DOM，
+ * 甚至直接摘掉自己 iframe 上的 `sandbox` 属性——这是该组合公认的逃逸路径。
+ *
+ * 而 embed 的 `url` 是内容属性，UGC 场景下由使用者控制（粘贴 JSON 即可指定任意
+ * http/https 地址，包括宿主自己的源），所以**任意地址一律不给 `allow-same-origin`**，
+ * 让它跑在不透明源里。只有 YouTube / Vimeo 这类 src 被本文件重写成固定官方域名、
+ * 内容不受使用者控制的已知播放器才保留该权限（播放器需要它读 localStorage）。
+ *
+ * 代价是可预期的：任意第三方嵌入拿不到自己的 cookie / storage。对一个所见即所得
+ * 编辑器里的展示型嵌入，这个取舍优于把宿主页面的 DOM 暴露出去。
+ */
+function sandboxFor(knownProvider: boolean): string {
+  const base = "allow-scripts allow-presentation allow-popups-to-escape-sandbox";
+  return knownProvider ? `${base} allow-same-origin` : base;
 }
 
 export const Embed = Node.create({
@@ -147,9 +178,9 @@ export const Embed = Node.create({
       };
 
       const renderIframe = () => {
-        const src = resolveIframeSrc(String(node.attrs.url ?? ""));
+        const target = resolveIframeSrc(String(node.attrs.url ?? ""));
         // 地址不可安全嵌入时退化为 bookmark 卡片，而不是渲染一个空/危险的 iframe
-        if (!src) {
+        if (!target) {
           renderBookmark();
           return;
         }
@@ -157,13 +188,10 @@ export const Embed = Node.create({
         dom.replaceChildren();
         const iframe = document.createElement("iframe");
         iframe.className = "embed-block__iframe";
-        iframe.src = src;
-        // 第三方内容按最小权限沙箱运行：允许脚本与同源读取以便播放器工作，
-        // 但禁止其导航顶层窗口、弹窗、下载与表单提交
-        iframe.setAttribute(
-          "sandbox",
-          "allow-scripts allow-same-origin allow-presentation allow-popups-to-escape-sandbox",
-        );
+        iframe.src = target.src;
+        // 第三方内容按最小权限沙箱运行：禁止导航顶层窗口、弹窗、下载与表单提交；
+        // allow-same-origin 只给已知播放器，理由见 sandboxFor
+        iframe.setAttribute("sandbox", sandboxFor(target.knownProvider));
         // 用 setAttribute 而非 IDL 属性：部分环境（含 jsdom）不反射这两个属性到 DOM
         iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
         iframe.setAttribute("loading", "lazy");
