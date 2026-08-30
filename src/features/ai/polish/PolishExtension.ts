@@ -49,6 +49,7 @@ export const PolishExtension = Extension.create<PolishOptions>({
             { from, to },
             client.polish.bind(client),
             localeText(this.options, "messages.polishFailed"),
+            this.options.getLocaleText,
           );
           return true;
         },

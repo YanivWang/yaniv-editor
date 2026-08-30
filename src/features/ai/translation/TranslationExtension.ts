@@ -63,6 +63,7 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
             (content, sysPrompt, callbacks) =>
               client.translate(content, lang, sysPrompt, callbacks),
             localeText(this.options, "messages.translationFailed"),
+            this.options.getLocaleText,
           );
 
           return true;

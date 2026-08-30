@@ -57,14 +57,20 @@ function runStream(
   });
 }
 
+/**
+ * @param getLocaleText 发起实例的 locale 解析器；在会话开始时绑定到 `aiSuggestionManager`，
+ * 使同页多实例各自弹出自己语言的悬浮层文案。
+ */
 export function runAiSuggestionStream(
   editor: Editor,
   selectedText: string,
   originalSelection: { from: number; to: number },
   stream: StreamInvoker,
   errorTitle: string,
+  getLocaleText?: (key: string) => string,
 ): void {
   removeAiHighlight(editor);
+  aiSuggestionManager.bindLocale(getLocaleText);
   aiSuggestionManager.show(selectedText, originalSelection, editor);
   runStream(editor, selectedText, stream, errorTitle);
 }
@@ -76,7 +82,9 @@ export function runAiContinueWritingStream(
   insertPosition: number,
   errorTitle: string,
   client: AiClient,
+  getLocaleText?: (key: string) => string,
 ): void {
+  aiSuggestionManager.bindLocale(getLocaleText);
   aiSuggestionManager.showContinueWriting(editor, selectedText, userRange, insertPosition);
   runStream(editor, selectedText, client.continueWriting.bind(client), errorTitle);
 }

@@ -39,11 +39,35 @@ type AiClient = ReturnType<typeof createAiClient>;
 class AiSuggestionManager {
   private getLocaleText: (key: string) => string = (key) => key;
 
-  /** 由 capability registry 在构建 AI 扩展时注入实例 locale 文案 */
-  bindLocale(getLocaleText: (key: string) => string): void {
-    this.getLocaleText = getLocaleText;
+  /**
+   * 绑定当前 AI 会话的 locale 文案解析器。
+   *
+   * 必须由发起会话的扩展在 `show*()` 之前调用，**不能**在 capability 构建扩展时调用：
+   * 本类是模块级单例（同一时刻只存在一个 AI 悬浮层），构建期绑定会让同页多实例中
+   * 后构建的那个覆盖前者的语言，导致 zh-CN 实例弹出 en-US 文案。
+   * 会话是互斥的，因此按会话绑定既正确又无需实例化多份 manager。
+   */
+  bindLocale(getLocaleText?: (key: string) => string): void {
+    this.getLocaleText = getLocaleText ?? ((key) => key);
   }
   private editor: Editor | null = null;
+
+  /**
+   * 取当前仍存活的编辑器；已销毁时顺手断开引用并返回 null。
+   *
+   * 本类是模块级单例，会跨 session 存活：能力开关变化会重建 editor（`useEditorSession`
+   * 的 sessionKey 机制），组件卸载也会 destroy。若此时仍持有旧实例，任何
+   * `editor.view` / `editor.state` 访问都会抛 `[tiptap error]: The editor view is not available`，
+   * 且发生在弹层回调里无人捕获。
+   *
+   * 与 `SearchReplace` / `FormatPainter` 的 `isDestroyed` 前置判断是同一类保护。
+   */
+  private liveEditor(): Editor | null {
+    if (this.editor?.isDestroyed) {
+      this.editor = null;
+    }
+    return this.editor;
+  }
   private popoverApp: App | null = null;
   private container: HTMLElement | null = null;
   private mode: AiSessionMode = "replace";
@@ -79,9 +103,10 @@ class AiSuggestionManager {
     editor?: Editor,
   ): void {
     if (editor) this.ensureEditor(editor);
-    if (!this.editor) return;
+    const live = this.liveEditor();
+    if (!live) return;
 
-    removeAiHighlight(this.editor);
+    removeAiHighlight(live);
     this.mode = "replace";
     this.positionAnchor = originalSelection;
     this.userContextRange = null;
@@ -95,23 +120,24 @@ class AiSuggestionManager {
     insertPosition: number,
   ): void {
     this.ensureEditor(editor);
-    if (!this.editor) return;
+    const live = this.liveEditor();
+    if (!live) return;
 
-    removeAiHighlight(this.editor);
+    removeAiHighlight(live);
     this.mode = "continue";
     this.positionAnchor = userRange;
     this.userContextRange = userRange;
 
-    addAiHighlight(this.editor, userRange.from, userRange.to, {
+    addAiHighlight(live, userRange.from, userRange.to, {
       originalText: selectedText,
       suggestedText: "",
       isStreaming: false,
     });
 
-    this.editor.chain().focus().insertContentAt(insertPosition, " ").run();
+    live.chain().focus().insertContentAt(insertPosition, " ").run();
 
     const suggestionSelection = { from: insertPosition, to: insertPosition + 1 };
-    addAiHighlight(this.editor, suggestionSelection.from, suggestionSelection.to, {
+    addAiHighlight(live, suggestionSelection.from, suggestionSelection.to, {
       originalText: "",
       suggestedText: "",
       isStreaming: true,
@@ -211,10 +237,11 @@ class AiSuggestionManager {
   }
 
   accept(): void {
-    if (!this.editor || !this.state.visible) return;
+    const editor = this.liveEditor();
+    if (!editor || !this.state.visible) return;
 
     const { originalSelection, suggestedText } = this.state;
-    const docSize = this.editor.state.doc.content.size;
+    const docSize = editor.state.doc.content.size;
 
     if (!suggestedText.trim()) {
       this.hide();
@@ -227,9 +254,9 @@ class AiSuggestionManager {
     }
 
     const { from, to } = originalSelection;
-    removeAiHighlight(this.editor);
+    removeAiHighlight(editor);
 
-    const applied = this.editor
+    const applied = editor
       .chain()
       .focus()
       .setTextSelection({ from, to })
@@ -261,12 +288,19 @@ class AiSuggestionManager {
   }
 
   hide(): void {
-    if (!this.editor) return;
-
     this.abortActiveStream();
+    const editor = this.liveEditor();
+    if (!editor) {
+      // 编辑器已销毁：仍要复位自身状态，否则下一个 session 会读到脏数据
+      this.visibleRef.value = false;
+      this.isTemporarilyHidden = false;
+      this.unmountPopover();
+      return;
+    }
+
     this.visibleRef.value = false;
     this.isTemporarilyHidden = false;
-    removeAiHighlight(this.editor);
+    removeAiHighlight(editor);
     this.unmountPopover();
     this.removeClickHandler();
 
@@ -298,7 +332,7 @@ class AiSuggestionManager {
   }
 
   private ensureEditor(editor: Editor): void {
-    if (!this.editor) {
+    if (!this.liveEditor()) {
       this.init(editor);
     } else {
       this.editor = editor;

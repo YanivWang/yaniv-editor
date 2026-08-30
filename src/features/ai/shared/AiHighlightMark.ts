@@ -215,6 +215,14 @@ export function getAiSuggestionData(editor: Editor, pos: number): AiSuggestionDa
   const { state } = editor;
   const { doc } = state;
 
+  /**
+   * 位置可能已过期：`aiSuggestionManager` 在 `posAtDOM` 失败时会回退到会话开始时保存的
+   * `positionAnchor.from` / `userContextRange.from`，而用户在流式输出期间删减文档后，
+   * 这些位置可能已越界。`doc.resolve()` 越界会抛 RangeError，且调用点在 click 回调里无捕获。
+   * 与同文件的 add / update 保持一致：越界视为「没有数据」。
+   */
+  if (!Number.isFinite(pos) || pos < 0 || pos > doc.content.size) return null;
+
   const $pos = doc.resolve(pos);
   const marks = $pos.marks();
   const aiMark = marks.find((mark) => mark.type.name === "aiHighlight");

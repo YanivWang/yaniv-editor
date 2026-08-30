@@ -42,6 +42,7 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
           }
 
           preventCommandAutoDispatch(tr);
+          aiSuggestionManager.bindLocale(this.options.getLocaleText);
           aiSuggestionManager.showCustom(
             editor,
             selectedText,

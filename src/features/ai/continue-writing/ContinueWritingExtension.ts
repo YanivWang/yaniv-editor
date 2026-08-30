@@ -60,6 +60,7 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             insertPosition,
             localeText(this.options, "messages.continueWritingFailed"),
             client,
+            this.options.getLocaleText,
           );
           return true;
         },

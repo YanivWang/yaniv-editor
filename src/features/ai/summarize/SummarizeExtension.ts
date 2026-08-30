@@ -56,6 +56,7 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
             summaryRange,
             client.summarize.bind(client),
             localeText(this.options, "messages.summarizeFailed"),
+            this.options.getLocaleText,
           );
           return true;
         },
