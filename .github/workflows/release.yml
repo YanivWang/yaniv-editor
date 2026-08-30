@@ -17,7 +17,11 @@ permissions:
   id-token: write
 
 env:
+  # 仓库 .npmrc 把 registry 指向 registry.npmmirror.com（只读镜像，无法发布）。
+  # 注意 actions/setup-node 的 registry-url 只写 **user 级** 配置，优先级低于项目级
+  # .npmrc，因此不能只靠它——发布步骤额外用 CLI flag 钉死目标源（CLI 优先级最高）。
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+  PUBLISH_REGISTRY: https://registry.npmjs.org/
 
 jobs:
   publish:
@@ -68,12 +72,23 @@ jobs:
             echo "::error::发布包缺少 NOTICE"; exit 1; }
           echo "tarball 内容:"; tar -tzf "$tarball" | head -30
 
+      # 发布前确认目标源确实是官方 npm，而不是仓库 .npmrc 里的只读镜像
+      - name: Assert publish registry
+        run: |
+          set -euo pipefail
+          resolved=$(pnpm config get registry)
+          echo "resolved registry: ${resolved}"
+          case "$resolved" in
+            https://registry.npmjs.org*) ;;
+            *) echo "::error::registry 解析为 ${resolved}，不是官方 npm"; exit 1 ;;
+          esac
+
       - name: Publish (dry run)
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run
-        run: pnpm publish --dry-run --no-git-checks
+        run: pnpm publish --dry-run --no-git-checks --registry "$PUBLISH_REGISTRY"
 
       - name: Publish
         if: startsWith(github.ref, 'refs/tags/v')
-        run: pnpm publish --provenance --access public --no-git-checks
+        run: pnpm publish --provenance --access public --no-git-checks --registry "$PUBLISH_REGISTRY"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
