@@ -1,6 +1,165 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0] — 2026-08-30
+
+### ⚠️ 许可证更正（License correction）
+
+- **恢复 MIT 许可证。** 本项目派生自 [benngaihk/Tiptap-UI-Kit](https://github.com/benngaihk/Tiptap-UI-Kit)，
+  接手时上游为 MIT 协议。提交 `23a7605`（「修复ts错误和移除版权信息」）删除了 `LICENSE`
+  文件与 `package.json` 的 `"license": "MIT"` 字段，而 MIT 明确要求在所有副本及实质性部分中
+  **保留版权声明与许可声明**——`0.1.1` – `0.1.4` 的 npm 发布因此不符合上游授权条件。
+  现已恢复 `LICENSE`（同时保留 benngaihk 与 YanivWang 两条版权行）、补回 `license` 字段，
+  并新增 `NOTICE` 说明衍生关系。接入方在此前版本上的合规疑虑随本次修正解除。
+
+### Security
+
+- **HTML 解析不再经过 `innerHTML`。** `ContentAdapter` 原先用
+  `document.createElement("div").innerHTML = html` 解析传入内容，节点建在**活动文档**中，
+  `<img src=x onerror=...>` / `<svg onload=...>` 会立即执行，外链资源会真实发起请求。
+  Inline Editor 的 `v-model:content` 直接接收宿主 HTML（评论 / 表单等 UGC 场景），
+  该路径构成存储型 XSS 面。改用 `DOMParser.parseFromString(..., "text/html")` 产出的
+  惰性文档（无 browsing context），与 Tiptap 官方 `elementFromString` 一致。
+- **`embed` 节点的 iframe 加固。** `provider` 是节点属性，可由粘贴的 JSON 或
+  `setEmbed({ provider: "iframe" })` 直接指定，`resolveEmbedProvider` 的域名判断因此不构成
+  安全边界，此前可生成任意 `src` 的 iframe 且无 `sandbox`。现在：`src` 必须通过新增的
+  `normalizeSafeFrameUrl`（仅 http/https，且不做 `https://` 自动补全）；不合格时降级为书签卡片；
+  iframe 加 `sandbox`、`referrerpolicy`、`loading="lazy"`，`allow` 从 6 项权限收窄到播放必需的 4 项，
+  移除 `accelerometer` / `gyroscope` / `clipboard-write`。
+- **书签卡片校验 `href` 与封面图。** 未通过白名单的 `url` 不再写入 `href`（卡片不可点击），
+  封面图经 `normalizeSafeMediaUrl` 过滤。
+- 新增 `SECURITY.md`，明确编辑器与接入方各自的安全边界（服务端二次校验、AI 密钥 `proxy` 模式、
+  上传文件扫描等仍属接入方责任）。
+
+### BREAKING CHANGES
+
+- **`dist/inline.css` 不再包含 Full Editor 的全量样式。** 此前构建脚本把 `style.css` 整体拼进
+  `inline.css`，导致 inline 产物（139KB）反而大于 full（114KB），与 inline 入口「评论 / 表单
+  轻量场景」的定位冲突。现在按 rollup 入口可达性拆分，`inline.css` 降至 56KB（gzip 19.1→9.2KB）。
+  若你在页面上**仅引入 `inline.css` 却渲染了 Full Editor**，请改为引入 `style.css`。
+  正常按入口配对引用样式的用法不受影响。
+- **`getHostAiConfig()` / `isHostAiManaged()` 在多实例下的行为变化。** 见下方多实例修复。
+
+### Fixed
+
+- **媒体节点未做 URL 白名单校验。** `Video` / `ResizableImage` 的 `src` 只在 UI 上传路径
+  （`VideoUpload.vue` / `mediaUpload.ts`）过滤，而 `initialContent` 的 JSON/HTML、粘贴、
+  宿主直接调 `setVideo()` / `setImage()` 三条路径完全绕开。schema 是渲染前最后一道关，
+  现已在 `parseHTML` / `renderHTML` 两侧接入 `normalizeSafeMediaUrl`。
+- **图片尺寸在 HTML 往返中丢失。** `renderHTML` 把 width/height 写成内联 `style`
+  （`width: 200px`），而 `parseHTML` 只读 `width` 属性 → **每次 HTML 往返尺寸归零**。
+  Inline Editor 的 `v-model:content` 正是 HTML 往返，图片尺寸在每次内容同步后被清掉。
+  现在解析同时接受属性与内联 style。
+- **`width="abc"` 产生 `NaN` 并写入文档。** 旧写法 `value ? parseInt(value) : null` 中
+  `"abc"` 为真值，`parseInt` 得到 `NaN` 存进节点属性，破坏后续缩放计算；而 `getJSON()`
+  会把 `NaN` 序列化成 `null`，导致宿主收到的值与编辑器内部状态不一致。现统一校验为正整数。
+- **`getAiSuggestionData` 遇过期位置抛 `RangeError`。** `aiSuggestionManager` 在
+  `posAtDOM` 失败时会回退到会话开始时保存的 `positionAnchor.from`；用户在流式输出期间
+  删减文档后该位置可能越界，`doc.resolve()` 直接抛错，且调用点在 click 回调里无人捕获。
+  现与同文件的 `addAiHighlight` / `updateAiHighlight` 一致做边界判断。
+- **`aiSuggestionManager` 持有已销毁的 editor。** 它是跨 session 存活的模块级单例，
+  而能力开关变化会重建 editor、组件卸载会 destroy；此后任何 `editor.view` 访问都会抛
+  `[tiptap error]: The editor view is not available`。新增 `liveEditor()` 统一守门，
+  与 `SearchReplace` / `FormatPainter` 已有的 `isDestroyed` 判断对齐。
+- **块菜单打开请求在异步组件加载期间被丢弃。** `BlockPickerMenu` 改为 `defineAsyncComponent`
+  后，chunk 解析完成前实例尚未注册，`provideBlockMenuHost` 直接丢掉此时到达的
+  `activate` / `openInsert`——用户敲下的第一个 `/` 不弹菜单，得再敲一次。现缓冲最后一次
+  打开请求，实例注册后补投。
+- **AI 宿主配置的多实例串用。** `hostConfig.ts` 原先是单个模块级变量：同页两个编辑器时，
+  后挂载者覆盖先挂载者；**未传 `ai-config` 的实例会静默复用另一个实例的密钥与端点**。
+  改为按 owner（每实例一个 Symbol）键控的注册表。无 owner 的查询：恰好一个实例登记时返回该配置
+  （单实例行为不变），多个实例登记时返回 `null` 并告警——此时不存在正确答案，任选一个正是原来的缺陷。
+  与本批次修复的 outline `scrollParent` 属同源问题（模块级存储 → 实例作用域）。
+- **AI 悬浮层语言被后挂载实例覆盖。** `aiSuggestionManager.bindLocale` 原先在 capability
+  构建扩展时调用，同页多实例下按构建顺序互相覆盖（zh-CN 实例可能弹出 en-US 文案）。
+  改为由各 AI 扩展在**发起会话时**绑定；会话是互斥的，因此按会话绑定既正确又无需实例化多份 manager。
+- **`terserOptions.mangle.properties` 会破坏运行时。** 原配置对所有 `^_` 开头的属性做 mangle，
+  而 Vue（`_ctx` / `__vccOpts` / `__name`）、Tiptap 扩展 options 与 ProseMirror 插件状态都依赖
+  下划线前缀属性跨包访问。该配置因挂在从未设置的 `NODE_ENV` 上而侥幸未生效，现已移除。
+- **`drop_console: true` 会抹掉面向接入方的诊断信息**（如 session 重建失败告警）。
+  改为只清除 `console.log` / `debug` / `info`，保留 `warn` / `error`。
+- **E2E 中 `count() === 0` 的分支判断存在竞态**：`count()` 是瞬时快照、不自动等待，
+  门控工具按钮改为按需加载后会随机走进从未被验证过的 fallback 分支。改用自动等待的合并选择器。
+
+### Added
+
+- **无障碍基线（WCAG 2.1 AA 方向）。** 接入 `eslint-plugin-vuejs-accessibility` 并清零全部告警：
+  - 所有工具栏按钮补 `aria-label`（此前 `title` 只喂给 `a-tooltip` 浮层，按钮本身对辅助技术无名称）；
+    切换类按钮补 `aria-pressed`，下拉按钮补 `aria-haspopup` / `aria-expanded`。
+  - `div[@click]` 一律改为原生 `<button>`：图库项、模板卡、表格尺寸格、公式显示态、下拉分裂项。
+  - `BaseTooltip` 的 `@focus`/`@blur` 改为会冒泡的 `@focusin`/`@focusout`——**原实现下键盘用户
+    永远看不到提示**（focus 事件不冒泡，挂在容器上不会被子元素触发）；提示层补 `role="tooltip"`。
+  - 块菜单与提及菜单的 `@mouseenter` 补 `@focus` 对等项，遮罩层标记 `role="presentation"`。
+  - 无法自动满足的两处保留 `eslint-disable` 并写明理由（用户上传视频无字幕轨道、纯装饰性容器）。
+- **工具栏键盘导航（`useRovingTabindex`）。** 按 WAI-ARIA APG 的 toolbar 模式，工具栏收敛为
+  **单一 tab stop**，内部用 ←/→/↑/↓ 与 Home/End 移动。改动前 `preset="full"` 下工具栏有 18 个
+  tab stop，键盘用户要按 18 次 Tab 才能越过工具栏到达正文。实现用 `MutationObserver` 重扫
+  （按需加载的工具按钮首帧尚未挂载），并跳过输入型控件与带修饰键的方向键。
+- **虚拟焦点弹层的 ARIA 绑定（`useVirtualFocusPopup`）。** 斜杠命令与提及菜单的焦点始终留在正文，
+  DOM 焦点无法表达"当前选中项"。现在弹层用 `role="listbox"` / `role="option"` + `aria-selected`，
+  并把 `aria-expanded` / `aria-controls` / `aria-activedescendant` 挂到编辑器正文，关闭时清除引用。
+- **查找替换对话框的焦点管理。** 打开时焦点直接落在查找框（此前落在对话框容器，还需多按一次 Tab）；
+  关闭时把焦点还给正文——Ant Design Modal 只会还给"触发元素"，而该面板可由 Ctrl/Cmd+F 唤起
+  （无触发元素），焦点会掉到 body。两个输入框补 `aria-label`。
+- 两个新 composable 从主入口导出，供自建 shell 复用。
+- **组件测试与覆盖率门禁。** 引入 `@vue/test-utils` 与 `@vitest/coverage-v8`；
+  新增 `YanivEditor` / `YanivInlineEditor` 挂载与阶段测试、无障碍基线测试、
+  URL 白名单测试、HTML 惰性解析回归测试、`embed` iframe 安全测试、多实例 AI 配置测试、
+  `buildExtensions` gate 过滤测试、工具栏 roving tabindex 测试，以及 Office 粘贴流水线、
+  AI 三个适配器与客户端、AI 配置存储、Word 导出、气泡菜单判定、块菜单动作、
+  扩展命令（video / toggle / formatPainter / searchReplace）、图片节点、
+  AI 高亮 mark、AI 会话管理器、斜杠菜单等模块的测试。
+  **用例数 86 → 421，语句覆盖率 30.9% → 73.7%**，阈值设为
+  statements/lines 72、branches 78、functions 60。
+
+  `DragHandleExtension` 与浮层定位是纯浏览器几何逻辑，jsdom 无布局引擎，
+  强行做单测只能断言自己写的桩。这两块改由 Playwright E2E 验收
+  （新增 `e2e/drag-handle.spec.ts` 5 个用例，E2E 共 22 个），并在
+  `vitest.config.ts` 注明——**没有把它们排除出覆盖率分母来修饰数字**。
+
+- **CI 质量门禁**（`.github/workflows/ci.yml`）：typecheck / 覆盖率测试 / ESLint / Stylelint /
+  Prettier、Node 20 与 22 双版本构建、Playwright E2E、`pnpm audit`。
+  构建任务附带产物断言：入口文件齐全、`inline.css` 必须小于 `style.css`、
+  门控能力不得回流主 chunk。`deploy-pages` 部署前也会先跑 `verify`。
+- **公开 API 表面锁**（`src/publicApi.test.ts`）：三个入口的导出名快照。
+  这是发布到 npm 的库，导出增删即契约变更；快照让改动必须显式过一次人眼，
+  并额外断言 AI 符号不从主入口泄漏。
+- **发布流水线**（`.github/workflows/release.yml`）：tag 触发，发布前跑完整 `verify`、
+  校验 tag 与 `package.json` 版本一致、断言 tarball 内含 `LICENSE` 与 `NOTICE`，
+  使用 `npm publish --provenance` 附带可验证的构建来源证明。支持 dry-run。
+- **产物体积预算**（CI）：主 chunk 46KB / `style.css` 19KB / `inline.css` 10.5KB（均为 gzip，
+  当前实测 43.2 / 18.0 / 9.3KB）。超预算必须显式调整并说明原因，避免"每次多一点"的无声劣化。
+- `CONTRIBUTING.md`、`SECURITY.md`、`NOTICE`、`CODEOWNERS`、Issue / PR 模板、
+  `dependabot.yml`（Tiptap 全家桶分组升级、忽略 major）。
+
+### Changed
+
+- **能力按 gate 代码分割。** `capabilities/registry.ts` 此前 43 行全是静态 import，
+  gate 只决定「运行时是否注册」，不影响打包体积——`preset="basic"` 的接入方仍会下载
+  DragHandle（1000+ 行）、office-paste 流水线、search-replace 与全套 AI 扩展。
+  现在**默认 preset 关闭的能力一律 `await import()`**：table / video / outline / officePaste /
+  searchReplace / formatPainter / math / ai / notionBlocks / dragHandle / slashCommand。
+  同步地，`ToolbarNav` 与 `EditorEditChrome` 中由 gate 控制显隐的 15 个组件改为
+  `defineAsyncComponent`。主 chunk 366KB → 199KB（gzip 73.9 → 41.8KB，**−43%**）。
+- **`docx` / `file-saver` / `mammoth` / `katex` 标记为可选 peer 依赖**
+  （`peerDependenciesMeta.optional`）——它们只在 Word 导入导出与公式能力的动态 import 链路中使用，
+  不用这些能力的接入方无需安装。
+- 构建产物输出 sourcemap，便于接入方调试到库内部。
+- 移除无引用的 devDependencies：`rollup-plugin-obfuscator`、`@tiptap/extension-typography`。
+- `verify` 脚本改用 `test:coverage`，与 CI 保持一致。
+
+### Docs
+
+- **`ARCHITECTURE.md` 补 5 条架构不变量**（第 14 – 18 条）：能力按 gate 代码分割、
+  禁止模块级可变状态、HTML 入口惰性解析、URL 白名单单一入口、无障碍基线。
+  该文档是本仓库的实施依据，本次新增的约束必须写进去，否则文档与实现分叉。
+- `docs/api/ai-config.md` 补同页多实例语义；`docs/api/composables.md` 补两个无障碍 composable；
+  `docs/guide/getting-started.md` 补样式入口配对提示（含 `inline.css` 的 breaking 说明）；
+  `docs/features/feature-matrix.md` 说明 preset 同时决定打包体积并给出 gzip 数字。
+- 修正 `docs/features/media.md` 已失实的警告：媒体上下文条早已接入 i18n；
+  同时补充视频字幕属接入方责任的说明。
+- 补充压缩策略的实际行为说明：Vite 的 `vite:terser` 插件对 `build.lib && format === "es"`
+  直接跳过压缩，这是面向打包器的**有意设计**（保留换行与 `/*#__PURE__*/` 标注以便下游
+  tree-shake），Vue / React / Tiptap / Ant Design Vue 同样以未压缩 ESM 发布。CJS 产物正常压缩。
 
 ### Fixed
 
