@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-基于 Vue 3 + Tiptap 3 的富文本编辑器组件库（**v0.1.4**）。
+基于 Vue 3 + Tiptap 3 的富文本编辑器组件库（**v0.2.0**）。
 
 | 形态                | 引入路径                       | 适用场景                       |
 | ------------------- | ------------------------------ | ------------------------------ |
@@ -244,3 +244,32 @@ pnpm dev          # demo → http://localhost:9527（线上：https://yanivwang.
 pnpm docs:dev     # VitePress 文档（线上：https://yanivwang.github.io/yaniv-editor/）
 pnpm run verify   # 类型检查 + 测试 + Lint
 ```
+
+## 无障碍
+
+工具栏按钮均带 `aria-label`，切换类按钮带 `aria-pressed`，下拉触发器带
+`aria-haspopup` / `aria-expanded`。CI 中 `eslint-plugin-vuejs-accessibility` 零告警。
+
+两项仍需接入方负责：
+
+- **视频字幕** — 上传的媒体没有编辑器可感知的字幕轨道，请在 `uploadVideo` 返回的资源上
+  自行挂载 WebVTT `<track>`。
+- **文档语言** — 在宿主页面设置 `lang`，让屏幕阅读器选用正确的语音。
+
+## 安全
+
+编辑器对所有渲染的 URL 做白名单校验：链接（`http`/`https`/`mailto`/`tel`）、图片与视频
+（另允许 `blob:` 及类型匹配的 `data:`）、iframe 嵌入（仅 `http`/`https`，且带 `sandbox`）。
+传入的 HTML 在惰性文档中解析，脚本与内联事件处理器不会执行。
+
+**编辑器输出在入库与回显前必须由服务端再校验一次** —— 前端 schema 约束不能替代服务端清洗。
+AI 生产环境请使用 `storageMode: "proxy"`，让密钥留在后端。
+
+完整边界与漏洞报告方式见 [`SECURITY.md`](./SECURITY.md)。
+
+## 许可证
+
+[MIT](./LICENSE)。
+
+Yaniv Editor 派生自 [benngaihk/Tiptap-UI-Kit](https://github.com/benngaihk/Tiptap-UI-Kit)，
+上游以 MIT 协议发布。按许可证要求保留了双方版权声明，详见 [`NOTICE`](./NOTICE)。

@@ -1,0 +1,15 @@
+Yaniv Editor (@yanivjs/yaniv-editor)
+
+This product includes software originally developed as "Tiptap UI Kit"
+by benngaihk (https://github.com/benngaihk/Tiptap-UI-Kit), released under
+the MIT License.
+
+Yaniv Editor is a derivative work: the project was renamed and substantially
+re-architected from v0.1.0 onward (runtime profile pipeline, capability
+registry, session lifecycle, appearance system, i18n and AI modules).
+
+Copyright (c) 2026 benngaihk
+Copyright (c) 2026 YanivWang
+
+Both copyright notices are retained as required by the MIT License. See
+LICENSE for the full license text.

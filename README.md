@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Vue 3 + Tiptap 3 rich-text editor library (**v0.1.4**).
+Vue 3 + Tiptap 3 rich-text editor library (**v0.2.0**).
 
 | Shape               | Import                         | Use case                       |
 | ------------------- | ------------------------------ | ------------------------------ |
@@ -244,3 +244,37 @@ pnpm dev          # demo → http://localhost:9527 (live: https://yanivwang.gith
 pnpm docs:dev     # VitePress docs (live: https://yanivwang.github.io/yaniv-editor/)
 pnpm run verify   # typecheck + test + lint
 ```
+
+## Accessibility
+
+Toolbar controls expose `aria-label`, toggle buttons expose `aria-pressed`, and dropdown
+triggers expose `aria-haspopup` / `aria-expanded`. `eslint-plugin-vuejs-accessibility` runs
+in CI with zero warnings.
+
+Two things remain the integrator's responsibility:
+
+- **Video captions** — uploaded media has no caption track the editor can know about. Attach a
+  WebVTT `<track>` to the asset returned by your `uploadVideo` handler.
+- **Document language** — set `lang` on the host page so screen readers pick the right voice.
+
+## Security
+
+The editor validates every URL it renders: links (`http`/`https`/`mailto`/`tel`), images and
+video (plus `blob:` and type-matching `data:`), and iframe embeds (`http`/`https` only, rendered
+with `sandbox`). Incoming HTML is parsed in an inert document, so scripts and inline event
+handlers never execute.
+
+**Always re-validate editor output on the server** before persisting or re-rendering it — a
+client-side schema is not a substitute for server-side sanitisation. For AI, use
+`storageMode: "proxy"` in production so the key stays on your backend.
+
+See [`SECURITY.md`](./SECURITY.md) for the full boundary and for reporting a vulnerability.
+
+## License
+
+[MIT](./LICENSE).
+
+Yaniv Editor is a derivative work of
+[benngaihk/Tiptap-UI-Kit](https://github.com/benngaihk/Tiptap-UI-Kit), which was released under
+the MIT License. Both copyright notices are retained as the license requires — see
+[`NOTICE`](./NOTICE).

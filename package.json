@@ -1,7 +1,8 @@
 {
   "name": "@yanivjs/yaniv-editor",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor appearance with AI support",
+  "license": "MIT",
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -33,7 +34,11 @@
     "./inline.css": "./dist/inline.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "README.zh-CN.md"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -59,9 +64,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "vitest",
-    "verify": "pnpm run typecheck && pnpm run test && pnpm run lint && pnpm run lint:style && pnpm run format:check",
+    "verify": "pnpm run typecheck && pnpm run test:coverage && pnpm run lint && pnpm run lint:style && pnpm run format:check",
     "prepublishOnly": "pnpm build",
-    "release": "pnpm build && pnpm publish"
+    "release": "pnpm build && pnpm publish",
+    "test:coverage": "vitest run --coverage"
   },
   "lint-staged": {
     "*.{ts,vue,js,mjs,cjs}": "eslint --fix",
@@ -128,7 +134,6 @@
     "@tiptap/extension-task-list": "^3.7.1",
     "@tiptap/extension-text-align": "^3.0.0",
     "@tiptap/extension-text-style": "^3.0.0",
-    "@tiptap/extension-typography": "^3.7.2",
     "@tiptap/extension-underline": "^3.0.0",
     "@tiptap/extension-unique-id": "^3.13.0",
     "@tiptap/pm": "^3.7.2",
@@ -138,6 +143,8 @@
     "@types/katex": "^0.16.8",
     "@types/node": "^20.14.9",
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vitest/coverage-v8": "3.2.7",
+    "@vue/test-utils": "^2.4.6",
     "ant-design-vue": "^4.2.6",
     "docx": "^9.5.1",
     "eslint": "^9.39.4",
@@ -145,6 +152,7 @@
     "eslint-import-resolver-typescript": "^3.10.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-vue": "^10.9.0",
+    "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "file-saver": "^2.0.5",
     "globals": "^17.5.0",
     "husky": "^9.1.7",
@@ -156,7 +164,6 @@
     "mammoth": "^1.11.0",
     "postcss-html": "^1.8.1",
     "prettier": "^3.8.3",
-    "rollup-plugin-obfuscator": "^1.1.0",
     "sass-embedded": "^1.96.0",
     "stylelint": "^17.9.0",
     "stylelint-config-html": "^1.1.0",
@@ -172,7 +179,7 @@
     "vite": "^6.0.3",
     "vite-plugin-dts": "^4.3.0",
     "vitepress": "^1.6.4",
-    "vitest": "^3.2.4",
+    "vitest": "^3.2.7",
     "vue": "^3.5.13",
     "vue-eslint-parser": "^10.4.0",
     "vue-router": "^4.6.4",
@@ -224,5 +231,19 @@
   "engines": {
     "node": ">=20.19.5",
     "pnpm": ">=10.17.0"
+  },
+  "peerDependenciesMeta": {
+    "docx": {
+      "optional": true
+    },
+    "file-saver": {
+      "optional": true
+    },
+    "mammoth": {
+      "optional": true
+    },
+    "katex": {
+      "optional": true
+    }
   }
 }
