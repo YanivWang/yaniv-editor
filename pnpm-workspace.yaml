@@ -1,0 +1,9 @@
+# pnpm 11 起，依赖的安装脚本默认不执行，需在此显式登记（pnpm 10 的 onlyBuiltDependencies）。
+# 下列四个包均随 optionalDependencies 分发预编译二进制（@esbuild/*、@parcel/watcher-*、
+# @unrs/resolver-binding-*），安装脚本只是「二进制缺失时回退自建」或纯提示，无需执行。
+# 这也是 pnpm 10 时期的既有行为（当时无配置即全部忽略），CI 一直是绿的。
+allowBuilds:
+  "@parcel/watcher": false
+  core-js: false
+  esbuild: false
+  unrs-resolver: false
