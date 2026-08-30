@@ -45,3 +45,26 @@ export function normalizeSafeMediaUrl(rawUrl: string, kind: "image" | "video"): 
     return null;
   }
 }
+
+const ALLOWED_FRAME_PROTOCOLS = new Set(["https:", "http:"]);
+
+/**
+ * iframe `src` 专用校验：仅允许 http/https。
+ *
+ * 不能复用 `normalizeSafeUrl`——它放行 `mailto:` / `tel:`，这两者对 iframe 无意义；
+ * 更关键的是 iframe 会创建新的 browsing context，协议白名单必须比链接更严格。
+ * 且此处**不做** `https://` 自动补全：嵌入源必须由内容显式给出完整绝对地址，
+ * 避免把 `javascript:alert(1)` 这类串意外补成看似合法的 URL。
+ */
+export function normalizeSafeFrameUrl(rawUrl: string): string | null {
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return null;
+
+  try {
+    const parsed = new URL(trimmed);
+    if (!ALLOWED_FRAME_PROTOCOLS.has(parsed.protocol)) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}

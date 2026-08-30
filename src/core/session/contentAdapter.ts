@@ -12,10 +12,20 @@ export interface SetContentOptions {
 
 const EMPTY_DOC_HTML = "<p></p>";
 
+/**
+ * 用惰性文档（inert document）解析 HTML 字符串。
+ *
+ * 不能用 `document.createElement("div").innerHTML = html`：那样建出的节点属于**当前活动
+ * 文档**，`<img src=x onerror=...>` / `<svg onload=...>` 的事件处理器会立即执行，外链资源
+ * 也会真实发起请求。Inline Editor 的 `v-model:content` 直接接收宿主传入的 HTML 字符串
+ * （评论 / 表单等 UGC 场景），该路径因此构成存储型 XSS 面。
+ *
+ * `DOMParser.parseFromString(..., "text/html")` 产出的文档没有 browsing context
+ * （`ownerDocument.defaultView === null`）：脚本不执行、事件处理器不触发、资源不加载。
+ * 与 Tiptap 官方 `elementFromString` 的实现保持一致。
+ */
 function htmlToElement(html: string): HTMLElement {
-  const el = document.createElement("div");
-  el.innerHTML = html;
-  return el;
+  return new window.DOMParser().parseFromString(`<body>${html}</body>`, "text/html").body;
 }
 
 function emptyDocNode(schema: Schema): ProseMirrorNode {

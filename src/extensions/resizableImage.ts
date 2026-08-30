@@ -9,6 +9,8 @@
 
 import Image from "@tiptap/extension-image";
 
+import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
+
 export interface ResizableImageOptions {
   HTMLAttributes?: Record<string, any>;
   inline?: boolean;
@@ -32,12 +34,27 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
 
   addAttributes() {
     // 创建尺寸属性的通用配置
+    /**
+     * 尺寸属性。两处坑：
+     *
+     * 1. `renderHTML` 把尺寸写成内联 `style`（`width: 200px`）而非 `width` 属性，
+     *    但解析只读属性 → **每次 HTML 往返都会丢尺寸**。Inline Editor 的
+     *    `v-model:content` 是 HTML 往返，图片尺寸会在每次同步后归零。
+     *    这里补上从 `style` 读取的分支。
+     * 2. `parseInt("abc")` 得到 `NaN`，而 `NaN` 是 truthy 之外的坑：旧写法
+     *    `value ? parseInt(value) : null` 会把 `NaN` 存进文档，破坏后续缩放计算；
+     *    `getJSON()` 又会把 `NaN` 序列化成 `null`，导致宿主看到的值与文档实际值不一致。
+     */
+    const parseSize = (raw: string | null | undefined): number | null => {
+      if (!raw) return null;
+      const parsed = parseInt(raw, 10);
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+    };
+
     const createSizeAttribute = (name: "width" | "height") => ({
       default: null,
-      parseHTML: (element: HTMLElement) => {
-        const value = element.getAttribute(name);
-        return value ? parseInt(value, 10) : null;
-      },
+      parseHTML: (element: HTMLElement) =>
+        parseSize(element.getAttribute(name)) ?? parseSize(element.style[name]),
       renderHTML: (attributes: Record<string, any>) => {
         return attributes[name] ? { [name]: attributes[name] } : {};
       },
@@ -45,6 +62,19 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
 
     return {
       ...this.parent?.(),
+      /**
+       * 节点层强制走媒体 URL 白名单——理由同 `video.ts`：
+       * UI 上传路径之外还有 `initialContent` / 粘贴 / 宿主直接插入三条绕过途径。
+       */
+      src: {
+        default: null,
+        parseHTML: (element: HTMLElement) =>
+          normalizeSafeMediaUrl(element.getAttribute("src") ?? "", "image"),
+        renderHTML: (attributes: Record<string, any>) => {
+          const safe = normalizeSafeMediaUrl(String(attributes.src ?? ""), "image");
+          return safe ? { src: safe } : {};
+        },
+      },
       width: createSizeAttribute("width"),
       height: createSizeAttribute("height"),
       align: {

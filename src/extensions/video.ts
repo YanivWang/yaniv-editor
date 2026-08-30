@@ -6,6 +6,8 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { Plugin, NodeSelection, TextSelection } from "@tiptap/pm/state";
 
+import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
+
 export interface VideoOptions {
   HTMLAttributes: Record<string, any>;
   inline: boolean;
@@ -48,6 +50,18 @@ export const Video = Node.create<VideoOptions>({
     return {
       src: {
         default: null,
+        /**
+         * 节点层强制走媒体 URL 白名单。
+         *
+         * UI 上传路径（`VideoUpload.vue` / `mediaUpload.ts`）已经校验过，但内容还可能来自
+         * `initialContent` 的 JSON/HTML、粘贴，或宿主直接调 `setVideo()`——那些路径绕开 UI。
+         * schema 是渲染前的最后一道关，与 ARCHITECTURE.md 不变量 17「URL 白名单单一入口」对齐。
+         */
+        parseHTML: (element) => normalizeSafeMediaUrl(element.getAttribute("src") ?? "", "video"),
+        renderHTML: (attributes) => {
+          const safe = normalizeSafeMediaUrl(String(attributes.src ?? ""), "video");
+          return safe ? { src: safe } : {};
+        },
       },
       width: {
         default: null,
