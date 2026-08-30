@@ -37,9 +37,24 @@
 - **选中后**：视频上下文条（`VideoToolbar`）— 预览播放（Modal）、删除
 - 预览模式（`mode="preview"`）下视频仍可播放
 
-::: warning 媒体上下文条尚未接入 i18n
-`ImageToolbar` / `VideoToolbar` 的按钮 `title`（「预览」「删除图片」「左对齐」等）是硬编码中文，没有走 `useEditorT()`。设 `locale="en-US"` 时这些 tooltip 仍显示中文。
+::: tip 媒体上下文条已接入 i18n
+`ImageToolbar` / `VideoToolbar` 的按钮文案走 `useEditorT()`，随 `locale` 切换。
 :::
+
+## 无障碍：视频字幕
+
+`VideoToolbar` 的预览与正文中的 `<video>` **不会**自动生成 `<track>` 字幕轨道——编辑器
+无从获知上传资源是否有字幕，而挂一个空轨道对屏幕阅读器反而是噪音。
+
+字幕属于内容侧责任：请在 `uploadVideo` 返回的资源上自行提供 WebVTT，并在你的播放场景中挂载。
+
+```ts
+const uploadVideo = async (file: File) => {
+  const { videoUrl } = await api.upload(file);
+  // 字幕与视频一同返回，由宿主页面在自己的播放器上挂 <track>
+  return videoUrl;
+};
+```
 
 ## 图库
 

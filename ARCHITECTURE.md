@@ -2,7 +2,7 @@
 
 Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
 
-> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；v0.1.1 – v0.1.4 的增量变更（大纲默认收起、Ant Design Vue 局部注册、z-index 治理与 overlay portal 收口、tsconfig 路径修复等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
+> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；「架构不变量」第 14 – 18 条为 v0.1.4 之后新增（代码分割、多实例隔离、HTML 惰性解析、URL 白名单、无障碍基线），同样具备约束力。v0.1.1 – v0.1.4 的增量变更（大纲默认收起、Ant Design Vue 局部注册、z-index 治理与 overlay portal 收口、tsconfig 路径修复等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
 
 ## 实施约定
 
@@ -1266,6 +1266,11 @@ src/appearance/
 11. **chromeCoupled DOM 注入** — outline 滚动容器在 Workspace mount 后经 `editor.commands.bindOutlineScrollParent(el)` 注入，写读统一走 `ctx.outline`（实例作用域，禁止模块级单例）；`TableOfContents` 的 `scrollParent` 必须是 getter（`ctx.outline.scrollParent() ?? window`），**禁止**在 configure 求值阶段直接取值。
 12. **AI config 动态化** — AI 扩展的所有运行时配置（apiKey / model / endpoint / timeout）必须通过 `getXxx: () => ctx.aiConfig()?.xxx` getter 形式声明，**禁止**在 configure 阶段静态取值。
 13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Ant Design Dropdown/Select/Popover/Modal/Tooltip、自建 Toast/Notice 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo / `getPopupContainer` / `getContainer` 回退到 `document.body`（HTML5 drag preview 与隐藏 file input 除外）；**禁止** Ant Design 静态 `message` / `notification`（全局单例 + body）。`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` 读取 portal token，**禁止** `:root` fallback。统一入口：`useOverlayMountTarget` / `useOverlayBubbleMenu`（`src/composables/useOverlayMount.ts`）、`useOverlayFeedback` / `showOverlayToast` / `showOverlayNotice`（`src/core/overlayFeedback.ts`）。
+14. **能力按 gate 代码分割** — `capabilities/registry.ts` 中**默认 preset（`basic`）关闭的能力一律 `await import()`**，只有 `basic` 已开启的（core / image）才允许静态 import。gate 必须同时决定「运行时是否注册」与「是否进入 bundle」；否则 `preset` / `features` 只是运行时开关，接入方仍要下载全部能力。同理，`ToolbarNav` / `EditorEditChrome` 中由 gate 控制显隐的组件必须用 `defineAsyncComponent`。CI 有产物断言守着（主 chunk 不得出现 `dragHandle` / `slashCommand` / `searchReplace` / AI 适配器的特征串）。
+15. **禁止模块级可变状态** — 库需支持同页多实例，`let x = ...` 形式的模块级配置会让实例互相覆盖。所有实例相关状态走 provide/inject 或 **owner 键控注册表**（每实例一个 `Symbol`）。历史事故：outline `scrollParent`、AI `hostConfig`（未传 `ai-config` 的实例会静默复用另一实例的密钥）、`aiSuggestionManager` 的构建期 `bindLocale`。无 owner 的查询在存在多个登记方时必须**显式返回 null 并告警**，不得任选其一——任选其一正是缺陷本身。
+16. **HTML 入口惰性解析** — 传入的 HTML 字符串必须经 `DOMParser.parseFromString(..., "text/html")` 解析（惰性文档，无 browsing context）。**禁止** `element.innerHTML = html`：那样节点建在活动文档中，`<img onerror>` / `<svg onload>` 会立即执行、外链资源会真实请求。Inline 的 `v-model:content` 直接接收宿主 HTML，是 UGC 场景的存储型 XSS 面。
+17. **URL 白名单单一入口** — 链接走 `normalizeSafeUrl`、图片/视频走 `normalizeSafeMediaUrl`、iframe 走 `normalizeSafeFrameUrl`（比链接更严格：仅 http/https，且不做 `https://` 自动补全）。节点属性（如 `embed.provider`）**不构成安全边界**——它可由粘贴的 JSON 直接指定，域名判断只是选择渲染形态，真正的边界永远是白名单函数。iframe 必须带 `sandbox`，`allow` 按需最小化。
+18. **无障碍基线** — 交互元素一律用原生语义标签（`div` + `@click` 会被 `eslint-plugin-vuejs-accessibility` 拦下，例外须写明理由）；图标按钮必须有 `aria-label`（`a-tooltip` 的 `title` 只进浮层，不构成可访问名称）；切换按钮用 `aria-pressed`，下拉用 `aria-haspopup` / `aria-expanded`。`role="toolbar"` 按 WAI-ARIA APG 收敛为**单一 tab stop**，内部方向键移动（`useRovingTabindex`）。焦点留在正文的弹层（斜杠命令、提及）用 `listbox` / `option` + 正文上的 `aria-activedescendant`（`useVirtualFocusPopup`），关闭时必须清除引用。容器上监听子元素聚焦须用会冒泡的 `focusin` / `focusout`，`focus` / `blur` 不冒泡。
 
 ---
 

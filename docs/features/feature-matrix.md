@@ -57,3 +57,19 @@
 - `/inline-editor` — Inline toolbar 开关
 - `/inline-compose` — 自定义 toolbar 插槽
 - `/multi-instance` — 多实例 locale / appearance 隔离
+
+## preset 同时决定打包体积
+
+`preset` / `features` 关闭的能力**不会进入你的产物**：`basic` 默认关闭的能力在 capability registry 中
+全部走动态 `import()`，对应的工具栏组件也是 `defineAsyncComponent`。
+
+| 入口         | gzip 后 |
+| ------------ | ------- |
+| 主 chunk     | ~42 KB  |
+| `style.css`  | ~18 KB  |
+| `inline.css` | ~9 KB   |
+
+table / video / math / outline / 查找替换 / 格式刷 / Office 粘贴 / AI / Notion 块 / 拖拽手柄 /
+斜杠命令各自是独立 chunk，只有对应 gate 打开时才加载。
+
+因此**用 `basic` 就真的只下载 `basic` 需要的代码**——这一点由 CI 的产物断言守着。

@@ -79,6 +79,22 @@ import {
 
 修改 `aiConfig.model` 等字段后，**下次 AI 请求**使用新值，无需重建 session（扩展内 getter 读取）。
 
+## 同页多实例
+
+宿主配置按**实例**登记，互不覆盖：实例 A 传 `ai-config`、实例 B 不传时，B 不会复用 A 的密钥与端点。
+
+`getHostAiConfig()` / `isHostAiManaged()` 接受可选的 `owner`（每个编辑器实例内部持有的 `Symbol`）：
+
+| 调用方式                   | 行为                                     |
+| -------------------------- | ---------------------------------------- |
+| `getHostAiConfig(owner)`   | 返回该实例的配置，未登记则 `null`        |
+| `getHostAiConfig()`        | 仅**一个**实例登记时返回它（单实例场景） |
+| `getHostAiConfig()` 多实例 | 返回 `null` 并在控制台告警               |
+
+多实例下无 `owner` 的查询没有正确答案，因此显式失败而不是任选一个——旧版本正是"任选一个"导致跨实例串用密钥。
+
+AI 扩展发起的请求不走这条路径：它们通过实例作用域的 `ctx.aiConfig()` getter 取值，始终正确。
+
 ## 相关
 
 - [AI 辅助](../features/ai.md)

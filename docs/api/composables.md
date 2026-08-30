@@ -106,6 +106,26 @@ import {
 - `parseContentToDoc(content, schema)`：把 HTML 或 JSON 解析成合法的 ProseMirror doc，解析失败回退空段落。
 - `BYPASS_GUARD_META`：打在事务 meta 上以绕过 `withTransactionGuard`；`ContentAdapter.setContent` 内部已自动打上。
 
+## 无障碍
+
+```ts
+import { useRovingTabindex, useVirtualFocusPopup } from "@yanivjs/yaniv-editor";
+```
+
+| Composable             | 用途                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| `useRovingTabindex`    | 把一个容器收敛为 WAI-ARIA APG 的单一 tab stop，内部用方向键 / Home / End 移动                     |
+| `useVirtualFocusPopup` | 焦点留在正文的弹层：把 `aria-expanded` / `aria-controls` / `aria-activedescendant` 挂到编辑器正文 |
+
+`useRovingTabindex(containerRef)` 会用 `MutationObserver` 重扫容器——按需加载的工具按钮在首帧尚未挂载。输入型控件（`input` / `textarea` / `contenteditable` / `role="combobox"`）内的方向键不劫持，带修饰键的方向键也不拦截。
+
+自建工具栏时可直接复用：
+
+```ts
+const toolbarRef = ref<HTMLElement | null>(null);
+useRovingTabindex(toolbarRef);
+```
+
 ## 国际化
 
 ```ts

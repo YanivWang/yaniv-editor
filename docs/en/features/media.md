@@ -37,9 +37,25 @@ Upload callback changes **do not** trigger session rebuild; extensions read the 
 - **When selected**: video context bar (`VideoToolbar`) — preview playback (modal), delete
 - Videos remain playable in preview mode (`mode="preview"`)
 
-::: warning Media context bars are not localized yet
-Button `title` attributes in `ImageToolbar` / `VideoToolbar` ("预览", "删除图片", "左对齐", …) are hard-coded Chinese and do not go through `useEditorT()`. With `locale="en-US"` these tooltips still render in Chinese.
+::: tip Media context bars are localised
+`ImageToolbar` / `VideoToolbar` labels go through `useEditorT()` and follow `locale`.
 :::
+
+## Accessibility: video captions
+
+The `<video>` elements rendered by `VideoToolbar` and in the document do **not** get an
+automatic `<track>`. The editor cannot know whether an uploaded asset ships captions, and an
+empty track is noise for screen readers.
+
+Captions are a content-side responsibility: return a WebVTT alongside the asset from your
+`uploadVideo` handler and attach it in your own playback surface.
+
+```ts
+const uploadVideo = async (file: File) => {
+  const { videoUrl } = await api.upload(file);
+  return videoUrl;
+};
+```
 
 ## Gallery
 

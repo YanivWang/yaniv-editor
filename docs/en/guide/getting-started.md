@@ -55,6 +55,17 @@ const html = ref("<p>Hello Yaniv</p>");
 </template>
 ```
 
+::: warning Pair the stylesheet with the component entry
+`style.css` is for `YanivEditor` (Full); `inline.css` is for `YanivInlineEditor` (Inline).
+
+Since v0.1.4, `inline.css` **no longer bundles the full editor stylesheet**. It previously
+concatenated all of `style.css`, so the inline artifact (139KB) was larger than the full one
+(114KB) — at odds with the inline entry's lightweight comment/form use case. It is now 56KB.
+
+If a page renders both shapes, import both files. If you imported only `inline.css` but render
+the Full Editor, switch to `style.css`.
+:::
+
 ## AI Subpackage
 
 ```ts

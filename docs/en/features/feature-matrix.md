@@ -57,3 +57,19 @@ After running `pnpm dev`, visit [http://localhost:9527](http://localhost:9527):
 - `/inline-editor` — Inline toolbar toggles
 - `/inline-compose` — custom toolbar slot
 - `/multi-instance` — multi-instance locale / appearance isolation
+
+## Presets decide bundle size, not just runtime registration
+
+Capabilities disabled by `preset` / `features` **never enter your bundle**. Everything the
+`basic` preset turns off is loaded through a dynamic `import()` in the capability registry, and
+the matching toolbar components are `defineAsyncComponent`.
+
+| Entry        | gzipped |
+| ------------ | ------- |
+| main chunk   | ~42 KB  |
+| `style.css`  | ~18 KB  |
+| `inline.css` | ~9 KB   |
+
+table / video / math / outline / find-replace / format painter / Office paste / AI / Notion
+blocks / drag handle / slash command each land in their own chunk, fetched only when the gate
+is on. A CI assertion keeps them out of the main chunk.

@@ -55,6 +55,15 @@ const html = ref("<p>Hello Yaniv</p>");
 </template>
 ```
 
+::: warning 样式入口必须与组件入口配对
+`style.css` 供 `YanivEditor`（Full），`inline.css` 供 `YanivInlineEditor`（Inline）。
+
+自 v0.1.4 之后，`inline.css` **不再包含 Full Editor 的全量样式**（此前它把 `style.css` 整体拼了进去，
+产物 139KB 反而大于 full 的 114KB，与 Inline「评论 / 表单轻量场景」的定位冲突；现已降至 56KB）。
+
+若你在同一页面同时用两种形态，两个样式文件都要引；若只引了 `inline.css` 却渲染 Full Editor，请改引 `style.css`。
+:::
+
 ## AI 子包
 
 ```ts
