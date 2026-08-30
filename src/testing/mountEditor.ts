@@ -11,7 +11,16 @@ import { nextTick } from "vue";
 import type { VueWrapper } from "@vue/test-utils";
 import type { Component } from "vue";
 
-const READY_TIMEOUT_MS = 10_000;
+/**
+ * 就绪预算要**贴着** `vitest.config.ts` 的 `testTimeout`（20s）留一点余量，而不是取它的一半。
+ *
+ * 轮询一旦就绪就立刻返回，因此健康机器上这个值多大都不影响耗时；它只在机器被别的负载
+ * 挤占时起作用。此前是 10s——比 testTimeout 少一半，于是繁忙机器上编辑器还在解析
+ * 十几个门控 chunk 时轮询就先放弃了，明明还剩 10s 预算没用。
+ *
+ * 放宽不会掩盖任何回归：真的挂死仍然会失败，只是从 10s 变成 18s，且报错里照样带当前 DOM。
+ */
+const READY_TIMEOUT_MS = 18_000;
 
 /**
  * jsdom 没有布局引擎，`view.coordsAtPos()` 会在 `getClientRects` 上抛错，

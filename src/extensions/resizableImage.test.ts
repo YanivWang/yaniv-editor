@@ -67,6 +67,28 @@ describe("src 白名单（节点层）", () => {
     expect(e.getHTML()).not.toContain("javascript:");
   });
 
+  /**
+   * 只断言 `getHTML()` 不够：`renderHTML` 那一侧的白名单会把输出洗干净，
+   * 于是 `parseHTML` 侧的白名单即使整个被删掉，getHTML 断言照样是绿的
+   * （实测：变异掉 parseHTML 校验后 `getHTML()` 仍是 `<p><img></p>`）。
+   * 但危险值这时已经进了文档 attrs，`getJSON()` 会原样交给宿主——
+   * 宿主若自行按 JSON 渲染就直接中招。因此这里必须断言**节点属性**。
+   */
+  it.each([
+    "javascript:alert(1)",
+    "vbscript:msgbox(1)",
+    "data:text/html,<script>alert(1)</script>",
+  ])("HTML 解析后危险 src %s 不得进入 attrs / getJSON", (src) => {
+    const e = mount(`<p><img src="${src}"></p>`);
+    expect(imageNode(e)?.src).toBeNull();
+    expect(JSON.stringify(e.getJSON())).not.toContain(src);
+  });
+
+  it("HTML 解析的合法 src 正常落到 attrs", () => {
+    const e = mount('<p><img src="https://cdn.example.com/a.png"></p>');
+    expect(imageNode(e)?.src).toBe("https://cdn.example.com/a.png");
+  });
+
   it("视频类型的 data: 不能用于图片节点", () => {
     const e = mount();
     e.commands.setImage({ src: "data:video/mp4;base64,AAA" });

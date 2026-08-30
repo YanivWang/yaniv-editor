@@ -198,15 +198,37 @@ describe("locale 会话级绑定", () => {
     expect(() => aiSuggestionManager.bindLocale(undefined)).not.toThrow();
   });
 
-  it("不同会话可绑定不同语言解析器", () => {
-    const zh = vi.fn((k: string) => `zh:${k}`);
-    const en = vi.fn((k: string) => `en:${k}`);
+  /**
+   * 这里必须断言**弹层里真的用上了绑定的解析器**。
+   *
+   * 早先的写法只有 `expect(en).toBeDefined()` / `expect(zh).toBeDefined()`——断言的是
+   * 两个刚在本用例里创建的 `vi.fn()` 存在，恒真；把 `bindLocale` 整个改成忽略入参
+   * （退回构建期绑定的旧语义，也就是 367dcb9 要修的多实例串用）测试照样全绿。
+   */
+  it("绑定的解析器真的用于渲染弹层文案", () => {
+    const e = mount();
+    const zh = vi.fn((key: string) => `zh:${key}`);
+
+    aiSuggestionManager.bindLocale(zh);
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
+
+    const portal = document.querySelector(".yaniv-editor__overlay-portal");
+    expect(portal?.textContent).toContain("zh:editor.");
+    expect(zh).toHaveBeenCalled();
+  });
+
+  it("后绑定的解析器覆盖先前的（会话互斥）", () => {
+    const e = mount();
+    const zh = vi.fn((key: string) => `zh:${key}`);
+    const en = vi.fn((key: string) => `en:${key}`);
 
     aiSuggestionManager.bindLocale(zh);
     aiSuggestionManager.bindLocale(en);
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
 
-    // 后绑定的生效——会话互斥，这是预期行为
-    expect(en).toBeDefined();
-    expect(zh).toBeDefined();
+    const portal = document.querySelector(".yaniv-editor__overlay-portal");
+    expect(portal?.textContent).toContain("en:editor.");
+    expect(portal?.textContent).not.toContain("zh:editor.");
+    expect(zh).not.toHaveBeenCalled();
   });
 });

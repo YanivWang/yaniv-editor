@@ -95,6 +95,33 @@ describe("工具栏 roving tabindex", () => {
     expect(document.activeElement).toBe(probe);
   });
 
+  /**
+   * 门控工具按钮是 `defineAsyncComponent`，chunk 解析完成才挂进 DOM，首帧拿不到完整列表；
+   * 所以 `useRovingTabindex` 用 `MutationObserver` 重扫。这条链路此前无测试覆盖：
+   * 把 `observer.observe(...)` 整个短路掉，原有 6 个用例依然全绿——因为 `mountEditor`
+   * 会一直等到全部异步组件就绪才返回断言，掩盖了"晚到的按钮"这个真实场景。
+   *
+   * 没有重扫的后果不是样式问题：晚挂载的按钮拿不到 `tabindex="-1"`，
+   * 每一个都会变成独立 tab stop，单一 tab stop 直接失效。
+   */
+  it("挂载后新增的控件也会被纳入 roving（异步按钮晚到）", async () => {
+    const wrapper = await mountEditor(YanivEditor, { mode: "edit", preset: "full" });
+    const toolbar = wrapper.find('[role="toolbar"]').element as HTMLElement;
+
+    expect(toolbar.querySelectorAll('[tabindex="0"]').length).toBe(1);
+
+    // 模拟异步组件在首帧之后才挂进工具栏
+    const late = document.createElement("button");
+    late.textContent = "晚到的按钮";
+    toolbar.appendChild(late);
+
+    // MutationObserver 回调是微任务，等一拍
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(late.getAttribute("tabindex")).toBe("-1");
+    expect(toolbar.querySelectorAll('[tabindex="0"]').length).toBe(1);
+  });
+
   it("带修饰键的方向键不拦截（留给宿主快捷键）", async () => {
     const wrapper = await mountEditor(YanivEditor, { mode: "edit", preset: "full" });
     const toolbar = wrapper.find('[role="toolbar"]').element as HTMLElement;
