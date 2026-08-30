@@ -63,21 +63,23 @@ test.describe("Overlay portal & z-index", () => {
   test("editor modal mounts inside overlay portal", async ({ page }) => {
     const errors = attachPageDiagnostics(page);
 
-    // 图库按钮打开 Modal（title 中英均可）
+    // 图库按钮打开 Modal。
+    // 注意：不能用 `count() === 0` 做分支——count() 是瞬时快照、不会自动等待，
+    // 而门控工具按钮是 defineAsyncComponent 按需加载的，首帧可能尚未挂载。
+    // 这里用一个能同时命中图标与 aria-label（中英）的合并选择器，交给 Playwright 自动等待。
     const galleryBtn = page
-      .locator(".yaniv-editor .ye-toolbar-button")
-      .filter({ has: page.locator(".anticon-appstore, .anticon-AppstoreOutlined") })
+      .locator(
+        [
+          ".yaniv-editor .ye-toolbar-button:has(.anticon-appstore)",
+          ".yaniv-editor .ye-toolbar-button:has(.anticon-AppstoreOutlined)",
+          '.yaniv-editor .ye-toolbar-button[aria-label*="图库"]',
+          '.yaniv-editor .ye-toolbar-button[aria-label*="Gallery"]',
+        ].join(", "),
+      )
       .first();
 
-    if ((await galleryBtn.count()) === 0) {
-      // fallback：通过 title 属性
-      await page
-        .locator('.yaniv-editor [title*="图库"], .yaniv-editor [title*="Gallery"]')
-        .first()
-        .click();
-    } else {
-      await galleryBtn.click();
-    }
+    await expect(galleryBtn).toBeVisible({ timeout: 15_000 });
+    await galleryBtn.click();
 
     const modal = page.locator(".yaniv-editor__overlay-portal .ant-modal-wrap").first();
     await expect(modal).toBeVisible({ timeout: 10_000 });
