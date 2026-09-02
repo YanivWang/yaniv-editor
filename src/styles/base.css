@@ -8,6 +8,38 @@
  * 各处动画都在自己的样式文件里就地定义（如 `block-picker-fade-in`）。
  */
 
+/* ========== 文本选中 ========== */
+
+/*
+ * `::selection` 不继承，必须靠后代选择器覆盖编辑器里的每个元素，
+ * 所以要同时写「根节点自身」和「根节点后代」两条。
+ *
+ * 用 `background-color` 而不是 `background` shorthand：规范只保证
+ * `::selection` 认得 color / background-color / text-decoration / text-shadow
+ * 这几个属性，shorthand 不在其列。
+ *
+ * 只改背景、不设 `color`：压掉文字色会把代码块的语法高亮、链接色、
+ * AI 高亮一起抹平。半透明底色下文字保持原色，实测六种外观 × 明暗组合的
+ * 选中文字对比度 7.08~13.92，全部远超 WCAG AA 的 4.5（取值依据见 variables.css）。
+ */
+.yaniv-editor::selection,
+.yaniv-editor ::selection {
+  background-color: var(--ye-selection);
+}
+
+/*
+ * 光标色。`--ye-caret` 早就按不变量 26 的形状 C 分层声明好了（`:root`、
+ * `.yaniv-editor` 实例作用域、深色段各一份，值都是 `var(--ye-primary)`），
+ * 却一直没有任何规则读它——「配了值却没写规则」，与选中色同型。
+ *
+ * 特异性 (0,2,0)，低于 document-layout.css 里
+ * `[data-phase="preview"] .ProseMirror { caret-color: transparent }` 的 (0,4,0)，
+ * 预览态隐藏光标的行为不受影响；base.css 的导入顺序也在它之前。
+ */
+.yaniv-editor .ProseMirror {
+  caret-color: var(--ye-caret);
+}
+
 /* ========== 响应式断点 ========== */
 @media (width <= 768px) {
   :root {

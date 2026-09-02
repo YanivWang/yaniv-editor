@@ -38,6 +38,7 @@
   --ye-radius-lg: 4px;
   --ye-primary: #0078d4;
   --ye-primary-hover: #106ebe;
+  --ye-selection: rgb(0 120 212 / 30%);
   --ye-code-bg: #f4f4f4;
   --ye-code-text: #333333;
   --ye-blockquote-border: #d4d4d4;
@@ -113,15 +114,20 @@
   /*
    * Word 蓝在深色下保持不变。
    *
-   * 这三条对渲染其实没有影响——上面浅色段的 `.yaniv-editor.appearance-word`（0,2,0）
+   * 前两条对渲染没有影响——上面浅色段的 `.yaniv-editor.appearance-word`（0,2,0）
    * 本就压过全局的 `[data-color-mode="dark"]`（0,1,0）。写出来是为了**声明意图**：
    * 全局深色段确实给这几个 token 备了另一套值（`--ye-primary: #4c88ff` 等），
    * 本外观是主动不要。`darkTokenAliases.test.ts` 的形状 A 要求这种情况必须显式表态，
    * 否则「浅色段悄悄盖住深色值」和「有意保持浅色值」在代码里长得一模一样——
    * `--ye-code-text` 就是前者，深色下行内代码 `#333` 压在 `#2d2d2d` 上根本看不见。
+   *
+   * `--ye-selection` 不同：色相同样保持 Word 蓝，但**透明度必须换成深色档的 40%**
+   * （浅色档是 30%）。同一个半透明蓝叠在 `#1e1e1e` 上比叠在白底上弱得多，
+   * 30% 时选中区几乎看不出来。本段选择器是 (0,3,0)，确实压过浅色段。
    */
   --ye-primary: #0078d4;
   --ye-primary-hover: #106ebe;
+  --ye-selection: rgb(0 120 212 / 40%);
 }
 
 .yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h2,

@@ -13,6 +13,19 @@
   --ye-primary-hover: #1456f0;
   --ye-primary-light: rgb(51 112 255 / 10%);
 
+  /*
+   * 文本选中底色：主色的半透明版，**只给背景、不动文字颜色**。
+   * 压掉文字色会连代码块的语法高亮、链接色、AI 高亮一起抹平，
+   * 而半透明叠加下文字仍是它原本的颜色，对比度也够（见下）。
+   * 每套外观都要跟着自己的 `--ye-primary` 配一份（notion / word 各自覆盖）：
+   * 写成 `color-mix(… var(--ye-primary) …)` 更省事，但构建 target 是
+   * chrome105 / safari16 / firefox110，都低于 color-mix 的支持线。
+   * 透明度：亮色 30% / 深色 40%。深色底上同样的半透明色看起来更弱，要给得更足。
+   * 实测（WCAG）六种组合的选中文字对比度 7.08~13.92，全部远超 AA 的 4.5；
+   * 真正卡住取值的是「选中背景 vs 正常背景」的可辨识度，30/40% 下为 1.45~1.97。
+   */
+  --ye-selection: rgb(51 112 255 / 30%);
+
   /* ===== Semantic ===== */
   --ye-danger: #ef4444;
   --ye-danger-bg: #fef2f2;
@@ -207,6 +220,7 @@
   --ye-primary: #4c88ff;
   --ye-primary-hover: #6b9bff;
   --ye-primary-light: rgb(76 136 255 / 15%);
+  --ye-selection: rgb(76 136 255 / 40%);
   --ye-danger: #f87171;
   --ye-danger-bg: #3f1d1d;
   --ye-bg: #1a1a1a;

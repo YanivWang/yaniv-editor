@@ -30,6 +30,13 @@ const TOKEN_VAR_USE = /var\(\s*(--ye-[\w-]+)/g;
 /** JS/TS 里 `el.style.setProperty("--ye-x", …)` / `getPropertyValue("--ye-x")` 一类 */
 const TOKEN_STRING_USE = /["'`](--ye-[\w-]+)["'`]/g;
 
+/** 块注释与行注释都掩成等长空白，保持后续正则的偏移量不变 */
+function maskComments(text: string): string {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => " ".repeat(m.length))
+    .replace(/\/\/[^\n]*/g, (m) => " ".repeat(m.length));
+}
+
 function collectFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
@@ -47,23 +54,36 @@ export function findUnconsumedTokens(files: { path: string; text: string }[]): s
   const consumed = new Set<string>();
 
   for (const { path, text } of files) {
-    // 测试文件只当消费方，不当声明方：护栏自检里的假 token 不该被算成违规
-    const isTest = path.endsWith(".test.ts");
+    /**
+     * 测试文件**既不当声明方、也不当消费方**。
+     *
+     * 不当声明方是为了让护栏自检里的假 token（`--ye-dead` 等）不被算成违规。
+     * 不当消费方是后补的：一个 token 只要在**任何**测试里被 `var()` 提到——哪怕只是
+     * 写在断言的正则字符串里——就会被永久判成"有人用"，那正是本护栏要抓的死 token
+     * 的伪装。实测：删掉 `base.css` 里唯一的 `::selection` 规则后，
+     * 只因 `selectionColor.test.ts` 的断言里出现过 `var(--ye-selection)`，
+     * 本护栏就不再报警。测试引用不构成"这个 token 有产品价值"的证据。
+     */
+    if (path.endsWith(".test.ts")) continue;
 
-    if (!isTest) {
-      TOKEN_DECL.lastIndex = 0;
-      let decl: RegExpExecArray | null;
-      while ((decl = TOKEN_DECL.exec(text)) !== null) {
-        const set = declared.get(decl[1]) ?? new Set<string>();
-        set.add(path);
-        declared.set(decl[1], set);
-      }
+    TOKEN_DECL.lastIndex = 0;
+    let decl: RegExpExecArray | null;
+    while ((decl = TOKEN_DECL.exec(text)) !== null) {
+      const set = declared.get(decl[1]) ?? new Set<string>();
+      set.add(path);
+      declared.set(decl[1], set);
     }
 
+    /**
+     * 消费方只认**代码里**的引用：注释里的 `var(--ye-x)` 同样是伪装。
+     * 掩掉注释再扫，否则「删了规则但论证注释还留着」的改动会静默逃过本护栏
+     * （方法论：新写扫描器第一件事就是先掩注释再切规则）。
+     */
+    const code = maskComments(text);
     for (const re of [TOKEN_VAR_USE, TOKEN_STRING_USE]) {
       re.lastIndex = 0;
       let use: RegExpExecArray | null;
-      while ((use = re.exec(text)) !== null) consumed.add(use[1]);
+      while ((use = re.exec(code)) !== null) consumed.add(use[1]);
     }
   }
 

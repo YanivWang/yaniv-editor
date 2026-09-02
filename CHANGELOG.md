@@ -49,6 +49,13 @@
   `buildDocumentContextPrompt` 保持原签名（新增的 `limit` 是可选参数），
   `runAiSuggestionStream` / `runAiContinueWritingStream` 也只在末尾追加可选参数
   ——都是向后兼容的扩展，不属于 BREAKING CHANGES。
+- **文本选中底色跟随品牌主色**（`--ye-selection` + `::selection` 规则）。此前选中色一直是
+  浏览器默认的系统高亮，与三套外观的品牌色无关。现在三套外观 × 明暗两态各有一份值，
+  RGB 恒等于同一作用域的 `--ye-primary`，透明度分档（亮 30% / 暗 40%——深色底上同样的
+  半透明色看起来更弱）。只设 `background-color` 不设 `color`，代码块的语法高亮、链接色、
+  AI 高亮都不受影响。浏览器实测六种组合的选中文字对比度 7.08~~13.92，全部远超 WCAG AA
+  的 4.5；真正卡住取值的是「选中背景 vs 正常背景」的可辨识度（1.45~~1.97）。
+  新增护栏 `styles/selectionColor.test.ts` 锁住「选中色与主色同源」。→ 不变量 46
 
 ### Fixed
 
@@ -776,6 +783,18 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `handleUpdate` 只剩转调状态同步，而 `update` 是 `transaction` 的严格子集（不变量 37），
   每次编辑白算一遍。只保留 `transaction`。唯一的例外 `setEditable`（只 emit `update`、
   不产生事务）经实测不改变 `can().undo()` / `can().redo()`，不受影响。
+- **光标颜色从未跟随外观：`--ye-caret` 定义齐全却没有任何规则读它。** 它按不变量 26 的
+  形状 C 在 `:root` / `.yaniv-editor` 实例作用域 / 深色段各声明了一份（值都是
+  `var(--ye-primary)`），`variables.css` 的注释里还留着作者核对它渲染值的记录
+  （「`--ye-caret` 是全局 `#3370ff` 而非 word 的 `#0078d4`」）——但全仓没有一条
+  `caret-color` 规则消费它，那次分层「修复」因此从未生效过。补上规则后浏览器实测：
+  三套外观 × 明暗六种组合的光标色全部等于各自的 `--ye-primary`，
+  预览态 `caret-color: transparent` 不受影响（特异性 (0,2,0) 低于它的 (0,4,0)）。
+- **`tokenConsumers` 护栏把注释和测试里的引用当成了消费方。** 「JS 字符串读写也算消费」
+  那条判据的正则带反引号，而本仓库中文注释的通行写法正是 Markdown 风格的
+  `` `--ye-x` ``——注释里提一句，死 token 就永久免检；测试断言里出现一次
+  `var(--ye-x)` 同理。`--ye-caret` 正是这么躲过去的。扫描器改为先掩注释、
+  并整体跳过 `*.test.ts`；收紧后全仓 99 个 token 只暴露出这一个。→ 不变量 42
 
 ### Changed
 

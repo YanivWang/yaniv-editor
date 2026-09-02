@@ -27,6 +27,7 @@
   --ye-primary: #2383e2;
   --ye-primary-hover: #1a6fc9;
   --ye-primary-light: rgb(35 131 226 / 12%);
+  --ye-selection: rgb(35 131 226 / 30%);
   --ye-bubble-bg: #ffffff;
   --ye-bubble-shadow:
     rgb(15 15 15 / 5%) 0 0 0 1px, rgb(15 15 15 / 10%) 0 3px 6px, rgb(15 15 15 / 20%) 0 9px 24px;
@@ -417,6 +418,7 @@
   --ye-primary: rgb(82, 156, 202);
   --ye-primary-hover: #6aadcf;
   --ye-primary-light: rgb(82 156 202 / 15%);
+  --ye-selection: rgb(82 156 202 / 40%);
   --ye-bubble-bg: #252525;
   --ye-bubble-shadow: 0 12px 32px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 25%);
   --ye-code-bg: rgba(135, 131, 120, 0.15);
