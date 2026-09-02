@@ -66,11 +66,11 @@ export default defineConfig({
        * 前三个是上面说的「要布局才能测」的几何部分，后三个是常规逻辑，
        * 下一棒还想提档就从它们开始。
        *
-       * ⚠️ **别把「该走 E2E」读成「已经有 E2E」**：`resizableImage.ts` 的拖拽改尺寸
-       * 当前**既没有单测也没有 E2E**（`e2e/` 全文搜不到 resize 相关用例），
-       * 属于真实的验收空白，不是「已交给 Playwright」。`aiSuggestionManager` 那 92 行
-       * 也只有浮层的挂载点与 z-index 被 `overlay-z-index.spec.ts` 覆盖到，
-       * 定位算得对不对没人验。
+       * ⚠️ **别把「该走 E2E」读成「已经有 E2E」**：`resizableImage.ts` 的拖拽改尺寸与
+       * `aiSuggestionManager` 的浮层定位一度**既没有单测也没有 E2E**，而这里的注释
+       * 却写着「验收在 Playwright」。第 17 棒补上了 `e2e/resize-image.spec.ts` 与
+       * `e2e/ai-suggestion.spec.ts`（各 2 条，均做过变异验证）。
+       * **再往这段注释里写「验收在 E2E」之前，先去 `e2e/` 里搜一下真的有没有。**
        *
        * 第 16 棒点名的三个常规组件（`BlockPickerMenu` 99 行、`ColorPicker` 50 行、
        * `AiSettingsModal` 44 行）已在第 17 棒补完，statements 77.58% → 80.43%。

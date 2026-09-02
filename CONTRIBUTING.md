@@ -83,7 +83,8 @@ docs: 补充 z-index 说明
 
 1. **禁止模块级可变状态。** 库要支持同页多实例，`let x = ...` 形式的模块级配置会让实例
    互相覆盖（历史上 outline `scrollParent` 与 AI `hostConfig` 都踩过）。用 provide/inject
-   或 owner 键控注册表。
+   或 owner 键控注册表。确有进程级归属的（语言包缓存、浏览器用户自己的 AI 配置）
+   要登记进 `src/moduleLevelState.test.ts` 的清单并写明理由——那条护栏会拦住没登记的。
 2. **默认 preset 关闭的能力必须动态 import。** 见 `src/capabilities/registry.ts` 文件头。
    CI 有断言检查门控能力没有回流到主 chunk。
 3. **URL 一律过白名单。** 链接 / 媒体 / iframe 分别用 `normalizeSafeUrl` /

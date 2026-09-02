@@ -133,9 +133,10 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
    - ⚠️ 往 `CHANGELOG.md` 插新分节时注意：`[Unreleased]` 的 `### Fixed` 段很长（现已 600+ 行），
      直接在 `### Fixed\n` 后面插新分节会把原有条目全挤进去。**在 Fixed 段末尾追加条目最安全**。
 8. **能写成静态护栏的就写静态护栏**——对现存与未来文件同时生效，价值最高。
-   现有 **21 个护栏文件**（`grep -rln "readFileSync\|readdirSync" src --include="*.test.ts"`
-   数得到 17 个静态扫描类，另有 `capabilities/toolbarGateMap`、`publicApi`、
+   现有 **27 个护栏文件**（第 17 棒实测：`grep -rln "readFileSync\|readdirSync" src --include="*.test.ts"`
+   数得到 **23** 个静态扫描类，另有 `capabilities/toolbarGateMap`、`publicApi`、
    `locales/localeParity`、`components/editor/template/templates` 四个不读文件系统的）。
+   ⚠️ 这个数字第 10~16 棒一直没跟着更新（停在 21/17），**每次新增护栏记得回来改**。
    第 9 棒新增 4 个，第 10 棒新增 4 个 + 1 条规则：
    - `components/editor/table/tableToolLabels.test.ts`（`t()` 不得在 setup 顶层求值后冻结）
    - `locales/localeParams.test.ts`（带 `{占位符}` 的文案不得漏传 params）
@@ -270,11 +271,12 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
   `new PluginKey("dragHandle")` / `new PluginKey("slashCommand")` / `yanivSearchReplace` / `chat/completions`。
   **绝不能让 `core/` 或 `capabilities/` 静态 import 门控能力模块。**
 - **产物预算（gzip）**：主 chunk ≤ 46000B、`dist/style.css` ≤ 19000B、`dist/inline.css` ≤ 10500B。
-  ⚠️ **主 chunk 余量 456B**（第 10 棒结束时实测 45544）。**注释也算进去**——ESM 产物
-  不压缩，源文件里的每行注释都原样进产物（不变量 41）。`registry.ts` / `templates.ts` /
+  ⚠️ **主 chunk 余量 3305B**（第 17 棒实测 42695；第 13 棒把 ColorPicker 移出主 chunk
+  腾出了 3109B）。注释基本**不**吃预算（不变量 41 已在第 12 棒更正：`.ts` / `.vue`
+  语句之间的注释进不了产物，只有写在对象字面量属性上的才进）。`registry.ts` / `templates.ts` /
   `core/` / `extensions/` 里 core 能力下的扩展都在主 chunk，往里加代码前先想清楚，
   加完必须 `pnpm run build` 复量。**阶段 D/E 若要新增主 chunk 代码，可能需要先腾空间。**
-- **覆盖率阈值**写在 `vitest.config.ts`（statements 56 / lines 56 / branches 44 / functions 52），只能升不能降。
+- **覆盖率阈值**写在 `vitest.config.ts`（第 17 棒起 statements 78 / lines 80 / branches 67 / functions 76），只能升不能降。
 - **eslint 零 warning**（不只是零 error）。prettier / stylelint 也必须全过。
   stylelint 有 `order/properties-order`（recess-order），改 CSS 后跑 `npx stylelint '<glob>' --fix`；
   **改完一定要 `npx prettier --write <改过的文件>`**（第 6、8 棒都因此让 verify 红过）。
@@ -285,7 +287,7 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
 - **新增文案**必须同时补 `zh-CN.ts` / `en-US.ts` / `types.ts`（`localeParity.test.ts` 会校验）。
   `TiptapLocale` 类型是公开导出的，但没有「注册自定义 locale」的 API，
   `createI18n({ messages })` 可覆盖文案——**所以 locale 文案拼进 HTML 前必须 `escapeHtml`**。
-- **禁止模块级可变状态**。已知有意例外两处：`locales/manager.ts`、`features/ai/translation/translateStore.ts`。
+- **禁止模块级可变状态**。⚠️ 第 17 棒实测：实际有 **12 处**声明，集中在三个模块（`locales/manager.ts` 5 处、`features/ai/translation/translateStore.ts` 2 处、`features/ai/config/` 5 处——最后这组一直没写进例外清单）。现已全部登记进静态护栏 `src/moduleLevelState.test.ts` 并逐条写了理由，**清单以那里为准**，新增未登记的会转红。
 
 ---
 
@@ -293,14 +295,14 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
 
 ```bash
 pnpm run verify        # typecheck + test:coverage + lint + lint:style + format:check
-pnpm run test:e2e      # Playwright，22 个用例
+pnpm run test:e2e      # Playwright，34 个用例
 pnpm run build:check   # build + 逐条件真实加载每个入口（约 5 分钟）
 pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个就够）
 ```
 
 **当前基线（第 17 棒全部完成时实测）：**
 
-- `pnpm run verify` 退出 0，**1173 个用例全过（121 个测试文件）**，eslint 零 warning
+- `pnpm run verify` 退出 0，**1177 个用例全过（122 个测试文件）**，eslint 零 warning
   —— 第 16 棒 1109 / 119，第 15 棒 1009 / 108，第 14 棒 966 / 102，第 13 棒 933 / 100
 - 覆盖率 Statements **80.43%** / Branches **69.05%** / Functions **78.69%** / Lines **82.77%**
   （`vitest.config.ts` 的阈值第 17 棒已提档到 **78 / 80 / 67 / 76**，各留约 2 个点余量；
@@ -309,7 +311,7 @@ pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个�
   里的约定：实测 9 条 `import/order` warning 照样让 verify 退出 0，硬约束根本没生效。
 - `pnpm run build` 产物预算实测：主 chunk gzip **42695 / 46000**（余量 **3305B**）、
   `style.css` **17193 / 19000**、`inline.css` **8938 / 10500**；代码分割断言全过
-- `pnpm run test:e2e` **30 passed**（第 17 棒从 28 补到 30）
+- `pnpm run test:e2e` **34 passed**（第 17 棒从 28 补到 34：查找替换 2、图片改尺寸 2、AI 浮层 2）
 - `pnpm run build:check` 通过（三个入口 × ESM/CJS 共 6 种加载方式 + 两个 CSS）
 - ARCHITECTURE 不变量 **58 条**，CONTRIBUTING 约定 **45 条**
 - ⚠️ 注释基本不吃产物预算（不变量 41 已更正）：`.ts` / `.vue` 语句之间的注释进不了
@@ -1141,11 +1143,42 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
   实测 9 条 `import/order` warning 照样退出 0。加完做了变异验证（造一条 warning → 退出 1）。
 - 删掉两处改变不了结果的分支（见下方负结果）。
 
+### 三（续）、补两处真实的验收空白 + 给不变量 15 装上护栏
+
+第一轮收尾时核对自己写下的断言，发现**「该走 E2E」被我写成了「已经有 E2E」**——
+`resizableImage` 的拖拽改尺寸与 `aiSuggestionManager` 的浮层定位，两处都是**零验收**
+（既没单测也没 e2e）。当场补上：
+
+| 新增 e2e                     | 锁住什么                                                  | 变异 |
+| ---------------------------- | --------------------------------------------------------- | ---- |
+| `resize-image.spec.ts`（2）  | 拖手柄真的放大 + **尺寸写进文档**；只点不拖则文档一字不变 | 3/3  |
+| `ai-suggestion.spec.ts`（2） | 浮层挂进 overlay portal、贴着选区定位；接受把改写写进正文 | 3/4  |
+
+`ai-suggestion` 那条没转红的变异是 `accept()` 里的 `removeAiHighlight(editor)`：
+接受时 `insertContent` 会把带高亮的那段整个替换掉，标记自然消失，**在本场景下它是
+无差别的双保险**。如实标注，没有硬凑一条测试去"覆盖"它（参见方法论第 6 条的三种情况）。
+| `find-replace.spec.ts`（2） | 见上（第二件事） | 2/2 |
+
+另外给**不变量 15（禁止模块级可变状态）**补了静态护栏 `src/moduleLevelState.test.ts`：
+这条不变量有三次历史事故，却一直只写在文档里没有检查。实测全仓 **12 处**模块级可变状态，
+而交接文档一直写着「已知有意例外两处」——`features/ai/config/` 那 5 处从没被登记过。
+护栏逐条登记并要求写明「为什么它不该按实例隔离」，双向可打红（新增未登记的、清单留过期条目）。
+
+### 负结果（这两条扫描没有产出，别重复走）
+
+- **「捕获快照 → 中途派发 → 又用旧快照」全仓零命中。** 2 条候选都是误报：
+  `blockMenuActions` 捕获的是 `schema`（跨事务不变）、`AiHighlightMark` 那条是扫描窗口
+  跨了函数边界。因为零真命中且判据有两处已知误报源，**没有**把它升级成护栏
+  ——真正咬到我们的那个机制已由 `commandTransactionScope` 覆盖。
+- **DOM watcher 的 flush 时机全仓零违规。** 唯一候选 `CustomAiPopover` 用的是
+  `nextTick(() => input.focus())`，与 `flush: "post"` 等价。
+
 ### 终点判据达成情况（如实）
 
 - ✅ **Statements 80.43%**（目标 80%），Lines 82.77%、Branches 69.05%、Functions 78.69%
 - ✅ 阈值提档到 78/80/67/76，并做过变异验证
 - ✅ 挂起的观察已结案：真缺陷，按根因修完并用护栏 + e2e 锁住
+- ✅ 两处零验收的几何逻辑补上 e2e（e2e 28 → 34），不变量 15 补上静态护栏（护栏总数 26 → 27）
 - ✅ 变异验证：**55 次运行，48 次直接转红**；没转红的 7 次逐条查清，没有一条含糊过去
   - 2 次是**代码本身改变不了结果**（`BlockPickerMenu` 的 `watch(query)`、
     `ColorPicker` 的 `indicatorBarStyle` 透明分支）→ 删掉 / 收敛
@@ -1197,6 +1230,24 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
 50. **`Element.prototype.scrollIntoView` 在 jsdom 里根本不存在**（不是空实现）。
     写在 `nextTick` 回调里的调用会变成未处理的 Promise 拒绝，让整轮 verify 退出 1
     而不是某条用例转红。已补进 `installLayoutStubs()`。
+
+### 第 17 棒续踩的坑（方法论补充）
+
+51. **e2e 的变异验证要打在「真正决定观察量的那一行」上。** 我把 AI 浮层的
+    `container.append` 换成 `document.body` 想验「挂载点」，用例照样绿——因为浮层是
+    antd popup，落点由 `getPopupContainer` 决定，`container` 只是 Vue app 的根。
+    换成改 `getPopupContainer` 才转红。**没转红先问「我改的这行真的能改变我断言的那个量吗」。**
+52. **看着像样的几何断言可能是恒真的。** 「x ≥ 0、没超出视口、与锚点垂直距离小于一屏」
+    在把定位整个换成 `{top:0,left:0}` 之后**全部满足**。真正区分得开的是
+    「水平方向贴着选区起点」（实测差 12px，缩到角落差 500 余）。**先量真实数值再定阈值。**
+53. **整篇 HTML 里找子串会被 base64 误伤。** `expect(html).not.toContain("NaN")` 挂了，
+    因为测试用图的 base64 里恰好有 `…RSNaNKJ…`。断言范围要收到 `<img>` 标签内。
+    这是「否定断言前先站住肯定的一半」（约定 43）的近亲：**否定断言还要限定作用域**。
+54. **antd 会在两个汉字之间插空格**（「接 受」「替 换」「取 消」），
+    `hasText: "接受"` 匹配不上。一律用 `/^接\s*受$/` 这类正则。（约定 45 的老坑又踩一次。）
+55. **护栏要能先抓住自己。** 「每条例外都要写理由」这条自检，第一次跑就把我
+    敷衍写的「同上，全局兜底语言」判红了——**给护栏加一条针对"填表人"的检查**，
+    比只检查被扫代码更能防住清单退化成摆设。
 
 ### 下一棒可以从哪儿挑
 
