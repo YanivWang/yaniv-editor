@@ -50,7 +50,7 @@ Four axes merge into `EditorRuntimeProfile`:
 
 ## ChromePolicy {#chromepolicy}
 
-`resolveChromePolicy(profile, layout, gates)` determines chrome visibility. Shell **reads** policy only—no `mode === 'preview'` checks in templates.
+`resolveChromePolicy({ profile, layout, gates, uiFlags, host, showInlineToolbar })` determines chrome visibility (a single input object — see `ResolveChromePolicyInput` in `core/runtime/types.ts`). Shell **reads** policy only—no `mode === 'preview'` checks in templates. The return value is a host-discriminated union: `FullChromePolicy` / `InlineChromePolicy`.
 
 In preview: `showEditChrome=false`; header/footer/block menu/context bars hidden; extension set unchanged.
 
@@ -101,6 +101,7 @@ Core context is mounted at **EditorShell root** (not unmounted in preview):
 - `provideEditorLocale`
 - `provideBlockMenuHost`
 - `provideOutlinePanel`
+- `provideFindReplacePanel` (dialog open state; decoupled from the header button, which is why Ctrl/Cmd+F does not depend on the header)
 
 ## Z-Index and Overlays
 

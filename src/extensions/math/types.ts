@@ -20,7 +20,11 @@ export interface MathExtensionOptions {
 }
 
 export interface KatexRenderOptions {
-  /** 是否显示错误信息 */
+  /**
+   * 遇到非法 LaTeX 时是否抛错。
+   * `false`（缺省）时 KaTeX 不抛错，而是用 `errorColor` 就地渲染出错的源码；
+   * `true` 时交由 NodeView 捕获并显示错误文案。
+   */
   throwOnError?: boolean;
   /** 错误颜色 */
   errorColor?: string;

@@ -307,6 +307,7 @@ describe("buildExtensions", () => {
         video: () => undefined,
       },
       galleryImages: () => [],
+      mentionItems: () => undefined,
       officePaste: {
         onPasteFromOfficeWithImages: () => undefined,
       },

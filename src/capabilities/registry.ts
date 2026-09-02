@@ -37,6 +37,8 @@ import { ListShortcuts } from "@/extensions/listShortcuts";
 import { PasteImage } from "@/extensions/pasteImage";
 import { ResizableImage } from "@/extensions/resizableImage";
 import { YanivPlaceholder } from "@/extensions/yanivPlaceholder";
+import { resolveMessage } from "@/locales/resolveMessage";
+import { escapeHtml } from "@/utils/escapeHtml";
 
 import type { BuildExtensionsCtx, CapabilityDefinition } from "./types";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
@@ -138,7 +140,6 @@ export const CAPABILITIES: CapabilityDefinition[] = [
     featureKey: "outline",
     schemaSignature: () => "outline",
     fullToolbarSlugs: ["outline"],
-    chrome: ["outlinePanel"],
     extensions: async (ctx) => {
       const [
         { default: UniqueID },
@@ -171,6 +172,12 @@ export const CAPABILITIES: CapabilityDefinition[] = [
       return [
         OfficePaste.configure({
           onPasteFromOfficeWithImages: ctx.officePaste.onPasteFromOfficeWithImages(),
+          // 占位段是**写进文档正文**的可见文案，必须跟随界面语言；扩展自带的默认值
+          // 是硬编码中文，而 YanivEditor 没有透传该选项的 prop，英文宿主此前只能拿到中文。
+          // 文案可被 `createI18n({ messages })` 覆盖，拼进 HTML 前先转义。
+          imagePlaceholderHtml: `<span data-office-paste-image>${escapeHtml(
+            ctx.locale.editor.officePasteImagePlaceholder,
+          )}</span>`,
         }),
       ];
     },
@@ -227,18 +234,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         getEndpoint: () => ctx.aiConfig()?.endpoint,
         getTimeout: () => ctx.aiConfig()?.timeout,
         getStorageMode: () => ctx.aiConfig()?.storageMode,
-        getLocaleText: (key: string) => {
-          const parts = key.split(".");
-          let cur: unknown = ctx.locale;
-          for (const part of parts) {
-            if (cur && typeof cur === "object" && part in cur) {
-              cur = (cur as Record<string, unknown>)[part];
-            } else {
-              return key;
-            }
-          }
-          return typeof cur === "string" ? cur : key;
-        },
+        getLocaleText: (key: string) => resolveMessage(ctx.locale, key) ?? key,
       };
       // locale 由各扩展在发起 AI 会话时绑定（见 aiSuggestionManager.bindLocale 注释）：
       // 在此处按构建顺序绑定会让同页多实例中后构建者覆盖前者的语言。
@@ -267,7 +263,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
     order: 115,
     featureKey: "slashCommand",
     schemaSignature: (profile) => (profile.gates.slashCommand ? "notionBlocks" : ""),
-    extensions: async () => {
+    extensions: async (ctx) => {
       const [
         { ToggleBlock },
         { Callout },
@@ -283,7 +279,19 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         import("@/extensions/mention"),
         import("@/extensions/markdownInput/NotionMarkdownInput"),
       ]);
-      return [ToggleBlock, Callout, Column, ColumnLayout, Embed, Mention, NotionMarkdownInput];
+      return [
+        // aria-label 走实例 locale：扩展拿不到 Vue inject，同 DragHandle 的约定
+        ToggleBlock.configure({
+          getLocaleText: (key: string) => resolveMessage(ctx.locale, key) ?? key,
+        }),
+        Callout,
+        Column,
+        ColumnLayout,
+        Embed,
+        // getter 而非数组：宿主换候选数据不该要求重建 session（同 upload / gallery 的约定）
+        Mention.configure({ getSuggestionItems: () => ctx.mentionItems() }),
+        NotionMarkdownInput,
+      ];
     },
   },
   {
@@ -300,18 +308,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
             ctx.blockMenuHost.openInsert(context);
           },
           onCloseInsertMenu: () => ctx.blockMenuHost.hide(),
-          getMenuLabel: (key: string) => {
-            const parts = key.split(".");
-            let cur: unknown = ctx.locale;
-            for (const part of parts) {
-              if (cur && typeof cur === "object" && part in cur) {
-                cur = (cur as Record<string, unknown>)[part];
-              } else {
-                return key;
-              }
-            }
-            return typeof cur === "string" ? cur : key;
-          },
+          getMenuLabel: (key: string) => resolveMessage(ctx.locale, key) ?? key,
         }),
       ];
     },
@@ -352,7 +349,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
           bold: g.textFormat ? {} : false,
           italic: g.textFormat ? {} : false,
           strike: g.textFormat ? {} : false,
-          undoRedo: g.undoRedo !== false ? {} : false,
+          undoRedo: g.undoRedo ? {} : false,
           link: false,
           underline: false,
           codeBlock: false,

@@ -107,10 +107,11 @@ Four independent axes plus optional overrides:
 | `initialContent`         | `string \| JSONContent`                       | built-in placeholder paragraph | Initial document                                    |
 | `customAppearanceVars`   | `Record<string, string>`                      | —                              | Visual `--ye-*` tokens when `appearance="custom"`   |
 | `zIndexBase`             | `number`                                      | `1000`                         | Overlay z-index base (`--ye-z-base`)                |
-| `uploadImage`            | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                                |
-| `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                                |
+| `uploadImage`            | `(file: File) => Promise<string>`             | `blob:` object URL fallback    | Image upload handler                                |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | `blob:` object URL fallback    | Video upload handler                                |
 | `galleryImages`          | `GalleryImage[]`                              | images from current doc        | External gallery source                             |
 | `customTemplates`        | `TemplateItem[]`                              | built-in templates             | Extra document templates                            |
+| `mentionItems`           | `MentionItem[]`                               | built-in placeholder data      | `@` mention suggestions (needs `slashCommand`)      |
 | `locale`                 | `string`                                      | `"zh-CN"`                      | Locale code (`zh-CN` \| `en-US`)                    |
 | `defaultOutlineExpanded` | `boolean`                                     | `false`                        | Initial outline panel state when outline gate is on |
 | `aiConfig`               | `YanivEditorAiConfig`                         | —                              | Host-managed AI config                              |
@@ -153,7 +154,9 @@ To keep pre–v0.1.0 basic behavior (table + video):
 
 `notion` focuses on block editing (slash command, drag handle) plus image, video, table, math, outline, find/replace, Office paste, and AI. Format painter stays off. It uses floating/block interactions and does not show the fixed top toolbar or footer.
 
-Because the header is hidden, the outline toggle and the find/replace button (both header-only) are unreachable under `notion` — those two gates register their extensions but expose no UI. Use `preset="full"` if you need them.
+Hiding the header only removes the two header _buttons_. The features themselves stay reachable: the
+outline panel has its own rail handle rendered next to the document, and the find/replace dialog (plus its
+Ctrl/Cmd+F shortcut) is mounted from the `searchReplace` gate rather than from the toolbar.
 
 ## Preview mode
 

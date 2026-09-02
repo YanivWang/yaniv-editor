@@ -25,7 +25,7 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 
-import { insertDefaultCodeBlock, updateCodeBlockLanguage } from "./codeBlockUtils";
+import { updateCodeBlockLanguage } from "./codeBlockUtils";
 
 import type { Editor } from "@tiptap/vue-3";
 
@@ -103,11 +103,8 @@ function insertCodeBlock(language: string) {
   const { from, to, empty } = e.state.selection;
 
   if (empty) {
-    if (language === DEFAULT_CODE_BLOCK_LANGUAGE) {
-      insertDefaultCodeBlock(e);
-    } else {
-      runCommand((chain) => chain.setCodeBlock({ language }))();
-    }
+    // 两条分支原本都是 setCodeBlock({ language })，只是默认语言那条绕了个同义的工具函数
+    runCommand((chain) => chain.setCodeBlock({ language }))();
     return;
   }
 

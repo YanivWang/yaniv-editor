@@ -41,6 +41,30 @@ function streamResponse(chunks: string[], ok = true, status = 200): Response {
   } as unknown as Response;
 }
 
+/**
+ * 按**字节**切分的流式响应：分片位置可能落在行中间或多字节字符中间，
+ * 复现真实网络分片。`streamResponse` 的每个 chunk 都恰好是完整的若干行，
+ * 覆盖不到这条路径。
+ */
+function splitStreamResponse(text: string, at: number): Response {
+  const bytes = new TextEncoder().encode(text);
+  const chunks = [bytes.slice(0, at), bytes.slice(at)];
+  let index = 0;
+  return {
+    ok: true,
+    status: 200,
+    text: () => Promise.resolve(""),
+    body: {
+      getReader: () => ({
+        read: () =>
+          index < chunks.length
+            ? Promise.resolve({ done: false, value: chunks[index++] })
+            : Promise.resolve({ done: true, value: undefined }),
+      }),
+    },
+  } as unknown as Response;
+}
+
 function jsonResponse(payload: unknown, ok = true, status = 200): Response {
   return {
     ok,
@@ -253,5 +277,51 @@ describe("createAiAdapter 工厂", () => {
     expect(() => createAiAdapter({ provider: "nope" as unknown as AiConfig["provider"] })).toThrow(
       /Unsupported AI provider/,
     );
+  });
+});
+
+describe("网络分片落在行 / 字符中间", () => {
+  it("OpenAI：被劈开的 SSE 行不会整条丢失", async () => {
+    const line = 'data: {"choices":[{"delta":{"content":"hello"}}]}\n';
+    fetchMock.mockResolvedValue(splitStreamResponse(line, 20));
+
+    const cb = collect();
+    await createOpenAiAdapter(baseConfig()).chatStream(messages, cb);
+
+    expect(cb.tokens).toEqual(["hello"]);
+    expect(cb.done).toEqual(["hello"]);
+  });
+
+  it("OpenAI：被劈开的多字节字符不会解成 U+FFFD", async () => {
+    const line = 'data: {"choices":[{"delta":{"content":"你好世界"}}]}\n';
+    // 在第一个中文字符的 3 个字节中间切开
+    const at = new TextEncoder().encode(line.slice(0, line.indexOf("你"))).length + 1;
+    fetchMock.mockResolvedValue(splitStreamResponse(line, at));
+
+    const cb = collect();
+    await createOpenAiAdapter(baseConfig()).chatStream(messages, cb);
+
+    expect(cb.done).toEqual(["你好世界"]);
+    expect(cb.done[0]).not.toContain("\uFFFD");
+  });
+
+  it("Aliyun：被劈开的 SSE 行不会整条丢失", async () => {
+    const line = 'data:{"output":{"choices":[{"message":{"content":"增量"}}]}}\n';
+    fetchMock.mockResolvedValue(splitStreamResponse(line, 25));
+
+    const cb = collect();
+    await createAliyunAdapter(baseConfig({ provider: "aliyun" })).chatStream(messages, cb);
+
+    expect(cb.done).toEqual(["增量"]);
+  });
+
+  it("Ollama：被劈开的 NDJSON 行不会整条丢失", async () => {
+    const line = '{"message":{"content":"本地"}}\n';
+    fetchMock.mockResolvedValue(splitStreamResponse(line, 15));
+
+    const cb = collect();
+    await createOllamaAdapter(baseConfig({ provider: "ollama" })).chatStream(messages, cb);
+
+    expect(cb.done).toEqual(["本地"]);
   });
 });

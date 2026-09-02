@@ -24,9 +24,26 @@ vi.mock("docx", async (importOriginal) => {
       super(options);
     }
   }
+  // Paragraph / TextRun 构造完就只剩 XML 树，读不回 options，所以在构造处留一份
+  class CapturingParagraph extends actual.Paragraph {
+    readonly capturedOptions: Record<string, unknown>;
+    constructor(options: ConstructorParameters<typeof actual.Paragraph>[0]) {
+      super(options);
+      this.capturedOptions = (options ?? {}) as Record<string, unknown>;
+    }
+  }
+  class CapturingTextRun extends actual.TextRun {
+    readonly capturedOptions: Record<string, unknown>;
+    constructor(options: ConstructorParameters<typeof actual.TextRun>[0]) {
+      super(options);
+      this.capturedOptions = typeof options === "string" ? { text: options } : options;
+    }
+  }
   return {
     ...actual,
     Document: CapturingDocument,
+    Paragraph: CapturingParagraph,
+    TextRun: CapturingTextRun,
     Packer: { ...actual.Packer, toBlob: vi.fn(() => Promise.resolve(new Blob(["x"]))) },
   };
 });
@@ -36,6 +53,23 @@ const { saveAs } = await import("file-saver");
 /** 取最近一次导出的顶层块节点 */
 function lastChildren(): unknown[] {
   return capturedSections[capturedSections.length - 1]?.children ?? [];
+}
+
+type Captured = { capturedOptions?: Record<string, unknown> };
+
+/** 递归取出一个 docx 节点下的全部文本（TextRun / ExternalHyperlink 的 children） */
+function textOf(node: unknown): string {
+  const options = (node as Captured)?.capturedOptions;
+  if (!options) return "";
+  if (typeof options.text === "string") return options.text;
+
+  const children = Array.isArray(options.children) ? options.children : [];
+  return children.map(textOf).join("");
+}
+
+/** 整份文档拼出的纯文本 */
+function exportedText(): string {
+  return lastChildren().map(textOf).join("\n");
 }
 
 beforeEach(() => {
@@ -139,4 +173,53 @@ describe("行内与属性解析不崩溃", () => {
       expect(saveAs).toHaveBeenCalledTimes(1);
     });
   }
+});
+
+/**
+ * 回归护栏：两处会静默丢/重内容的解析缺陷。
+ *
+ * 都不是「不崩溃」能覆盖的——导出照样成功，只是 .docx 打开后内容不对，
+ * 所以这里断言文本本身。
+ */
+describe("内容保真", () => {
+  it("引用块的文字不能丢，且带上缩进与左边框", async () => {
+    await exportToWord("<blockquote><p>被引用的文字</p></blockquote>");
+
+    const children = lastChildren();
+    expect(exportedText()).toContain("被引用的文字");
+
+    const quoted = children.find((c) => textOf(c).includes("被引用的文字")) as Captured;
+    expect(quoted.capturedOptions?.indent).toEqual({ left: 720 });
+    expect(quoted.capturedOptions?.border).toMatchObject({
+      left: { style: "single", size: 6, color: "999999" },
+    });
+  });
+
+  it("引用块内的多个段落逐段保留", async () => {
+    await exportToWord("<blockquote><p>第一段</p><p>第二段</p></blockquote>");
+
+    const quoted = lastChildren().filter((c) => (c as Captured).capturedOptions?.indent);
+    expect(quoted).toHaveLength(2);
+    expect(quoted.map(textOf)).toEqual(["第一段", "第二段"]);
+  });
+
+  it("嵌套列表的文字只出现一次，不并进父项", async () => {
+    await exportToWord("<ul><li>外<ul><li>内</li></ul></li></ul>");
+
+    const texts = lastChildren().map(textOf);
+    expect(texts).toEqual(["外", "内"]);
+    expect(exportedText().match(/内/g)).toHaveLength(1);
+  });
+
+  it("三层嵌套按层级各出一次", async () => {
+    await exportToWord("<ul><li>A<ul><li>B<ul><li>C</li></ul></li></ul></li></ul>");
+
+    expect(lastChildren().map(textOf)).toEqual(["A", "B", "C"]);
+  });
+
+  it("列表项内的行内标记仍然解析（跳过的只是嵌套列表）", async () => {
+    await exportToWord("<ul><li><b>粗</b>普通<ul><li>子</li></ul></li></ul>");
+
+    expect(lastChildren().map(textOf)).toEqual(["粗普通", "子"]);
+  });
 });

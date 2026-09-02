@@ -5,6 +5,8 @@
 
 import { computed, ref, shallowRef } from "vue";
 
+import { interpolate, resolveMessage } from "./resolveMessage";
+
 import type { LocaleCode, TiptapLocale } from "./types";
 
 export type { LocaleCode } from "./types";
@@ -24,6 +26,9 @@ const loadingLocales = new Map<LocaleCode, Promise<LocaleMessages>>();
 const localeGeneration = ref(0);
 
 const currentLocale = ref<LocaleCode>("zh-CN");
+/** `createI18n({ fallbackLocale })` 写在这里，`t()` 才能读到——只存在 `createI18n` 的局部变量里时，
+ * 该选项只影响预加载、不影响解析，等于被静默忽略。 */
+const fallbackLocale = ref<LocaleCode>("en-US");
 const customMessages = ref<Record<string, LocaleMessages>>({});
 
 /**
@@ -74,64 +79,31 @@ function getBuiltinMessages(locale: LocaleCode): LocaleMessages | undefined {
 }
 
 /**
- * Get nested value from object by dot-separated key
- */
-function getNestedValue(
-  obj: LocaleMessages | Record<string, LocaleMessages> | undefined,
-  key: string,
-): string {
-  if (!obj) return key;
-
-  const keys = key.split(".");
-  let result: unknown = obj;
-
-  for (const k of keys) {
-    if (result === undefined || result === null || typeof result !== "object") {
-      return key;
-    }
-    result = (result as Record<string, unknown>)[k];
-  }
-
-  return typeof result === "string" ? result : key;
-}
-
-/**
  * Translate a key with optional interpolation
  */
 export function t(key: string, params?: Record<string, string | number>): string {
   void localeGeneration.value;
 
   const locale = currentLocale.value;
-  let result = key;
+  const fallback = fallbackLocale.value;
 
-  if (customMessages.value[locale]) {
-    const custom = getNestedValue(customMessages.value[locale], key);
-    if (custom !== key) result = custom;
-  }
+  // 当前 locale（自定义包 → 内置包）→ 兜底 locale（自定义包 → 内置包）。
+  // `resolveMessage` 未命中返回 undefined，因此这里用 ?? 串联即可；旧写法拿
+  // 「返回值 === key」当未命中哨兵，译文恰好等于 key 时会被误判为没查到而继续往下找。
+  //
+  // 兜底段必须也查 `customMessages`：内置包两份由 localeParity.test.ts 保证 key 集合
+  // 完全一致，缺 key 只可能出现在自定义包里——只查内置包的话这一段永远命不中。
+  const result =
+    resolveMessage(customMessages.value[locale], key) ??
+    resolveMessage(getBuiltinMessages(locale), key) ??
+    (fallback === locale
+      ? undefined
+      : (resolveMessage(customMessages.value[fallback], key) ??
+        resolveMessage(getBuiltinMessages(fallback), key)));
 
-  if (result === key) {
-    const builtIn = getBuiltinMessages(locale);
-    if (builtIn) {
-      const builtInResult = getNestedValue(builtIn, key);
-      if (builtInResult !== key) result = builtInResult;
-    }
-  }
+  if (result === undefined) return key;
 
-  if (result === key && locale !== "en-US") {
-    const fallback = getBuiltinMessages("en-US");
-    if (fallback) {
-      const fallbackResult = getNestedValue(fallback, key);
-      if (fallbackResult !== key) result = fallbackResult;
-    }
-  }
-
-  if (params && result !== key) {
-    Object.entries(params).forEach(([paramKey, value]) => {
-      result = result.replace(new RegExp(`\\{${paramKey}\\}`, "g"), String(value));
-    });
-  }
-
-  return result;
+  return interpolate(result, params);
 }
 
 /**
@@ -143,14 +115,15 @@ export function createI18n(options?: {
   messages?: Record<string, LocaleMessages>;
 }) {
   const locale = options?.locale ?? currentLocale.value;
-  const fallbackLocale = options?.fallbackLocale ?? "en-US";
+  const fallback = options?.fallbackLocale ?? "en-US";
 
   currentLocale.value = locale;
+  fallbackLocale.value = fallback;
   if (options?.messages) {
     customMessages.value = options.messages;
   }
 
-  void ensureLocalesLoaded(locale, fallbackLocale);
+  void ensureLocalesLoaded(locale, fallback);
 }
 
 /**

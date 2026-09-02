@@ -43,6 +43,8 @@ import { createCommandRunner } from "@/utils/editorCommands";
 import { createStateCheckers } from "@/utils/editorState";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
 
+import { applyLinkToEditor } from "./linkActions";
+
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
@@ -84,17 +86,6 @@ function handleClick() {
 }
 
 /**
- * 构建链接属性
- */
-function buildLinkAttrs(href: string) {
-  return {
-    href,
-    target: "_blank",
-    rel: "noopener noreferrer",
-  };
-}
-
-/**
  * 应用链接
  */
 function applyLink() {
@@ -116,22 +107,7 @@ function applyLink() {
     return;
   }
 
-  const hasSelection = !e.state.selection.empty;
-  const chain = e.chain().focus();
-
-  if (hasSelection) {
-    chain.extendMarkRange("link").setLink(buildLinkAttrs(safeUrl)).run();
-  } else {
-    chain
-      .insertContent([
-        {
-          type: "text",
-          text: safeUrl,
-          marks: [{ type: "link", attrs: buildLinkAttrs(safeUrl) }],
-        },
-      ])
-      .run();
-  }
+  applyLinkToEditor(e, safeUrl);
 
   linkModalOpen.value = false;
   linkUrl.value = "";

@@ -1,6 +1,6 @@
 /**
  * Editor Commands Utilities
- * @description 编辑器命令执行工具函数
+ * @description 编辑器命令执行工具函数（内部工具，不在包的公开 exports 里）
  */
 
 import { toValue, type MaybeRefOrGetter } from "vue";
@@ -18,6 +18,20 @@ export type EditorChain = ReturnType<Editor["chain"]>;
 export type CommandBuilder = (chain: EditorChain) => EditorChain;
 
 /**
+ * 取出可用的编辑器实例；取不到就留一条诊断。
+ *
+ * 四个入口此前各写一份逐字相同的判空 + `console.warn`，这里收敛成一处。
+ */
+function resolveEditor(source: MaybeRefOrGetter<Editor | null | undefined>): Editor | null {
+  const editor = toValue(source);
+  if (!editor) {
+    console.warn("[editorCommands] Editor instance is null or undefined");
+    return null;
+  }
+  return editor;
+}
+
+/**
  * 创建命令执行器
  * @description 创建一个命令执行函数，自动处理 editor 实例检查和焦点管理
  * @param editor - 编辑器实例引用
@@ -32,60 +46,10 @@ export type CommandBuilder = (chain: EditorChain) => EditorChain;
  */
 export function createCommandRunner(editor: MaybeRefOrGetter<Editor | null | undefined>) {
   return (fn: CommandBuilder) => () => {
-    const e = toValue(editor);
-    if (!e) {
-      console.warn("[editorCommands] Editor instance is null or undefined");
-      return;
-    }
+    const e = resolveEditor(editor);
+    if (!e) return;
     fn(e.chain().focus()).run();
   };
-}
-
-/**
- * 创建不带焦点的命令执行器
- * @description 与 createCommandRunner 类似，但不自动设置焦点
- * @param editor - 编辑器实例引用
- * @returns 命令执行函数
- */
-export function createCommandRunnerWithoutFocus(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-) {
-  return (fn: CommandBuilder) => () => {
-    const e = toValue(editor);
-    if (!e) {
-      console.warn("[editorCommands] Editor instance is null or undefined");
-      return;
-    }
-    fn(e.chain()).run();
-  };
-}
-
-/**
- * 直接执行命令
- * @description 立即执行一个编辑器命令
- * @param editor - 编辑器实例引用
- * @param fn - 命令构建函数
- * @param withFocus - 是否自动聚焦，默认 true
- * @returns 命令是否执行成功
- *
- * @example
- * ```typescript
- * executeCommand(editor, (chain) => chain.toggleBold())
- * ```
- */
-export function executeCommand(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-  fn: CommandBuilder,
-  withFocus = true,
-): boolean {
-  const e = toValue(editor);
-  if (!e) {
-    console.warn("[editorCommands] Editor instance is null or undefined");
-    return false;
-  }
-
-  const chain = withFocus ? e.chain().focus() : e.chain();
-  return fn(chain).run();
 }
 
 /**
@@ -109,11 +73,8 @@ export function executeBatchCommands(
   commands: CommandBuilder[],
   withFocus = true,
 ): boolean {
-  const e = toValue(editor);
-  if (!e) {
-    console.warn("[editorCommands] Editor instance is null or undefined");
-    return false;
-  }
+  const e = resolveEditor(editor);
+  if (!e) return false;
 
   let chain = withFocus ? e.chain().focus() : e.chain();
 

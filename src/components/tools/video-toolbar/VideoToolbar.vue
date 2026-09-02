@@ -189,7 +189,6 @@ onBeforeUnmount(() => {
 
   [data-color-mode="dark"] & {
     background: #1f1f1f;
-    border-color: var(--ye-border);
   }
 }
 
@@ -199,10 +198,6 @@ onBeforeUnmount(() => {
   align-items: center;
   padding: 0 4px;
   border-right: var(--ye-border-width) solid var(--ye-border);
-
-  [data-color-mode="dark"] & {
-    border-right-color: var(--ye-border);
-  }
 }
 
 .video-menu-group:last-child {
@@ -245,11 +240,9 @@ onBeforeUnmount(() => {
 }
 
 .video-menu-btn--danger:hover {
-  color: #ff4d4f;
   background: #fff1f0;
 
   [data-color-mode="dark"] & {
-    color: #ff7875;
     background: #3a1a1a;
   }
 }

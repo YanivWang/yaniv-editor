@@ -93,8 +93,6 @@ import { ref, computed, nextTick, watch } from "vue";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Popover, Textarea as ATextarea } from "@/shared/antd";
 
-const t = useEditorT();
-
 export interface CustomAiPopoverProps {
   visible?: boolean;
   originalText?: string;
@@ -104,6 +102,12 @@ export interface CustomAiPopoverProps {
   position?: { top: number; left: number };
   /** Ant Design Popover 挂载容器（必须为 overlay portal） */
   getPopupContainer: () => HTMLElement;
+  /**
+   * 文案解析器。挂在编辑器组件树内时不必传，组件自己 inject 实例 locale；
+   * 由 `aiSuggestionManager` 这类**独立 createApp** 挂载时必须传——
+   * 独立 app 继承不到 EditorShell 的 provide。
+   */
+  t?: (key: string) => string;
 }
 
 const props = withDefaults(defineProps<CustomAiPopoverProps>(), {
@@ -113,6 +117,9 @@ const props = withDefaults(defineProps<CustomAiPopoverProps>(), {
   isStreaming: false,
   isExecuting: false,
 });
+
+/** 显式传入优先；否则回退到组件树里的实例 locale */
+const t = props.t ?? useEditorT();
 
 const emit = defineEmits<{
   "update:visible": [value: boolean];
@@ -291,10 +298,7 @@ watch(
   border-top: 1px solid #f0f0f0;
 }
 
-.custom-ai-footer:has(.footer-right) {
-  justify-content: space-between;
-}
-
+/* 基础规则已是 space-between，带 .footer-right 时无需再声明一次 */
 .custom-ai-footer:not(:has(.footer-right)) {
   gap: 8px;
   justify-content: flex-end;

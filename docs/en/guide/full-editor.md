@@ -19,7 +19,7 @@ Full Editor uses four explicit axes:
 
 `notion` enables block editing (slash command, drag handle) plus image, video, table, math, outline, find/replace, Office paste, and AI (format painter off). It hides the fixed top toolbar and footer, relying on floating/block interactions instead.
 
-Note: with the header hidden, the outline toggle and the find/replace button (both header-only) are unreachable, so those two capabilities register their extensions but have no UI entry point under `notion`. See [Outline](../features/outline.md) and [Find and Replace](../features/find-replace.md).
+Note: hiding the header removes the outline toggle and find/replace _buttons_ (both live only in the header), but the capabilities themselves stay reachable under `notion` — the outline uses its rail grip next to the document, and find/replace uses Ctrl/Cmd+F. See [Outline](../features/outline.md) and [Find and Replace](../features/find-replace.md).
 
 ## Ability Overrides
 

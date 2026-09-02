@@ -127,7 +127,7 @@ import {
   MergeCellsOutlined,
   SplitCellsOutlined,
 } from "@ant-design/icons-vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarButton } from "@/components/base";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
@@ -155,7 +155,12 @@ const runCommand = createCommandRunner(editor);
 const { canExecute } = createStateCheckers(editor);
 
 // ===== 表格操作工具 =====
-const rowTools = [
+/**
+ * 必须是 computed：`t()` 读的是异步加载的语言包（见 `provideEditorLocale` 的 shallowRef
+ * 注释）。setup 执行时 `messages` 还是 null，此时求值会把原始 key（`table.addRowBefore`）
+ * 冻进普通数组，语言包加载完也不再更新——按钮 tooltip 会永久显示 key。切换 locale 同理。
+ */
+const rowTools = computed(() => [
   {
     name: "addRowBefore",
     icon: InsertRowAboveOutlined,
@@ -177,9 +182,9 @@ const rowTools = [
     command: "deleteRow",
     action: runCommand((chain) => chain.deleteRow()),
   },
-];
+]);
 
-const columnTools = [
+const columnTools = computed(() => [
   {
     name: "addColumnBefore",
     icon: InsertRowLeftOutlined,
@@ -201,9 +206,9 @@ const columnTools = [
     command: "deleteColumn",
     action: runCommand((chain) => chain.deleteColumn()),
   },
-];
+]);
 
-const cellTools = [
+const cellTools = computed(() => [
   {
     name: "mergeCells",
     icon: MergeCellsOutlined,
@@ -232,7 +237,7 @@ const cellTools = [
     command: "toggleHeaderColumn",
     action: runCommand((chain) => chain.toggleHeaderColumn()),
   },
-];
+]);
 
 // ===== 响应式状态 =====
 const tableDropdownOpen = ref(false);
@@ -301,7 +306,6 @@ function deleteTable() {
 
 [data-color-mode="dark"] .grid {
   background: #262626;
-  border-color: var(--ye-border);
 }
 
 .grid-row {
@@ -326,7 +330,6 @@ function deleteTable() {
 
 [data-color-mode="dark"] .grid-cell {
   background: #1f1f1f;
-  border-color: var(--ye-border);
 }
 
 .grid-cell:hover {
@@ -368,7 +371,6 @@ function deleteTable() {
 
   [data-color-mode="dark"] & {
     background: #262626;
-    border-color: var(--ye-border);
   }
 }
 
@@ -389,10 +391,6 @@ function deleteTable() {
   align-items: center;
   padding: 0 4px;
   border-right: var(--ye-border-width) solid var(--ye-border);
-
-  [data-color-mode="dark"] & {
-    border-right-color: var(--ye-border);
-  }
 }
 
 .table-menu-group:last-child {

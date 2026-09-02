@@ -41,37 +41,32 @@ interface Props {
 const props = defineProps<Props>();
 const editor = useYanivEditor(() => props.editor);
 
+const ALIGN_OPTIONS = [
+  { value: "left", labelKey: "editor.alignLeft", icon: AlignLeftOutlined },
+  { value: "center", labelKey: "editor.alignCenter", icon: AlignCenterOutlined },
+  { value: "right", labelKey: "editor.alignRight", icon: AlignRightOutlined },
+  { value: "justify", labelKey: "editor.alignJustify", icon: MenuOutlined },
+] as const satisfies ReadonlyArray<{ value: AlignValue; labelKey: string; icon: unknown }>;
+
 // ===== 工具函数 =====
 const runCommand = createCommandRunner(editor);
 const { isActiveAlign } = createStateCheckers(editor);
 
 // ===== 对齐工具菜单项 =====
-const alignMenuItems = computed<MenuItemConfig[]>(() => [
-  {
-    key: "align-left",
-    label: t("editor.alignLeft"),
-    icon: AlignLeftOutlined,
-    action: () => setAlign("left"),
-  },
-  {
-    key: "align-center",
-    label: t("editor.alignCenter"),
-    icon: AlignCenterOutlined,
-    action: () => setAlign("center"),
-  },
-  {
-    key: "align-right",
-    label: t("editor.alignRight"),
-    icon: AlignRightOutlined,
-    action: () => setAlign("right"),
-  },
-  {
-    key: "align-justify",
-    label: t("editor.alignJustify"),
-    icon: MenuOutlined,
-    action: () => setAlign("justify"),
-  },
-]);
+/**
+ * 四个对齐项。`active` 不能省：按钮图标会跟着当前对齐变
+ * （见 {@link currentAlignIcon}），但菜单**打开后**没有选中态，
+ * 用户看不出当前是哪一种——本仓库其它下拉（代码块 / 上下标 / 标题）都设了它。
+ */
+const alignMenuItems = computed<MenuItemConfig[]>(() =>
+  ALIGN_OPTIONS.map(({ value, labelKey, icon }) => ({
+    key: `align-${value}`,
+    label: t(labelKey),
+    icon,
+    active: isActiveAlign(value),
+    action: () => setAlign(value),
+  })),
+);
 
 /**
  * 获取当前激活的对齐图标

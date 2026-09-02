@@ -62,11 +62,11 @@
   overflow: hidden;
 }
 
-[data-color-mode="dark"] .yaniv-editor.document-layout {
-  background: var(--ye-bg-secondary);
-}
-
-/* 文档区域容器 - 这是唯一可滚动的区域 */
+/*
+ * 文档区域容器 - 这是唯一可滚动的区域。
+ * `position: relative` 是承重的：代码块语言角标（.code-block-language-badge）
+ * 以本元素为定位祖先，top/left 由 CodeBlockLanguageBadge 按容器 rect 算出。
+ */
 .document-container {
   position: relative;
   display: flex;

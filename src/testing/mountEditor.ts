@@ -123,6 +123,22 @@ export function unmountAll(): void {
   document.body.innerHTML = "";
 }
 
+/**
+ * 统计编辑器上某个事件挂了几个监听。
+ *
+ * Tiptap 的 `EventEmitter` 把监听存在 `callbacks[event]` 数组里。测「换实例后旧实例
+ * 是否被摘干净」只能看这份账本——监听留在旧实例上不改变任何可见状态，正是它难被发现的原因。
+ */
+export function countEditorListeners(editor: object, event: string): number {
+  const callbacks = (editor as { callbacks?: Record<string, unknown[]> }).callbacks ?? {};
+  return (callbacks[event] ?? []).length;
+}
+
+/** 一组事件的监听总数，便于与基线做整体比较 */
+export function countEditorListenersFor(editor: object, events: readonly string[]): number {
+  return events.reduce((sum, event) => sum + countEditorListeners(editor, event), 0);
+}
+
 /** 可访问名称：可见文本 / aria-label / title 任一存在即可被辅助技术朗读 */
 export function accessibleName(el: Element): string {
   return el.getAttribute("aria-label") ?? el.getAttribute("title") ?? (el.textContent ?? "").trim();

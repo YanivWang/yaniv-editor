@@ -1,5 +1,10 @@
 <template>
-  <div class="inline-toolbar" role="toolbar" :aria-label="t('editor.toolbarLabel')">
+  <div
+    ref="toolbarRef"
+    class="inline-toolbar"
+    role="toolbar"
+    :aria-label="t('editor.toolbarLabel')"
+  >
     <component :is="UndoRedoButton" v-if="config.undoRedo" :editor="editor" />
     <component :is="HeadingControl" v-if="config.heading" variant="dropdown" :editor="editor" />
     <component :is="TextFormatButtons" v-if="config.textFormat" :editor="editor" />
@@ -21,6 +26,9 @@
  * Child tools load via async import so disabled toolbar switches stay out of the initial chunk.
  */
 
+import { ref } from "vue";
+
+import { useRovingTabindex } from "@/composables/useRovingTabindex";
 import type { InlineToolbarConfig } from "@/configs/inlineTypes";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { defineGatedAsyncComponent } from "@/shared/gatedAsyncComponent";
@@ -28,6 +36,14 @@ import { defineGatedAsyncComponent } from "@/shared/gatedAsyncComponent";
 import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
+
+/**
+ * `role="toolbar"` 按 WAI-ARIA APG 必须是**单一 tab stop**、内部用方向键移动焦点。
+ * 顶栏 `ToolbarNav` 一直这么做，inline 工具栏漏了——键盘用户得逐个 Tab 穿过每个按钮，
+ * 方向键也不起作用。
+ */
+const toolbarRef = ref<HTMLElement | null>(null);
+useRovingTabindex(toolbarRef);
 
 interface Props {
   editor: Editor;

@@ -62,7 +62,14 @@ function onDblClick() {
 </script>
 
 <style>
-/* 使用全局样式以支持深色模式（因为需要匹配父级的 data-color-mode 属性） */
+/*
+ * 刻意不加 scoped：`.ye-toolbar-button` 是基础组件对外的样式钩子，
+ * 外观样式表与宿主覆盖都按这个类名书写，加了 scoped 会给它挂上作用域属性、
+ * 抬高特异性。
+ *
+ * （注：与深色模式无关——主题全部走 `--ye-*` 变量，祖先上的
+ * `[data-color-mode]` 在 scoped 下同样能匹配。原注释的理由是错的。）
+ */
 .ye-toolbar-button {
   display: inline-flex;
   align-items: center;

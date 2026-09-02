@@ -1,5 +1,14 @@
 import { Editor } from "@tiptap/vue-3";
-import { computed, nextTick, onScopeDispose, ref, shallowRef, watch, type ComputedRef } from "vue";
+import {
+  computed,
+  nextTick,
+  onScopeDispose,
+  ref,
+  shallowRef,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from "vue";
 
 import { buildExtensions } from "@/capabilities/buildExtensions";
 import type { BuildExtensionsCtx } from "@/capabilities/types";
@@ -19,7 +28,8 @@ export interface UseEditorSessionOptions {
   host: EditorShellHost;
   profile: ComputedRef<EditorRuntimeProfile>;
   sessionKey: ComputedRef<string>;
-  locale: ComputedRef<TiptapLocale>;
+  /** 语言包异步加载，落地前为 null——`rebuild()` 与下方 watch 都按可空处理。 */
+  locale: Ref<TiptapLocale | null>;
   blockMenuHost: BlockMenuHost;
   buildCtx: () => Omit<BuildExtensionsCtx, "locale" | "gates" | "isEditable" | "blockMenuHost">;
   editorProps?: Record<string, unknown>;
@@ -141,7 +151,9 @@ export function useEditorSession(options: UseEditorSessionOptions) {
       if (disposed || myGen !== generation) return;
       console.error("[useEditorSession] rebuild failed:", error);
       sessionError.value =
-        error instanceof Error ? error.message : locale.value.editor.sessionInitFailed;
+        error instanceof Error
+          ? error.message
+          : (locale.value?.editor.sessionInitFailed ?? "Editor initialization failed");
       status.value = "error";
       editor.value = null;
     }

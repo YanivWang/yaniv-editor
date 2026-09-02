@@ -28,14 +28,14 @@
       </div>
 
       <div class="ai-settings__section">
-        <label class="ai-settings__label">API Key 存储方式</label>
+        <label class="ai-settings__label">{{ t("aiSettings.storageMode") }}</label>
         <a-select
           v-model:value="formData.storageMode"
           :options="storageModeOptions"
           class="ai-settings__select"
           :get-popup-container="getOverlayContainer"
         />
-        <p class="ai-settings__hint">生产环境推荐使用后端代理，避免在浏览器长期保存密钥。</p>
+        <p class="ai-settings__hint">{{ t("aiSettings.storageModeHint") }}</p>
       </div>
 
       <!-- API Key -->
@@ -73,7 +73,7 @@
           :placeholder="currentProviderInfo?.defaultModel || 'gpt-4o-mini'"
           class="ai-settings__input"
         />
-        <p class="ai-settings__hint">{{ currentProviderInfo?.description }}</p>
+        <p class="ai-settings__hint">{{ currentProviderDescription }}</p>
       </div>
 
       <!-- 连接测试 -->
@@ -91,7 +91,7 @@
           {{ testButtonText }}
         </a-button>
         <span v-if="testLatency" class="ai-settings__latency"> {{ testLatency }}ms </span>
-        <p v-if="testError" class="ai-settings__error">{{ testError }}</p>
+        <p v-if="testErrorText" class="ai-settings__error">{{ testErrorText }}</p>
       </div>
 
       <!-- 启用开关 -->
@@ -132,6 +132,7 @@ import {
   type AiProvider,
   type AiUserConfig,
   type AiStorageMode,
+  type ConnectionTestResult,
   AI_PROVIDERS,
   getProviderInfo,
   DEFAULT_CONFIG,
@@ -176,24 +177,35 @@ const formData = reactive<Omit<AiUserConfig, "updatedAt">>({
 
 // 测试状态
 const testStatus = ref<"idle" | "testing" | "success" | "error">("idle");
-const testError = ref<string | null>(null);
+/** 保存整个结果而不是文案：`useAiConfig` 只回 key，翻译在本组件做 */
+const testError = ref<ConnectionTestResult | null>(null);
 const testLatency = ref<number | null>(null);
 
-// 计算属性
+/** provider 回的原始错误无法本地化，有就直接显示；否则翻译 key */
+const testErrorText = computed(() => {
+  const result = testError.value;
+  if (!result) return "";
+  return result.detail || t(result.messageKey);
+});
+
+// 计算属性 —— 展示名与说明按 provider id 从语言包取，随 locale 切换
 const providerOptions = computed(() =>
   AI_PROVIDERS.map((p) => ({
     value: p.id,
-    label: p.name,
+    label: t(`aiSettings.providerName.${p.id}`),
   })),
 );
 
-const storageModeOptions: { value: AiStorageMode; label: string }[] = [
-  { value: "memory", label: "仅本次会话" },
-  { value: "proxy", label: "后端代理" },
-  { value: "local", label: "本地存储（仅调试）" },
-];
+const storageModeOptions = computed<{ value: AiStorageMode; label: string }[]>(() => [
+  { value: "memory", label: t("aiSettings.storageModeMemory") },
+  { value: "proxy", label: t("aiSettings.storageModeProxy") },
+  { value: "local", label: t("aiSettings.storageModeLocal") },
+]);
 
 const currentProviderInfo = computed(() => getProviderInfo(formData.provider));
+const currentProviderDescription = computed(() =>
+  currentProviderInfo.value ? t(`aiSettings.providerDesc.${currentProviderInfo.value.id}`) : "",
+);
 
 const canSave = computed(() => {
   const info = currentProviderInfo.value;
@@ -262,7 +274,7 @@ async function handleTest() {
 
   const result = await testConnection(tempConfig);
   testStatus.value = result.success ? "success" : "error";
-  testError.value = result.success ? null : result.message;
+  testError.value = result.success ? null : result;
   testLatency.value = result.latency ?? null;
 }
 

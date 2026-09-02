@@ -68,45 +68,45 @@ function updateFormatPainterActive() {
   isFormatPainterActive.value = Boolean(storage?.isActive);
 }
 
-/**
- * 设置格式刷事件订阅
- */
-function setupFormatPainterSubscriptions() {
-  // 清理已有订阅，避免重复绑定
-  cleanupFormatPainterSubscriptions();
-  const e = editor.value;
+/** `props.editor` 用的是 @tiptap/vue-3 的 Editor，而 useYanivEditor 交出的是 core 的 */
+type BoundEditor = NonNullable<typeof editor.value>;
+
+/** 订阅会引起格式刷状态变化的事件 */
+function attachFormatPainterListeners(e: BoundEditor | null) {
   if (!e) return;
-  // 初始化一次状态
   updateFormatPainterActive();
-  // 订阅常见会引起状态变化的事件
   e.on("update", updateFormatPainterActive);
   e.on("selectionUpdate", updateFormatPainterActive);
   e.on("transaction", updateFormatPainterActive);
 }
 
-/**
- * 清理格式刷事件订阅
- */
-function cleanupFormatPainterSubscriptions() {
-  const e = editor.value;
+/** 退订指定编辑器上的监听 */
+function detachFormatPainterListeners(e: BoundEditor | null) {
   if (!e) return;
-  try {
-    e.off("update", updateFormatPainterActive);
-    e.off("selectionUpdate", updateFormatPainterActive);
-    e.off("transaction", updateFormatPainterActive);
-  } catch (error) {
-    // 忽略取消订阅时的错误
-  }
+  e.off("update", updateFormatPainterActive);
+  e.off("selectionUpdate", updateFormatPainterActive);
+  e.off("transaction", updateFormatPainterActive);
 }
 
-// 初始化与后续 editor 变更时设置订阅
-if (editor.value) setupFormatPainterSubscriptions();
-// 监听 editor 引用的变化（在父组件传入实例后触发）
-watch(editor, setupFormatPainterSubscriptions, { immediate: true });
+/**
+ * 退订必须针对**上一个**编辑器实例。
+ *
+ * 此前是 `watch(editor, setupSubscriptions)`，而 setup 里读的是 `editor.value`——
+ * 回调触发时它已经是新实例，于是 `off()` 全打在刚换上的实例上（那上面还没有监听），
+ * 旧实例的三个监听一个也没摘掉。同 `OutlinePanel` 的写法，用 watch 的 prev 参数。
+ */
+watch(
+  editor,
+  (next, prev) => {
+    detachFormatPainterListeners(prev ?? null);
+    attachFormatPainterListeners(next ?? null);
+  },
+  { immediate: true },
+);
 
 // 组件卸载时清理订阅
 onBeforeUnmount(() => {
-  cleanupFormatPainterSubscriptions();
+  detachFormatPainterListeners(editor.value ?? null);
 });
 
 // ===== 格式刷命令 =====

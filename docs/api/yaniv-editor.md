@@ -19,10 +19,11 @@ import "@yanivjs/yaniv-editor/style.css";
 | `initialContent`         | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | 初始文档内容                                               |
 | `customAppearanceVars`   | `Record<string, string>`                      | 无                             | 自定义外观 CSS 变量（视觉 token，不含 z-index）            |
 | `zIndexBase`             | `number`                                      | `1000`                         | 浮层 z-index 基准；写入 `--ye-z-base`；不触发 session 重建 |
-| `uploadImage`            | `(file: File) => Promise<string>`             | DataURL 回退                   | 图片上传处理                                               |
-| `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL 回退                   | 视频上传处理                                               |
+| `uploadImage`            | `(file: File) => Promise<string>`             | 回退 `blob:` 对象 URL          | 图片上传处理                                               |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | 回退 `blob:` 对象 URL          | 视频上传处理                                               |
 | `galleryImages`          | `GalleryImage[]`                              | 当前文档图片                   | 外部图库来源                                               |
 | `customTemplates`        | `TemplateItem[]`                              | 内置模板                       | 额外模板                                                   |
+| `mentionItems`           | `MentionItem[]`                               | 内置占位数据                   | `@` 提及候选项；需 `slashCommand` 能力                     |
 | `locale`                 | `string`                                      | `"zh-CN"`                      | 语言代码                                                   |
 | `defaultOutlineExpanded` | `boolean`                                     | `false`                        | outline 开启时大纲面板初始展开                             |
 | `aiConfig`               | `YanivEditorAiConfig`                         | 无                             | 宿主侧 AI 配置                                             |

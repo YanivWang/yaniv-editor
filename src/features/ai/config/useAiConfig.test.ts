@@ -192,7 +192,9 @@ describe("连接测试", () => {
     const result = await api.testConnection(config());
 
     expect(result.success).toBe(false);
-    expect(result.message).toContain("Invalid API key");
+    // 上游报错无法本地化，走 detail 原样透出；messageKey 只给通用「连接失败」
+    expect(result.detail).toContain("Invalid API key");
+    expect(result.messageKey).toBe("aiSettings.testFailed");
     expect(api.testStatus.value).toBe("error");
   });
 
@@ -203,7 +205,8 @@ describe("连接测试", () => {
 
     const result = await useAiConfig().testConnection(config());
     expect(result.success).toBe(false);
-    expect(result.message).toContain("超时");
+    // 只回 key，不回文案 —— 翻译在 AiSettingsModal 做，否则英文界面会混出中文
+    expect(result.messageKey).toBe("aiSettings.testTimeout");
   });
 
   it("ollama 走 /api/tags 探活且不带密钥", async () => {
@@ -232,5 +235,48 @@ describe("连接测试", () => {
   it("缺少 endpoint 时提示补端点", async () => {
     const result = await useAiConfig().testConnection(config({ provider: "custom", endpoint: "" }));
     expect(result.success).toBe(false);
+  });
+});
+
+describe("useAiConfig 的响应式派生量", () => {
+  it("isConfigured 跟随 saveConfig / clearConfig 变化", () => {
+    const api = useAiConfig();
+    api.clearConfig();
+    expect(api.isConfigured.value).toBe(false);
+
+    api.saveConfig(config());
+    // 回归：曾经写成 computed(() => store.isConfigured())，读的是 localStorage /
+    // 模块级变量，Vue 追踪不到依赖，首次求值后永久缓存在 false。
+    expect(api.isConfigured.value).toBe(true);
+
+    api.clearConfig();
+    expect(api.isConfigured.value).toBe(false);
+  });
+
+  it("isConfigured 与 store.isConfigured() 判定一致", () => {
+    const api = useAiConfig();
+    const store = getAiConfigStore();
+
+    // 缺 apiKey 且非 proxy —— 两边都应判为未配置
+    api.saveConfig(config({ apiKey: "", storageMode: "memory" }));
+    expect(api.isConfigured.value).toBe(false);
+    expect(store.isConfigured()).toBe(false);
+
+    // proxy 模式下前端本就没有 apiKey，仍算已配置
+    api.saveConfig(config({ apiKey: "", storageMode: "proxy" }));
+    expect(api.isConfigured.value).toBe(true);
+    expect(store.isConfigured()).toBe(true);
+
+    // enabled=false 一票否决
+    api.saveConfig(config({ enabled: false }));
+    expect(api.isConfigured.value).toBe(false);
+    expect(store.isConfigured()).toBe(false);
+
+    // custom 必须显式填 endpoint
+    api.saveConfig(config({ provider: "custom", endpoint: "" }));
+    expect(api.isConfigured.value).toBe(false);
+    expect(store.isConfigured()).toBe(false);
+
+    api.clearConfig();
   });
 });

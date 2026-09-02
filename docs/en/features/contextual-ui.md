@@ -29,7 +29,7 @@ Contents: heading dropdown, bold/italic/underline/strike, text color and highlig
 
 | Selection type | UI                                                                                                             |
 | -------------- | -------------------------------------------------------------------------------------------------------------- |
-| Link           | Link bubble — edit URL, remove link                                                                            |
+| Link           | Link bubble — edit URL, open in a new tab, remove link                                                         |
 | Image          | Image context bar — alignment, preview, delete (drag-resize comes from the node handles, not this bar)         |
 | Video          | Video context bar — preview playback, delete                                                                   |
 | Table cell     | Table context bar — add/remove rows/cols, merge/split, header row/column, delete table (no cell background UI) |

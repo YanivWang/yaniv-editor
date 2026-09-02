@@ -1,12 +1,10 @@
-import { createApp, h, provide, ref } from "vue";
+import { createApp, h, ref } from "vue";
 
-import { editorLocaleKey } from "@/core/infra/useEditorLocale";
 import { showEditorNotice } from "@/core/overlayFeedback";
 import { resolveOverlayPortal } from "@/core/overlayPortal";
 import { aiClient } from "@/features/ai/client";
 import type { createAiClient } from "@/features/ai/client";
 import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
-import type { LocaleCode } from "@/locales/manager";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import {
@@ -56,9 +54,13 @@ class AiSuggestionManager {
    * 取当前仍存活的编辑器；已销毁时顺手断开引用并返回 null。
    *
    * 本类是模块级单例，会跨 session 存活：能力开关变化会重建 editor（`useEditorSession`
-   * 的 sessionKey 机制），组件卸载也会 destroy。若此时仍持有旧实例，任何
-   * `editor.view` / `editor.state` 访问都会抛 `[tiptap error]: The editor view is not available`，
-   * 且发生在弹层回调里无人捕获。
+   * 的 sessionKey 机制），组件卸载也会 destroy。销毁后 `editor.state` 仍可读（缓存），
+   * 但凡走到 `editor.view` 的都会抛 `[tiptap error]: The editor view is not available`
+   * —— 派发事务（`addAiHighlight` 等）、读 `view.dom`（挂弹层、装/摘点击监听）、
+   * `showEditorNotice` 全在此列，且这些调用多在流式回调里，无人捕获。
+   *
+   * 因此**所有**触碰 editor 的方法都必须经此取用，异步回调要在回调发生时重取：
+   * 会话开始时还活着，不代表 token 到达时仍然活着。
    *
    * 与 `SearchReplace` / `FormatPainter` 的 `isDestroyed` 前置判断是同一类保护。
    */
@@ -69,6 +71,8 @@ class AiSuggestionManager {
     return this.editor;
   }
   private popoverApp: App | null = null;
+  /** 当前编辑器 destroy 监听的反订阅句柄；换实例 / 收尾时必须调用，避免监听随实例累积 */
+  private detachLifecycle: (() => void) | null = null;
   private container: HTMLElement | null = null;
   private mode: AiSessionMode = "replace";
   private positionAnchor: { from: number; to: number } = { from: 0, to: 0 };
@@ -92,9 +96,40 @@ class AiSuggestionManager {
   private isStreamingRef = ref(false);
   private isExecutingRef = ref(false);
 
+  /**
+   * 绑定编辑器，并订阅它自身的 `destroy`。
+   *
+   * 这是本单例唯一可靠的清理时机：`destroy()` 虽是公开方法，但生产代码里没有调用方
+   * —— session 重建与组件卸载都只 destroy editor（见 `useEditorSession` 的三处）。
+   * 也不能反过来让 session 层调本模块：AI 是门控能力，主 chunk 里出现它会打穿
+   * 代码分割断言（CI 检查 `chat/completions` 等标记未回流）。
+   * 因此由持有方自己订阅资源的生命周期，并持有显式反订阅句柄。
+   */
   init(editor: Editor): void {
+    // 换实例先摘上一个的监听，否则同页多编辑器会让监听逐个堆积
+    this.detachLifecycle?.();
     this.editor = editor;
+
+    const onDestroy = () => this.handleEditorDestroyed();
+    editor.on("destroy", onDestroy);
+    this.detachLifecycle = () => editor.off("destroy", onDestroy);
+
     this.setupClickHandler();
+  }
+
+  /**
+   * 编辑器销毁时的收尾。
+   *
+   * Tiptap 先 emit `destroy` 再拆 view（此刻 `isDestroyed` 仍为 false、`view.dom` 仍可读），
+   * 所以点击监听还能摘干净；但**不能再派发事务**，因此先断引用，让 `hide()` 走
+   * 「无存活编辑器」分支，只做状态复位与弹层卸载。
+   */
+  private handleEditorDestroyed(): void {
+    this.detachLifecycle?.();
+    this.detachLifecycle = null;
+    this.removeClickHandler();
+    this.editor = null;
+    this.hide();
   }
 
   show(
@@ -153,16 +188,17 @@ class AiSuggestionManager {
     client: AiClient = aiClient,
   ): void {
     this.ensureEditor(editor);
-    if (!this.editor) return;
+    const live = this.liveEditor();
+    if (!live) return;
 
-    removeAiHighlight(this.editor);
+    removeAiHighlight(live);
     this.mode = "custom";
     this.positionAnchor = selection;
     this.userContextRange = null;
     this.isExecutingRef.value = false;
     this.customClient = client;
 
-    addAiHighlight(this.editor, selection.from, selection.to, {
+    addAiHighlight(live, selection.from, selection.to, {
       originalText: selectedText,
       suggestedText: "",
       isStreaming: false,
@@ -172,7 +208,8 @@ class AiSuggestionManager {
   }
 
   executeCustomPrompt(prompt: string): void {
-    if (!this.editor || this.mode !== "custom") return;
+    const live = this.liveEditor();
+    if (!live || this.mode !== "custom") return;
 
     const abortController = new AbortController();
     this.setAbortController(abortController);
@@ -184,7 +221,7 @@ class AiSuggestionManager {
     this.customClient.customCommand(
       this.state.originalText,
       prompt,
-      this.editor ? buildDocumentContextPrompt(this.editor) : "",
+      buildDocumentContextPrompt(live),
       {
         onStart: () => {
           accumulated = "";
@@ -206,8 +243,10 @@ class AiSuggestionManager {
           console.error("[Custom AI]", error);
           this.isExecutingRef.value = false;
           this.hide();
-          if (this.editor) {
-            showEditorNotice(this.editor, {
+          // 回调时重取：请求在途期间编辑器可能已被销毁
+          const target = this.liveEditor();
+          if (target) {
+            showEditorNotice(target, {
               message: this.getLocaleText("messages.customAiFailed"),
               description: error.message,
               kind: "error",
@@ -220,7 +259,22 @@ class AiSuggestionManager {
     );
   }
 
+  /**
+   * 接管当前流的取消句柄；换成**另一个**流时先把上一个取消掉。
+   *
+   * 此前是直接覆盖：同一个编辑器上连着做两次 AI 操作时，`show()` 不会 abort
+   * （`ensureEditor` 对同一实例直接返回），于是第一个流的 controller 被覆盖后
+   * 再也没人能取消它——它继续消耗 API 配额，`onToken` 还在往**同一个单例**里
+   * `updateSuggestion()`，两个流的文本互相覆盖、来回跳变；编辑器销毁时
+   * `hide()` 也只能 abort 得到最后那个，孤儿流失败时拿的是闭包里已销毁的 editor。
+   *
+   * 传 `null` 是「流已结束、清空句柄」，不需要 abort。
+   */
   setAbortController(abortController: AbortController | null): void {
+    const previous = this.abortController;
+    if (previous && abortController && previous !== abortController) {
+      previous.abort();
+    }
     this.abortController = abortController;
   }
 
@@ -289,20 +343,20 @@ class AiSuggestionManager {
 
   hide(): void {
     this.abortActiveStream();
+
+    // 只有这两步需要活着的编辑器（派发事务 / 读 view.dom）；
+    // 编辑器已销毁时跳过它们，但**下面的复位一步都不能少**——
+    // 状态是本单例自己的，会一直带到下一个 session：漏复位会让 isVisible() 恒真、
+    // getState() 返回上一轮的建议文本、customClient 停在上一个实例的 client 上。
     const editor = this.liveEditor();
-    if (!editor) {
-      // 编辑器已销毁：仍要复位自身状态，否则下一个 session 会读到脏数据
-      this.visibleRef.value = false;
-      this.isTemporarilyHidden = false;
-      this.unmountPopover();
-      return;
+    if (editor) {
+      removeAiHighlight(editor);
+      this.removeClickHandler();
     }
 
     this.visibleRef.value = false;
     this.isTemporarilyHidden = false;
-    removeAiHighlight(editor);
     this.unmountPopover();
-    this.removeClickHandler();
 
     this.state = {
       visible: false,
@@ -327,6 +381,8 @@ class AiSuggestionManager {
   }
 
   destroy(): void {
+    this.detachLifecycle?.();
+    this.detachLifecycle = null;
     this.hide();
     this.editor = null;
   }
@@ -367,7 +423,8 @@ class AiSuggestionManager {
     selection: { from: number; to: number },
     streaming: boolean,
   ): void {
-    if (!this.editor) return;
+    const editor = this.liveEditor();
+    if (!editor) return;
 
     this.state = {
       visible: true,
@@ -385,7 +442,7 @@ class AiSuggestionManager {
     this.isTemporarilyHidden = false;
 
     if (this.mode === "replace") {
-      addAiHighlight(this.editor, selection.from, selection.to, {
+      addAiHighlight(editor, selection.from, selection.to, {
         originalText,
         suggestedText: "",
         isStreaming: streaming,
@@ -397,16 +454,19 @@ class AiSuggestionManager {
   }
 
   private updateHighlightMeta(partial: Partial<AiSuggestionData>): void {
-    if (!this.editor) return;
+    // 每个 token 都会走到这里，而流式期间编辑器随时可能被重建
+    const editor = this.liveEditor();
+    if (!editor) return;
     const { originalSelection } = this.state;
-    if (!isValidSelection(originalSelection, this.editor.state.doc.content.size)) return;
+    if (!isValidSelection(originalSelection, editor.state.doc.content.size)) return;
 
-    updateAiHighlight(this.editor, originalSelection.from, originalSelection.to, partial);
+    updateAiHighlight(editor, originalSelection.from, originalSelection.to, partial);
   }
 
   private setupClickHandler(): void {
-    if (!this.editor) return;
-    const editorDom = this.editor.view.dom;
+    const editor = this.liveEditor();
+    if (!editor) return;
+    const editorDom = editor.view.dom;
     this.removeClickHandler();
 
     const clickHandler = (event: MouseEvent) => {
@@ -415,15 +475,16 @@ class AiSuggestionManager {
         ? target
         : target.closest(".ai-highlight");
 
-      if (!highlightElement || !this.editor) return;
+      const live = this.liveEditor();
+      if (!highlightElement || !live) return;
 
       if (this.isTemporarilyHidden || !this.visibleRef.value) {
         event.stopPropagation();
         const pos = this.posAtDOMOrAnchor(highlightElement);
 
-        let data = getAiSuggestionData(this.editor, pos);
+        let data = getAiSuggestionData(live, pos);
         if (!data && this.userContextRange) {
-          data = getAiSuggestionData(this.editor, this.userContextRange.from);
+          data = getAiSuggestionData(live, this.userContextRange.from);
         }
         if (!data) {
           data = {
@@ -443,7 +504,7 @@ class AiSuggestionManager {
       }
 
       const pos = this.posAtDOMOrAnchor(highlightElement);
-      const data = getAiSuggestionData(this.editor, pos);
+      const data = getAiSuggestionData(live, pos);
       if (data && !this.state.visible) {
         this.restoreSuggestion(highlightElement as HTMLElement, data);
       }
@@ -460,17 +521,19 @@ class AiSuggestionManager {
    * 「未隐藏」那条裸调 `posAtDOM`，同样的脱链场景照样会把点击回调打断。
    */
   private posAtDOMOrAnchor(element: Element): number {
-    if (!this.editor) return this.positionAnchor.from;
+    const editor = this.liveEditor();
+    if (!editor) return this.positionAnchor.from;
     try {
-      return this.editor.view.posAtDOM(element, 0);
+      return editor.view.posAtDOM(element, 0);
     } catch {
       return this.positionAnchor.from;
     }
   }
 
   private removeClickHandler(): void {
-    if (!this.editor) return;
-    const editorDom = this.editor.view.dom;
+    const editor = this.liveEditor();
+    if (!editor) return;
+    const editorDom = editor.view.dom;
     const handler = editorClickHandlers.get(editorDom);
     if (handler) {
       editorDom.removeEventListener("click", handler);
@@ -479,12 +542,13 @@ class AiSuggestionManager {
   }
 
   private restoreSuggestion(element: HTMLElement, data: AiSuggestionData): void {
-    if (!this.editor) return;
+    const editor = this.liveEditor();
+    if (!editor) return;
 
     const pos = this.posAtDOMOrAnchor(element);
-    if (pos < 0 || pos > this.editor.state.doc.content.size) return;
+    if (pos < 0 || pos > editor.state.doc.content.size) return;
 
-    const node = this.editor.state.doc.nodeAt(pos);
+    const node = editor.state.doc.nodeAt(pos);
     if (!node) return;
 
     const from = pos;
@@ -517,12 +581,13 @@ class AiSuggestionManager {
   }
 
   private mountPopover(): void {
-    if (!this.editor) return;
+    const editor = this.liveEditor();
+    if (!editor) return;
     this.unmountPopover();
 
     this.container = document.createElement("div");
 
-    const editorRoot = this.editor.view.dom.closest(".yaniv-editor");
+    const editorRoot = editor.view.dom.closest(".yaniv-editor");
     if (!(editorRoot instanceof HTMLElement)) {
       throw new Error("AI suggestion popover requires an editor root (.yaniv-editor)");
     }
@@ -541,20 +606,18 @@ class AiSuggestionManager {
 
     const position = this.calculatePopoverPosition();
     const isCustom = this.mode === "custom";
-    const translate = this.getLocaleText.bind(this);
+    // 晚绑定：读的是**调用时**的解析器，而不是挂载那一刻的快照
+    const translate = (key: string) => this.getLocaleText(key);
     const getPopupContainer = () => overlayPortal;
 
+    // 弹层跑在独立 app 里，继承不到 EditorShell 的 provide。
+    // 依赖显式作为 prop 传入 —— 不伪造 provide(editorLocaleKey)：
+    // 那样 locale / messages 只能填假值，任何读它们的组件都会拿到错的实例语言。
     this.popoverApp = createApp({
-      setup() {
-        provide(editorLocaleKey, {
-          locale: ref("zh-CN" as LocaleCode),
-          messages: ref(null),
-          t: translate,
-        });
-      },
       render: () => {
         if (isCustom) {
           return h(CustomAiPopover, {
+            t: translate,
             visible: this.visibleRef.value,
             originalText: this.originalTextRef.value,
             suggestedText: this.suggestedTextRef.value,
@@ -576,6 +639,7 @@ class AiSuggestionManager {
         }
 
         return h(AiSuggestionPopover, {
+          t: translate,
           visible: this.visibleRef.value,
           originalText: this.originalTextRef.value,
           suggestedText: this.suggestedTextRef.value,

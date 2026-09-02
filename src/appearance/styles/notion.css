@@ -146,18 +146,6 @@
 
 /* ===== Notion 风格 - 高亮（token 见上方 --ye-mark-bg） ===== */
 
-/* ===== Notion 风格 - placeholder ===== */
-.yaniv-editor.appearance-notion .ProseMirror p.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h1.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h2.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h3.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h4.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h5.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror h6.is-empty::before,
-.yaniv-editor.appearance-notion .ProseMirror pre.is-empty::before {
-  font-style: normal;
-}
-
 /* ===== Notion 风格 - 列表 ===== */
 .yaniv-editor.appearance-notion .ProseMirror ul,
 .yaniv-editor.appearance-notion .ProseMirror ol {
@@ -443,6 +431,11 @@
   --ye-table-header-bg: rgba(255, 255, 255, 0.04);
   --ye-hr-color: rgba(255, 255, 255, 0.09);
   --ye-link: rgb(82, 156, 202);
+  --ye-outline-title-color: var(--ye-primary);
+
+  /* Notion 的引用块与行内代码本就没有底色 / 边框，深色下同样保持 */
+  --ye-blockquote-bg: transparent;
+  --ye-code-inline-border: transparent;
 }
 
 .yaniv-editor.appearance-notion.document-layout[data-color-mode="dark"],
@@ -477,16 +470,6 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-.yaniv-editor.appearance-notion[data-color-mode="dark"]
-  .ProseMirror
-  ul[data-type="taskList"]
-  > li
-  > label
-  input[type="checkbox"]:checked {
-  background-color: var(--ye-primary);
-  border-color: var(--ye-primary);
-}
-
 /* ===== Notion 拖拽手柄与块菜单（自 drag-handle.css 收拢） ===== */
 .yaniv-editor.appearance-notion .drag-handle-plus {
   width: 24px;
@@ -518,15 +501,9 @@
 .yaniv-editor.appearance-notion .drag-handle-plus:hover,
 .yaniv-editor.appearance-notion .drag-handle.is-dragging {
   background: rgb(55 53 47 / 8%);
-  border-color: transparent;
-  box-shadow: none;
 }
 
 .yaniv-editor.appearance-notion .drag-handle__dot {
-  background: #c4c4c4;
-}
-
-.yaniv-editor.appearance-notion .drag-handle.is-dragging .drag-handle__dot {
   background: #c4c4c4;
 }
 
@@ -548,10 +525,6 @@
 
 .drag-handle-menu.appearance-notion .drag-handle-menu__item:hover {
   background: rgb(55 53 47 / 8%);
-}
-
-.drag-handle-menu.appearance-notion .drag-handle-menu__description {
-  color: rgb(120 119 116);
 }
 
 .drag-handle-menu.appearance-notion .drag-handle-menu__arrow {
@@ -593,7 +566,6 @@
   background: rgb(255 255 255 / 10%);
 }
 
-.drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__description,
 .drag-handle-menu.appearance-notion[data-color-mode="dark"] .drag-handle-menu__arrow {
   color: #a3a3a3;
 }
@@ -611,11 +583,6 @@
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle:hover,
 .yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle.is-dragging {
   background: rgb(255 255 255 / 10%);
-  border-color: transparent;
-}
-
-.yaniv-editor.appearance-notion[data-color-mode="dark"] .drag-handle__dot {
-  background: #c4c4c4;
 }
 
 /* ===== Notion 块选择菜单 ===== */
@@ -668,10 +635,6 @@
   color: var(--ye-text-muted);
 }
 
-.block-picker-menu.appearance-notion[data-color-mode="dark"] {
-  box-shadow: var(--ye-bubble-shadow);
-}
-
 .block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item {
   color: #e8e8e8;
 }
@@ -684,16 +647,6 @@
 .block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item-icon {
   color: #a8a8a8;
   background: #2a2a2a;
-}
-
-.block-picker-menu.appearance-notion[data-color-mode="dark"]
-  .block-picker-item.active
-  .block-picker-item-icon,
-.block-picker-menu.appearance-notion[data-color-mode="dark"]
-  .block-picker-item:hover
-  .block-picker-item-icon {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
 }
 
 .block-picker-menu.appearance-notion[data-color-mode="dark"] .block-picker-item-title {
@@ -794,7 +747,6 @@
 }
 
 .link-bubble-menu-content.appearance-notion .link-action-btn--danger:hover:not(:disabled) {
-  color: #eb5757;
   background: rgb(235 87 87 / 10%);
 }
 
@@ -829,7 +781,6 @@
 
 .link-bubble-menu-content.appearance-notion[data-color-mode="dark"]
   .link-action-btn--danger:hover:not(:disabled) {
-  color: #ff7369;
   background: rgb(255 115 105 / 12%);
 }
 
@@ -959,8 +910,4 @@
 .mention-suggestion-menu.appearance-notion .mention-suggestion-menu__item:hover,
 .mention-suggestion-menu.appearance-notion .mention-suggestion-menu__item.is-active {
   background: var(--ye-bg-hover);
-}
-
-.mention-suggestion-menu.appearance-notion[data-color-mode="dark"] {
-  box-shadow: var(--ye-bubble-shadow);
 }

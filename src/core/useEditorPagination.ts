@@ -1,15 +1,16 @@
 import { nextTick, ref } from "vue";
 
-import {
-  A4_WIDTH_PX,
-  A4_HEIGHT_PX,
-  PAGE_PADDING_TOP_PX,
-  PAGE_PADDING_BOTTOM_PX,
-  PAGE_CONTENT_HEIGHT_PX,
-} from "@/extensions/pageConstants";
+import { A4_HEIGHT_PX } from "@/extensions/pageConstants";
 
 import type { Ref } from "vue";
 
+/**
+ * 文档型布局的页码统计。
+ *
+ * **只负责算「共几页」，不碰页面尺寸。** 页宽 / 内边距 / 最小高度全部是
+ * `--ye-doc-*` token，由 `variables.css` 给基础值、三套 appearance 各自覆盖，
+ * 这里再写一遍就会盖掉外观（内联 style 优先级高于任何选择器）。
+ */
 export function useEditorPagination(containerRef: Ref<HTMLElement | null>) {
   const totalPages = ref(1);
   const zoomLevel = ref(100);
@@ -29,18 +30,9 @@ export function useEditorPagination(containerRef: Ref<HTMLElement | null>) {
     });
   };
 
-  const initPageCssVariables = () => {
-    if (!containerRef.value) return;
-    containerRef.value.style.setProperty("--ye-doc-page-width", `${A4_WIDTH_PX}px`);
-    containerRef.value.style.setProperty("--ye-doc-padding-top", `${PAGE_PADDING_TOP_PX}px`);
-    containerRef.value.style.setProperty("--ye-doc-padding-bottom", `${PAGE_PADDING_BOTTOM_PX}px`);
-    containerRef.value.style.setProperty("--ye-doc-page-min-height", `${PAGE_CONTENT_HEIGHT_PX}px`);
-  };
-
   return {
     totalPages,
     zoomLevel,
     calculatePages,
-    initPageCssVariables,
   };
 }

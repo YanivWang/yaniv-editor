@@ -15,9 +15,12 @@
   box-shadow: none;
 }
 
+/*
+ * padding 归 ToolbarNav.vue 的 scoped 样式（基础值与 768px 断点写在一起）。
+ * 这里曾有一条同值的 `padding: 6px 12px`，因特异性相同且更靠前，两个断点下都轮不上。
+ */
 .document-toolbar {
   flex-shrink: 0;
-  padding: 6px 12px;
   background: transparent;
   border-bottom: none;
   box-shadow: none;

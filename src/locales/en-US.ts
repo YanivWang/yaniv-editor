@@ -68,6 +68,9 @@ export const enUS: TiptapLocale = {
       "Image upload handler is not configured. Currently using local preview. Please implement your own upload logic for production.",
     videoUploadNotConfigured:
       "Video upload handler is not configured. Currently using local preview. Please implement your own upload logic for production.",
+    aiNotConfigured:
+      "Configure an API Key under AI Settings in the toolbar, or set VITE_AI_DEMO_MODE=true to try the simulated stream.",
+    aiRequestFailed: "AI request failed",
   },
 
   editor: {
@@ -200,6 +203,7 @@ export const enUS: TiptapLocale = {
     officePasteImageTitle: "Paste from Office/WPS with images detected",
     officePasteImageBody:
       "Inline images were replaced by placeholders while keeping HTML styles where possible. To embed originals, upload via Insert Image, or paste content with fewer images and try again.",
+    officePasteImagePlaceholder: "[Image will be carried in by the document HTML]",
 
     enterValidLink: "Please enter a valid link URL",
 
@@ -350,6 +354,44 @@ export const enUS: TiptapLocale = {
     save: "Save",
     cancel: "Cancel",
     clearConfig: "Clear Config",
+    storageMode: "API Key storage",
+    storageModeHint:
+      "For production, prefer a backend proxy so the key is never kept in the browser.",
+    storageModeMemory: "This session only",
+    storageModeProxy: "Backend proxy",
+    storageModeLocal: "Local storage (debug only)",
+    providerName: {
+      openai: "OpenAI",
+      deepseek: "DeepSeek",
+      aliyun: "Alibaba Cloud Qwen",
+      ollama: "Ollama (local)",
+      custom: "Custom",
+    },
+    providerDesc: {
+      openai: "GPT-4o, GPT-4o-mini and similar models",
+      deepseek: "DeepSeek-V3, DeepSeek-R1 and similar models",
+      aliyun: "Qwen-Max, Qwen-Plus and similar models",
+      ollama: "Open models running locally",
+      custom: "Any OpenAI-compatible endpoint",
+    },
+    testUnknownProvider: "Unknown provider",
+    testMissingApiKey: "Enter an API Key",
+    testMissingEndpoint: "Enter an API endpoint",
+    testTimeout: "Connection timed out",
+    testNotConfigured: "Configure AI settings first",
+  },
+
+  aiDemo: {
+    continue:
+      "This is a demo of AI continuation.\n\nOnce an API Key is configured (toolbar → AI Settings), the model continues from your text.\nSupported providers: OpenAI, DeepSeek, Alibaba Cloud Qwen, Ollama (local), and any OpenAI-compatible endpoint.",
+    polish:
+      "This is a demo of AI polishing.\n\nOnce an API Key is configured (toolbar → AI Settings), the model improves wording, fixes grammar and raises readability while keeping your meaning.",
+    summarize:
+      "This is a demo of AI summarising.\n\nOnce an API Key is configured (toolbar → AI Settings), the model extracts the key points of the selection into a short summary.",
+    translate:
+      "This is a demo of AI translation.\n\nOnce an API Key is configured (toolbar → AI Settings), the model produces a high-quality translation that keeps the original tone.",
+    custom:
+      "This is a demo of the custom AI command.\n\nOnce an API Key is configured (toolbar → AI Settings), whatever instruction you type is applied to the selected text.",
   },
 };
 

@@ -58,8 +58,43 @@ describe("ContentAdapter", () => {
     expect(editor.getText()).toBe("after");
   });
 
-  test("BYPASS_GUARD_META 是 Symbol", () => {
-    expect(typeof BYPASS_GUARD_META).toBe("symbol");
+  /**
+   * 这里断言的是**隔离性**，不是 JS 类型。
+   *
+   * 此前断言 `typeof === "symbol"`——锁住的恰恰是缺陷本身：ProseMirror 按
+   * `this.meta[typeof key == "string" ? key : key.key]` 存取 meta，symbol 没有 `.key`，
+   * 于是所有 symbol 键共用 `meta["undefined"]` 一个槽，任何第三方 meta 都能解除只读保护。
+   */
+  test("BYPASS_GUARD_META 与其他 meta 键互不串味", () => {
+    editor = new Editor({ extensions: [StarterKit], content: "<p>x</p>" });
+
+    // 无关的 symbol / 裸对象 / 字符串 "undefined" 都不得被读成 bypass
+    const unrelated = editor.state.tr
+      .setMeta(Symbol("无关") as unknown as string, true)
+      .setMeta({} as unknown as string, true)
+      .setMeta("undefined", true);
+    expect(unrelated.getMeta(BYPASS_GUARD_META)).toBeUndefined();
+
+    // 反向：写了 bypass 之后，无关键读不到它
+    const bypassed = editor.state.tr.setMeta(BYPASS_GUARD_META, true);
+    expect(bypassed.getMeta(BYPASS_GUARD_META)).toBe(true);
+    expect(bypassed.getMeta(Symbol("另一个") as unknown as string)).toBeUndefined();
+  });
+
+  test("只读守卫不被第三方 meta 绕过", () => {
+    const isEditable = ref(false);
+    const guarded = withTransactionGuard(Extension.create({ name: "bypassProbe" }), isEditable);
+
+    editor = new Editor({ extensions: [StarterKit, guarded], content: "<p>before</p>" });
+    editor.setEditable(false);
+
+    // 第三方用自己的 symbol 作 meta——不该因此获得写权限
+    const tr = editor.state.tr
+      .setMeta(Symbol("宿主自己的 meta") as unknown as string, true)
+      .insertText("X", 1);
+    editor.view.dispatch(tr);
+
+    expect(editor.getText()).toBe("before");
   });
 
   test("普通业务 commands 在 editable=false 下被守卫拦截", () => {

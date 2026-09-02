@@ -1,8 +1,12 @@
 /**
  * Yaniv Editor - Inline Stylesheet Entry
  *
- * 构建后 dist/inline.css 会合并本入口与主包 Vue 组件样式（共享工具栏等），
- * npm 接入仅 `import '@yanivjs/yaniv-editor/inline.css'` 即可，无需再引 style.css。
+ * 构建时（见 vite.config.ts 的 consolidateLibCssPlugin）会沿 rollup import 图，
+ * 把 **inline 入口真正可达** 的 Vue SFC 样式（共享的工具栏按钮、下拉等）合并进来，
+ * 但不会带上 full 专属的 document-layout / table / outline / drag-handle / appearance。
+ *
+ * 因此：只渲染 `YanivInlineEditor` 时引本文件即可；同页还要渲染 `YanivEditor` 的，
+ * 必须另外引 `style.css`（两者是配对关系，不是包含关系）。
  */
 
 /* CSS variables must be loaded first. */
@@ -41,17 +45,12 @@
   align-items: center;
   padding: 8px 12px;
   background: var(--ye-toolbar-bg);
-  border-bottom: var(--ye-border-width) solid var(--ye-border);
+
+  /* 工具栏边框走工具栏自己的 token：宿主单独覆盖 --ye-toolbar-border 时要跟随 */
+  border-bottom: var(--ye-border-width) solid var(--ye-toolbar-border);
 }
 
 .yaniv-inline-editor__content {
   min-height: 120px;
   padding: 12px 16px;
-}
-
-.yaniv-inline-editor__status {
-  min-height: 120px;
-  padding: 12px 16px;
-  font-size: 14px;
-  color: var(--ye-text-muted, #64748b);
 }

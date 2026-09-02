@@ -3,7 +3,7 @@ import { TextSelection } from "@tiptap/pm/state";
 
 import type { MediaUploadHandler } from "@/core/editorTypes";
 import { resolveEmbedProvider } from "@/extensions/embed";
-import type { MentionItem } from "@/extensions/mention";
+import { resolveMentionItems, type MentionItem } from "@/extensions/mention";
 import { resolveMediaUrl, type MediaKind } from "@/utils/mediaUpload";
 
 import type { BlockInsertContext, BlockMenuItemId } from "./types";
@@ -170,17 +170,33 @@ export function pickMediaUrl(
 
     const cleanup = () => input.remove();
 
-    input.addEventListener("change", () => {
-      const file = input.files?.[0];
-      cleanup();
-      if (!file) {
+    input.addEventListener(
+      "change",
+      () => {
+        const file = input.files?.[0];
+        cleanup();
+        if (!file) {
+          resolve(null);
+          return;
+        }
+        void resolveMediaUrl({ file, kind, upload, translate, overlayPortal })
+          .then(resolve)
+          .catch(() => resolve(null));
+      },
+      { once: true },
+    );
+
+    // 用户直接关掉文件选择器时不会有 change 事件：不收这个事件的话，
+    // 这个 <input> 会永久留在 document.body 里，Promise 也永远悬着，
+    // 每取消一次泄漏一份。
+    input.addEventListener(
+      "cancel",
+      () => {
+        cleanup();
         resolve(null);
-        return;
-      }
-      void resolveMediaUrl({ file, kind, upload, translate, overlayPortal })
-        .then(resolve)
-        .catch(() => resolve(null));
-    });
+      },
+      { once: true },
+    );
 
     document.body.appendChild(input);
     input.click();
@@ -221,18 +237,16 @@ export function insertBlockEmbedAt(editor: Editor, insertPos: number, url: strin
 }
 
 /**
- * @param item 默认值是**占位内容**（会写进文档，可由用户改写），不是 UI 文案，
- * 故不走 i18n；宿主接入真实的页面/人员数据时应显式传入。
+ * 块菜单「页面链接」插入的提及节点。
+ *
+ * @param item 省略时取当前编辑器生效的候选项的第一条（`resolveMentionItems`：宿主经
+ * `mention-items` prop 注入的优先，未注入才是内置占位数据）。这些字符串会**写进文档**，
+ * 属于内容而不是 UI 文案，因此不走 i18n。
  */
 export function insertBlockMentionAt(
   editor: Editor,
   insertPos: number,
-  item: MentionItem = {
-    id: "page-docs",
-    label: "文档",
-    href: "#docs",
-    type: "page",
-  },
+  item: MentionItem = resolveMentionItems(editor)[0],
 ): void {
   if (!editor.state.schema.nodes.mention) return;
   editor

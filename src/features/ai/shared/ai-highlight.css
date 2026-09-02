@@ -1,15 +1,38 @@
-/* AI Highlight Styles */
+/**
+ * AI Highlight — 正在被 AI 处理的文本标记（AiHighlightMark）
+ *
+ * 颜色全部走 --ye-ai-highlight-* token（见 styles/variables.css 的浅色与深色两段）：
+ * 高亮里的文字用的是继承来的 --ye-text，所以底色必须跟着主题走。浅色那套
+ * `#fff7e6` 直接搬到深色下，实测对比度只有 1.18:1（浅色下是 14.8:1），
+ * 整段 AI 建议文字几乎看不见。keyframes 也一并用 token，否则淡入的终帧会把
+ * 深色底再刷回浅色。
+ *
+ * 这里曾有一组 `.ai-highlight:hover::after` 的 CSS tooltip（连同
+ * `@keyframes tooltip-fade-in` 与一条 `[contenteditable="false"]` 的禁用规则），
+ * 但**全仓没有任何地方给它设 `content`**——没有 `content` 的伪元素根本不生成，
+ * 浏览器实测 `getComputedStyle(el, "::after").content` 在明暗两态都是 `none`。
+ * AiHighlightMark 也只渲染 data-original-text / data-suggested-text /
+ * data-is-streaming，没有可供 `attr()` 取用的提示文案，真正的建议 UI 是
+ * AiSuggestionPopover.vue。整组已删除。
+ */
+
 .ai-highlight {
   position: relative;
   padding: 2px 0;
   cursor: pointer;
-  background-color: #fff7e6;
-  border-bottom: 2px solid #ffa940;
+  background-color: var(--ye-ai-highlight-bg);
+  border-bottom: 2px solid var(--ye-ai-highlight-border);
   border-radius: 2px;
   transition: all 0.2s ease;
+  animation: ai-highlight-fade-in 0.3s ease;
 }
 
-/* Hide AI highlights when editing is disabled */
+.ai-highlight:hover {
+  background-color: var(--ye-ai-highlight-bg-hover);
+  border-bottom-color: var(--ye-ai-highlight-border-hover);
+}
+
+/* 预览 / 只读模式：不显示 AI 高亮的编辑态视觉 */
 .ProseMirror[contenteditable="false"] .ai-highlight {
   padding: 0;
   cursor: default;
@@ -17,46 +40,6 @@
   border-bottom: none;
 }
 
-.ProseMirror[contenteditable="false"] .ai-highlight:hover::after {
-  display: none;
-}
-
-.ai-highlight:hover {
-  background-color: #ffe7ba;
-  border-bottom-color: #f80;
-}
-
-.ai-highlight:hover::after {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  z-index: var(--ye-z-chrome-tooltip);
-  padding: 4px 8px;
-  margin-bottom: 4px;
-  font-size: 12px;
-  color: white;
-  white-space: nowrap;
-  pointer-events: none;
-  background-color: rgb(0 0 0 / 75%);
-  border-radius: 4px;
-  opacity: 0;
-  transform: translateX(-50%);
-  animation: tooltip-fade-in 0.2s ease 0.5s forwards;
-}
-
-@keyframes tooltip-fade-in {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-/* Optional: Add animation for better visual feedback */
 @keyframes ai-highlight-fade-in {
   0% {
     background-color: transparent;
@@ -64,11 +47,7 @@
   }
 
   100% {
-    background-color: #fff7e6;
-    border-bottom-color: #ffa940;
+    background-color: var(--ye-ai-highlight-bg);
+    border-bottom-color: var(--ye-ai-highlight-border);
   }
-}
-
-.ai-highlight {
-  animation: ai-highlight-fade-in 0.3s ease;
 }

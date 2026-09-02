@@ -42,6 +42,8 @@ const extensions = await buildExtensions("inline", {
   blockMenuHost,
   upload: { image: () => undefined, video: () => undefined },
   galleryImages: () => [],
+  // Inline 下不会被消费（mention 属于 notionBlocks 能力），但类型要求存在
+  mentionItems: () => undefined,
   officePaste: { onPasteFromOfficeWithImages: () => undefined },
   outline: { scrollParent: () => null, bindScrollParent: () => {} },
   aiConfig: () => undefined,

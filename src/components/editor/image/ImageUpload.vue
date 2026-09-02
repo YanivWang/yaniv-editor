@@ -126,8 +126,10 @@ function applyImage() {
 
 /**
  * 处理本地图片上传（自定义上传逻辑）
- * - 若父组件提供 uploadImage(file) 回调则使用其返回的 URL
- * - 否则回退为本地 DataURL 直接插入
+ * - 若父组件提供 uploadImage(file) 回调则使用其返回的 URL（再过一遍媒体 URL 白名单）
+ * - 否则由 `resolveMediaUrl` 回退为 `URL.createObjectURL(file)` 生成的 `blob:` 对象 URL，
+ *   并弹出「未配置上传处理器」提示。该地址只在当前页面会话内有效，刷新即失效，
+ *   不适合持久化——生产集成必须传 `uploadImage`。
  */
 async function handleLocalUpload(options: any) {
   const { file, onSuccess, onError } = options || {};

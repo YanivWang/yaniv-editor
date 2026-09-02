@@ -65,6 +65,7 @@ export const MathExtension = Node.create<MathExtensionOptions>({
       {
         tag: 'span[data-type="math"]',
       },
+      // div 变体只用于**读**：v0.2.0 之前块级公式被序列化成 div，已落库的内容要能读回来
       {
         tag: 'div[data-type="math"]',
       },
@@ -78,11 +79,20 @@ export const MathExtension = Node.create<MathExtensionOptions>({
     ];
   },
 
+  /**
+   * 一律输出 `span`，块级与否只由 `data-block` / class 表达。
+   *
+   * **不能按 `data-block` 切成 `div`**：本节点是 `inline: true`，只会出现在段落等
+   * inline 容器里，于是块级公式会被序列化成 `<p><div …></div></p>`。这不是合法 HTML，
+   * `getHTML()` → 存库 → `setContent()` 回读时，HTML 解析器会在 div 处把 `<p>` 劈开，
+   * 每存读一轮就在公式前后各多出一个空段落，且逐轮累积（N 轮后多 2N 个空段落）；
+   * 公式若插在句中，那句话还会被拦腰截断成两段。
+   * 块级展示由 NodeView 的 `.is-block` 样式负责，与序列化标签无关。
+   */
   renderHTML({ HTMLAttributes }) {
     const isBlock = HTMLAttributes["data-block"] === "true";
-    const tag = isBlock ? "div" : "span";
     return [
-      tag,
+      "span",
       mergeAttributes(HTMLAttributes, {
         "data-type": "math",
         class: isBlock ? "math-node math-block" : "math-node math-inline",

@@ -14,7 +14,9 @@ You can also enable explicitly on other presets:
 
 ## Slash Command `/`
 
-Type `/` on an empty line to open the block type menu with search filtering.
+Type `/` at the **start of a block** to open the block type menu with search filtering.
+
+The trigger condition is "the block text before the cursor is exactly `/` plus non-whitespace characters", so content may already follow the cursor — the line does not have to be empty. Deleting the `/`, moving the cursor out of that range, or making a non-collapsed selection closes the menu.
 
 ### Basic Blocks
 
@@ -28,7 +30,7 @@ Ordered list, unordered list, task list
 
 | Block type   | Description                 | Shortcut                |
 | ------------ | --------------------------- | ----------------------- |
-| Callout      | Callout / tip box           | Type `> ` on empty line |
+| Callout      | Callout / tip box           | Type `> ` at line start |
 | Toggle list  | Expandable / collapsible    | Choose via `/`          |
 | ColumnLayout | Two-column layout           | Choose via `/`          |
 | Embed        | External link bookmark card | Choose via `/`          |
@@ -39,6 +41,11 @@ Ordered list, unordered list, task list
 Blockquote, code block, table, image, video, formula, horizontal rule
 
 The block menu is filtered by gates and schema (e.g., table item hidden when `table` gate is off).
+
+### Mention data
+
+Both the `@` menu and the block menu's "page link" item read the `mentionItems` prop; without it they
+fall back to built-in placeholder data. See [Integration Props](../guide/integration-props.md).
 
 ## Drag Handle
 

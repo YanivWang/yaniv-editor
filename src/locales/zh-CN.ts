@@ -66,6 +66,9 @@ export const zhCN: TiptapLocale = {
     wordExportFailed: "Word 文件导出失败",
     imageUploadNotConfigured: "未配置图片上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
     videoUploadNotConfigured: "未配置视频上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
+    aiNotConfigured:
+      "请先在工具栏 AI 设置中配置 API Key，或设置 VITE_AI_DEMO_MODE=true 启用演示模式",
+    aiRequestFailed: "AI 请求失败",
   },
 
   editor: {
@@ -197,6 +200,7 @@ export const zhCN: TiptapLocale = {
     officePasteImageTitle: "检测到来自 Office/WPS 的含图粘贴",
     officePasteImageBody:
       "内联图片已替换为占位符，并尽可能保留 HTML 样式。若要嵌入原图，请通过「插入图片」上传，或粘贴图片更少的内容后再试。",
+    officePasteImagePlaceholder: "[图片将由文档 HTML 带入]",
 
     enterValidLink: "请输入有效的链接地址",
 
@@ -347,6 +351,43 @@ export const zhCN: TiptapLocale = {
     save: "保存",
     cancel: "取消",
     clearConfig: "清除配置",
+    storageMode: "API Key 存储方式",
+    storageModeHint: "生产环境推荐使用后端代理，避免在浏览器长期保存密钥。",
+    storageModeMemory: "仅本次会话",
+    storageModeProxy: "后端代理",
+    storageModeLocal: "本地存储（仅调试）",
+    providerName: {
+      openai: "OpenAI",
+      deepseek: "DeepSeek",
+      aliyun: "阿里云通义千问",
+      ollama: "Ollama（本地）",
+      custom: "自定义",
+    },
+    providerDesc: {
+      openai: "GPT-4o、GPT-4o-mini 等模型",
+      deepseek: "DeepSeek-V3、DeepSeek-R1 等模型",
+      aliyun: "Qwen-Max、Qwen-Plus 等模型",
+      ollama: "本地运行的开源模型",
+      custom: "自定义 OpenAI 兼容接口",
+    },
+    testUnknownProvider: "未知的提供商",
+    testMissingApiKey: "请输入 API Key",
+    testMissingEndpoint: "请输入 API 端点",
+    testTimeout: "连接超时",
+    testNotConfigured: "请先配置 AI 设置",
+  },
+
+  aiDemo: {
+    continue:
+      "这是 AI 续写功能的演示效果。\n\n配置 API Key 后（工具栏 → AI 设置），AI 会根据上文智能续写。\n支持的提供商：OpenAI、DeepSeek、阿里云通义千问、Ollama（本地）、自定义 OpenAI 兼容接口。",
+    polish:
+      "这是 AI 润色功能的演示效果。\n\n配置 API Key 后（工具栏 → AI 设置），AI 会在保持原意的前提下优化表达、修正语法、提升可读性。",
+    summarize:
+      "这是 AI 总结功能的演示效果。\n\n配置 API Key 后（工具栏 → AI 设置），AI 会提取选中内容的要点并生成简洁摘要。",
+    translate:
+      "这是 AI 翻译功能的演示效果。\n\n配置 API Key 后（工具栏 → AI 设置），AI 会在保持原文风格的前提下给出高质量译文。",
+    custom:
+      "这是自定义 AI 命令的演示效果。\n\n配置 API Key 后（工具栏 → AI 设置），你输入的任意指令都会被用于处理选中的文本。",
   },
 };
 

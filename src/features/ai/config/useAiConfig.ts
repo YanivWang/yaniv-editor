@@ -7,7 +7,7 @@ import { ref, computed, shallowReadonly } from "vue";
 
 import { getHostAiConfig, isHostAiManaged } from "./hostConfig";
 import { getAiConfigStore } from "./store";
-import { DEFAULT_CONFIG, getProviderInfo, AI_PROVIDERS } from "./types";
+import { DEFAULT_CONFIG, getProviderInfo, isUsableAiConfig, AI_PROVIDERS } from "./types";
 
 import type { AiUserConfig, AiProvider, AiConfigState, ConnectionTestResult } from "./types";
 
@@ -40,22 +40,26 @@ function initConfig(): void {
 }
 
 /**
- * 测试 API 连接
+ * 测试 API 连接。
+ *
+ * 返回的是**语言包 key**（`aiSettings.*`）而不是文案：本 composable 没有 locale 上下文，
+ * 翻译交给持有 `useEditorT()` 的 `AiSettingsModal`。provider 回的原始错误无法本地化，
+ * 走 `detail` 原样透出。
  */
 async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestResult> {
   const providerInfo = getProviderInfo(config.provider);
   if (!providerInfo) {
-    return { success: false, message: "未知的提供商" };
+    return { success: false, messageKey: "aiSettings.testUnknownProvider" };
   }
 
   // 检查必要参数
   if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
-    return { success: false, message: "请输入 API Key" };
+    return { success: false, messageKey: "aiSettings.testMissingApiKey" };
   }
 
   const endpoint = config.endpoint || providerInfo.defaultEndpoint;
   if (!endpoint) {
-    return { success: false, message: "请输入 API 端点" };
+    return { success: false, messageKey: "aiSettings.testMissingEndpoint" };
   }
 
   const startTime = Date.now();
@@ -80,7 +84,7 @@ async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestRes
       }
 
       const latency = Date.now() - startTime;
-      return { success: true, message: "连接成功", latency };
+      return { success: true, messageKey: "aiSettings.testSuccess", latency };
     }
 
     if (config.apiKey) {
@@ -104,21 +108,25 @@ async function testAiConnection(config: AiUserConfig): Promise<ConnectionTestRes
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const errorMessage =
-        errorData.error?.message || errorData.message || `HTTP ${response.status}`;
-      return { success: false, message: errorMessage, latency };
+      const detail = errorData.error?.message || errorData.message || `HTTP ${response.status}`;
+      return { success: false, messageKey: "aiSettings.testFailed", detail, latency };
     }
 
-    return { success: true, message: "连接成功", latency };
+    return { success: true, messageKey: "aiSettings.testSuccess", latency };
   } catch (error) {
     const latency = Date.now() - startTime;
     if (error instanceof Error) {
       if (error.name === "AbortError" || error.name === "TimeoutError") {
-        return { success: false, message: "连接超时", latency };
+        return { success: false, messageKey: "aiSettings.testTimeout", latency };
       }
-      return { success: false, message: error.message, latency };
+      return {
+        success: false,
+        messageKey: "aiSettings.testFailed",
+        detail: error.message,
+        latency,
+      };
     }
-    return { success: false, message: "连接失败", latency };
+    return { success: false, messageKey: "aiSettings.testFailed", latency };
   }
 }
 
@@ -133,7 +141,13 @@ export function useAiConfig() {
 
   // 计算属性
   const config = computed(() => state.value.config);
-  const isConfigured = computed(() => store.isConfigured());
+  /**
+   * 必须从响应式 `state` 推导，**不能**调 `store.isConfigured()`：
+   * 那个方法读的是 localStorage / 模块级变量，Vue 追踪不到，computed 会因为
+   * 没有任何依赖而在首次求值后永久缓存 —— 用户在设置弹窗里存好配置，
+   * 这里仍旧回 false。
+   */
+  const isConfigured = computed(() => isUsableAiConfig(state.value.config));
   const isEnabled = computed(() => state.value.config?.enabled ?? false);
   const currentProvider = computed(() => state.value.config?.provider ?? "openai");
   const currentProviderInfo = computed(() => getProviderInfo(currentProvider.value));
@@ -182,7 +196,7 @@ export function useAiConfig() {
   async function testConnectionAsync(configOverride?: AiUserConfig): Promise<ConnectionTestResult> {
     const currentConfig = configOverride ?? state.value.config;
     if (!currentConfig) {
-      return { success: false, message: "请先配置 AI 设置" };
+      return { success: false, messageKey: "aiSettings.testNotConfigured" };
     }
 
     state.value.testStatus = "testing";
@@ -191,7 +205,7 @@ export function useAiConfig() {
     const result = await testAiConnection(currentConfig);
 
     state.value.testStatus = result.success ? "success" : "error";
-    state.value.testError = result.success ? null : result.message;
+    state.value.testError = result.success ? null : result;
 
     return result;
   }
@@ -233,18 +247,11 @@ function resolveRequestConfig(config: AiUserConfig): {
   timeout: number;
   provider: AiProvider;
 } | null {
-  if (!config.enabled) return null;
+  if (!isUsableAiConfig(config)) return null;
 
+  // isUsableAiConfig 已确认 provider 合法，这里只是把类型收窄掉 undefined
   const providerInfo = getProviderInfo(config.provider);
   if (!providerInfo) return null;
-
-  if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
-    return null;
-  }
-
-  if (config.provider === "custom" && !config.endpoint) {
-    return null;
-  }
 
   return {
     endpoint: config.endpoint || providerInfo.defaultEndpoint,

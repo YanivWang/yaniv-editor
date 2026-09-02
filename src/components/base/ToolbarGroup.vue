@@ -1,47 +1,34 @@
 <template>
-  <div
-    :class="[
-      'toolbar-group',
-      `toolbar-group--${direction}`,
-      { 'toolbar-group--with-divider': divider },
-    ]"
-    :style="groupStyle"
-  >
+  <div :class="['toolbar-group', `toolbar-group--${direction}`]" :style="groupStyle">
     <slot />
-
-    <!-- 分隔线 -->
-    <ToolbarDivider v-if="divider" :direction="dividerDirection" :color="computedDividerColor" />
   </div>
 </template>
 
 <script setup lang="ts">
+/**
+ * 工具栏分组容器：只负责排列方向与间距。
+ *
+ * **分割线不归它管。** 曾经有一组 `divider` / `dividerColor` prop 和一个
+ * `ToolbarDivider.vue` 组件，但全仓没有任何调用点传过 `divider`——
+ * 那个 `v-if` 恒为假，组件、`dividerDirection`、`computedDividerColor`
+ * 连同只有一行注释、没有任何声明的 `.toolbar-group--with-divider` 全是死的。
+ * 项目实际用的是 `ToolbarNav` 里的 `border-left: … var(--ye-toolbar-divider)`。
+ */
 import { computed } from "vue";
-
-import ToolbarDivider from "./ToolbarDivider.vue";
 
 interface Props {
   direction?: "horizontal" | "vertical";
   gap?: number;
-  divider?: boolean;
-  dividerColor?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   direction: "horizontal",
   gap: 4,
-  divider: false,
-  dividerColor: undefined,
 });
 
 const groupStyle = computed(() => ({
   gap: `${props.gap}px`,
 }));
-
-const dividerDirection = computed(() => {
-  return props.direction === "horizontal" ? "vertical" : "horizontal";
-});
-
-const computedDividerColor = computed(() => props.dividerColor ?? "var(--ye-border)");
 </script>
 
 <style scoped>
@@ -57,6 +44,4 @@ const computedDividerColor = computed(() => props.dividerColor ?? "var(--ye-bord
 .toolbar-group--vertical {
   flex-direction: column;
 }
-
-/* .toolbar-group--with-divider - 分隔线已经包含在组内，不需要额外样式 */
 </style>

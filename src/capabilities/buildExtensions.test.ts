@@ -20,6 +20,7 @@ function makeCtx(gates: ExtensionGates): BuildExtensionsCtx {
     } as unknown as BuildExtensionsCtx["blockMenuHost"],
     upload: { image: () => undefined, video: () => undefined },
     galleryImages: () => [],
+    mentionItems: () => undefined,
     officePaste: { onPasteFromOfficeWithImages: () => undefined },
     outline: { scrollParent: () => null, bindScrollParent: () => {} },
     aiConfig: () => undefined,

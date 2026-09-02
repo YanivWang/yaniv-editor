@@ -33,33 +33,37 @@ export function useEditorColorState(editor: MaybeRefOrGetter<Editor | null>) {
     }
   }
 
-  function setupEditorSubscriptions() {
-    cleanupEditorSubscriptions();
-    const e = toValue(editor);
+  function attachEditorListeners(e: Editor | null) {
     if (!e) return;
-
     syncColorFromSelection();
     e.on("selectionUpdate", syncColorFromSelection);
     e.on("transaction", syncColorFromSelection);
     e.on("update", syncColorFromSelection);
   }
 
-  function cleanupEditorSubscriptions() {
-    const e = toValue(editor);
+  function detachEditorListeners(e: Editor | null) {
     if (!e) return;
-    try {
-      e.off("selectionUpdate", syncColorFromSelection);
-      e.off("transaction", syncColorFromSelection);
-      e.off("update", syncColorFromSelection);
-    } catch {
-      // 忽略取消订阅时的错误
-    }
+    e.off("selectionUpdate", syncColorFromSelection);
+    e.off("transaction", syncColorFromSelection);
+    e.off("update", syncColorFromSelection);
   }
 
-  watch(() => toValue(editor), setupEditorSubscriptions, { immediate: true });
+  /**
+   * 退订必须针对**上一个**实例：watch 回调触发时 `toValue(editor)` 已是新实例，
+   * 在退订函数里就地取值只会打在刚换上的实例上，旧实例的三个监听一个也摘不掉。
+   * 见 ARCHITECTURE 不变量 24。
+   */
+  watch(
+    () => toValue(editor),
+    (next, prev) => {
+      detachEditorListeners(prev ?? null);
+      attachEditorListeners(next ?? null);
+    },
+    { immediate: true },
+  );
 
   onBeforeUnmount(() => {
-    cleanupEditorSubscriptions();
+    detachEditorListeners(toValue(editor));
   });
 
   const setTextColor = (color: string) => {

@@ -44,6 +44,25 @@ export function normalizeSafeUrl(rawUrl: string): string | null {
   }
 }
 
+/**
+ * 无协议的值是否该当作「省略了 https:// 的绝对地址」。
+ *
+ * 只认 `host.tld/path` 这一种形状：**首段含点且后面还有路径**。
+ * `a.png`（没有 `/`，就是个文件名）与 `images/a.png`（首段不含点）都判为相对路径。
+ *
+ * 媒体 src 与链接的取舍不同：链接里用户手打 `example.com/x` 期望补成 https，
+ * 而媒体 src 几乎不会写成裸域名，`a.png` 这类**一定**是相对路径——
+ * 一律补 `https://` 会把它变成指向外部主机 `a.png` 的地址，图片直接失效，
+ * 且这个被改坏的值会经 `getJSON()` 回到宿主并被持久化。
+ * 这正是 {@link isSameDocumentReference} 注释里那条理由（补全会把站内引用劫持到站外）
+ * 在「不带前导 `/`」的相对路径上的同一情形。
+ */
+function looksLikeHostWithPath(value: string): boolean {
+  const slash = value.indexOf("/");
+  if (slash <= 0) return false;
+  return value.slice(0, slash).includes(".");
+}
+
 export function normalizeSafeMediaUrl(rawUrl: string, kind: "image" | "video"): string | null {
   const trimmed = rawUrl.trim();
   if (!trimmed) return null;
@@ -55,10 +74,16 @@ export function normalizeSafeMediaUrl(rawUrl: string, kind: "image" | "video"): 
     return trimmed.startsWith(allowedPrefix) ? trimmed : null;
   }
 
-  const candidate =
-    /^[a-z][a-z\d+.-]*:/i.test(trimmed) || trimmed.startsWith("//")
-      ? trimmed
-      : `https://${trimmed}`;
+  const hasScheme = /^[a-z][a-z\d+.-]*:/i.test(trimmed);
+  const isProtocolRelative = trimmed.startsWith("//");
+
+  // 无协议且不像域名的，按相对路径原样保留：不含协议就不可能承载可执行 scheme，
+  // 与 `isSameDocumentReference` 放行 `./a.png` 的理由一致。
+  if (!hasScheme && !isProtocolRelative && !looksLikeHostWithPath(trimmed)) {
+    return trimmed;
+  }
+
+  const candidate = hasScheme || isProtocolRelative ? trimmed : `https://${trimmed}`;
 
   try {
     const parsed = new URL(candidate, "https://yaniv.local");

@@ -9,11 +9,6 @@
   padding: 8px 16px;
   background: var(--ye-footer-bg);
   border-bottom: var(--ye-border-width) solid var(--ye-footer-divider);
-
-  [data-color-mode="dark"] & {
-    background: var(--ye-footer-bg);
-    border-bottom-color: var(--ye-footer-divider);
-  }
 }
 
 /* 缩放显示数字 */
@@ -23,10 +18,6 @@
   font-weight: 500;
   color: var(--ye-footer-text);
   text-align: center;
-
-  [data-color-mode="dark"] & {
-    color: var(--ye-footer-text);
-  }
 }
 
 /* 页数信息 */
@@ -34,10 +25,6 @@
   margin-left: 8px;
   font-size: 13px;
   color: var(--ye-footer-text);
-
-  [data-color-mode="dark"] & {
-    color: var(--ye-footer-text);
-  }
 }
 
 /* 字数统计 */
@@ -47,11 +34,6 @@
   font-size: 13px;
   color: var(--ye-footer-text);
   border-left: var(--ye-border-width) solid var(--ye-footer-divider);
-
-  [data-color-mode="dark"] & {
-    color: var(--ye-footer-text);
-    border-left-color: var(--ye-footer-divider);
-  }
 }
 
 /* 快捷键摘要（底部状态栏） */
@@ -65,11 +47,6 @@
   color: var(--ye-text-muted);
   white-space: nowrap;
   border-left: var(--ye-border-width) solid var(--ye-footer-divider);
-
-  [data-color-mode="dark"] & {
-    color: var(--ye-text-muted);
-    border-left-color: var(--ye-footer-divider);
-  }
 }
 
 /* 底栏位置 */
@@ -79,9 +56,4 @@
   border-top: var(--ye-border-width) solid var(--ye-footer-divider);
   border-bottom: none;
   box-shadow: none;
-
-  [data-color-mode="dark"] & {
-    border-top-color: var(--ye-footer-divider);
-    box-shadow: none;
-  }
 }

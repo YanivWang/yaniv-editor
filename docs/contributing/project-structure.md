@@ -35,7 +35,9 @@ Preset 默认能力仅在 `src/core/runtime/resolveEditorProfile.ts` 定义。`e
 | 功能 chrome | `src/styles/*.css`、`src/components/tools/**`           | 工具栏、菜单、拖拽手柄、大纲、`overlay-portal.css` 等             |
 | 外观        | `src/appearance/styles/*.css`                           | 主题 token 和排版（margin、font-size、padding）                   |
 
-导入顺序在 `src/styles/index.css`（Full）和 `src/styles/inline.css`（Inline）中定义，两者都以 `variables.css` 开头，并在其它规则之前导入 `content.css` 与 `overlay-portal.css`。只有 `index.css` 会在末尾导入 `appearance/styles/*.css`；`inline.css` **不含任何 appearance 文件**（Inline 无 `appearance` prop）。
+导入顺序在 `src/styles/index.css`（Full）和 `src/styles/inline.css`（Inline）中定义。两者都以 `variables.css` 开头（token 必须最先），随后各自按需引入结构层与功能 chrome 层；`inline.css` 只引 Inline 用得到的那部分（不含 document-layout、表格、拖拽手柄、大纲等）。
+
+关键约束只有一条：**`content.css` 必须排在 `appearance/styles/*.css` 之前**——外观层只改 token 与排版，不能被结构层反向覆盖。只有 `index.css` 在末尾导入 `appearance/styles/*.css`；`inline.css` **不含任何 appearance 文件**（Inline 无 `appearance` prop），因此那条排序约束对它不适用。
 
 规则：
 

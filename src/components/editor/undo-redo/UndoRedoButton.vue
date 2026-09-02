@@ -21,7 +21,7 @@
  * @description 可复用的撤销/重做按钮组件，提供撤销和重做功能
  */
 import { UndoOutlined, RedoOutlined } from "@ant-design/icons-vue";
-import { nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useYanivEditor } from "@/core/editorContext";
@@ -105,60 +105,58 @@ function handleUpdate() {
   updateUndoRedoState();
 }
 
+type BoundEditor = NonNullable<typeof editor.value>;
+
 /**
- * 设置编辑器事件订阅
- * @description 监听编辑器状态变化，实时更新撤销/重做按钮状态
+ * 订阅编辑器状态变化。
+ *
+ * 这里**不能**再包一层 `nextTick`：订阅要等到下一个 tick 才真正发生，而
+ * `onBeforeUnmount` 与换实例的退订都跑在此之前，于是退订摘了个空、
+ * 随后 tick 里又把监听挂到一个已被弃用（甚至已销毁）的实例上，永远摘不掉。
+ * 编辑器是父组件建好后才传进来的，取状态不需要额外等待；
+ * `updateUndoRedoState` 自身也有兜底。
  */
-function setupEditorSubscriptions() {
-  // 清理已有订阅，避免重复绑定
-  cleanupEditorSubscriptions();
-  const e = editor.value;
+function attachEditorListeners(e: BoundEditor | null) {
   if (!e) return;
 
-  // 重置编辑标志
+  // 新实例意味着新的历史栈：重新开始判定「是否发生过真正的编辑」
   hasRealEdit.value = false;
+  updateUndoRedoState();
 
-  // 使用 nextTick 确保编辑器完全初始化后再检查状态
-  nextTick(() => {
-    // 初始化一次状态（此时应该没有可撤销操作）
-    updateUndoRedoState();
+  e.on("update", handleUpdate);
+  e.on("selectionUpdate", updateUndoRedoState);
+  e.on("transaction", updateUndoRedoState);
+}
 
-    // 订阅编辑器状态变化事件
-    e.on("update", handleUpdate); // 使用专门的更新处理函数，检测文档变化
-    e.on("selectionUpdate", updateUndoRedoState);
-    e.on("transaction", updateUndoRedoState);
-    e.on("create", () => {
-      // 编辑器创建时，重置编辑标志
-      hasRealEdit.value = false;
-      updateUndoRedoState();
-    });
-  });
+/** 退订指定编辑器上的监听 */
+function detachEditorListeners(e: BoundEditor | null) {
+  if (!e) return;
+  e.off("update", handleUpdate);
+  e.off("selectionUpdate", updateUndoRedoState);
+  e.off("transaction", updateUndoRedoState);
 }
 
 /**
- * 清理编辑器事件订阅
+ * 退订必须针对**上一个**实例（不变量 24）。
+ *
+ * 此前退订函数读的是 `editor.value`——回调触发时已是新实例，三次 `off()` 全打空。
+ * 另外原来还订阅了 `create`：编辑器由父组件构造完才传进来，`create` 早已 emit 过，
+ * 那个回调**永远不会执行**；它又是匿名函数，而退订写的是
+ * `off("create", updateUndoRedoState)`（另一个引用），于是每换一次实例就多攒一个
+ * 摘不掉的监听（实测 create 回调数 2 → 4 → 5 单调增长）。已整体删除。
  */
-function cleanupEditorSubscriptions() {
-  const e = editor.value;
-  if (!e) return;
-  try {
-    e.off("update", handleUpdate);
-    e.off("selectionUpdate", updateUndoRedoState);
-    e.off("transaction", updateUndoRedoState);
-    e.off("create", updateUndoRedoState);
-  } catch (error) {
-    // 忽略取消订阅时的错误
-  }
-}
-
-// 初始化与后续 editor 变更时设置订阅
-if (editor.value) setupEditorSubscriptions();
-// 监听 editor 引用的变化（在父组件传入实例后触发）
-watch(editor, setupEditorSubscriptions, { immediate: true });
+watch(
+  editor,
+  (next, prev) => {
+    detachEditorListeners(prev ?? null);
+    attachEditorListeners(next ?? null);
+  },
+  { immediate: true },
+);
 
 // 组件卸载时清理订阅
 onBeforeUnmount(() => {
-  cleanupEditorSubscriptions();
+  detachEditorListeners(editor.value ?? null);
 });
 
 // ===== 撤销/重做命令 =====

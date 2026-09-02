@@ -12,7 +12,8 @@ Image and video are separate capabilities, controlled by `features.image` and `f
 
 ## Upload
 
-When `uploadImage` / `uploadVideo` are not provided, local uploads fall back to **DataURL**:
+When `uploadImage` / `uploadVideo` are not provided, local uploads fall back to a **`blob:` object URL** (`URL.createObjectURL(file)`) and show an "upload handler not configured" notice.
+Such a URL dies on reload, so it is preview-only and must not be persisted:
 
 ```vue
 <YanivEditor
@@ -26,7 +27,7 @@ Upload callback changes **do not** trigger session rebuild; extensions read the 
 
 ## Image
 
-- **Insert**: full header / notion via `/` or floating menu
+- **Insert**: full header / under notion via `/` or the + block menu next to the drag handle (the floating menu has no image entry)
 - **When selected**: image context bar (`ImageToolbar`) — left / center / right alignment, preview (modal), delete
 - **Resize**: drag-resize comes from `ResizableImage` (`enableResize: true`) node handles, not from the context bar
 - **Paste**: the `PasteImage` extension registers alongside the `image` gate, so images can be pasted directly

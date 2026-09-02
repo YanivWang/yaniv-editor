@@ -16,6 +16,10 @@ export function transformLists(html: string): string {
   listElements.forEach((node) => {
     const el = node as HTMLElement;
     const parsed = parseMsoListAttribute(parseStyleAttribute(el)["mso-list"]);
+    // Word 用 `mso-list:none` 显式声明「这段**不是**列表项」。解析不出列表 id 的段落
+    // （`none`、被截断的值、非 Word 生成的 mso-list）一律原样放过：
+    // 不转换、更不能 remove——下面的 el.remove() 会让它彻底消失。
+    if (!parsed.id) return;
     const msoListId = parsed.id;
     const msoListLevel = parsed.level;
 
@@ -41,7 +45,11 @@ export function transformLists(html: string): string {
     }
 
     const last = listStack[listStack.length - 1];
-    if (last) last.appendChild(getListItemFromParagraph(el));
+    // 不变量守卫，不是当前可达分支：层级被钳制到 >= 1 后上面的 while 至少入栈一次，
+    // 所以 last 恒非空。写在这里是为了让「删除原段落」与「内容已搬进列表」严格绑定 ——
+    // 一旦有人放宽钳制，退化的结果是不转换，而不是段落连内容一起消失。
+    if (!last) return;
+    last.appendChild(getListItemFromParagraph(el));
     el.remove();
   });
 
@@ -61,12 +69,27 @@ function getListItemFromParagraph(el: HTMLElement): HTMLLIElement {
   return li;
 }
 
+/**
+ * Word 列表最深 9 级（「定义新的多级列表」对话框的上限）。
+ *
+ * 层级来自剪贴板 —— 不可信输入。它直接驱动 `while (level > stack.length)` 建嵌套列表，
+ * 所以必须钳制：`mso-list:l0 level5000 lfo1` 会创建 5000 层嵌套 `<ul>`，
+ * 序列化时 parse5 递归爆栈抛 RangeError，而 transformPastedHTML 的异常
+ * 会让整次粘贴失败。
+ */
+const MAX_LIST_LEVEL = 9;
+
 function parseMsoListAttribute(attr: string | undefined): { id: string; level: number } {
   const msoListValue = attr || "";
-  const msoListInfos = msoListValue.split(" ");
-  const msoListId = msoListInfos.find((e) => /l[0-9]+/.test(e)) || "";
-  const levelRaw = msoListInfos.find((e) => e.startsWith("level"))?.substring(5);
-  const msoListLevel = +(levelRaw || 1);
+  // 值形如 `l0 level1 lfo1`；连续空白会切出空串项，交给下面的判定自然忽略
+  const msoListInfos = msoListValue.split(/\s+/);
+  // 必须整段匹配：未锚定的 /l[0-9]+/ 会把 `level1` 也认成列表 id（第 5 个字符起是 `l1`）
+  const msoListId = msoListInfos.find((e) => /^l\d+$/.test(e)) || "";
+  const levelRaw = msoListInfos.find((e) => /^level\d+$/.test(e))?.slice(5);
+  const parsedLevel = levelRaw ? Number.parseInt(levelRaw, 10) : 1;
+  const msoListLevel = Number.isFinite(parsedLevel)
+    ? Math.min(Math.max(parsedLevel, 1), MAX_LIST_LEVEL)
+    : 1;
   return { id: msoListId, level: msoListLevel };
 }
 

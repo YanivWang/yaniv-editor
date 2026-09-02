@@ -13,10 +13,12 @@
 
 面板只取决于 `features.outline` 是否开启，与顶栏无关。
 
-| preset | 入口                         | 行为                                      |
-| ------ | ---------------------------- | ----------------------------------------- |
-| full   | 顶栏大纲开关 + rail 展开把手 | 右侧/顶部大纲面板，点击跳转标题；默认收起 |
-| notion | rail 展开把手（无顶栏）      | 同上                                      |
+| preset | 入口                         | 行为                                       |
+| ------ | ---------------------------- | ------------------------------------------ |
+| full   | 顶栏大纲开关 + rail 展开把手 | 右上角浮出大纲面板，点击跳转标题；默认收起 |
+| notion | rail 展开把手（无顶栏）      | 同上                                       |
+
+三个 preset 的 `layout.outlineAnchor` 都是 `top-right`（`configs/editorPreset.ts` 的 `sharedLayout`），因此面板与把手固定在文档右上角；`OutlinePanel` 本身支持 `top-left`，但目前没有 preset 用它。
 
 面板收起时，大纲 rail 的锚点位置会渲染一个展开把手（`.outline-rail__handle`）。顶栏的 `OutlineToggleButton` 只是 full preset 的额外便捷入口，隐藏顶栏的 preset 依然可以从把手展开。
 

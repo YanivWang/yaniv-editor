@@ -4,6 +4,7 @@
  */
 import type { TemplateItem } from "@/components/editor/template/templates";
 import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
+import type { MentionItem } from "@/extensions/mention";
 import type { AiProvider, AiStorageMode } from "@/features/ai/config/types";
 
 import type { JSONContent } from "@tiptap/core";
@@ -87,14 +88,19 @@ export interface YanivEditorProps {
   initialContent?: string | JSONContent;
   /** 能力开关覆盖 */
   features?: FeatureConfig;
-  /** 图片上传函数；未传时本地上传回退为 DataURL */
+  /** 图片上传函数；未传时本地上传回退为 `blob:` 对象 URL（刷新即失效，仅供预览） */
   uploadImage?: MediaUploadHandler;
-  /** 视频上传函数；未传时本地上传回退为 DataURL */
+  /** 视频上传函数；未传时本地上传回退为 `blob:` 对象 URL（刷新即失效，仅供预览） */
   uploadVideo?: MediaUploadHandler;
   /** 外部图库图片源；未传时图库从当前文档收集图片 */
   galleryImages?: GalleryImage[];
   /** 自定义模板列表，会追加到内置模板后面 */
   customTemplates?: TemplateItem[];
+  /**
+   * `@` 提及的候选项（页面 / 人员）；slashCommand 能力开启时生效。
+   * 未传时使用内置占位示例数据。变更不触发 session 重建（扩展经 getter 现取）。
+   */
+  mentionItems?: MentionItem[];
   /** 语言设置 */
   locale?: string;
   /** 大纲面板初始是否展开；outline 能力开启时生效，默认 false */

@@ -78,6 +78,7 @@
   max-width: var(--ye-outline-width, 200px);
   height: auto;
   overflow: hidden;
+  font-family: var(--ye-font-family);
   pointer-events: auto;
 }
 
@@ -154,7 +155,11 @@
   width: 24px;
   height: 24px;
   padding: 0;
+
+  /* div → button（键盘可达），需重置浏览器默认按钮样式 */
+  font: inherit;
   font-size: 12px;
+  appearance: none;
   cursor: pointer;
   background: transparent;
   border: none;
@@ -187,18 +192,18 @@
   width: 100%;
   padding: 5px 16px;
   margin: 0;
+
+  /* div → button（键盘可达），需重置浏览器默认按钮样式 */
+  font: inherit;
   font-size: 13px;
   line-height: 1.5;
   text-align: left;
+  appearance: none;
   cursor: pointer;
   background: transparent;
   border: none;
   border-radius: 0;
   transition: color var(--ye-transition-normal);
-}
-
-.outline-panel__index {
-  display: none;
 }
 
 .outline-panel__text {
@@ -250,9 +255,6 @@
 /* ===== 大纲视觉皮肤（各 appearance 通过 --ye-outline-* token 微调） ===== */
 .yaniv-editor .outline-panel {
   background: var(--ye-bg);
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
 }
 
 .yaniv-editor .outline-panel--top-left {
@@ -295,13 +297,4 @@
 
 .yaniv-editor .outline-panel__item--h1 {
   color: var(--ye-text);
-}
-
-.yaniv-editor .outline-panel__item--h1.is-active,
-.yaniv-editor .outline-panel__item--h2.is-active,
-.yaniv-editor .outline-panel__item--h3.is-active,
-.yaniv-editor .outline-panel__item--h4.is-active,
-.yaniv-editor .outline-panel__item--h5.is-active,
-.yaniv-editor .outline-panel__item--h6.is-active {
-  color: var(--ye-primary);
 }

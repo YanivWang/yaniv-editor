@@ -4,23 +4,23 @@
 
 ## FeatureConfig 能力键
 
-| 能力键          | basic | full | notion | 入口（full 顶栏）   | 入口（notion） |
-| --------------- | :---: | :--: | :----: | ------------------- | -------------- |
-| `image`         |  ✅   |  ✅  |   ✅   | 顶栏图片            | `/` 或悬浮菜单 |
-| `video`         |  ❌   |  ✅  |   ✅   | 顶栏视频            | `/` 或悬浮菜单 |
-| `table`         |  ❌   |  ✅  |   ✅   | 顶栏表格            | `/` 或悬浮菜单 |
-| `math`          |  ❌   |  ✅  |   ✅   | 顶栏公式            | `/`            |
-| `ai`            |  ❌   | ❌\* |   ✅   | 顶栏 AI + 悬浮菜单† | 悬浮菜单 AI    |
-| `formatPainter` |  ❌   |  ✅  |   ❌   | 顶栏格式刷          | —              |
-| `outline`       |  ❌   |  ✅  |  ✅‡   | 顶栏大纲            | 无入口‡        |
-| `searchReplace` |  ❌   |  ✅  |  ✅‡   | 顶栏 / Ctrl+F       | 无入口‡        |
-| `officePaste`   |  ❌   |  ✅  |   ✅   | 粘贴即用            | 粘贴即用       |
-| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                   | 空行输入 `/`   |
-| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                   | 段落左侧六点   |
+| 能力键          | basic | full | notion | 入口（full 顶栏）    | 入口（notion）    |
+| --------------- | :---: | :--: | :----: | -------------------- | ----------------- |
+| `image`         |  ✅   |  ✅  |   ✅   | 顶栏图片             | `/` 或 + 号块菜单 |
+| `video`         |  ❌   |  ✅  |   ✅   | 顶栏视频             | `/` 或 + 号块菜单 |
+| `table`         |  ❌   |  ✅  |   ✅   | 顶栏表格             | `/` 或 + 号块菜单 |
+| `math`          |  ❌   |  ✅  |   ✅   | 顶栏公式             | `/`               |
+| `ai`            |  ❌   | ❌\* |   ✅   | 顶栏 AI + 浮动菜单†  | 浮动菜单 AI       |
+| `formatPainter` |  ❌   |  ✅  |   ❌   | 顶栏格式刷           | —                 |
+| `outline`       |  ❌   |  ✅  |   ✅   | 顶栏大纲 / rail 把手 | rail 展开把手‡    |
+| `searchReplace` |  ❌   |  ✅  |   ✅   | 顶栏 / Ctrl+F        | Ctrl/Cmd+F‡       |
+| `officePaste`   |  ❌   |  ✅  |   ✅   | 粘贴即用             | 粘贴即用          |
+| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                    | 行首输入 `/`      |
+| `dragHandle`    |  ❌   |  ❌  |   ✅   | —                    | 段落左侧六点      |
 
 \* full 需 `:features="{ ai: true }"` 并传入 `:ai-config`  
-† full 默认关闭 AI gate；开启后顶栏「智能」区显示 `AiMenuButton`，悬浮菜单亦有 AI 入口  
-‡ notion 的 gate 默认开启（扩展会注册），但大纲开关与查找替换按钮**只存在于顶栏**，而 notion 隐藏了顶栏；且 notion 的顶栏配置里 `outline` / `searchReplace` 本身也是 `false`。因此 notion 下大纲面板不会渲染、Ctrl/Cmd+F 也不会被绑定（快捷键由 `FindReplaceButton` 注册）。详见 [大纲目录](./outline.md) 与 [查找替换](./find-replace.md)。
+† full 默认关闭 AI gate；开启后顶栏「智能」区显示 `AiMenuButton`，浮动菜单亦有 AI 入口。注意浮动菜单只含标题 / 格式 / 颜色 / 链接 / 列表（+ AI），**不含**图片、视频、表格——那三项在 notion 下走 `/` 或拖拽手柄旁的 + 号块菜单  
+‡ notion 隐藏顶栏，因此这两项的**顶栏按钮**不存在，但能力本身照常可用：大纲面板由 `showOutlineRail`（= 编辑态 + `outline` gate）渲染 rail，收起时显示展开把手；查找替换面板与 Ctrl/Cmd+F 挂在 `EditorEditChrome` 上，只看 `searchReplace` gate。详见 [大纲目录](./outline.md) 与 [查找替换](./find-replace.md)。
 
 ## 非 FeatureConfig 能力（preset 工具栏）
 
@@ -65,7 +65,7 @@
 
 | 入口         | gzip 后 |
 | ------------ | ------- |
-| 主 chunk     | ~42 KB  |
+| 主 chunk     | ~44 KB  |
 | `style.css`  | ~18 KB  |
 | `inline.css` | ~9 KB   |
 

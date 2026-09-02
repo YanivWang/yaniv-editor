@@ -21,7 +21,7 @@ import "katex/dist/katex.min.css";
 - **full**: insert LaTeX formulas from the header
 - **notion**: `/` → formula block
 - Supports inline and block-level formulas
-- Select a formula block to edit the LaTeX source
+- Double-click a formula to edit its LaTeX source (a single click only selects the node); `Ctrl/Cmd + Enter` saves, `Esc` cancels
 
 ## InputRule and Shortcuts
 

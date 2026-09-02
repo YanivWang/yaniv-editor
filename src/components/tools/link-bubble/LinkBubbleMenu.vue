@@ -144,25 +144,17 @@ const bubbleBindings = useOverlayBubbleMenu({
 });
 const getOverlayContainer = useOverlayMountTarget();
 
-// 监听编辑器选择变化，更新链接URL
-watch(
-  () => editor.value?.state.selection,
-  () => {
-    if (editor.value?.isActive("link")) {
-      updateCurrentLinkUrl();
-    }
-  },
-  { deep: true },
-);
-
-// 监听编辑器状态更新，同步链接URL
-watch(
-  () => editor.value?.state,
-  () => {
-    updateCurrentLinkUrl();
-  },
-  { deep: true, immediate: true },
-);
+/**
+ * 链接 URL 的**实时来源是 `shouldShow`**：BubbleMenu 每次重新判断可见性都会调用它，
+ * 命中链接时经 `onLinkFound` 回填 `currentLinkUrl`。
+ *
+ * 这里只在编辑器实例被换掉（session 重建）时复位一次。
+ * 不要改成 watch `editor.value?.state` / `.state.selection`：`editor` 是 shallowRef，
+ * ProseMirror 的 state 不是响应式对象，对它取值的 getter 只会在**实例本身**变化时重跑
+ * ——选区与文档变化根本不触发；而 `deep: true` 还会在每次重跑时把整个 state 对象图
+ * （文档全树、schema、各插件状态）深度遍历一遍。
+ */
+watch(editor, updateCurrentLinkUrl, { immediate: true });
 
 /**
  * 编辑链接
@@ -241,13 +233,14 @@ function openLink() {
   const e = editor.value;
   if (!e) return;
 
-  if (e.isActive("link")) {
-    const attrs = e.getAttributes("link");
-    const href = attrs.href || "";
-    if (href) {
-      window.open(href, "_blank", "noopener,noreferrer");
-    }
-  }
+  if (!e.isActive("link")) return;
+
+  // 必须再过一次白名单：attrs.href 可能来自宿主直接注入的 JSON，
+  // 而 window.open("javascript:...") 会执行脚本。
+  const safeHref = normalizeSafeUrl(e.getAttributes("link").href || "");
+  if (!safeHref) return;
+
+  window.open(safeHref, "_blank", "noopener,noreferrer");
 }
 
 /**
@@ -271,7 +264,6 @@ function removeLink() {
 
   [data-color-mode="dark"] & {
     background: #1f1f1f;
-    border-color: var(--ye-border);
   }
 }
 
@@ -377,11 +369,9 @@ function removeLink() {
 }
 
 .link-bubble-menu-content:not(.appearance-notion) .link-action-btn--danger:hover:not(:disabled) {
-  color: #ff4d4f;
   background: #fff1f0;
 
   [data-color-mode="dark"] & {
-    color: #ff7875;
     background: #3a1a1a;
   }
 }

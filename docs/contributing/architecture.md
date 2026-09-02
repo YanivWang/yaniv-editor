@@ -50,7 +50,7 @@ flowchart TB
 
 ## ChromePolicy {#chromepolicy}
 
-`resolveChromePolicy(profile, layout, gates)` 决定 chrome 显隐。Shell **只读** policy，禁止模板内写 `mode === 'preview'`。
+`resolveChromePolicy({ profile, layout, gates, uiFlags, host, showInlineToolbar })` 决定 chrome 显隐（单个入参对象，见 `core/runtime/types.ts` 的 `ResolveChromePolicyInput`）。Shell **只读** policy，禁止模板内写 `mode === 'preview'`。返回值是按 `host` 区分的联合类型：`FullChromePolicy` / `InlineChromePolicy`。
 
 preview 时：`showEditChrome=false`，顶栏/底栏/块菜单/上下文条隐藏；扩展集合不变。
 
@@ -101,6 +101,7 @@ Extension tier：
 - `provideEditorLocale`
 - `provideBlockMenuHost`
 - `provideOutlinePanel`
+- `provideFindReplacePanel`（面板开关状态；与顶栏按钮解耦，Ctrl/Cmd+F 因此不依赖顶栏）
 
 ## Z-Index 与浮层
 

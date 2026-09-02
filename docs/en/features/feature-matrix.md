@@ -6,21 +6,21 @@ Editor capabilities and entry points summarized by preset. `features` can overri
 
 | Key             | basic | full | notion | Entry (full header)        | Entry (notion)               |
 | --------------- | :---: | :--: | :----: | -------------------------- | ---------------------------- |
-| `image`         |  ✅   |  ✅  |   ✅   | Header image               | `/` or floating menu         |
-| `video`         |  ❌   |  ✅  |   ✅   | Header video               | `/` or floating menu         |
-| `table`         |  ❌   |  ✅  |   ✅   | Header table               | `/` or floating menu         |
+| `image`         |  ✅   |  ✅  |   ✅   | Header image               | `/` or the + block menu      |
+| `video`         |  ❌   |  ✅  |   ✅   | Header video               | `/` or the + block menu      |
+| `table`         |  ❌   |  ✅  |   ✅   | Header table               | `/` or the + block menu      |
 | `math`          |  ❌   |  ✅  |   ✅   | Header formula             | `/`                          |
 | `ai`            |  ❌   | ❌\* |   ✅   | Header AI + floating menu† | Floating menu AI             |
 | `formatPainter` |  ❌   |  ✅  |   ❌   | Header format painter      | —                            |
-| `outline`       |  ❌   |  ✅  |  ✅‡   | Header outline             | No entry point‡              |
-| `searchReplace` |  ❌   |  ✅  |  ✅‡   | Header / Ctrl+F            | No entry point‡              |
+| `outline`       |  ❌   |  ✅  |   ✅   | Header outline / rail grip | Outline rail grip‡           |
+| `searchReplace` |  ❌   |  ✅  |   ✅   | Header / Ctrl+F            | Ctrl/Cmd+F‡                  |
 | `officePaste`   |  ❌   |  ✅  |   ✅   | Paste as-is                | Paste as-is                  |
-| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                          | Type `/` on empty line       |
+| `slashCommand`  |  ❌   |  ❌  |   ✅   | —                          | Type `/` at start of a block |
 | `dragHandle`    |  ❌   |  ❌  |   ✅   | —                          | Six-dot handle on block left |
 
 \* full requires `:features="{ ai: true }"` and `:ai-config`  
-† full disables the AI gate by default; when enabled, the header shows `AiMenuButton` in the assistant row, and the floating menu also exposes AI  
-‡ notion enables the gate by default (the extensions register), but the outline toggle and find/replace buttons exist **only in the header**, which notion hides; notion's toolbar config also leaves `outline` / `searchReplace` at `false`. So under notion the outline panel never renders and Ctrl/Cmd+F is never bound (the shortcut is registered by `FindReplaceButton`). See [Outline](./outline.md) and [Find and Replace](./find-replace.md).
+† full disables the AI gate by default; when enabled, the header shows `AiMenuButton` in the assistant row, and the floating menu also exposes AI. Note the floating menu only carries heading / formatting / colors / link / lists (plus AI) — it does **not** insert images, video or tables; under notion those go through `/` or the + block menu next to the drag handle  
+‡ notion hides the header, so the two header _buttons_ are gone — but the features themselves still work. The outline rail is rendered by `showOutlineRail` (edit phase + `outline` gate) and shows an expand grip while collapsed; the find/replace dialog and its Ctrl/Cmd+F shortcut are mounted on `EditorEditChrome` and depend only on the `searchReplace` gate. See [Outline](./outline.md) and [Find and Replace](./find-replace.md).
 
 ## Non–FeatureConfig Capabilities (Preset Toolbar)
 
@@ -66,7 +66,7 @@ the matching toolbar components are `defineAsyncComponent`.
 
 | Entry        | gzipped |
 | ------------ | ------- |
-| main chunk   | ~42 KB  |
+| main chunk   | ~44 KB  |
 | `style.css`  | ~18 KB  |
 | `inline.css` | ~9 KB   |
 

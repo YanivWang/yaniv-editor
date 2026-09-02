@@ -106,8 +106,14 @@ function deleteTable() {
   runCommand((chain) => chain.deleteTable())();
 }
 
-// 4 列网格：行(3)+合并 | 列(3)+拆分 | 表头行+表头列+删除
-const menuTools: TableToolItem[] = [
+/**
+ * 4 列网格：行(3)+合并 | 列(3)+拆分 | 表头行+表头列+删除
+ *
+ * 必须是 computed：`t()` 读的是异步加载的语言包（见 `provideEditorLocale` 的 shallowRef
+ * 注释）。setup 执行时 `messages` 还是 null，此时求值会把原始 key 冻进普通数组，
+ * 语言包加载完也不再更新——按钮 tooltip 会永久显示 `table.addRowBefore` 这样的 key。
+ */
+const menuTools = computed<TableToolItem[]>(() => [
   tool(
     "addRowBefore",
     InsertRowAboveOutlined,
@@ -185,7 +191,7 @@ const menuTools: TableToolItem[] = [
     danger: true,
     action: deleteTable,
   },
-];
+]);
 
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) =>
   shouldShowTableBubbleMenu(bubbleProps, props.disabled, props.showMode);

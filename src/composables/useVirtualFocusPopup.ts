@@ -6,8 +6,8 @@ import type { Editor } from "@tiptap/core";
  * 「虚拟焦点」弹层的无障碍绑定（斜杠命令菜单、提及菜单）。
  *
  * 这类菜单的键盘焦点**始终留在正文**（弹层用 `@mousedown.prevent` 阻止夺焦，
- * 上下键由扩展在 ProseMirror 层处理），因此不能靠 DOM 焦点告知辅助技术当前选中项。
- * WAI-ARIA 对此的答案是 `aria-activedescendant`：由持有焦点的元素指向逻辑上的活动项。
+ * 上下键由菜单组件在捕获阶段的全局 `keydown` 里消费），因此不能靠 DOM 焦点告知辅助技术
+ * 当前选中项。WAI-ARIA 对此的答案是 `aria-activedescendant`：由持有焦点的元素指向逻辑上的活动项。
  *
  * 本 composable 在弹层可见期间给编辑器正文挂上：
  * - `aria-expanded` —— 弹层是否展开

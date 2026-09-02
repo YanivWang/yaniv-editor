@@ -5,7 +5,7 @@ import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
 import {
   editorAppearanceInjectionKey,
   type EditorAppearanceContext,
-  ResolvedColorMode,
+  type ResolvedColorMode,
 } from "./appearanceContext";
 import { applyAppearanceToElement, watchSystemColorMode } from "./applyAppearance";
 import { loadAppearance } from "./loadAppearance";
@@ -34,15 +34,17 @@ export function useEditorAppearance(
 
   const resolvedMode = useResolvedColorMode(colorMode);
 
+  const registerCustomAppearance = (name: string, vars: Record<string, string>): void => {
+    activeCustomName = name;
+    customAppearances.set(name, vars);
+    void syncDom();
+  };
+
   const appearanceContext: EditorAppearanceContext = {
     appearance,
     colorMode,
     resolvedMode,
-    registerCustom: (name: string, vars: Record<string, string>) => {
-      activeCustomName = name;
-      customAppearances.set(name, vars);
-      syncDom();
-    },
+    registerCustom: registerCustomAppearance,
   };
 
   provide(editorAppearanceInjectionKey, appearanceContext);
@@ -58,9 +60,14 @@ export function useEditorAppearance(
     applyAppearanceToElement(el, appearance.value, colorMode.value, vars);
   };
 
-  watch([rootRef, appearance, colorMode, resolvedMode, customAppearanceVars], syncDom, {
-    immediate: true,
-  });
+  // customAppearanceVars 是**可选**参数，不能直接放进 watch 源数组：
+  // 省略时数组里就是一个 undefined，Vue 会报 `Invalid watch source`（实测）。
+  // 包成 getter 后既是合法的 watch 源，也能正确处理「没有这个 ref」的情况。
+  watch(
+    [rootRef, appearance, colorMode, resolvedMode, () => customAppearanceVars?.value],
+    syncDom,
+    { immediate: true },
+  );
 
   watch(
     () => colorMode.value,
@@ -76,6 +83,6 @@ export function useEditorAppearance(
   return {
     resolvedMode,
     appearanceContext,
-    registerCustomAppearance: appearanceContext.registerCustom!,
+    registerCustomAppearance,
   };
 }

@@ -59,9 +59,14 @@ export function localeText(
   return options.getLocaleText?.(key) ?? fallback;
 }
 
-/** 按扩展 options getter 创建 AI client，每次请求现取配置 */
+/**
+ * 按扩展 options getter 创建 AI client：配置每次请求现取，文案走该实例的 locale。
+ * `getLocaleText` 必须一并传下去，否则 client 自己的提示（未配置 / 请求失败 / demo 流）
+ * 会退回英文兜底，与编辑器其余 chrome 的语言不一致。
+ */
 export function createConfiguredAiClient(options: AiExtensionConfigureOptions) {
   return createAiClient({
     resolveConfig: () => resolveAiExtensionOptions(options),
+    getLocaleText: options.getLocaleText,
   });
 }

@@ -242,12 +242,24 @@ watch(
   },
 );
 
-watch(activeItemId, (id, prevId) => {
-  if (!id || id === prevId || !listRef.value) return;
+/**
+ * 必须 `flush: "post"`：这个 watcher 要读的按钮是本次更新**刚渲染出来**的。
+ *
+ * 默认的 pre 时机跑在组件重渲之前，此时 DOM 还是上一版：新敲出的标题按钮尚未存在
+ * （列表从空变非空时连 `listRef` 都还是 null），`querySelector` 取到 null 就静默跳过。
+ * 而下一轮 `syncItems` 的 `activeItemId` 没变，`id === prevId` 又会提前返回，
+ * 于是这次滚动**永远补不回来**——直到用户把光标移到另一个标题上。
+ */
+watch(
+  activeItemId,
+  (id, prevId) => {
+    if (!id || id === prevId || !listRef.value) return;
 
-  const activeButton = listRef.value.querySelector<HTMLElement>(`[data-outline-id="${id}"]`);
-  activeButton?.scrollIntoView({ block: "nearest" });
-});
+    const activeButton = listRef.value.querySelector<HTMLElement>(`[data-outline-id="${id}"]`);
+    activeButton?.scrollIntoView({ block: "nearest" });
+  },
+  { flush: "post" },
+);
 
 onBeforeUnmount(() => {
   detachEditorListeners(editor.value);

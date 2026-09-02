@@ -83,6 +83,8 @@ export interface TiptapLocale {
     wordExportFailed: string;
     imageUploadNotConfigured: string;
     videoUploadNotConfigured: string;
+    aiNotConfigured: string;
+    aiRequestFailed: string;
   };
 
   editor: {
@@ -215,6 +217,8 @@ export interface TiptapLocale {
     statusBarShortcutHintsTitle: string;
     officePasteImageTitle: string;
     officePasteImageBody: string;
+    /** 写进文档正文的图片占位文案（会被转义后包进 `<span data-office-paste-image>`） */
+    officePasteImagePlaceholder: string;
 
     enterValidLink: string;
 
@@ -374,8 +378,34 @@ export interface TiptapLocale {
     save: string;
     cancel: string;
     clearConfig: string;
+    storageMode: string;
+    storageModeHint: string;
+    storageModeMemory: string;
+    storageModeProxy: string;
+    storageModeLocal: string;
+    /** 提供商展示名与说明；key 与 `AiProvider` 一一对应 */
+    providerName: Record<AiProviderKey, string>;
+    providerDesc: Record<AiProviderKey, string>;
+    /** 连接测试结果文案；`useAiConfig` 只返回 key，由 UI 层翻译 */
+    testUnknownProvider: string;
+    testMissingApiKey: string;
+    testMissingEndpoint: string;
+    testTimeout: string;
+    testNotConfigured: string;
+  };
+
+  /** `VITE_AI_DEMO_MODE=true` 时代替真实请求的模拟流式输出 */
+  aiDemo: {
+    continue: string;
+    polish: string;
+    summarize: string;
+    translate: string;
+    custom: string;
   };
 }
+
+/** 与 `features/ai/config/types.ts` 的 `AiProvider` 保持一致（此处不反向依赖 AI 子包） */
+type AiProviderKey = "openai" | "deepseek" | "aliyun" | "ollama" | "custom";
 
 export type TranslationKey = string;
 export type TranslationFunction = (key: string, params?: Record<string, any>) => string;

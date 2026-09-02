@@ -5,6 +5,9 @@
  * 架构约定：
  * - 本文件是 ProseMirror 表格的唯一结构样式来源（边框、单元格、resize handle）
  * - appearance/*.css 仅通过 --ye-* token 与 margin/padding 等布局差异做主题化，禁止重复声明 border
+ * - 本文件是普通 CSS（经 index.css `@import`），**不是 SFC `<style scoped>`**：
+ *   `:deep()` / `::v-deep` / `:slotted()` 这类编译期伪类在这里不会被转换，会原样进产物，
+ *   浏览器视作无效选择器并丢弃**整条规则**。护栏见 scopedPseudoScope.test.ts。
  */
 
 /* ===== 编辑器内表格内容与列宽拖拽 ===== */
@@ -169,39 +172,6 @@
   font-size: var(--ye-btn-icon-size);
 }
 
-/* 表格边框样式类 */
-:deep(table.table-border-default) {
-  border-collapse: collapse;
-}
-
-:deep(table.table-border-default td),
-:deep(table.table-border-default th) {
-  border: var(--ye-border-width) solid var(--ye-table-border);
-}
-
-:deep(table.table-border-none) {
-  border-collapse: collapse;
-}
-
-:deep(table.table-border-none td),
-:deep(table.table-border-none th) {
-  border: none;
-}
-
-:deep(table.table-border-outer) {
-  border-collapse: collapse;
-  border: 2px solid #333;
-}
-
-[data-color-mode="dark"] :deep(table.table-border-outer) {
-  border-color: #f0f0f0;
-}
-
-:deep(table.table-border-outer td),
-:deep(table.table-border-outer th) {
-  border: none;
-}
-
 /* 响应式 */
 @media (width <= 768px) {
   .table-bubble-menu {
@@ -215,14 +185,11 @@
     gap: 2px;
   }
 
+  /* 图标字号由 base.css 的 --ye-btn-icon-size 断点（14px）负责，此处不再重复声明 */
   .table-menu-btn {
     flex-shrink: 0;
     width: var(--ye-btn-size-sm);
     height: var(--ye-btn-size-sm);
-  }
-
-  .table-menu-btn :deep(.anticon) {
-    font-size: 14px;
   }
 }
 
@@ -237,7 +204,7 @@
     height: 26px;
   }
 
-  .table-menu-btn :deep(.anticon) {
+  .table-menu-btn .anticon {
     font-size: 13px;
   }
 }

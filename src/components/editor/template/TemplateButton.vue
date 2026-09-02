@@ -111,6 +111,7 @@ function insertTemplate(tpl: TemplateItem) {
   text-align: left;
   appearance: none;
   cursor: pointer;
+  background: none;
   border: var(--ye-border-width) solid var(--ye-border);
   border-radius: 8px;
   transition: all 0.2s;
@@ -119,10 +120,6 @@ function insertTemplate(tpl: TemplateItem) {
 .template-card:hover {
   background: #f0f5ff;
   border-color: var(--ye-primary);
-}
-
-[data-color-mode="dark"] .template-card {
-  border-color: var(--ye-border);
 }
 
 [data-color-mode="dark"] .template-card:hover {
@@ -167,10 +164,6 @@ function insertTemplate(tpl: TemplateItem) {
 .template-card__desc {
   font-size: 12px;
   line-height: 1.4;
-  color: #8c8c8c;
-}
-
-[data-color-mode="dark"] .template-card__desc {
   color: #8c8c8c;
 }
 

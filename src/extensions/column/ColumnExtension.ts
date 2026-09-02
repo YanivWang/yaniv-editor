@@ -8,10 +8,6 @@ declare module "@tiptap/core" {
   }
 }
 
-function createEmptyColumn(schema: import("@tiptap/pm/model").Schema) {
-  return schema.nodes.column.create(null, schema.nodes.paragraph.create());
-}
-
 export const Column = Node.create({
   name: "column",
 
@@ -67,13 +63,16 @@ export const ColumnLayout = Node.create({
         (columns = 2) =>
         ({ chain, state }) => {
           const { schema } = state;
+          // 防御性守卫，实际不可达：`content: "column+"` 让这两个节点同生共死——
+          // 少注册一个，schema 构建阶段就会抛 `No node type or group 'column' found`，
+          // 根本走不到这条命令。
           if (!schema.nodes.column || !schema.nodes.columnLayout) return false;
-          const count = Math.max(2, Math.min(columns, 4));
-          const columnNodes = Array.from({ length: count }, () => createEmptyColumn(schema));
+          // 列数钳制在 2~4；`insertContent` 走 JSON，节点由 schema 自行构造
+          const count = Number.isFinite(columns) ? Math.max(2, Math.min(columns, 4)) : 2;
           return chain()
             .insertContent({
               type: this.name,
-              content: columnNodes.map(() => ({
+              content: Array.from({ length: count }, () => ({
                 type: "column",
                 content: [{ type: "paragraph" }],
               })),

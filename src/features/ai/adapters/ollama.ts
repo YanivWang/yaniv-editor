@@ -3,6 +3,8 @@
  * For local Ollama models
  */
 
+import { readStreamLines } from "./readStreamLines";
+
 import type { AiAdapter, AiConfig, AiMessage, AiResponse, AiStreamCallbacks } from "../types";
 
 export class OllamaAdapter implements AiAdapter {
@@ -84,32 +86,23 @@ export class OllamaAdapter implements AiAdapter {
         throw new Error(`Ollama API error: ${response.status} - ${error}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      if (!reader) {
+      if (!response.body) {
         throw new Error("No response body");
       }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      let fullText = "";
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter((line) => line.trim());
-
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line);
-            const token = json.message?.content || "";
-            if (token) {
-              fullText += token;
-              callbacks.onToken?.(token);
-            }
-          } catch {
-            // Skip invalid JSON
+      // Ollama 原生接口回的是 NDJSON（每行一个完整 JSON），不是 SSE
+      for await (const line of readStreamLines(response.body)) {
+        try {
+          const json = JSON.parse(line);
+          const token = json.message?.content || "";
+          if (token) {
+            fullText += token;
+            callbacks.onToken?.(token);
           }
+        } catch {
+          // Skip invalid JSON
         }
       }
 

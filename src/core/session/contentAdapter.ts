@@ -2,6 +2,7 @@ import { getSchema, type Extensions, type JSONContent } from "@tiptap/core";
 import { DOMParser, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/model";
 
 import { BYPASS_GUARD_META } from "@/capabilities/transactionGuard";
+import { sanitizeLinkHrefMarks } from "@/utils/linkHrefPolicy";
 import { sanitizeMediaSrcAttrs } from "@/utils/mediaSrcPolicy";
 
 import type { Editor } from "@tiptap/vue-3";
@@ -100,7 +101,8 @@ function adaptNode(
   if (node.attrs !== undefined) adapted.attrs = sanitizeMediaSrcAttrs(type, node.attrs);
   if (node.text !== undefined) adapted.text = node.text;
 
-  const marks = stripUnknownMarks(node.marks, validMarks);
+  // 同理，link 的 href 白名单也只在 DOM 边界与命令上生效，JSON 这条要在这里补
+  const marks = sanitizeLinkHrefMarks(stripUnknownMarks(node.marks, validMarks));
   if (marks) adapted.marks = marks;
 
   if (type !== "text") {
@@ -180,7 +182,7 @@ export const ContentAdapter = {
     const doc = parseContentToDoc(content, view.state.schema);
 
     const tr = view.state.tr
-      .setMeta(BYPASS_GUARD_META as unknown as string, true)
+      .setMeta(BYPASS_GUARD_META, true)
       .setMeta("addToHistory", options.addToHistory ?? false)
       .setMeta("yaniv:source", options.source ?? "external")
       .replaceWith(0, view.state.doc.content.size, doc.content);

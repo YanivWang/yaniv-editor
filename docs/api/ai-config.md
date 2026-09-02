@@ -61,7 +61,9 @@ const aiConfig: YanivEditorAiConfig = {
 | 用户配置 | localStorage | 显示       |   2    | Demo / 内部工具 |
 | 环境变量 | `VITE_AI_*`  | 显示       |   3    | 本地开发        |
 
-传入 `ai-config` 后即视为宿主托管，后两级不再参与解析。未传时按 2 → 3 依次回退。
+表里是三种**配置来源**；实际解析在 `getAiConfig()` 里分四级（宿主托管占了 1、3 两级，第 3 级是宿主配置未通过校验时的兜底，用于阻止悄悄下沉到 `.env`）。完整顺序见 [AI 辅助 — 配置来源](../features/ai.md#配置来源优先级)。
+
+传入 `ai-config` 后即视为宿主托管，环境变量不再参与解析。未传时按 2 → 3 依次回退。
 
 ## 子包 API
 
@@ -74,6 +76,26 @@ import {
   AI_PROVIDERS,
 } from "@yanivjs/yaniv-editor/ai";
 ```
+
+`AI_PROVIDERS` 只含**技术参数**（`id` / `defaultEndpoint` / `defaultModel` / `requiresApiKey` / `docsUrl`）。
+展示名与说明是 UI 文案，放在语言包的 `aiSettings.providerName[id]` / `aiSettings.providerDesc[id]`，
+随 `locale` 切换。
+
+`useAiConfig().testConnection()` 返回的 `ConnectionTestResult` 同理**只回 key 不回文案**：
+
+```ts
+interface ConnectionTestResult {
+  success: boolean;
+  /** 语言包 key，如 `aiSettings.testTimeout` */
+  messageKey: string;
+  /** provider 返回的原始错误文本（无法本地化）；有值时优先展示 */
+  detail?: string;
+  latency?: number;
+}
+```
+
+`createAiClient({ getLocaleText })` 同样接收实例 locale 解析器——AI 扩展经
+`createConfiguredAiClient` 自动注入；直接使用导出的 `aiClient` 单例时，client 自身的提示退回英文。
 
 ## 动态更新
 

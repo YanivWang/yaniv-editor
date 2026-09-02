@@ -12,7 +12,8 @@
 
 ## 上传
 
-未传 `uploadImage` / `uploadVideo` 时，本地上传回退为 **DataURL**：
+未传 `uploadImage` / `uploadVideo` 时，本地上传回退为 **`blob:` 对象 URL**（`URL.createObjectURL(file)`），并提示未配置上传处理器。
+该地址刷新即失效，只适合本地预览，不可入库：
 
 ```vue
 <YanivEditor
@@ -26,7 +27,7 @@
 
 ## 图片
 
-- **插入**：full 顶栏 / notion 的 `/` 或悬浮菜单
+- **插入**：full 顶栏 / notion 的 `/` 或拖拽手柄旁的 + 号块菜单（浮动菜单里没有插图入口）
 - **选中后**：图片上下文条（`ImageToolbar`）— 左 / 居中 / 右对齐、预览（Modal）、删除
 - **缩放**：拖拽缩放由 `ResizableImage`（`enableResize: true`）的节点手柄提供，不在上下文条里
 - **粘贴**：`PasteImage` 扩展随 `image` gate 一起注册，支持直接粘贴图片

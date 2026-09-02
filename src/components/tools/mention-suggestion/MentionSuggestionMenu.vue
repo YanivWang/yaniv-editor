@@ -41,7 +41,12 @@ import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance"
 import { useVirtualFocusPopup } from "@/composables/useVirtualFocusPopup";
 import { useOverlayPortal, useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
-import { getMentionSuggestions, mentionPluginKey, type MentionItem } from "@/extensions/mention";
+import {
+  getMentionSuggestions,
+  mentionPluginKey,
+  resolveMentionItems,
+  type MentionItem,
+} from "@/extensions/mention";
 
 const t = useEditorT();
 const editor = useYanivEditor();
@@ -58,7 +63,10 @@ const query = ref("");
 const selectedIndex = ref(0);
 const position = ref({ x: 0, y: 0 });
 
-const suggestions = computed(() => getMentionSuggestions(query.value));
+// 候选数据取自扩展 options（宿主 `mention-items` prop → registry getter），未注入时回退内置占位项
+const suggestions = computed(() =>
+  getMentionSuggestions(query.value, resolveMentionItems(editor.value)),
+);
 
 /** 虚拟焦点：焦点留在正文，用 aria-activedescendant 指向当前候选项 */
 const popupId = `yaniv-mention-menu-${useId()}`;

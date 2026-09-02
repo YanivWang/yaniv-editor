@@ -32,15 +32,25 @@ UX: **AiSuggestionPopover** streams suggestions with accept/reject; **AiHighligh
 
 ## Config Sources (Priority)
 
-`getAiConfig()` in `client.ts` is the single resolution entry point. Highest priority first:
+`getAiConfig()` in `client.ts` is the single resolution entry point. It returns at the first level that matches, highest priority first:
 
-1. **Host-managed** — the `:ai-config` prop, forwarded through the registry's getters (read fresh on every request)
-2. **User config** — localStorage (written by `AiSettingsModal`, read by `getAiRequestConfig()`)
-3. **Build-time** — `VITE_AI_*` environment variables
+1. **Host-managed (instance-scoped)** — the `:ai-config` prop, forwarded through the registry's getters (read fresh on every request)
+2. **`getAiRequestConfig()`** — the registered host-managed copy, otherwise the localStorage user config (written by `AiSettingsModal`).
+   It validates `enabled` and `apiKey` (except in `proxy` mode) and returns `null` when they don't check out
+3. **Host-managed fallback** — when level 2 fails validation but a host config _is_ registered, resolution still uses the
+   host's provider / endpoint / model and does **not** fall through to `.env` (so an explicitly host-managed editor never
+   silently picks up a build-time key)
+4. **Build-time** — `VITE_AI_*` environment variables
 
-Upstream layers (registry getters, `resolveAiExtensionOptions`) **only forward the host's raw values and never fill in defaults**: without `:ai-config`, `resolveAiExtensionOptions` returns `null` and resolution falls through to levels 2 and 3. Defaults (the provider's default endpoint / model, a 60s `timeout`) are filled in inside `getAiConfig()`.
+Levels 2 and 3 look the host config up without an owner, so both fall through when several editors on the page pass
+`:ai-config` (see [AI Config API — Multiple instances](../api/ai-config.md)); requests made by the AI extensions rely on
+the instance-scoped getter at level 1 and are unaffected.
+
+Upstream layers (registry getters, `resolveAiExtensionOptions`) **only forward the host's raw values and never fill in defaults**: without `:ai-config`, `resolveAiExtensionOptions` returns `null` and resolution falls through. Defaults (the provider's default endpoint / model, a 60s `timeout`) are filled in inside `getAiConfig()`.
 
 `ai-config` field changes **do not** trigger a session rebuild; changing `model` takes effect on the next request.
+
+`temperature` / `maxTokens` are not part of `ai-config` and do not follow the levels above: their only source is `VITE_AI_TEMPERATURE` / `VITE_AI_MAX_TOKENS` (defaulting to 0.7 / 2048), and they apply whichever level supplied the key and endpoint.
 
 With `storageMode: "proxy"` the key is held by your backend, so an omitted `apiKey` still counts as configured as long as there is a reachable endpoint.
 

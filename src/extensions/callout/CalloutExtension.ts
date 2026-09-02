@@ -1,5 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 
+import { createNodeDecorationApplier } from "@/extensions/shared/nodeViewDecorations";
+
 export type CalloutColor =
   "default" | "gray" | "brown" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "red";
 
@@ -109,19 +111,7 @@ export const Callout = Node.create({
       const contentDOM = document.createElement("div");
       contentDOM.className = "callout-block__content";
 
-      const applyDecorations = (decoList: typeof decorations) => {
-        let extraClass = "";
-        let placeholder: string | null = null;
-        decoList.forEach((deco) => {
-          const attrs = (deco as { type?: { attrs?: Record<string, string> } }).type?.attrs;
-          if (!attrs) return;
-          if (attrs.class) extraClass = `${extraClass} ${attrs.class}`.trim();
-          if (attrs["data-placeholder"]) placeholder = attrs["data-placeholder"];
-        });
-        dom.className = extraClass ? `callout-block ${extraClass}` : "callout-block";
-        if (placeholder) dom.setAttribute("data-placeholder", placeholder);
-        else dom.removeAttribute("data-placeholder");
-      };
+      const applyDecorations = createNodeDecorationApplier(dom);
 
       dom.appendChild(icon);
       dom.appendChild(contentDOM);

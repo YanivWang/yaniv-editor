@@ -57,7 +57,32 @@ describe("normalizeSafeMediaUrl", () => {
   it("放行相对路径与 blob:", () => {
     expect(normalizeSafeMediaUrl("/a.png", "image")).toBe("/a.png");
     expect(normalizeSafeMediaUrl("./a.png", "image")).toBe("./a.png");
+    expect(normalizeSafeMediaUrl("../up/a.png", "image")).toBe("../up/a.png");
     expect(normalizeSafeMediaUrl("blob:https://x/y", "video")).toBe("blob:https://x/y");
+  });
+
+  /**
+   * 回归：不带前导 `/` 的相对路径一度被「无协议就补 https://」的分支改写成
+   * `https://a.png/`（把文件名当成了主机名）。图片直接失效，而且这个被改坏的值
+   * 会经 `getJSON()` 回到宿主被持久化。
+   */
+  it("不带前导斜杠的相对路径同样原样保留", () => {
+    expect(normalizeSafeMediaUrl("a.png", "image")).toBe("a.png");
+    expect(normalizeSafeMediaUrl("images/a.png", "image")).toBe("images/a.png");
+    expect(normalizeSafeMediaUrl("assets/media/clip.mp4", "video")).toBe("assets/media/clip.mp4");
+    expect(normalizeSafeMediaUrl("a.png?v=2", "image")).toBe("a.png?v=2");
+  });
+
+  it("形如 host.tld/path 的无协议地址仍补全为 https", () => {
+    expect(normalizeSafeMediaUrl("cdn.example.com/a.png", "image")).toBe(
+      "https://cdn.example.com/a.png",
+    );
+  });
+
+  it("相对路径这条分支不会放过带协议的值", () => {
+    expect(normalizeSafeMediaUrl("javascript:alert(1)", "image")).toBeNull();
+    expect(normalizeSafeMediaUrl("file:///etc/passwd", "image")).toBeNull();
+    expect(normalizeSafeMediaUrl("//evil.com/a.png", "image")).toBe("https://evil.com/a.png");
   });
 
   it("拦截 javascript:", () => {

@@ -60,7 +60,7 @@ const html = ref("<p>Hello Yaniv</p>");
 
 Since v0.1.4, `inline.css` **no longer bundles the full editor stylesheet**. It previously
 concatenated all of `style.css`, so the inline artifact (139KB) was larger than the full one
-(114KB) — at odds with the inline entry's lightweight comment/form use case. It is now 56KB.
+(115KB) — at odds with the inline entry's lightweight comment/form use case. It is now 56KB (~9KB gzipped).
 
 If a page renders both shapes, import both files. If you imported only `inline.css` but render
 the Full Editor, switch to `style.css`.

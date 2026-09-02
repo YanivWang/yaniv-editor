@@ -33,25 +33,24 @@
 
 颜色等 token 定义在 `:root`；**z-index token 仅定义在 `.yaniv-editor`**：
 
-| Token                     | 计算（默认 base=1000） | 用途                                   |
-| ------------------------- | ---------------------- | -------------------------------------- |
-| `--ye-z-content`          | `1`                    | 文档内基础层                           |
-| `--ye-z-content-overlay`  | `2`                    | 表格选区等                             |
-| `--ye-z-content-control`  | `10`                   | 图片列宽手柄等                         |
-| `--ye-z-editor-ui`        | `20`                   | 拖拽手柄                               |
-| `--ye-z-editor-rail`      | `30`                   | 大纲栏                                 |
-| `--ye-z-chrome`           | `40`                   | 顶栏 / 底栏                            |
-| `--ye-z-chrome-tooltip`   | `50`                   | 文档内自建 tooltip（`BaseTooltip` 等） |
-| `--ye-z-overlay-backdrop` | `base`                 | 块选择器遮罩                           |
-| `--ye-z-bubble-menu`      | `base + 10`            | 链接 / 图片 / 表格 bubble              |
-| `--ye-z-floating-menu`    | `base + 20`            | 选中文本浮动菜单                       |
-| `--ye-z-picker-menu`      | `base + 30`            | BlockPicker、mention、AI popover       |
-| `--ye-z-drag-menu`        | `base + 40`            | 拖拽块菜单                             |
-| `--ye-z-drag-submenu`     | `base + 41`            | 拖拽子菜单                             |
-| `--ye-z-dropdown`         | `base + 50`            | Ant Design 下拉                        |
-| `--ye-z-tooltip`          | `base + 60`            | portal 内 Ant Design Tooltip           |
-| `--ye-z-toast`            | `base + 80`            | 自建 Toast / Notice                    |
-| `--ye-z-modal`            | `base + 100`           | 编辑器内 Modal                         |
+| Token                     | 计算（默认 base=1000） | 用途                             |
+| ------------------------- | ---------------------- | -------------------------------- |
+| `--ye-z-content`          | `1`                    | 文档内基础层                     |
+| `--ye-z-content-overlay`  | `2`                    | 表格选区等                       |
+| `--ye-z-content-control`  | `10`                   | 图片列宽手柄等                   |
+| `--ye-z-editor-ui`        | `20`                   | 拖拽手柄                         |
+| `--ye-z-editor-rail`      | `30`                   | 大纲栏                           |
+| `--ye-z-chrome`           | `40`                   | 顶栏 / 底栏                      |
+| `--ye-z-overlay-backdrop` | `base`                 | 块选择器遮罩                     |
+| `--ye-z-bubble-menu`      | `base + 10`            | 链接 / 图片 / 表格 bubble        |
+| `--ye-z-floating-menu`    | `base + 20`            | 选中文本浮动菜单                 |
+| `--ye-z-picker-menu`      | `base + 30`            | BlockPicker、mention、AI popover |
+| `--ye-z-drag-menu`        | `base + 40`            | 拖拽块菜单                       |
+| `--ye-z-drag-submenu`     | `base + 41`            | 拖拽子菜单                       |
+| `--ye-z-dropdown`         | `base + 50`            | Ant Design 下拉                  |
+| `--ye-z-tooltip`          | `base + 60`            | portal 内 Ant Design Tooltip     |
+| `--ye-z-toast`            | `base + 80`            | 自建 Toast / Notice              |
+| `--ye-z-modal`            | `base + 100`           | 编辑器内 Modal                   |
 
 浮层相对顺序：`modal > toast > tooltip > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop`。
 

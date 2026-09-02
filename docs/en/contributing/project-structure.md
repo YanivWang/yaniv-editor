@@ -35,7 +35,9 @@ Styles split into structure, functional chrome, and appearance. Do not duplicate
 | Functional chrome | `src/styles/*.css`, `src/components/tools/**`           | Toolbar, menus, drag handle, outline, `overlay-portal.css`, etc. |
 | Appearance        | `src/appearance/styles/*.css`                           | Theme tokens and typography (margin, font-size, padding)         |
 
-Import order is defined in `src/styles/index.css` (Full) and `src/styles/inline.css` (Inline). Both start with `variables.css` and import `content.css` and `overlay-portal.css` ahead of other rules. Only `index.css` imports `appearance/styles/*.css` at the end; `inline.css` contains **no appearance files at all** (Inline has no `appearance` prop).
+Import order is defined in `src/styles/index.css` (Full) and `src/styles/inline.css` (Inline). Both start with `variables.css` (tokens must come first) and then pull in the structural and chrome layers they need; `inline.css` only imports the subset Inline actually uses (no document layout, table, drag handle or outline styles).
+
+There is exactly one ordering constraint: **`content.css` must come before `appearance/styles/*.css`** — the appearance layer only adjusts tokens and typography and must not be overridden by the structural layer. Only `index.css` imports `appearance/styles/*.css` (at the end); `inline.css` contains **no appearance files at all** (Inline has no `appearance` prop), so the constraint does not apply there.
 
 Rules:
 

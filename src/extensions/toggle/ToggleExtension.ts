@@ -1,8 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 
-import { isVisuallyEmpty } from "@/extensions/shared/isVisuallyEmpty";
-
-import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { createNodeDecorationApplier } from "@/extensions/shared/nodeViewDecorations";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -13,8 +11,17 @@ declare module "@tiptap/core" {
   }
 }
 
-export const ToggleBlock = Node.create({
+export interface ToggleBlockOptions {
+  /** 实例 locale 文案，key 为 dot-path；扩展拿不到 Vue inject，同 DragHandle 的约定 */
+  getLocaleText?: (key: string) => string;
+}
+
+export const ToggleBlock = Node.create<ToggleBlockOptions>({
   name: "toggleBlock",
+
+  addOptions() {
+    return { getLocaleText: undefined };
+  },
 
   group: "block",
 
@@ -85,52 +92,40 @@ export const ToggleBlock = Node.create({
   },
 
   addNodeView() {
-    return ({ node, getPos, editor }) => {
+    const chevronLabel =
+      this.options.getLocaleText?.("slashCommand.toggleBlock") ?? "slashCommand.toggleBlock";
+
+    return ({ node, getPos, editor, decorations }) => {
       const dom = document.createElement("div");
+      dom.className = "toggle-block";
       dom.dataset.type = "toggle";
 
       const chevron = document.createElement("button");
       chevron.type = "button";
       chevron.className = "toggle-block__chevron";
-      chevron.setAttribute("aria-label", "Toggle");
+      chevron.setAttribute("aria-label", chevronLabel);
       chevron.innerHTML =
         '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
       const contentDOM = document.createElement("div");
       contentDOM.className = "toggle-block__content";
 
-      const resolvePlaceholder = (current: ProseMirrorNode, pos: number): string => {
-        const placeholderExt = editor.extensionManager.extensions.find(
-          (ext) => ext.name === "placeholder",
-        );
-        const option = placeholderExt?.options?.placeholder;
-        if (typeof option === "function") {
-          return option({ editor, node: current, pos, hasAnchor: true }) || "";
-        }
-        if (typeof option === "string") return option;
-        return "";
-      };
-
       const syncOpen = (open: boolean) => {
         dom.dataset.open = open ? "true" : "false";
+        // 折叠块是 disclosure 控件：展开态必须经 aria-expanded 播报，光有图标旋转读屏读不出来
+        chevron.setAttribute("aria-expanded", open ? "true" : "false");
         chevron.classList.toggle("is-open", open);
       };
 
-      const syncEmptyState = (current: ProseMirrorNode) => {
-        const empty = isVisuallyEmpty(current);
-        dom.className = empty ? "toggle-block is-empty" : "toggle-block";
-        if (empty) {
-          const pos = typeof getPos === "function" ? (getPos() ?? 0) : 0;
-          const text = resolvePlaceholder(current, pos);
-          if (text) dom.setAttribute("data-placeholder", text);
-          else dom.removeAttribute("data-placeholder");
-        } else {
-          dom.removeAttribute("data-placeholder");
-        }
-      };
+      /*
+       * 空态 placeholder 不自算：`YanivPlaceholder` 已经把 `is-empty` + `data-placeholder`
+       * 作为节点装饰打在容器上（`CONTAINER_PLACEHOLDER_TYPES` 含 toggleBlock），
+       * 这里照 callout 的做法直接消费装饰，避免同一份判断存在两套实现。
+       */
+      const applyDecorations = createNodeDecorationApplier(dom);
 
       syncOpen(node.attrs.open);
-      syncEmptyState(node);
+      applyDecorations(decorations);
 
       chevron.addEventListener("mousedown", (event) => {
         event.preventDefault();
@@ -160,10 +155,10 @@ export const ToggleBlock = Node.create({
         ignoreMutation: (mutation) =>
           mutation.type === "attributes" &&
           (mutation.attributeName === "class" || mutation.attributeName === "data-placeholder"),
-        update(updatedNode) {
+        update(updatedNode, updatedDecorations) {
           if (updatedNode.type.name !== "toggleBlock") return false;
           syncOpen(updatedNode.attrs.open);
-          syncEmptyState(updatedNode);
+          applyDecorations(updatedDecorations);
           return true;
         },
       };

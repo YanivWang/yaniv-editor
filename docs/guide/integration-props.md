@@ -11,7 +11,10 @@
 />
 ```
 
-未传时回退 DataURL。
+未传时，本地上传回退为 `URL.createObjectURL(file)` 生成的 **`blob:` 对象 URL**，同时弹出一条「未配置上传处理器」提示。
+该地址只在当前页面会话内有效（刷新即失效），**不可持久化**——生产集成必须传上传回调。
+
+从剪贴板直接粘贴图片走的是另一条路径（`PasteImage` 扩展），插入的是 `data:` URL，与上传回调无关。
 
 ## 图库
 
@@ -26,6 +29,23 @@
 ```vue
 <YanivEditor :custom-templates="templates" />
 ```
+
+## `@` 提及候选项
+
+`slashCommand` 能力开启时（notion preset 默认开），正文里输入 `@` 会弹出候选菜单。
+未传 `mentionItems` 时用的是内置占位数据（首页 / 文档 / 路线图 / 我），生产集成应传真实数据：
+
+```vue
+<YanivEditor
+  preset="notion"
+  :mention-items="[
+    { id: 'u-1', label: 'Ada', href: '/people/ada', type: 'user' },
+    { id: 'p-1', label: '发布计划', href: '/pages/release', type: 'page' },
+  ]"
+/>
+```
+
+该 prop 同时决定块菜单「页面链接」插入的节点内容；与上传 / 图库一致，变更**不触发** session 重建。
 
 ## AI 托管
 

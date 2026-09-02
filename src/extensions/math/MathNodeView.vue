@@ -48,13 +48,12 @@
 
 <script setup lang="ts">
 import { NodeViewWrapper, nodeViewProps } from "@tiptap/vue-3";
-import katex from "katex";
 import { ref, computed, watch, nextTick, onMounted } from "vue";
 
 /* KaTeX 样式由接入方引入: import 'katex/dist/katex.min.css'（勿打入 npm 包） */
 import { useEditorT } from "@/core/infra/useEditorLocale";
 
-import { DEFAULT_KATEX_OPTIONS } from "./types";
+import { renderMath } from "./renderMath";
 
 import type { MathExtensionOptions } from "./types";
 
@@ -64,39 +63,32 @@ const props = defineProps(nodeViewProps);
 
 const isEditing = ref(false);
 const latexInput = ref("");
-const renderError = ref<string | null>(null);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
-// 渲染 LaTeX 为 HTML
-function renderLatex(latex: string, displayMode: boolean): string {
-  if (!latex.trim()) {
-    return `<span class="math-placeholder">${t("editor.mathEmpty")}</span>`;
-  }
+const katexOptions = computed(
+  () => (props.extension?.options as MathExtensionOptions | undefined)?.katexOptions,
+);
 
-  try {
-    renderError.value = null;
-    const extensionOptions = (props.extension?.options as MathExtensionOptions | undefined)
-      ?.katexOptions;
-    return katex.renderToString(latex, {
-      ...DEFAULT_KATEX_OPTIONS,
-      ...extensionOptions,
-      displayMode,
-    });
-  } catch (e) {
-    renderError.value = e instanceof Error ? e.message : "Render error";
-    return `<span class="math-error">${renderError.value}</span>`;
-  }
+/**
+ * 渲染结果一律走纯函数派生，不在 computed 里写 ref。
+ * `t()` 必须在 computed 内部求值，否则语言切换后占位文案会冻结在首次求值的语言上。
+ */
+function render(latex: unknown) {
+  return renderMath(latex, props.node.attrs.block, katexOptions.value, t("editor.mathEmpty"));
 }
 
-// 显示模式的 HTML
-const displayHtml = computed(() => {
-  return renderLatex(props.node.attrs.latex, props.node.attrs.block);
-});
+// 显示模式
+const displayResult = computed(() => render(props.node.attrs.latex));
+const displayHtml = computed(() => displayResult.value.html);
 
-// 预览 HTML
-const previewHtml = computed(() => {
-  return renderLatex(latexInput.value, props.node.attrs.block);
-});
+// 编辑模式预览
+const previewResult = computed(() => render(latexInput.value));
+const previewHtml = computed(() => previewResult.value.html);
+
+/** 编辑态看预览的错误，显示态看公式本身的错误——两者都随输入实时消长，不会粘住 */
+const renderError = computed(() =>
+  isEditing.value ? previewResult.value.error : displayResult.value.error,
+);
 
 // 开始编辑
 function startEdit() {
@@ -173,25 +165,29 @@ watch(
   text-align: center;
 }
 
-.math-node-wrapper.is-selected .math-display {
-  /* 由 span 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式 */
+/* 显示模式 */
+.math-display {
+  /*
+   * 由 span 改为 button 以获得原生键盘可达性，需重置浏览器默认按钮样式。
+   * 这组重置必须留在基础选择器上：早先它被写在 `.is-selected` 里，
+   * 于是未选中的公式一直顶着 UA 的按钮外观（灰底、outset 边框、非继承字体）。
+   */
+  display: inline-block;
+  padding: 2px 4px;
   font: inherit;
   color: inherit;
+  text-align: inherit;
   appearance: none;
-  outline: 2px solid var(--ye-primary);
-  outline-offset: 2px;
+  cursor: pointer;
   background: none;
   border: none;
   border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-/* 显示模式 */
-.math-display {
-  display: inline-block;
-  padding: 2px 4px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+.math-node-wrapper.is-selected .math-display {
+  outline: 2px solid var(--ye-primary);
+  outline-offset: 2px;
 }
 
 .math-display:hover {
@@ -273,7 +269,11 @@ watch(
 
 .math-btn {
   padding: 4px 12px;
+
+  /* <button>，需重置浏览器默认按钮样式：按钮不继承 font-family */
+  font: inherit;
   font-size: 13px;
+  line-height: normal;
   cursor: pointer;
   border: none;
   border-radius: 4px;

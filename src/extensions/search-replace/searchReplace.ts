@@ -20,11 +20,26 @@ type SearchReplaceStorage = {
   lastResultIndex: number;
 };
 
-function getRegex(s: string, disableRegex: boolean, caseSensitive: boolean): RegExp {
-  return RegExp(
-    disableRegex ? s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : s,
-    caseSensitive ? "gu" : "gui",
-  );
+/**
+ * 编译搜索词；**模式非法时返回 `null` 而不是抛错**。
+ *
+ * `disableRegex: false`（宿主开启正则搜索）时，搜索词直接来自输入框，用户敲出
+ * `(foo)` 的过程中必然经过 `(` 这样的半截模式。此前这里让 `RegExp()` 直接抛
+ * `SyntaxError`：它是在插件的 `apply` 里被调用的，于是**整条 transaction 都失败**；
+ * 更糟的是坏搜索词已经存进 storage，此后**每一次**事务（包括正文里正常打字）
+ * 都会重新走到这里再抛一次——编辑器被卡死到搜索词碰巧重新合法为止。
+ *
+ * 非法模式按「无命中」处理，与主流编辑器的正则搜索行为一致。
+ */
+function getRegex(s: string, disableRegex: boolean, caseSensitive: boolean): RegExp | null {
+  try {
+    return RegExp(
+      disableRegex ? s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : s,
+      caseSensitive ? "gu" : "gui",
+    );
+  } catch {
+    return null;
+  }
 }
 
 function processSearches(
@@ -311,6 +326,12 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
             }
 
             const regex = getRegex(searchTerm, disableRegex, caseSensitive);
+            if (!regex) {
+              // 正则模式下的半截模式：当作无命中，等用户把它敲完整
+              storage.results = [];
+              return DecorationSet.empty;
+            }
+
             const { decorationsToReturn, results } = processSearches(
               tr.doc,
               regex,
@@ -332,9 +353,9 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
          * 退出编辑态时自清搜索状态。
          *
          * 搜索词、命中集合与高亮装饰都归本扩展所有，因此复位责任也在这里，
-         * 不依赖外部（Shell / 工具栏按钮）代为清理：查找面板是随顶栏一起被
-         * `v-if` 卸载的，卸载路径不会触发面板的 onClose，残留的搜索词会让
-         * 命中高亮一直显示到 preview 里。
+         * 不依赖外部（Shell / 工具栏按钮）代为清理：查找面板挂在 `EditorEditChrome` 上，
+         * 切到 preview 时整块编辑期 chrome 被 `v-if` 卸载，卸载路径不会触发面板的
+         * onClose，残留的搜索词会让命中高亮一直显示到 preview 里。
          */
         view() {
           let wasEditable: boolean | null = null;

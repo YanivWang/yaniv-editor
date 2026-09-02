@@ -133,7 +133,6 @@ type BlockMenuKind = "actions";
 interface BlockMenuItem {
   id: string;
   label: string;
-  description?: string;
   danger?: boolean;
   dividerBefore?: boolean;
   submenu?: BlockMenuItem[];
@@ -448,12 +447,11 @@ function createBlockquote(schema: Schema, text = ""): ProseMirrorNode {
   return schema.nodes.blockquote.create(null, createParagraph(schema, text));
 }
 
-function createList(schema: Schema, type: "bulletList" | "orderedList" | "taskList", text = "") {
-  const listType = schema.nodes[type];
-  const itemType = type === "taskList" ? schema.nodes.taskItem : schema.nodes.listItem;
-  const attrs = type === "taskList" ? { checked: false } : null;
-
-  return listType.create(null, itemType.create(attrs, createParagraph(schema, text)));
+function createList(schema: Schema, type: "bulletList" | "orderedList", text = "") {
+  return schema.nodes[type].create(
+    null,
+    schema.nodes.listItem.create(null, createParagraph(schema, text)),
+  );
 }
 
 function insertNodeAfter(view: EditorView, target: DragTarget, node: ProseMirrorNode): void {
@@ -644,13 +642,6 @@ function renderBlockMenu(menu: HTMLElement, items: BlockMenuItem[], closeMenu: (
       }
 
       itemElement.appendChild(submenu);
-    }
-
-    if (item.description) {
-      const description = document.createElement("span");
-      description.className = "drag-handle-menu__description";
-      description.textContent = item.description;
-      itemElement.appendChild(description);
     }
 
     itemElement.addEventListener("mousedown", (event) => {
@@ -1025,7 +1016,12 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           const cancelPortalMount = mountMenuWhenPortalReady(menu, view);
           handle.addEventListener("mouseenter", keepHandleVisible);
           plusButton.addEventListener("mouseenter", keepHandleVisible);
-          handleRoot.addEventListener("mousemove", handleMouseMove);
+          // mousemove 只挂 document：handleRoot 在 document 内且没人对 mousemove
+          // stopPropagation，两处都挂等于每次移动跑两遍 handleMouseMove——
+          // 而它每遍都要做 getBoundingClientRect / posAtCoords / elementFromPoint /
+          // getComputedStyle。菜单挂在 overlay portal（handleRoot 之外），也只有
+          // document 这一层能覆盖到指针移到菜单上的情况。
+          // mouseleave 不冒泡，必须留在 handleRoot 上。
           handleRoot.addEventListener("mouseleave", handleMouseLeave);
           document.addEventListener("mousemove", handleMouseMove);
           document.addEventListener("mousedown", handleDocumentPointerDown);
@@ -1063,7 +1059,6 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
               cancelPortalMount();
               handle.removeEventListener("mouseenter", keepHandleVisible);
               plusButton.removeEventListener("mouseenter", keepHandleVisible);
-              handleRoot.removeEventListener("mousemove", handleMouseMove);
               handleRoot.removeEventListener("mouseleave", handleMouseLeave);
               document.removeEventListener("mousemove", handleMouseMove);
               document.removeEventListener("mousedown", handleDocumentPointerDown);

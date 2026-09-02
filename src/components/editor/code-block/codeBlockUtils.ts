@@ -1,11 +1,4 @@
-import { DEFAULT_CODE_BLOCK_LANGUAGE } from "@/configs/editorConstants";
-
 import type { Editor } from "@tiptap/core";
-
-/** 插入默认语言的空代码块 */
-export function insertDefaultCodeBlock(editor: Editor): boolean {
-  return editor.chain().focus().setCodeBlock({ language: DEFAULT_CODE_BLOCK_LANGUAGE }).run();
-}
 
 /** 查找选区所在的 codeBlock 节点深度 */
 export function findCodeBlockDepth(editor: Editor): number {

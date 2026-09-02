@@ -3,6 +3,8 @@
  * For Qwen/Tongyi Qianwen models via DashScope API
  */
 
+import { readStreamLines } from "./readStreamLines";
+
 import type { AiAdapter, AiConfig, AiMessage, AiResponse, AiStreamCallbacks } from "../types";
 
 export class AliyunAdapter implements AiAdapter {
@@ -96,35 +98,28 @@ export class AliyunAdapter implements AiAdapter {
         throw new Error(`Aliyun API error: ${response.status} - ${error}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      if (!reader) {
+      if (!response.body) {
         throw new Error("No response body");
       }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      let fullText = "";
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter((line) => line.trim().startsWith("data:"));
+      for await (const rawLine of readStreamLines(response.body)) {
+        const line = rawLine.trim();
+        if (!line.startsWith("data:")) continue;
 
-        for (const line of lines) {
-          const data = line.slice(5).trim(); // Remove 'data:' prefix
-          if (!data) continue;
+        const data = line.slice(5).trim(); // 去掉 'data:' 前缀
+        if (!data) continue;
 
-          try {
-            const json = JSON.parse(data);
-            const token = json.output?.choices?.[0]?.message?.content || json.output?.text || "";
-            if (token) {
-              fullText += token;
-              callbacks.onToken?.(token);
-            }
-          } catch {
-            // Skip invalid JSON
+        try {
+          const json = JSON.parse(data);
+          const token = json.output?.choices?.[0]?.message?.content || json.output?.text || "";
+          if (token) {
+            fullText += token;
+            callbacks.onToken?.(token);
           }
+        } catch {
+          // Skip invalid JSON
         }
       }
 

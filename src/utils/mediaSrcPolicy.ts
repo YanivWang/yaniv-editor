@@ -24,6 +24,8 @@ import type { JSONContent } from "@tiptap/core";
  * - JSON：`adaptJsonToSchema`（所有 JSON 内容的唯一漏斗）逐节点调 {@link sanitizeMediaSrcAttrs}
  * - 命令 / 任意事务：{@link createMediaSrcGuardPlugin} 的 `appendTransaction`
  *
+ * 还有第四处：节点视图**把 src 交给真实 DOM 元素**的那一行，见 {@link applyMediaSrc}。
+ *
  * 对应 CONTRIBUTING「URL 一律过白名单，不要新增绕过路径」与 ARCHITECTURE 不变量 17。
  */
 export const MEDIA_SRC_NODES = {
@@ -89,4 +91,22 @@ export function createMediaSrcGuardPlugin(nodeName: MediaSrcNodeName): Plugin {
       return tr;
     },
   });
+}
+
+/**
+ * 把媒体 src 应用到真实 DOM 元素上。
+ *
+ * **禁止直接写 `el.src = node.attrs.src`。** `src` 是 DOM 字符串属性：赋 `null` /
+ * `undefined` 会被强制成字符串 `"null"`，赋 `""` 则按「空 URL」解析成当前页面地址——
+ * 两种情况浏览器都会真的发一次请求（`<origin>/null`，或重新请求本页）。
+ *
+ * 而「src 为空」恰恰是白名单**拒绝之后的正常状态**：`normalizeSafeMediaUrl` 不合格时返回
+ * `null`，事务级守卫据此把 attrs 写回 `null`。于是「拦下一个危险 URL」反而换来一次指向
+ * 宿主自己域名的无效请求（实测 `<img src="null">` 会 GET `<origin>/null`）。
+ * 没有可用值时必须**移除属性**，而不是赋空值。
+ */
+export function applyMediaSrc(el: HTMLImageElement | HTMLVideoElement, raw: unknown): void {
+  const value = typeof raw === "string" ? raw : "";
+  if (value) el.setAttribute("src", value);
+  else el.removeAttribute("src");
 }

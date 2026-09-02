@@ -1,44 +1,16 @@
 /**
  * Editor Constants
- * @description 编辑器常量配置（颜色、字体、字号等）
+ * @description 工具栏控件的可选项常量（字体、字号、段落样式、代码语言）。
+ *
+ * 约定：**这里只放真的有消费方的常量**。曾经堆过一批「看起来像配置、实际没人读」的清单
+ * （色板、对齐项、表格边框、缩放上限、快捷键表），它们改了不会有任何效果，
+ * 反而误导接入方以为是可调参数——已全部删除。新增常量前先确认有调用点。
+ *
+ * 工具栏与菜单类型请从 `@/configs/toolbarTypes` 导入。
  */
 
 /**
- * 文本颜色选项
- */
-export const TEXT_COLORS = [
-  "#000000", // 黑色
-  "#ff0000", // 红色
-  "#ff9900", // 橙色
-  "#ffff00", // 黄色
-  "#00ff00", // 绿色
-  "#00ffff", // 青色
-  "#0000ff", // 蓝色
-  "#9900ff", // 紫色
-] as const;
-
-/**
- * 背景颜色选项
- */
-export const BACKGROUND_COLORS = [
-  "#ffffff", // 白色
-  "#f5f5f5", // 浅灰
-  "#e8f5e9", // 浅绿
-  "#e3f2fd", // 浅蓝
-  "#fff3e0", // 浅橙
-  "#fce4ec", // 浅粉
-  "#f3e5f5", // 浅紫
-  "#e0f2f1", // 浅青
-] as const;
-
-/**
- * 表格单元格背景颜色选项（与 BACKGROUND_COLORS 相同）。
- * schema（TableCellWithBackground.backgroundColor）已支持；当前 TableToolbar 未挂取色 UI。
- */
-export const TABLE_CELL_COLORS = BACKGROUND_COLORS;
-
-/**
- * 字体系列选项
+ * 字体系列选项 — `FontFamilySelect` 的下拉项。
  */
 export const FONT_FAMILIES = [
   { label: "PMingLiU", value: "PMingLiU" },
@@ -52,7 +24,7 @@ export const FONT_FAMILIES = [
 ] as const;
 
 /**
- * 字号选项（中文印刷标准）
+ * 字号选项 — `FontSizeSelect` 的下拉项（值为 CSS px，label 为去掉单位的数字）。
  */
 export const FONT_SIZES = [
   { label: "12", value: "12px" },
@@ -66,20 +38,7 @@ export const FONT_SIZES = [
 ] as const;
 
 /**
- * 行间距选项
- * @remarks 当前没有独立的行高工具栏控件；仅经 `components/editor/font` 转出，
- * 供宿主自行拼装 UI，以及 `LineHeightOption` 类型推导。
- */
-export const LINE_HEIGHTS = [
-  { label: "1.0", value: "1" },
-  { label: "1.5", value: "1.5" },
-  { label: "2.0", value: "2" },
-  { label: "2.5", value: "2.5" },
-  { label: "3.0", value: "3" },
-] as const;
-
-/**
- * 段落样式选项（label 由 i18n `editor.{value}` 提供）
+ * 段落样式选项 — `HeadingControl` 的下拉项（label 由 i18n `editor.{value}` 提供）。
  */
 export const HEADING_OPTIONS = [
   { value: "paragraph" },
@@ -123,93 +82,13 @@ export const CODE_LANGUAGES = [
 ] as const;
 
 /**
- * 对齐方式选项
- * @deprecated 未被任何组件使用。`AlignDropdown` 直接读 i18n key（`editor.alignLeft` 等），
- * 因此这里的中文 label 不会出现在 UI 上。保留仅为兼容外部引用。
- */
-export const TEXT_ALIGN_OPTIONS = [
-  { label: "左对齐", value: "left" },
-  { label: "居中", value: "center" },
-  { label: "右对齐", value: "right" },
-  { label: "两端对齐", value: "justify" },
-] as const;
-
-/**
- * 表格边框样式选项
- * @remarks 目前只被 `toolbarTypes.ts` 用于推导 `TableBorderStyle` 类型；
- * `TableToolbar` 没有挂载边框样式切换 UI，label 不会被渲染。
- */
-export const TABLE_BORDER_STYLES = [
-  { label: "默认边框", value: "default" },
-  { label: "无边框", value: "none" },
-  { label: "外边框", value: "outer" },
-] as const;
-
-/**
- * 默认配置值
- * @remarks 当前只有 `fontFamily` / `fontSize` 被 `FontFamilySelect` / `FontSizeSelect` 使用，
- * 作为读取不到当前 mark 时的回显值；其余字段无消费方。
+ * 字体控件读不到当前 mark 时的回显值。
+ * @remarks 只服务 `FontFamilySelect` / `FontSizeSelect`，不是「编辑器默认样式」——
+ * 真正的默认排版来自 `appearance/styles/*.css` 的 token。
  */
 export const DEFAULT_VALUES = {
   /** 默认字体 */
   fontFamily: "PMingLiU",
   /** 默认字号 */
   fontSize: "16px",
-  /** 默认行间距 */
-  lineHeight: "1.5",
-  /** 默认文本颜色 */
-  textColor: "#000000",
-  /** 默认背景颜色 */
-  backgroundColor: "#ffffff",
-  /** 默认对齐方式 */
-  textAlign: "left",
-  /** 默认代码语言 */
-  codeLanguage: "javascript",
 } as const;
-
-/**
- * 编辑器限制
- * @deprecated 未被任何运行时代码引用。缩放上下限与步长实际写在
- * `FooterNav` / `ZoomBar` 的 props 默认值里（50 / 200 / 10），改这里不会生效。
- */
-export const EDITOR_LIMITS = {
-  /** 最小缩放比例 */
-  minZoom: 50,
-  /** 最大缩放比例 */
-  maxZoom: 200,
-  /** 缩放步长 */
-  zoomStep: 10,
-  /** 最大文档长度（字符数） */
-  maxDocumentLength: 1000000,
-  /** 最大标题级别 */
-  maxHeadingLevel: 6,
-} as const;
-
-/**
- * 快捷键配置
- * @deprecated 未被任何运行时代码引用，仅作文档性清单。真实快捷键由 StarterKit
- * 与各扩展的 `addKeyboardShortcuts()` 注册，改这里不会改变实际绑定。
- */
-export const KEYBOARD_SHORTCUTS = {
-  bold: "Mod-b",
-  italic: "Mod-i",
-  underline: "Mod-u",
-  strike: "Mod-Shift-s",
-  code: "Mod-e",
-  codeBlock: "Mod-Shift-e",
-  link: "Mod-k",
-  undo: "Mod-z",
-  redo: ["Mod-Shift-z", "Mod-y"],
-  paragraph: "Mod-Alt-0",
-  heading1: "Mod-Alt-1",
-  heading2: "Mod-Alt-2",
-  heading3: "Mod-Alt-3",
-  bulletList: "Mod-Shift-8",
-  orderedList: "Mod-Shift-7",
-  taskList: "Mod-Shift-9",
-} as const;
-
-/**
- * @note 此文件仅保留常量配置。
- * 工具栏与菜单类型请从 `@/configs/toolbarTypes` 导入。
- */

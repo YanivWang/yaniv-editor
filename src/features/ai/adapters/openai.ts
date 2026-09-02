@@ -3,6 +3,8 @@
  * Compatible with OpenAI API standard (also works with DeepSeek, etc.)
  */
 
+import { readStreamLines } from "./readStreamLines";
+
 import type { AiAdapter, AiConfig, AiMessage, AiResponse, AiStreamCallbacks } from "../types";
 
 export class OpenAiAdapter implements AiAdapter {
@@ -83,35 +85,28 @@ export class OpenAiAdapter implements AiAdapter {
         throw new Error(`OpenAI API error: ${response.status} - ${error}`);
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      if (!reader) {
+      if (!response.body) {
         throw new Error("No response body");
       }
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      let fullText = "";
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter((line) => line.trim().startsWith("data: "));
+      for await (const rawLine of readStreamLines(response.body)) {
+        const line = rawLine.trim();
+        if (!line.startsWith("data:")) continue;
 
-        for (const line of lines) {
-          const data = line.slice(6); // Remove 'data: ' prefix
-          if (data === "[DONE]") continue;
+        const data = line.slice(5).trim(); // 去掉 'data:' 前缀（冒号后的空格可有可无）
+        if (!data || data === "[DONE]") continue;
 
-          try {
-            const json = JSON.parse(data);
-            const token = json.choices?.[0]?.delta?.content || "";
-            if (token) {
-              fullText += token;
-              callbacks.onToken?.(token);
-            }
-          } catch {
-            // Skip invalid JSON
+        try {
+          const json = JSON.parse(data);
+          const token = json.choices?.[0]?.delta?.content || "";
+          if (token) {
+            fullText += token;
+            callbacks.onToken?.(token);
           }
+        } catch {
+          // Skip invalid JSON
         }
       }
 

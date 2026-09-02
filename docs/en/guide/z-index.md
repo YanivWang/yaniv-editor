@@ -33,25 +33,24 @@ To cover **all** editor overlays (including in-editor Modal), host UI must be ab
 
 Color tokens live on `:root`; **z-index tokens are only on `.yaniv-editor`**:
 
-| Token                     | Value (base=1000) | Use                                        |
-| ------------------------- | ----------------- | ------------------------------------------ |
-| `--ye-z-content`          | `1`               | In-document base                           |
-| `--ye-z-content-overlay`  | `2`               | Table selection, etc.                      |
-| `--ye-z-content-control`  | `10`              | Image column handles, etc.                 |
-| `--ye-z-editor-ui`        | `20`              | Drag handle                                |
-| `--ye-z-editor-rail`      | `30`              | Outline rail                               |
-| `--ye-z-chrome`           | `40`              | Header / footer                            |
-| `--ye-z-chrome-tooltip`   | `50`              | In-document tooltips (`BaseTooltip`, etc.) |
-| `--ye-z-overlay-backdrop` | `base`            | Block picker backdrop                      |
-| `--ye-z-bubble-menu`      | `base + 10`       | Link / image / table bubble                |
-| `--ye-z-floating-menu`    | `base + 20`       | Selection floating menu                    |
-| `--ye-z-picker-menu`      | `base + 30`       | BlockPicker, mention, AI popover           |
-| `--ye-z-drag-menu`        | `base + 40`       | Drag block menu                            |
-| `--ye-z-drag-submenu`     | `base + 41`       | Drag submenu                               |
-| `--ye-z-dropdown`         | `base + 50`       | Ant Design dropdown                        |
-| `--ye-z-tooltip`          | `base + 60`       | Portal Ant Design Tooltip                  |
-| `--ye-z-toast`            | `base + 80`       | Custom Toast / Notice                      |
-| `--ye-z-modal`            | `base + 100`      | In-editor Modal                            |
+| Token                     | Value (base=1000) | Use                              |
+| ------------------------- | ----------------- | -------------------------------- |
+| `--ye-z-content`          | `1`               | In-document base                 |
+| `--ye-z-content-overlay`  | `2`               | Table selection, etc.            |
+| `--ye-z-content-control`  | `10`              | Image column handles, etc.       |
+| `--ye-z-editor-ui`        | `20`              | Drag handle                      |
+| `--ye-z-editor-rail`      | `30`              | Outline rail                     |
+| `--ye-z-chrome`           | `40`              | Header / footer                  |
+| `--ye-z-overlay-backdrop` | `base`            | Block picker backdrop            |
+| `--ye-z-bubble-menu`      | `base + 10`       | Link / image / table bubble      |
+| `--ye-z-floating-menu`    | `base + 20`       | Selection floating menu          |
+| `--ye-z-picker-menu`      | `base + 30`       | BlockPicker, mention, AI popover |
+| `--ye-z-drag-menu`        | `base + 40`       | Drag block menu                  |
+| `--ye-z-drag-submenu`     | `base + 41`       | Drag submenu                     |
+| `--ye-z-dropdown`         | `base + 50`       | Ant Design dropdown              |
+| `--ye-z-tooltip`          | `base + 60`       | Portal Ant Design Tooltip        |
+| `--ye-z-toast`            | `base + 80`       | Custom Toast / Notice            |
+| `--ye-z-modal`            | `base + 100`      | In-editor Modal                  |
 
 Order: `modal > toast > tooltip > dropdown > drag-menu > picker-menu > floating-menu > bubble-menu > backdrop`.
 

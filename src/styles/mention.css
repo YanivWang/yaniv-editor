@@ -35,7 +35,11 @@
   align-items: center;
   width: 100%;
   padding: 6px 8px;
+
+  /* <button>（键盘可达），需重置浏览器默认按钮样式：按钮不继承 font-family */
+  font: inherit;
   font-size: 14px;
+  line-height: normal;
   color: inherit;
   text-align: left;
   cursor: pointer;

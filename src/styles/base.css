@@ -1,41 +1,12 @@
 /**
  * Yaniv Editor 公共基础样式
- * @description 动画与工具类（Design Token 见 variables.css）
+ * @description 移动端 token 断点（Design Token 见 variables.css）
+ *
+ * 曾经还有 `ye-fade-in` / `ye-slide-in` / `ye-blink` 三个 keyframes 与
+ * `.ye-flex-center` / `.ye-hidden` / `.ye-visible` 三个工具类——全仓
+ * （含 examples / e2e / docs）零引用，也未出现在任何公开文档里，已删除。
+ * 各处动画都在自己的样式文件里就地定义（如 `block-picker-fade-in`）。
  */
-
-/* ========== 公共动画 ========== */
-@keyframes ye-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes ye-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes ye-blink {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
-}
 
 /* ========== 响应式断点 ========== */
 @media (width <= 768px) {
@@ -43,19 +14,4 @@
     --ye-btn-size: 28px;
     --ye-btn-icon-size: 14px;
   }
-}
-
-/* ========== 工具类 ========== */
-.ye-flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ye-hidden {
-  display: none !important;
-}
-
-.ye-visible {
-  display: flex !important;
 }

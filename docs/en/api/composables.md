@@ -106,6 +106,28 @@ import {
 - `parseContentToDoc(content, schema)`: parse HTML or JSON into a schema-valid ProseMirror doc, falling back to an empty paragraph on failure.
 - `BYPASS_GUARD_META`: transaction meta that bypasses `withTransactionGuard`; `ContentAdapter.setContent` sets it for you.
 
+## Accessibility
+
+```ts
+import { useRovingTabindex } from "@yanivjs/yaniv-editor";
+```
+
+| Composable             | Purpose                                                                                                                        | Exported?          |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| `useRovingTabindex`    | Collapse a container into a single WAI-ARIA APG tab stop; arrow keys / Home / End move inside it                               | ✅                 |
+| `useVirtualFocusPopup` | Popups that keep focus in the document: sets `aria-expanded` / `aria-controls` / `aria-activedescendant` on the editor content | ❌ internal (fork) |
+
+`useRovingTabindex(containerRef)` rescans the container with a `MutationObserver` — lazily loaded toolbar buttons are not mounted on the first frame. Arrow keys inside text-entry controls (`input` / `textarea` / `contenteditable` / `role="combobox"`) are not hijacked, and neither are arrow keys with modifiers.
+
+`useVirtualFocusPopup` currently serves only the built-in `BlockPickerMenu` / `MentionSuggestionMenu` and is **not** part of the package exports (it lives in `src/composables/useVirtualFocusPopup.ts`).
+
+Reusing it for a custom toolbar:
+
+```ts
+const toolbarRef = ref<HTMLElement | null>(null);
+useRovingTabindex(toolbarRef);
+```
+
 ## Locales
 
 ```ts

@@ -1,6 +1,19 @@
 /**
  * Inline content area — typography and focus reset for lightweight editors.
- * Requires a `.yaniv-editor` wrapper (see inline-composition guide).
+ * Selectors are scoped under `.yaniv-editor`, which `EditorShell` always puts on its root
+ * (see `rootSurfaceClass` in EditorShell.vue) — a hand-rolled shell must keep that class.
+ *
+ * 本文件只出现在 inline 入口（`inline.css`），承载 inline 模式的**紧凑排版差异**；
+ * 结构与语义样式仍归 `content.css`（同样被 inline.css 引入）。
+ *
+ * ⚠️ 两者对 `p` / `ul` / `ol` / `li` 用的是**同一批选择器、同一特异性 (0,2,1)**，
+ * 谁生效完全取决于 `inline.css` 里的 `@import` 顺序——本文件必须排在 `content.css`
+ * **之后**（当前 content.css 在第 26 行、本文件在第 32 行）。调换顺序不会报任何错，
+ * 只会让 inline 排版静默退回全量模式的值。
+ *
+ * 浏览器实测（inline.css，15px 基准字号）：段落 margin `7.5px`（= 0.5em，本文件）
+ * 而非 `12px`（content.css）；`ul` padding-left `21px`（= 1.4em）而非 `14px`；
+ * `li` margin `3.75px`（= 0.25em）而非 `4px`。
  */
 
 .yaniv-editor .ProseMirror,
@@ -100,5 +113,3 @@
 .ProseMirror.inline-prose ol > li {
   list-style-type: decimal;
 }
-
-/* Inline 模式：紧凑排版差异（结构见 content.css） */

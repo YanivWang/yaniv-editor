@@ -6,6 +6,7 @@ import type {
 } from "@/core/editorTypes";
 import type { EditorRuntimeProfile, ExtensionGates } from "@/core/runtime/types";
 import type { BlockMenuHost } from "@/core/shell/useBlockMenuHost";
+import type { MentionItem } from "@/extensions/mention";
 import type { TiptapLocale } from "@/locales/types";
 
 import type { AnyExtension } from "@tiptap/core";
@@ -23,6 +24,8 @@ export interface BuildExtensionsCtx {
     video: () => MediaUploadHandler | undefined;
   };
   galleryImages: () => GalleryImage[];
+  /** `@` 提及候选项 — getter 模式，未注入时返回 undefined 由扩展回退到内置占位数据 */
+  mentionItems: () => MentionItem[] | undefined;
   officePaste: {
     onPasteFromOfficeWithImages: () => (() => void) | undefined;
   };
@@ -44,7 +47,6 @@ export interface CapabilityDefinition {
   extensions: (ctx: BuildExtensionsCtx) => AnyExtension[] | Promise<AnyExtension[]>;
   fullToolbarSlugs?: string[];
   inlineToolbarSlugs?: ReadonlyArray<string>;
-  chrome?: string[];
   /** Inline host 下始终注册（如 inline-starter） */
   inlineAlways?: boolean;
 }

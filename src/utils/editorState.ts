@@ -105,81 +105,6 @@ export function createStateCheckers(
 }
 
 /**
- * 检查节点/标记是否激活
- * @description 直接检查，无需创建检查器对象
- * @param editor - 编辑器实例引用
- * @param name - 节点或标记名称
- * @param attributes - 可选的属性对象
- * @returns 是否激活
- *
- * @example
- * ```typescript
- * if (isActive(editor, 'bold')) {
- *   console.log('粗体已激活')
- * }
- * ```
- */
-export function isActive(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-  name: string,
-  attributes?: Record<string, AttributeValue>,
-): boolean {
-  const e = toValue(editor);
-  if (!e) return false;
-  return attributes ? e.isActive(name, attributes) : e.isActive(name);
-}
-
-/**
- * 检查标题级别是否激活
- * @param editor - 编辑器实例引用
- * @param level - 标题级别 (1-6)
- * @returns 是否激活
- */
-export function isHeadingActive(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-  level: number,
-): boolean {
-  const e = toValue(editor);
-  if (!e) return false;
-  return e.isActive("heading", { level });
-}
-
-/**
- * 检查对齐方式是否激活
- * @param editor - 编辑器实例引用
- * @param value - 对齐方式
- * @returns 是否激活
- */
-export function isActiveAlign(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-  value: "left" | "center" | "right" | "justify",
-): boolean {
-  const e = toValue(editor);
-  if (!e) return false;
-  return e.isActive({ textAlign: value });
-}
-
-/**
- * 检查命令是否可执行
- * @param editor - 编辑器实例引用
- * @param command - 命令名称
- * @returns 是否可执行
- */
-export function canExecute(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-  command: string,
-): boolean {
-  const e = toValue(editor);
-  if (!e) return false;
-  const canObj = e.can() as unknown as Record<
-    string,
-    ((...args: unknown[]) => boolean) | undefined
-  >;
-  const fn = canObj[command];
-  return typeof fn === "function" ? fn() : false;
-}
-
-/**
  * 获取当前段落样式
  * @description 获取当前光标位置的段落样式（正文或标题级别）
  * @param editor - 编辑器实例引用
@@ -198,32 +123,4 @@ export function getCurrentParagraphStyle(
   }
 
   return "paragraph";
-}
-
-/**
- * 获取当前文本对齐方式
- * @description 获取当前光标位置的文本对齐方式
- * @param editor - 编辑器实例引用
- * @returns 对齐方式 ('left' | 'center' | 'right' | 'justify')
- */
-export function getCurrentTextAlign(
-  editor: MaybeRefOrGetter<Editor | null | undefined>,
-): "left" | "center" | "right" | "justify" {
-  const e = toValue(editor);
-  if (!e) return "left";
-
-  const alignments: Array<"left" | "center" | "right" | "justify"> = [
-    "left",
-    "center",
-    "right",
-    "justify",
-  ];
-
-  for (const align of alignments) {
-    if (e.isActive({ textAlign: align })) {
-      return align;
-    }
-  }
-
-  return "left";
 }

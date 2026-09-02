@@ -9,7 +9,8 @@
 
 import Image from "@tiptap/extension-image";
 
-import { createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
+import { parseSize } from "@/utils/mediaSize";
+import { applyMediaSrc, createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
 import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export interface ResizableImageOptions {
@@ -34,24 +35,12 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
   },
 
   addAttributes() {
-    // 创建尺寸属性的通用配置
     /**
-     * 尺寸属性。两处坑：
-     *
-     * 1. `renderHTML` 把尺寸写成内联 `style`（`width: 200px`）而非 `width` 属性，
-     *    但解析只读属性 → **每次 HTML 往返都会丢尺寸**。Inline Editor 的
-     *    `v-model:content` 是 HTML 往返，图片尺寸会在每次同步后归零。
-     *    这里补上从 `style` 读取的分支。
-     * 2. `parseInt("abc")` 得到 `NaN`，而 `NaN` 是 truthy 之外的坑：旧写法
-     *    `value ? parseInt(value) : null` 会把 `NaN` 存进文档，破坏后续缩放计算；
-     *    `getJSON()` 又会把 `NaN` 序列化成 `null`，导致宿主看到的值与文档实际值不一致。
+     * 尺寸属性：`renderHTML` 把尺寸写成内联 `style`（`width: 200px`）而非 `width` 属性，
+     * 若解析只读属性 → **每次 HTML 往返都会丢尺寸**（Inline Editor 的 `v-model:content`
+     * 就是 HTML 往返，图片尺寸会在每次同步后归零）。所以属性与 style 两条都要读。
+     * 数值合法性统一由模块级 `parseSize` 判定。
      */
-    const parseSize = (raw: string | null | undefined): number | null => {
-      if (!raw) return null;
-      const parsed = parseInt(raw, 10);
-      return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-    };
-
     const createSizeAttribute = (name: "width" | "height") => ({
       default: null,
       parseHTML: (element: HTMLElement) =>
@@ -116,7 +105,7 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
       }
 
       const img = document.createElement("img");
-      img.src = node.attrs.src;
+      applyMediaSrc(img, node.attrs.src);
       img.alt = node.attrs.alt || "";
       img.title = node.attrs.title || "";
 
@@ -329,9 +318,16 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
             return;
           }
 
-          const finalWidth = parseInt(img.style.width, 10);
-          const finalHeight = parseInt(img.style.height, 10);
+          const finalWidth = parseSize(img.style.width);
+          const finalHeight = parseSize(img.style.height);
           const pos = typeof getPos === "function" ? getPos() : null;
+
+          // 算不出合法尺寸就不要写文档：图片还没加载完、或只是点了一下手柄没拖动时，
+          // `img.style.width` 会是 "" / "auto"，裸 parseInt 会把 NaN 写进 attrs。
+          if (finalWidth === null || finalHeight === null) {
+            cleanupResize?.();
+            return;
+          }
 
           if (pos !== null && pos !== undefined) {
             // 使用 editor 的链式命令更新图片尺寸
@@ -362,7 +358,7 @@ export const ResizableImage = Image.extend<ResizableImageOptions>({
         update: (updatedNode) => {
           // 更新图片源
           if (updatedNode.attrs.src !== node.attrs.src) {
-            img.src = updatedNode.attrs.src;
+            applyMediaSrc(img, updatedNode.attrs.src);
           }
 
           // 更新图片尺寸

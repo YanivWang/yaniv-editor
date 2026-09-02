@@ -61,8 +61,6 @@ import { computed } from "vue";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Button as AButton, Popover } from "@/shared/antd";
 
-const t = useEditorT();
-
 export interface AiSuggestionPopoverProps {
   visible?: boolean;
   originalText?: string;
@@ -71,6 +69,12 @@ export interface AiSuggestionPopoverProps {
   position?: { top: number; left: number };
   /** Ant Design Popover 挂载容器（必须为 overlay portal） */
   getPopupContainer: () => HTMLElement;
+  /**
+   * 文案解析器。挂在编辑器组件树内时不必传，组件自己 inject 实例 locale；
+   * 由 `aiSuggestionManager` 这类**独立 createApp** 挂载时必须传——
+   * 独立 app 继承不到 EditorShell 的 provide。
+   */
+  t?: (key: string) => string;
 }
 
 const props = withDefaults(defineProps<AiSuggestionPopoverProps>(), {
@@ -79,6 +83,9 @@ const props = withDefaults(defineProps<AiSuggestionPopoverProps>(), {
   suggestedText: "",
   isStreaming: false,
 });
+
+/** 显式传入优先；否则回退到组件树里的实例 locale */
+const t = props.t ?? useEditorT();
 
 const emit = defineEmits<{
   "update:visible": [value: boolean];

@@ -88,10 +88,117 @@ docs: 补充 z-index 说明
    CI 有断言检查门控能力没有回流到主 chunk。
 3. **URL 一律过白名单。** 链接 / 媒体 / iframe 分别用 `normalizeSafeUrl` /
    `normalizeSafeMediaUrl` / `normalizeSafeFrameUrl`，不要新增绕过路径。
+   注意白名单要落在「属性进入文档」处：节点/标记的 `parseHTML` 只覆盖 HTML 这一条，
+   JSON 内容与命令都绕开它（见 `utils/mediaSrcPolicy.ts`、`utils/linkHrefPolicy.ts`）。
+   从 attrs 取出 URL 再交给浏览器（`window.open` 等）时也要再过一次。
 4. **新增文案必须同时补 `zh-CN` 与 `en-US` 以及 `locales/types.ts`。**
-   `localeParity.test.ts` 会校验两边 key 完全一致且无空值。
+   `localeParity.test.ts` 会校验两边 key 完全一致、无空值，并且每个 `AI_PROVIDERS`
+   条目都有 `providerName` / `providerDesc`。
+   拿不到 locale 上下文的模块（纯 composable / 纯函数）**只回 key**，翻译交给上层组件；
+   需要自己产出文案的模块用入参接收解析器（见 `createAiClient({ getLocaleText })`）。
+   用独立 `createApp` 挂载的浮层把 `t` 作为显式 prop 传入，不要伪造 `provide(editorLocaleKey)`。
+   任何情况下都不要在这类模块里写中文常量。
 5. **交互元素用原生语义标签。** `div` + `@click` 会被 `vuejs-accessibility` 拦下；
    确有必要时用 `eslint-disable-next-line` 并写明理由。
+   把 `span` / `div` 换成 `<button>` 时，**浏览器默认按钮样式的重置要写在基础选择器上**，
+   不能塞进 `.is-selected` / `:hover` 这类状态规则——否则元素只在该状态下才正常。
+   静态护栏：`styles/uaResetScope.test.ts`。
+6. **节点位置从选区推导，不要拿节点对象反查。** 「复制块」会让副本与原块共享同一批子节点实例，
+   `doc.descendants` 里两处节点真的 `===`；且回调 `return false` 只是不再向下递归、
+   并不终止遍历。参照 `components/tools/image-toolbar/imageToolbarActions.ts`。
+   块内容末尾用 `$pos.end(depth)`，不要写 `$pos.start(depth) + parent.nodeSize`。
+7. **`inline: true` 的节点必须序列化成 phrasing content。** `renderHTML` 输出 `div` / `p`
+   会让 `getHTML()` 产出 `<p><div …></div></p>`，回读时段落被劈开、每轮多出两个空段落。
+   块级展示交给 class + CSS `display`。见架构不变量 21。
+8. **流式响应要跨 chunk 缓冲。** 解码带 `{ stream: true }`，按行切分要保留残行并在流末冲刷。
+   统一走 `features/ai/adapters/readStreamLines.ts`，不要在 adapter 里另写一份。
+   回归用例按**字节**切分构造 chunk——按整行切分覆盖不到这条路径。
+9. **dark 覆盖不得与基础规则同值。** 主题走 CSS 变量，token 本身已在 dark 段改写过，
+   再写一条同值覆盖恒为空操作。嵌套（`[data-color-mode="dark"] &`）与平铺
+   （`[data-color-mode="dark"] .x { }` 单独成条）两种写法都算。
+   静态护栏：`styles/darkOverrides.test.ts`。
+
+10. **节点视图的 `update()` 一律读 `updatedNode`，不要沿用创建时的 `node`。** 返回 `true`
+    表示「已自行处理」，PM 就不再重建视图，陈旧渲染会永久留在页面上。视图内持有
+    `let currentNode = node`，`update()` 里先推进再渲染。
+11. **要读「刚渲染出的 DOM」的 watcher 必须 `flush: "post"`。** 默认的 `pre` 跑在重渲之前，
+    此刻新元素还不存在；这类 watcher 又常带「值没变就返回」的去重守卫，跳过一次就再也补不回来。
+12. **组件订阅编辑器事件时，退订首选 `onCleanup`。** 回调触发时 `editor.value` 已经是新实例，
+    读它去 `off()` 摘不掉旧实例上的监听；而只处理 `prev` 参数的写法又漏掉**组件卸载**
+    ——watcher 停止时回调不再跑，监听就永久留在仍然活着的编辑器上。
+    `onCleanup` 两种情形都覆盖。用 `prev` 参数的必须另配 `onBeforeUnmount`。
+    静态护栏：`composables/editorListenerScope.test.ts`（两条规则）。
+13. **节点属性不要占用 `id` / `class` / `style` 这类 HTML 全局属性名。** 默认属性渲染会把它们
+    原样写成同名 HTML 属性，让文档内容溢出到宿主页面的语义层。必须自带 `renderHTML` 输出 `data-*`。
+    静态护栏：`extensions/nodeAttributeNames.test.ts`。
+14. **token 表要写完整，别靠继承或特异性巧合。** ① `:root` 上值形如 `var(--ye-X)` 的派生
+    token，必须在深色段原样再声明一遍——自定义属性的 `var()` 在**声明处**求值，写在 `:root` 上
+    就已经算成浅色值了；② 外观浅色段（`.yaniv-editor.appearance-X`，0,2,0）会盖住全局深色段
+    （`[data-color-mode="dark"]`，0,1,0），凡在浅色段声明过、深色段也想改的 token，
+    都要在外观自己的深色段里显式写出（哪怕值与浅色相同）；
+    ③ 同理，`:root` 上的**纯别名** token（`--ye-A: var(--ye-B)`）还必须在
+    `.yaniv-editor` 实例作用域再声明一遍——外观类、深色属性、`appearance="custom"`
+    的内联变量三条覆盖路径全都落在编辑器根节点这一个元素上，别名只有跟它们同元素
+    才跟得上（word / notion 曾各断掉 10 / 9 个 token，custom 全断）。
+    静态护栏：`styles/darkTokenAliases.test.ts`。
+15. **`appearance: none` 必须配套 `background`。** 它只关掉原生控件绘制，不会清掉 UA 的
+    `button { background-color: ButtonFace }`，元素会一直顶着灰底。
+    静态护栏：`styles/uaResetScope.test.ts`。
+16. **浮层容器的基础皮肤写在结构层，不要整个推给 appearance。** 结构层用 `--ye-*` token
+    给一套所有外观都能用的底色/边框/阴影，appearance 只在需要偏离 token 时覆盖。
+    否则漏写皮肤的外观就是透明面板压在正文上（`appearance-word` 真出过）。
+    静态护栏：`styles/overlayBaseSkin.test.ts`。
+17. **`div` 改 `button` 时别忘了 `font: inherit`。** 按钮不继承字体，UA 会给一套自己的
+    （Chromium 是 `Arial`）。大纲条目、块选择项、提及菜单项、公式按钮都漏过，
+    结果浮层里的字体与正文对不上。**只对会渲染文字的按钮加**——纯图标按钮加了会连字号
+    一起改掉、改变图标度量。静态护栏：`styles/buttonFontInherit.test.ts`。
+18. **`@media` 块要写在它想覆盖的基础规则之后。** 媒体查询不提升特异性，同选择器同特异性
+    只看源码顺序；写在前面会被后面的基础规则整块盖掉，而且没有任何工具会报错
+    （`toolbar-dropdown.css` 的窄屏压缩曾整块失效）。
+    静态护栏：`styles/mediaQueryOrder.test.ts`。
+19. **`:deep()` / `:slotted()` / `::v-deep` 只能写在 `<style scoped>` 里。** 它们是
+    `@vue/compiler-sfc` 的编译期标记，写进普通 `.css` 或没带 `scoped` 的 `<style>` 就没人转换，
+    会原样进产物，浏览器当成无效选择器**丢弃整条规则**（`table.css` 曾有 12 条这样蒸发）。
+    静态护栏：`styles/scopedPseudoScope.test.ts`。
+20. **深色规则里 `.yaniv-editor` 不能写成 `[data-color-mode]` 的后代。** 该属性是
+    `applyAppearanceToElement` 写在编辑器根节点**自身**上的，正确形态是
+    `.yaniv-editor[data-color-mode="dark"]`（复合）或 `[data-color-mode="dark"] .某后代`。
+    写成 `[data-color-mode="dark"] .yaniv-editor …` 要求另有外层祖先持有该属性，永远匹配不到。
+    静态护栏：`styles/darkOverrides.test.ts`。
+21. **`String.replace` 的替换串不得是运行时变量。** 字符串形式的替换参数里 `$&`、`` $` ``、
+    `$'`、`$1` 是**替换模式**，会被展开。替换串一旦来自选项或宿主输入就会失控：
+    `replaceImageWithPlaceholder` 曾把公开选项 `imagePlaceholderHtml` 直接当替换串，
+    宿主传 `<span>$&</span>` 时 `<img src="…">` 被替换成 `<span><img src="…"></span>`——
+    图片没被占位替掉，原始标签连同本地路径又被塞了回去。改用函数形式（`() => placeholder`）
+    没有任何展开语义。静态护栏：`utils/htmlRegexSafety.test.ts`。
+22. **用正则从 HTML 摘标签时，属性区一律用 `TAG_INNARDS`，不得写 `[^>]*`。** 引号内的 `>`
+    不结束标签：`<img alt="a>b" src="x.png">` 用 `[^>]*` 只吃到 `<img alt="a`，剩下的
+    `b" src="x.png">` 作为**可见文本**留在文档里，还会把 Word 图片的本地路径泄漏成正文。
+    片段在 `src/utils/htmlTagPattern.ts`。静态护栏：`utils/htmlRegexSafety.test.ts`。
+23. **外部输入驱动的结构生成必须钳制取值范围。** 剪贴板 / 宿主传入的数值直接喂给建树循环时，
+    畸形值就是拒绝服务：Word 列表层级 `mso-list:… level5000 …` 曾让 `transformLists`
+    创建 5000 层嵌套 `<ul>`，序列化时 parse5 递归爆栈抛 `RangeError`，
+    而 `transformPastedHTML` 抛异常会让整次粘贴失败。按业务上限钳制（Word 列表最深 9 级）。
+24. **JS 不得用内联 style 写 `--ye-*` 设计 token。** 这些 token 归 CSS 分层所有
+    （`variables.css` 给基础值、`appearance/styles/*.css` 三套外观各自覆盖），
+    而内联 style 优先级高于**任何**选择器，JS 写一次就把整套外观按死。
+    `useEditorPagination` 曾把 A4 常量写到 `.document-container` 上，浏览器实测
+    default 外观的 900px 页宽被压成 794px、48px 内边距被压成 96px，
+    notion 的 708px 同样被压成 794px，连 word 自己的 939px 最小高度也被改成 931px。
+    只有两条正当路径：custom 外观的变量注入，以及 `--ye-z-base`（公开 prop `zIndexBase`）。
+    静态护栏：`styles/designTokenWriteScope.test.ts`。
+25. **ProseMirror 的 meta 键必须是字符串或 `PluginKey`，不能用 `Symbol()`。** 存取走
+    `this.meta[typeof key == "string" ? key : key.key]`，symbol 没有 `.key` 属性，
+    于是**所有** symbol 键共用 `meta["undefined"]` 这一个槽——实测任意 symbol、
+    任意没有 `.key` 的裸对象、乃至字符串 `"undefined"` 都能读写它，
+    只读事务守卫因此可被任何第三方 meta 意外解除。用带命名空间前缀的字符串（`"yaniv:xxx"`）。
+26. **两处必须手工同步的表要配静态护栏。** `YE_Z_BASE_OFFSETS` 与 `variables.css` 的
+    `calc(var(--ye-z-base) + N)` 是一例：漂移后回退值算错，表现为「浮层被别的层盖住」这类
+    只在部分环境复现、又不报任何错的问题。护栏：`utils/zIndexTokenSync.test.ts`。
+    工具栏 slug → gate 的映射同理，护栏：`capabilities/toolbarGateMap.test.ts`。
+27. **可选的 ref 参数不能直接放进 `watch` 源数组。** 省略时数组里就是一个 `undefined`，
+    Vue 报 `Invalid watch source`（`useEditorAppearance` 实测）。包成 getter：
+    `() => maybeRef?.value`。
 
 ## 测试
 

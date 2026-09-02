@@ -266,3 +266,134 @@ describe("locale 会话级绑定", () => {
     expect(zh).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * 回归护栏：编辑器销毁后单例仍持有旧引用。
+ *
+ * 销毁后 `editor.state` 还能读（Tiptap 有缓存），但凡走到 `editor.view` 的都会抛
+ * `[tiptap error]: The editor view is not available` —— 派发事务、读 view.dom 挂弹层、
+ * 装/摘点击监听、showEditorNotice 全在此列。这些调用大多发生在流式回调里，
+ * 外层没有 try/catch，一抛就打断整条回调链。
+ */
+describe("编辑器销毁后", () => {
+  it("流式 token 迟到时静默丢弃，而不是抛 view is not available", () => {
+    const e = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
+
+    e.destroy();
+
+    expect(() => aiSuggestionManager.updateSuggestion("ALPHA")).not.toThrow();
+    expect(() => aiSuggestionManager.stopStreaming()).not.toThrow();
+  });
+
+  it("accept / reject / cancel / hide 都是安全空操作", () => {
+    const e = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
+    aiSuggestionManager.updateSuggestion("ALPHA");
+
+    e.destroy();
+
+    expect(() => aiSuggestionManager.accept()).not.toThrow();
+    expect(() => aiSuggestionManager.reject()).not.toThrow();
+    expect(() => aiSuggestionManager.cancel()).not.toThrow();
+    expect(() => aiSuggestionManager.hide()).not.toThrow();
+  });
+
+  it("showCustom 不建立会话，也不抛", () => {
+    const e = mount();
+    e.destroy();
+
+    expect(() => aiSuggestionManager.showCustom(e, "alpha", { from: 1, to: 6 })).not.toThrow();
+    expect(aiSuggestionManager.isVisible()).toBe(false);
+  });
+
+  it("executeCustomPrompt 不再发起请求", () => {
+    const e = mount();
+    const customCommand = vi.fn();
+    const client = { customCommand } as unknown as Parameters<
+      typeof aiSuggestionManager.showCustom
+    >[3];
+
+    aiSuggestionManager.showCustom(e, "alpha", { from: 1, to: 6 }, client);
+    e.destroy();
+
+    expect(() => aiSuggestionManager.executeCustomPrompt("翻译成英文")).not.toThrow();
+    expect(customCommand).not.toHaveBeenCalled();
+  });
+
+  it("hide 同样要复位会话状态，否则下一轮读到脏数据", () => {
+    const e = mount();
+    aiSuggestionManager.showCustom(e, "alpha", { from: 1, to: 6 });
+    aiSuggestionManager.updateSuggestion("ALPHA");
+    e.destroy();
+
+    aiSuggestionManager.hide();
+
+    expect(aiSuggestionManager.isVisible(), "isVisible 必须落回 false").toBe(false);
+    expect(aiSuggestionManager.getState().suggestedText, "建议文本不能留到下一轮").toBe("");
+    expect(aiSuggestionManager.getState().mode, "模式要回到默认 replace").toBe("replace");
+  });
+
+  it("续写会话同样安全退出", () => {
+    const e = mount("<p>alpha beta</p>");
+    const insertPos = e.state.doc.content.size - 1;
+    aiSuggestionManager.showContinueWriting(e, "alpha beta", { from: 1, to: 11 }, insertPos);
+
+    e.destroy();
+
+    expect(() => aiSuggestionManager.updateSuggestion("more")).not.toThrow();
+    expect(() => aiSuggestionManager.hide()).not.toThrow();
+  });
+});
+
+/**
+ * 回归护栏：编辑器销毁时本单例必须自己收尾。
+ *
+ * `destroy()` 是公开方法，但生产代码里**没有任何调用方**——session 重建与组件卸载
+ * 都只 destroy editor（`useEditorSession` 三处）。而 session 层不能反向 import 本模块：
+ * AI 是门控能力，主 chunk 里出现它会打穿代码分割断言。因此清理时机只能来自
+ * 编辑器自身的 destroy 事件。
+ */
+describe("编辑器销毁时自动收尾", () => {
+  function portalChildren(): number {
+    return document.querySelectorAll(".yaniv-editor__overlay-portal > *").length;
+  }
+
+  it("销毁编辑器会卸载弹层，不留下挂载中的 Vue app", () => {
+    const e = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, e);
+    expect(portalChildren(), "会话开始后弹层应已挂载").toBeGreaterThan(0);
+
+    e.destroy();
+
+    expect(portalChildren(), "编辑器销毁后弹层必须被卸载").toBe(0);
+    expect(aiSuggestionManager.isVisible()).toBe(false);
+  });
+
+  it("销毁后会话状态复位，下一个编辑器从干净状态开始", () => {
+    const a = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, a);
+    aiSuggestionManager.updateSuggestion("ALPHA");
+
+    a.destroy();
+
+    expect(aiSuggestionManager.getState().suggestedText).toBe("");
+    expect(aiSuggestionManager.getState().mode).toBe("replace");
+  });
+
+  it("切换编辑器不会让 destroy 监听随实例累积", () => {
+    const a = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, a);
+    const b = mount();
+    aiSuggestionManager.show("alpha", { from: 1, to: 6 }, b);
+
+    // a 已不再是当前实例，销毁它不该动到 b 的会话
+    a.destroy();
+
+    expect(aiSuggestionManager.isVisible(), "销毁旧实例不应关掉当前会话").toBe(true);
+    expect(b.getHTML()).toContain("ai-highlight");
+
+    b.destroy();
+    expect(aiSuggestionManager.isVisible()).toBe(false);
+  });
+});

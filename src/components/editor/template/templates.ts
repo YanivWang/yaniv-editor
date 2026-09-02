@@ -3,6 +3,8 @@
  * @description 提供常用的文档模板，可通过工具栏插入
  */
 
+import { TAG_INNARDS } from "@/utils/htmlTagPattern";
+
 export interface TemplateItem {
   /** 模板唯一标识 */
   key: string;
@@ -14,9 +16,16 @@ export interface TemplateItem {
   content: string;
 }
 
-/** 将空表格单元格补全为 `<p></p>`，满足 Tiptap tableCell schema */
+/**
+ * 将空表格单元格补全为 `<p></p>`，满足 Tiptap tableCell schema。
+ *
+ * 属性区用 {@link TAG_INNARDS} 而不是 `[^>]*`：`customTemplates` 是宿主传入的，
+ * `<td title="a>b"></td>` 这种带引号 `>` 的单元格用朴素写法会漏掉补全。
+ */
+const EMPTY_CELL = new RegExp(`<(td|th)(\\s${TAG_INNARDS})?>\\s*</\\1>`, "gi");
+
 export function normalizeTemplateHtml(html: string): string {
-  return html.replace(/<(td|th)(\s[^>]*)?>\s*<\/\1>/gi, "<$1$2><p></p></$1>");
+  return html.replace(EMPTY_CELL, "<$1$2><p></p></$1>");
 }
 
 /**

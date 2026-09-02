@@ -21,7 +21,7 @@ import "katex/dist/katex.min.css";
 - **full**：顶栏插入 LaTeX 公式
 - **notion**：`/` → 公式块
 - 支持行内与块级公式
-- 选中公式块可编辑 LaTeX 源码
+- 双击公式进入 LaTeX 源码编辑（单击仅选中节点）；`Ctrl/Cmd + Enter` 保存，`Esc` 取消
 
 ## InputRule 与快捷键
 

@@ -68,7 +68,9 @@ const videoUploadOpen = ref(false);
 
 /**
  * 处理本地视频上传（自定义上传逻辑）
- * - 视频必须由 uploadVideo(file) 上传并返回 URL，避免把大文件写入文档内容
+ * - 优先用 uploadVideo(file) 返回的 URL，避免把大文件写进文档内容
+ * - 未传该回调时，`resolveMediaUrl` 回退为 `URL.createObjectURL(file)` 的 `blob:` 对象 URL
+ *   并给出提示；该地址刷新即失效，仅供本地预览
  */
 async function handleVideoUpload(options: any) {
   const { file, onSuccess, onError } = options || {};

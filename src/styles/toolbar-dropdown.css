@@ -2,21 +2,6 @@
  * 工具栏下拉按钮共用样式
  */
 
-@media (width <= 768px) {
-  .ye-dropdown-btn {
-    height: 28px;
-    padding: 0 6px;
-  }
-
-  .ye-dropdown-btn__icon {
-    font-size: 14px;
-  }
-
-  .ye-dropdown-btn__label {
-    font-size: 12px;
-  }
-}
-
 .ye-dropdown-btn {
   display: inline-flex;
   align-items: center;
@@ -78,6 +63,26 @@
   flex-shrink: 0;
   font-size: 14px;
   line-height: 1;
+}
+
+/*
+ * 窄屏压缩：必须写在上面三条基础规则**之后**。
+ * @media 不提升特异性，`.ye-dropdown-btn` 与媒体块里的同名选择器都是 (0,1,0)，
+ * 同特异性由源码顺序决胜——放在文件开头会被后面的基础规则整块盖掉（实测 375px 下
+ * height 仍是 32px、icon 18px、label 14px）。护栏见 mediaQueryOrder.test.ts。
+ */
+@media (width <= 768px) {
+  .ye-dropdown-btn {
+    height: 28px;
+  }
+
+  .ye-dropdown-btn__icon {
+    font-size: 14px;
+  }
+
+  .ye-dropdown-btn__label {
+    font-size: 12px;
+  }
 }
 
 .ye-dropdown-btn__arrow {

@@ -297,10 +297,7 @@ const { currentTextColor, currentBgColor, setTextColor, setHighlight } =
 </script>
 
 <style lang="scss" scoped>
-$dark-selector: '[data-color-mode="dark"] &';
-
 .document-toolbar {
-  // min-height: 52px;
   padding: 6px 12px;
 }
 
@@ -326,11 +323,9 @@ $dark-selector: '[data-color-mode="dark"] &';
 .toolbar-section + .toolbar-section {
   padding-left: 8px;
   margin-left: 8px;
-  border-left: var(--ye-border-width) solid var(--ye-toolbar-divider);
 
-  #{$dark-selector} {
-    border-left-color: var(--ye-toolbar-divider);
-  }
+  // --ye-toolbar-divider 本身随 dark 改写，无需再写 dark 覆盖
+  border-left: var(--ye-border-width) solid var(--ye-toolbar-divider);
 }
 
 .tool-row {
@@ -344,10 +339,6 @@ $dark-selector: '[data-color-mode="dark"] &';
 .tool-row + .tool-row {
   padding-left: 6px;
   border-left: var(--ye-border-width) solid var(--ye-toolbar-divider);
-
-  #{$dark-selector} {
-    border-left-color: var(--ye-toolbar-divider);
-  }
 }
 
 @media (width <= 768px) {

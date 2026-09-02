@@ -203,7 +203,7 @@ const menuItems = computed((): MenuItemConfig[] => {
     {
       key: "translate",
       label: currentTranslateLang.value
-        ? t("editor.translateTo").replace("{lang}", currentTranslateLang.value)
+        ? t("editor.translateTo", { lang: currentTranslateLang.value })
         : t("editor.translate"),
       icon: TranslationOutlined,
       submenuMode: "split-hover",

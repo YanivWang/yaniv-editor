@@ -1,8 +1,20 @@
-@import "./_shared.css";
-
 /**
  * Word Visual Appearance
  * 类似 Microsoft Word 的专业文档风格
+ *
+ * 本目录仅有 default / word / notion 三个主题文件。
+ * custom 不在此目录：见 appearance="custom" + customAppearanceVars（applyAppearance.ts）。
+ * ProseMirror 正文结构见 src/styles/content.css；工具栏 sticky / z-index 见 src/styles/toolbar.css。
+ *
+ * 曾经还 `@import "./_shared.css"`——那个文件自称「各 appearance 公共样式」，实际只有本文件
+ * 引入过，而里面两条规则都是死的：
+ * - `.yaniv-editor .document-toolbar { padding: 6px 12px }` 与 ToolbarNav 的 scoped 样式
+ *   同值同特异性且更靠前，浏览器实测两个断点下生效的都是 ToolbarNav 那份（6px 12px / 6px 8px）；
+ * - `.yaniv-editor .continuous-pages { background: var(--ye-page-bg, #f5f5f5) }` 里
+ *   `--ye-page-bg` 全仓未定义，而 default / notion 各有 (0,3,0) 的 background 覆盖它；
+ *   word 下它虽然胜出，但 `--ye-doc-page-padding: 0` 让 `.ProseMirror`（794×1131）
+ *   把 `.continuous-pages` 完全盖住，实测四条露边全为 0，永远看不见。
+ * 已连同文件一并删除。
  */
 
 .yaniv-editor.appearance-word {
@@ -76,7 +88,14 @@
   text-indent: 0;
 }
 
-/* Word 深色模式 */
+/*
+ * Word 深色模式
+ *
+ * 凡是上面浅色段声明过、且全局 `[data-color-mode="dark"]` 也想改的 token，
+ * 这里都必须给出深色值：浅色段的 (0,2,0) 会盖住全局深色段的 (0,1,0)。
+ * `--ye-code-text` 就漏过一次——深色下行内代码是 `#333` 压在 `#2d2d2d` 上，
+ * 对比度约 1.06:1，等于看不见。
+ */
 .yaniv-editor.appearance-word[data-color-mode="dark"] {
   --ye-bg: #1e1e1e;
   --ye-bg-hover: #3e3e3e;
@@ -86,8 +105,25 @@
   --ye-border: #3e3e3e;
   --ye-border-hover: #4e4e4e;
   --ye-code-bg: #2d2d2d;
+  --ye-code-text: #d4d4d4;
   --ye-blockquote-bg: #2d2d2d;
+  --ye-blockquote-border: var(--ye-border);
   --ye-link: #4fc3f7;
+  --ye-outline-title-color: var(--ye-primary);
+
+  /*
+   * Word 蓝在深色下保持不变。
+   *
+   * 这三条对渲染其实没有影响——上面浅色段的 `.yaniv-editor.appearance-word`（0,2,0）
+   * 本就压过全局的 `[data-color-mode="dark"]`（0,1,0）。写出来是为了**声明意图**：
+   * 全局深色段确实给这几个 token 备了另一套值（`--ye-primary: #4c88ff` 等），
+   * 本外观是主动不要。`darkTokenAliases.test.ts` 的形状 A 要求这种情况必须显式表态，
+   * 否则「浅色段悄悄盖住深色值」和「有意保持浅色值」在代码里长得一模一样——
+   * `--ye-code-text` 就是前者，深色下行内代码 `#333` 压在 `#2d2d2d` 上根本看不见。
+   */
+  --ye-primary: #0078d4;
+  --ye-primary-hover: #106ebe;
+  --ye-border-focus: #0078d4;
 }
 
 .yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h2,

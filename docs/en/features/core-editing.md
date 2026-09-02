@@ -14,7 +14,7 @@ Full Editor **core** extensions are always registered across presets and are not
 ## Links
 
 - Insert links from the header or floating menu
-- A **link bubble menu** appears when a link is selected to edit the URL
+- A **link bubble menu** appears when a link is selected: edit the URL, open it in a new tab, remove the link
 
 ## Code Blocks
 

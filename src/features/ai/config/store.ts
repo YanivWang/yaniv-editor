@@ -3,7 +3,7 @@
  * @description AI 配置的 localStorage 持久化存储
  */
 
-import { DEFAULT_CONFIG, getProviderInfo } from "./types";
+import { DEFAULT_CONFIG, isUsableAiConfig } from "./types";
 
 import type { AiUserConfig, AiConfigStore } from "./types";
 
@@ -151,23 +151,7 @@ export function createAiConfigStore(): AiConfigStore {
     },
 
     isConfigured(): boolean {
-      const config = this.getConfig();
-      if (!config || !config.enabled) return false;
-
-      const providerInfo = getProviderInfo(config.provider);
-      if (!providerInfo) return false;
-
-      // 检查必要条件
-      if (providerInfo.requiresApiKey && config.storageMode !== "proxy" && !config.apiKey) {
-        return false;
-      }
-
-      // 自定义提供商需要 endpoint
-      if (config.provider === "custom" && !config.endpoint) {
-        return false;
-      }
-
-      return true;
+      return isUsableAiConfig(this.getConfig());
     },
   };
 }

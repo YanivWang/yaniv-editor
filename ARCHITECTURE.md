@@ -1,15 +1,19 @@
 # Yaniv Editor 架构设计
 
-Vue 3 + Tiptap 3 富文本编辑器库的目标架构。
+Vue 3 + Tiptap 3 富文本编辑器库的分层架构（对应 v0.2.0）。
 
-> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地；「架构不变量」第 14 – 18 条为 v0.1.4 之后新增（代码分割、多实例隔离、HTML 惰性解析、URL 白名单、无障碍基线），同样具备约束力。v0.1.1 – v0.1.4 的增量变更（大纲默认收起、Ant Design Vue 局部注册、z-index 治理与 overlay portal 收口、tsconfig 路径修复等）见 `CHANGELOG.md`。规范示例与 `src/` 实现已对齐。后续代码清理（死代码、无人 barrel、`EditorShell` locale 与 `normalizeLocaleCode` 对齐等）亦已完成。对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「删除清单」「实施顺序」「grep 验收」等章节均为**历史验收记录**，不是待办事项。
+> **状态（已完成）**：本文档描述的重构已于 v0.1.0（2026-05-22）完成并落地。「架构不变量」共 25 条，其中第 14 – 25 条为 v0.1.4 之后新增（能力按 gate 代码分割、禁止模块级可变状态、HTML 惰性解析、URL 白名单单一入口、无障碍基线、流式响应跨 chunk 缓冲、节点位置从选区推导、序列化标签与 schema 一致、节点视图渲染当前节点、DOM watcher 的 flush 时机、换实例退订旧实例、节点属性避开 HTML 全局属性名），同样具备约束力。各版本的增量变更见 `CHANGELOG.md`。
+>
+> **阅读约定**：文中标注 **Normative** 的代码块与 `src/` 逐字对齐，改实现必须同步改这里；未标注的块是**意图示意**，可能含伪代码。文档与 `src/` 冲突时以 `src/` 为准，并立即回改本文。
+>
+> 对外 API 与迁移说明以 `CHANGELOG.md` 为准；用户文档以 `docs/` 与 `README.md` 为准。下文「Public API（Breaking）」「历史迁移」「验收清单」等章节均为**历史记录**，不是待办事项。
 
 ## 实施约定
 
-- **本文档（仓库根目录 `ARCHITECTURE.md`）是重构的唯一实施依据。**
+- **本文档（仓库根目录 `ARCHITECTURE.md`）是分层设计的唯一依据。**
 - 所有代码改动、目录结构、API breaking、验收标准，均以本文档为准；不得偏离或另起一套设计。
-- Cursor Plan（`.cursor/plans/*.plan.md`）仅作任务跟踪；若与本文档冲突，**以本文档为准**。
-- 实施方式：单 feature branch 一次性彻底重构，不保留旧逻辑与补丁代码。
+- 本文档与 `src/` 冲突时，以 `src/` 为准并**立即回改本文档**——文档失真比缺文档更有害。
+- 重构本身已于 v0.1.0 一次性完成，不保留旧逻辑与补丁代码。
 
 ---
 
@@ -228,10 +232,15 @@ Shell 模板通过 `policy.host === 'full'` narrowing 后才能访问 host-speci
 
 `interaction` tier 扩展在 preview 下需要两类守卫**协同**工作（不是"双保险"，是**不同抽象层的分工**）：
 
-| 层       | 机制                                                                   | 作用                                               |
-| -------- | ---------------------------------------------------------------------- | -------------------------------------------------- |
-| 事件入口 | `ctx.isEditable` 短路 `onDragStart` / `onActivate` / `handleDOMEvents` | UX：拖拽 ghost / 光标提示根本不出现                |
-| 事务兜底 | `filterTransaction` 拦截 `docChanged` 事务                             | 正确性：防止任何代码路径（含程序化命令）绕过事件层 |
+| 层       | 机制                                                                                    | 作用                                               |
+| -------- | --------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| 事件入口 | 短路：registry 回调用 `ctx.isEditable.value`，插件内部的 DOM handler 用 `view.editable` | UX：拖拽 ghost / 光标提示根本不出现                |
+| 事务兜底 | `filterTransaction` 拦截 `docChanged` 事务                                              | 正确性：防止任何代码路径（含程序化命令）绕过事件层 |
+
+> **两个可编辑标志是同一个真相源。** `ctx.isEditable` 是 Shell 从 `profile.mode` 推导的 `computed`，
+> `view.editable` 是 `editor.setEditable()` 写进 view 的实时值，而 `setEditable` 只由
+> `applyPhaseTransition` 调用（不变量 9）。选哪个取决于取值处能拿到什么：
+> registry 里配置回调时只有 `ctx`，插件的 `view.update` / `handleDOMEvents` 里天然有 `view`。
 
 > **澄清**：DragHandle / SlashCommand 完成操作时**也会**派发 docChanged 事务（节点移动、块插入），事务守卫并非"无效"，而是 UX 较差（用户看到 ghost 但松手被吞）；事件入口短路负责 UX，事务守卫负责正确性。两层都不可省。
 
@@ -248,20 +257,22 @@ import { Plugin } from "@tiptap/pm/state";
 export const BYPASS_GUARD_META: symbol = Symbol("yaniv:bypassGuard");
 
 /**
- * 通过 addOptions 注入 isEditable getter，避免依赖 `this.editor`（Tiptap 在
- * addProseMirrorPlugins 阶段对 this.editor 的绑定时序在不同版本下不稳定）。
- * 由 buildExtensions 在包装时通过 ctx.isEditable 注入。
+ * `isEditable` 由 buildExtensions 以**闭包参数**传入，而不是从 `this.editor` 读：
+ * Tiptap 在 addProseMirrorPlugins 阶段对 `this.editor` 的绑定时序在不同版本下不稳定。
  */
 function withTransactionGuard(ext: Extension, isEditable: Readonly<Ref<boolean>>): Extension {
   return ext.extend({
     addProseMirrorPlugins() {
-      const parent = this.parent?.() ?? [];
+      // 被包装扩展自身的插件必须保留
+      const self = this as { parent?: () => Plugin[] };
+      const parent = self.parent?.() ?? [];
       return [
         ...parent,
         new Plugin({
           filterTransaction: (tr) => {
             if (!tr.docChanged) return true; // 只读 tr 放行（选区、装饰）
-            if (tr.getMeta(BYPASS_GUARD_META)) return true; // 程序化派发放行
+            // getMeta 的签名只收 string | PluginKey，Symbol 需要显式断言
+            if (tr.getMeta(BYPASS_GUARD_META as unknown as string)) return true;
             return isEditable.value; // ← 走外部 Ref，不依赖 this.editor
           },
         }),
@@ -282,25 +293,35 @@ interface BuildExtensionsCtx {
   // ...
 }
 
-// 扩展内部示例（DragHandle）：
-extensions: (ctx) => [
-  DragHandle.configure({
-    onDragStart: (view) => {
-      if (!ctx.isEditable.value) return false;
-      // ... 正常逻辑
+// registry 侧示例（与实现一致）：回调里只有 ctx，用 ctx.isEditable
+extensions: async (ctx) => [
+  DragHandleExtension.configure({
+    onOpenInsertMenu: (context) => {
+      if (!ctx.isEditable.value) return;
+      ctx.blockMenuHost.openInsert(context);
     },
+    onCloseInsertMenu: () => ctx.blockMenuHost.hide(),
   }),
 ];
+
+// 扩展内部示例（DragHandleExtension 的 dragstart handler）：这里有 view，直接读 view.editable
+handle.addEventListener("dragstart", (event) => {
+  if (!view.editable || !currentTarget || !event.dataTransfer) return;
+  // ... 正常逻辑
+});
 ```
 
-`interaction` tier 扩展**禁止**在注册时自行硬编码 `view.editable` 检查，一律通过 `ctx.isEditable` + `withTransactionGuard` 统一管理。
+`interaction` tier 扩展**禁止**用第三条判断可编辑性的路径（自建标志位、读 props、缓存快照等）：
+要么 `ctx.isEditable`，要么 `view.editable`，二者背后都是 `applyPhaseTransition` 一处写入。
+无论事件入口怎么写，`withTransactionGuard` 都由 `buildExtensions` 统一包上，不需要扩展自己处理。
 
 ```ts
-// 对所有 interaction tier 能力应用事务守卫（DOM 事件类扩展同时消费 ctx.isEditable）
+// 对所有 interaction tier 能力应用事务守卫（extensions() 允许返回 Promise，必须 await）
+const exts = await cap.extensions(ctx);
 if (cap.tier === "interaction") {
-  resolvedExtensions.push(
-    ...cap.extensions(ctx).map((ext) => withTransactionGuard(ext, ctx.isEditable)),
-  );
+  result.push(...exts.map((ext) => withTransactionGuard(ext, ctx.isEditable)));
+} else {
+  result.push(...exts);
 }
 ```
 
@@ -359,33 +380,59 @@ function setContent(
 外部 `initialContent` watcher 触发 `ContentAdapter.setContent` 前，**必须**做幂等检查，否则会因"emit → 父组件回写 → 子组件再 setContent"产生光标跳动和重复事务：
 
 ```ts
-// core/session/useControlledContent.ts
+// core/session/useControlledContent.ts（与实现逐字对齐）
 const lastEmittedSignature = ref<string | null>(null);
 
-// 用户输入路径：onUpdate 内更新签名
-editor.on("update", ({ editor }) => {
-  lastEmittedSignature.value = computeSignature(editor.getJSON(), host);
-  emit("update", editor.getJSON());
-});
-
-// 受控回写路径：签名相同则直接 return
+// 用户输入路径：editor 换实例时重新挂 update 监听，并在回调里更新签名
 watch(
-  () => props.initialContent,
-  (next) => {
-    if (!editor.value) return; // session 未 ready
-    const incoming = computeSignature(next, host);
-    if (!incoming) return;
-    if (incoming === lastEmittedSignature.value) return; // 防 emit 回流
-    if (incoming === computeSignature(editor.value.getJSON(), host)) return; // 防 no-op 重写
-    ContentAdapter.setContent(editor.value, next, { source: "external" });
+  editor,
+  (e, prev, onCleanup) => {
+    if (!e) {
+      if (prev) lastEmittedSignature.value = null; // 旧 editor 的签名不能带到新 session
+      return;
+    }
+    const handler = () => {
+      const payload = host === "inline" ? e.getHTML() : e.getJSON();
+      lastEmittedSignature.value = computeSignature(payload, host);
+      onUpdate(payload);
+    };
+    e.on("update", handler);
+    onCleanup(() => e.off("update", handler));
   },
+  { flush: "post" },
 );
+
+// 受控源：Inline 是 `content`，Full 是 `initialContent`
+const controlledSource = content ?? initialContent;
+
+function applyControlledContent(next: string | JSONContent | undefined): void {
+  if (!editor.value || !sessionReady.value) return; // session 未 ready 时不写
+  const incoming = computeSignature(next, host);
+  if (!incoming) return;
+  if (incoming === lastEmittedSignature.value) return; // 防 emit 回流
+  const current = computeSignature(
+    host === "inline" ? editor.value.getHTML() : editor.value.getJSON(),
+    host,
+  );
+  if (incoming === current) return; // 防 no-op 重写
+  ContentAdapter.setContent(editor.value, normalizeInitialContent(next), { source: "external" });
+  lastEmittedSignature.value = incoming; // 写入不触发 update，签名要手动补
+}
+
+watch(controlledSource, (next) => applyControlledContent(next));
+// rebuild 期间到达的回写会被上面的 sessionReady 挡掉，ready 后补投一次
+watch(sessionReady, (ready) => {
+  if (ready) applyControlledContent(controlledSource.value);
+});
 ```
 
 `computeSignature(content, host)`：
 
-- `host === 'full'`：`JSON.stringify(json)` 的稳定形式（key 顺序由 ProseMirror schema 决定，已稳定）；
-- `host === 'inline'`：`html.trim()` 直接比对字符串。
+- `host === 'full'`：`JSON.stringify(json)`（key 顺序由 ProseMirror schema 决定，已稳定）；
+- `host === 'inline'`：`html.trim()` 直接比对字符串；
+- 序列化失败或内容为空一律返回 `""`，调用方按「无输入」处理。
+
+`normalizeInitialContent` 兜住非 `doc` 型 JSON：空值与 `type !== "doc"` 的对象都退化为单空段落。
 
 **禁止**在 ContentAdapter 内做签名缓存——签名由 Session 层持有，ContentAdapter 是无状态写入工具。
 
@@ -394,23 +441,24 @@ watch(
 切到 preview 时，订阅方的清理命令（如 `cancelFormatPainting`、`setSearchReplaceTerm("")`）在 `editable=true` 状态下执行，才不会被守卫拦截。反之，切回 edit 时先 setEditable 再 emit。顺序本身已实现（见 `session/applyPhaseTransition.ts`），当前只是还没有订阅方利用它。
 
 ```ts
-// Session 层 —— applyPhaseTransition
+// Session 层 —— applyPhaseTransition（与实现逐字对齐）
 function applyPhaseTransition(
   editor: Editor,
-  prevPhase: EditorPhase,
+  prevPhase: EditorPhase | null, // null 表示首次同步
   nextPhase: EditorPhase,
   emitter: PhaseChangeEmitter,
+  reason: "mode-change" | "ready" = "mode-change",
 ): void {
   if (nextPhase === "preview") {
     // ① 先派发清理事件（此时 editable=true，清理命令不被守卫拦截）
-    emitter.emit({ from: prevPhase, to: nextPhase, editor });
+    emitter.emit({ from: prevPhase, to: nextPhase, editor, reason });
     // ② 再关闭编辑
     editor.setEditable(false);
   } else {
     // ① 先开启编辑
     editor.setEditable(true);
     // ② 再通知订阅方（初始化逻辑在 editable=true 时执行）
-    emitter.emit({ from: prevPhase, to: nextPhase, editor });
+    emitter.emit({ from: prevPhase, to: nextPhase, editor, reason });
   }
 }
 ```
@@ -529,14 +577,16 @@ onBeforeUnmount(() => offPhaseChange());
 
 ### sessionKey 包含
 
-- **Full**：extensionGates 签名、locale、outline 相关 gate 签名
-- **Inline**：toolbar 签名、extraExtensions id、placeholder、影响 schema 的 editorProps
+- **Full**：host、locale、已启用 capability 的 id 列表、已开启 gate 的键名列表、各 capability 的 `schemaSignature`
+- **Inline**：同上（gates 由 `resolveInlineGates` 从 toolbar 推导），外加 `runtimeSignature` —— `placeholder` 与 `extraExtensions` 的扩展名列表
 
 ### sessionKey 不包含
 
-- phase、appearance、colorMode
+- phase、appearance、colorMode、`zIndexBase`、`defaultOutlineExpanded`
 - 受控内容回写
-- upload / gallery / templates / aiConfig 等回调（由 `integrationProps` 响应式下发 Chrome）
+- upload / gallery / templates / aiConfig 等回调（由 `buildCtx()` 的 getter 现取）
+- Inline 的 `editorProps`：它在 `EditorShell` 的 setup 阶段一次性读取并传给 `useEditorSession`，
+  **既不进签名也不响应式**；需要改它请自行换 `key` 重挂组件
 
 ### sessionKey 签名计算规范（Normative）
 
@@ -599,7 +649,7 @@ interface CapabilityDefinition {
 generation 同时承担两个角色，必须显式区分：
 
 1. **rebuild 串行化**：同一组件内 sessionKey 连续变化时，每次 +1；async resolve 后比对 generation，stale 结果 discard。
-2. **销毁标志**：`onBeforeUnmount` 时 generation +1 **并设置 `disposed = true`**。任何 in-flight 的 `buildExtensions` resolve 后必须先检查 `disposed`，若为 true 立即 return，**绝不允许创建孤儿 editor**。
+2. **销毁标志**：`onScopeDispose`（effect scope 停止，早于 DOM 移除）时 generation +1 **并设置 `disposed = true`**。任何 in-flight 的 `buildExtensions` resolve 后必须先检查 `disposed`，若为 true 立即 return，**绝不允许创建孤儿 editor**。
 
 ```ts
 // useEditorSession 伪代码（A3 修订：含 content 快照步骤）
@@ -614,12 +664,13 @@ async function rebuild() {
   const extensions = await buildExtensions(host, ctx);
   if (disposed || myGen !== generation) return;  // ← 双重检查
 
-  // 使用快照内容（sessionKey 变化前已在 pre flush 阶段快照）
-  const initialContent = contentSnapshot ?? EMPTY_DOC;
+  // 使用快照内容（sessionKey 变化前已在 pre flush 阶段快照），并按新 schema 清洗
+  const initialContent = ContentAdapter.prepareEditorContent(contentSnapshot ?? EMPTY_DOC, extensions);
   contentSnapshot = null;  // 消费后清空
 
-  editor.value = new Editor({ extensions, content: initialContent, ... });
+  editor.value = new Editor({ editable: profile.value.mode === 'edit', extensions, content: initialContent, ... });
   status.value = 'ready';
+  // 失败分支：写 sessionError + status='error' + editor=null（同样先过 disposed/generation 双重检查）
 }
 
 // sessionKey 变化时的处理（快照同步完成，destroy 延后到 nextTick）
@@ -688,7 +739,11 @@ sessionKey 变化触发 destroy → rebuild，此期间 `editor = null`，禁止
   <EditorEditChrome v-if="chromePolicy.showEditChrome" />
   <!-- ... -->
 </div>
-<!-- loading 期间显示占位，尺寸与编辑区等高，避免布局抖动 -->
+<!--
+  loading 期间显示占位。注意：`.yaniv-editor__skeleton` / `.yaniv-editor__error`
+  目前**没有任何库内样式**，只是带 class 的纯文本节点；需要「与编辑区等高、避免布局抖动」
+  的宿主请自行给这两个 class 写样式。
+-->
 <div v-if="sessionStatus === 'loading'" class="yaniv-editor__skeleton">正在加载编辑器...</div>
 <div v-if="sessionStatus === 'error'" class="yaniv-editor__error">
   {{ sessionError }} <button type="button" @click="retrySession">重试</button>
@@ -733,9 +788,10 @@ flowchart TB
   EditorShell --> blockHost["provideBlockMenuHost"]
   EditorShell --> locale["provideEditorLocale"]
   EditorShell --> outline["provideOutlinePanel ← 必须在根"]
+  EditorShell --> findReplace["provideFindReplacePanel ← 必须在根"]
   EditorShell --> EditChrome["EditorEditChrome — v-if chromePolicy.showEditChrome"]
   EditorShell --> Workspace["EditorWorkspace"]
-  EditChrome --> BlockPicker["BlockPickerMenu.registerHost()"]
+  EditChrome --> BlockPicker["BlockPickerMenu.registerInstance()"]
 ```
 
 BlockMenuHost：Shell 根 provide 接口；BlockPicker 在 mount 时 register，扩展通过 host 调用，**禁止** `blockPickerMenuRef`。
@@ -757,7 +813,13 @@ interface BlockMenuHost {
 }
 ```
 
-当 `instance === null`（未注册或已卸载）时，host 的所有方法**静默 no-op**，不抛错。这是 SlashCommand / DragHandle 在 chrome 不可见时的兜底。
+当 `instance === null`（未注册或已卸载）时，host **不抛错**，但也不是一律 no-op：
+
+- `activate` / `openInsert`：**缓冲最后一次请求**（`pendingOpen`），`registerInstance(inst)` 时立即补投。
+  `BlockPickerMenu` 是 `defineAsyncComponent`，chunk 解析完成前实例为 null；若此时直接丢弃，
+  用户敲下的第一个 `/` 或点的第一次 + 号就白费了。只保留最后一次——菜单是单例浮层，更早的请求已无意义。
+- `hide`：清空缓冲，然后 no-op。
+- `updateQuery`：no-op（不缓冲；补投的 `activate` 已携带最新 query）。
 
 **BlockPicker 生命周期契约（Normative）**：
 
@@ -777,6 +839,8 @@ rg "host\.registerInstance\(null\)" src/components/tools/block-menu/
 ```
 
 > **`provideOutlinePanel` 必须挂在 EditorShell 根**，不得沉入 `EditorWorkspace`。原因：大纲展开状态由其持有，preview 模式下 Workspace 内部组件可能不渲染，若 provide 在子树则 inject 返回 `undefined`。
+>
+> **`provideFindReplacePanel` 同理挂在根**：面板开关状态被 `FindReplaceDialog`（挂 `EditorEditChrome`，只看 `gates.searchReplace`）与 `FindReplaceButton`（挂顶栏，看 `toolbarConfig.searchReplace`）两个位置共享，二者的挂载条件并不相同。拆成一层 provide 才让「面板 + Ctrl/Cmd+F」不依赖顶栏——此前二者揉在一个组件里，隐藏顶栏的 `notion` preset 连快捷键都注册不上。
 
 ---
 
@@ -837,6 +901,12 @@ async function buildExtensions(
       result.push(...exts);
     }
   }
+
+  // 宿主自带扩展追加在最末（仅 Inline 生效）：既不参与 gate 过滤，也不包守卫
+  if (host === "inline" && ctx.extraExtensions?.length) {
+    result.push(...ctx.extraExtensions);
+  }
+
   return result;
 }
 ```
@@ -854,8 +924,13 @@ interface CapabilityDefinition {
   // ...
   /** Full 编辑器下用 features[featureKey] 推导 gate；Inline 不使用 */
   featureKey?: keyof FeatureConfig;
-  /** Inline 编辑器下用 toolbar 的这些 slug 中任一为 true 时 gate 开启；Full 不使用 */
-  inlineToolbarSlugs?: ReadonlyArray<keyof InlineToolbarConfig>;
+  /**
+   * Inline 编辑器下用 toolbar 的这些 slug 中任一为 true 时 gate 开启；Full 不使用。
+   * 实现（`capabilities/types.ts`）里的声明类型是 `ReadonlyArray<string>`，
+   * 但取值必须是 `InlineToolbarConfig` 的键——消费方 `resolveInlineGates` /
+   * `resolveShowInlineToolbar` 都按该键去查 toolbar。
+   */
+  inlineToolbarSlugs?: ReadonlyArray<string>;
   // ...
 }
 
@@ -923,6 +998,9 @@ interface BuildExtensionsCtx {
   /** 图库数据 — getter 模式 */
   galleryImages: () => GalleryImage[];
 
+  /** `@` 提及候选项 — getter 模式；返回 undefined / 空数组时扩展回退内置占位数据 */
+  mentionItems: () => MentionItem[] | undefined;
+
   /** Office 粘贴处理 — getter 模式 */
   officePaste: {
     onPasteFromOfficeWithImages: () => (() => void) | undefined;
@@ -981,7 +1059,7 @@ extensions: (ctx) => [
 outline capability 定义在 `capabilities/registry.ts`（无独立 `outline.ts`）。Workspace 挂载前 `.document-container` 尚不可用，故采用 **getter + command 绑定** 混合策略：
 
 ```ts
-// capabilities/registry.ts — outline capability
+// capabilities/registry.ts — outline capability（basic 默认关闭 → 必须动态 import）
 {
   id: "outline",
   tier: "chromeCoupled",
@@ -990,17 +1068,26 @@ outline capability 定义在 `capabilities/registry.ts`（无独立 `outline.ts`
   schemaSignature: () => "outline",
   fullToolbarSlugs: ["outline"],
   chrome: ["outlinePanel"],
-  extensions: (ctx) => [
-    UniqueID.configure({ types: ["heading"] }),
-    TableOfContents.configure({
-      anchorTypes: ["heading"],
-      // getter：bind 前 fallback 到 window，避免 null 导致 TOC 初始化失败
-      scrollParent: () =>
-        ctx.outline.scrollParent() ??
-        (typeof window !== "undefined" ? window : (null as unknown as Window)),
-    }),
-    OutlineScrollParentBinder, // 暴露 bindOutlineScrollParent command
-  ],
+  extensions: async (ctx) => {
+    const [{ default: UniqueID }, { default: TableOfContents }, { createOutlineScrollParentBinder }] =
+      await Promise.all([
+        import("@tiptap/extension-unique-id"),
+        import("@tiptap/extension-table-of-contents"),
+        import("@/extensions/outlineScrollParentBinder"),
+      ]);
+    return [
+      UniqueID.configure({ types: ["heading"] }),
+      TableOfContents.configure({
+        anchorTypes: ["heading"],
+        // getter：bind 前 fallback 到 window，避免 null 导致 TOC 初始化失败
+        scrollParent: () =>
+          ctx.outline.scrollParent() ??
+          (typeof window !== "undefined" ? window : (null as unknown as Window)),
+      }),
+      // 工厂函数：把 bindScrollParent 注入进去，暴露 bindOutlineScrollParent command
+      createOutlineScrollParentBinder({ bindScrollParent: ctx.outline.bindScrollParent }),
+    ];
+  },
 }
 ```
 
@@ -1029,15 +1116,19 @@ AI 扩展（CustomAiExtension / ContinueWritingExtension 等）的 `apiKey` / `m
   tier: 'content',
   featureKey: 'ai',
   schemaSignature: (profile) => profile.gates.ai ? 'ai' : '',
+  // 实现里是 `async (ctx) => { const {...} = await import("@/features/ai"); return [...] }`
+  // （ai 在 basic 下默认关闭，必须动态 import）；此处省略以突出 getter 写法
   extensions: (ctx) => [
     CustomAiExtension.configure({
-      // ✅ 全部 getter 形式
-      getProvider: () => ctx.aiConfig()?.provider ?? 'openai',
+      // ✅ 全部 getter 形式，且**直透宿主原值、不填兜底**（见下方「兜底只能有一处」）
+      getProvider: () => ctx.aiConfig()?.provider,
       getApiKey:   () => ctx.aiConfig()?.apiKey,
       getModel:    () => ctx.aiConfig()?.model,
       getEndpoint: () => ctx.aiConfig()?.endpoint,
-      getTimeout:  () => ctx.aiConfig()?.timeout ?? 30000,
-      // ❌ 禁止：apiKey: ctx.aiConfig()?.apiKey
+      getTimeout:  () => ctx.aiConfig()?.timeout,
+      getStorageMode: () => ctx.aiConfig()?.storageMode,
+      // ❌ 禁止：apiKey: ctx.aiConfig()?.apiKey        （静态取值）
+      // ❌ 禁止：getProvider: () => ... ?? 'openai'     （填兜底 → 回退链失效）
     }),
     // ...
   ],
@@ -1049,9 +1140,12 @@ AI 扩展（CustomAiExtension / ContinueWritingExtension 等）的 `apiKey` / `m
 `ai` gate 本身（开 / 关）仍进 sessionKey（关闭后扩展卸载），但 gate 开启状态下的 config 字段变化不触发 rebuild。
 
 > **兜底只能有一处：`getAiConfig()`。**
-> `client.ts` 的 `getAiConfig()` 是配置解析的唯一入口，优先级为
-> `resolveConfig()`（宿主 `ai-config`）→ `getAiRequestConfig()`（localStorage / 宿主托管）
-> → `loadAiConfig()`（`VITE_AI_*`）。它靠 override 返回值**是否带 provider**判断"宿主已托管"。
+> `client.ts` 的 `getAiConfig()` 是配置解析的唯一入口，命中即返回，四级依次为：
+> ① `resolveConfig()`（宿主 `ai-config`，实例作用域）→ ② `getAiRequestConfig()`
+> （宿主托管副本，否则 localStorage；内部校验 `enabled` / `apiKey`）→ ③ `getHostAiConfig()`
+> （②因校验不过而落空、但确实登记过宿主配置时的兜底，**不再**下沉到 `.env`）→
+> ④ `loadAiConfig()`（`VITE_AI_*`）。它靠 override 返回值**是否带 provider**判断"宿主已托管"。
+> ②③ 用的是无 owner 的查询，同页多个传 `ai-config` 的实例时都会落空（见不变量 15）。
 >
 > 因此上游各层（registry getter、`resolveAiExtensionOptions`）**禁止**填兜底值：
 > 早期 `getProvider` 写了 `?? "openai"`，使 override 恒带 provider，后两级回退永远走不到，
@@ -1174,15 +1268,24 @@ Inline 编辑器对外 props **仅接受 HTML**（`content?: string`，`v-model:
 
 ---
 
-## 目录结构（目标）
+## 目录结构
 
 ```
 src/core/
   runtime/           resolveEditorProfile, resolveChromePolicy, computeSessionKey,
-                     mergeFeatures, resolveInlineGates, useEditorRuntime
-  session/           useEditorSession, applyPhaseTransition, contentAdapter
-  shell/             EditorShell, EditChrome, Workspace, StatusChrome, useBlockMenuHost
+                     mergeFeatures, resolveInlineGates, useEditorRuntime,
+                     editorRuntimeContext, types
+  session/           useEditorSession, useControlledContent, applyPhaseTransition,
+                     contentAdapter, types
+  shell/             EditorShell, EditorEditChrome, EditorWorkspace, EditorStatusChrome,
+                     useBlockMenuHost, exposeTypes
   infra/             useEditorLocale
+  editorContext.ts   provideYanivEditor / provideEditorRoot / provideOverlayPortal
+  overlayPortal.ts   overlay portal 的 DOM 约定（无 Vue 依赖）
+  overlayFeedback.ts Toast / Notice（替代 antd 静态 message/notification）
+  aiContext.ts       provide/inject「是否显示 AI 设置入口」
+  editorTypes.ts     Full Editor 对外类型
+  useEditorPagination.ts
   useYanivAiConfig.ts
   YanivEditor.vue
   YanivInlineEditor.vue
@@ -1192,11 +1295,15 @@ src/capabilities/
   transactionGuard.ts
   applyGatesToToolbarConfig.ts
   resolveShowInlineToolbar.ts
+  types.ts
 src/locales/
-  manager.ts         加载 + scoped locale（`localeGeneration` 为模块内部实现，不 export）
+  manager.ts         加载 + 全局兜底 t()（`localeGeneration` 为模块内部实现，不 export）
 src/appearance/
   useEditorAppearance.ts   (实例作用域，含 registerCustomAppearance)
   applyAppearance.ts       (纯函数，无模块级单例)
+src/shared/
+  antd.ts                  Ant Design Vue 的唯一入口（局部注册）
+  gatedAsyncComponent.ts   门控组件的异步加载包装（失败时留诊断）
 ```
 
 ---
@@ -1256,10 +1363,20 @@ src/appearance/
    - `data-phase="edit|preview"`：由 EditorShell 模板 `:data-phase="profile.mode"` 声明式绑定，随 props 响应式更新；宿主可用 `[data-phase="preview"]` 替代已删除的 `.is-preview` 做样式覆盖
 2. **Session** — 仅 sessionKey 触发 rebuild；先快照 → loading → nextTick → destroy → create；content 快照在 watcher 回调的同步部分完成（`flush: 'pre'`，getJSON/getHTML 早于任何 await）。
 3. **Chrome** — 显隐只读 chromePolicy；单一 `v-if`，仅 session loading 骨架允许 `v-show`；`v-show` 内子组件必须能处理 `editor === null`。`outlinePanelExpanded` 不进 chromePolicy，由 `provideOutlinePanel` 直接持有。
-4. **Provide** — 核心 context 挂在 EditorShell 根，不沉入会被 preview 卸载的子树；`provideOutlinePanel` 必须提升至 EditorShell 根。
+4. **Provide** — 核心 context 挂在 EditorShell 根，不沉入会被 preview 卸载的子树；`provideOutlinePanel` 与 `provideFindReplacePanel` 必须提升至 EditorShell 根（前者持有大纲展开态，后者让「面板 + Ctrl/Cmd+F」与顶栏按钮解耦）。
 5. **Appearance 实例隔离** — `customAppearances` Map 与相关状态禁止作为模块级单例，移入 `useEditorAppearance` 实例作用域；`watchSystemColorMode` 生命周期由 composable 内部 `onWatcherCleanup` 自动管理，Shell 无需手动 teardown。
-6. **ContentAdapter 原子性** — 所有受控内容写入通过 raw transaction + `BYPASS_GUARD_META`（Symbol），禁止 `editor.commands.setContent`；phase 切换的清理命令在 `editable=true` 时刻执行（先 emit 再 setEditable）。
+6. **ContentAdapter 原子性** — 所有**受控内容写入**（`initialContent` / `v-model:content` 回写、session 重建灌入）一律走 `ContentAdapter` 的 raw transaction + `BYPASS_GUARD_META`（Symbol），`ContentAdapter` 内部禁止出现 `editor.commands.setContent`；phase 切换的清理命令在 `editable=true` 时刻执行（先 emit 再 setEditable）。用户主动触发、本就该进 undo 栈且本就该在 preview 下被守卫拦掉的写入不受此约束——目前仅 Word 导入（`wordImport.ts`）走 `chain().setContent()`。
 7. **Locale 实例隔离** — 扩展层 / Chrome 组件禁止 `import { t } from "@/locales"`；扩展走 `ctx.locale` 静态快照，Vue 组件走 `inject(EditorLocaleKey)`；全局 `t()` 仅作 SSR/非组件兜底。
+   既拿不到 `ctx.locale` 也拿不到 inject 的模块（`config/useAiConfig.ts` 这类纯 composable / 纯函数）**只返回语言包 key**，由上层持有解析器的组件翻译；需要自己产出文案的模块（`features/ai/client.ts`）通过入参接收实例解析器（`createAiClient({ getLocaleText })`），并只在解析器缺席时退回英文兜底串。**禁止**在这类模块里写中文常量。
+   用**独立 `createApp`** 挂载的浮层（如 `aiSuggestionManager` 的 AI 弹层）继承不到 EditorShell 的 provide，必须把 `t` 作为**显式 prop** 传入，**禁止**自铺一份 `provide(editorLocaleKey)`——那样 `locale` / `messages` 只能填假值，读它们的组件会拿到与实例不符的语言。被这样挂载的组件同时保留 `useEditorT()` 回退，以兼容宿主在组件树内直接使用。
+   **语言包是异步加载的，实例 locale 只有一个加载方**：`provideEditorLocale` 的 watch 里 `await` 的结果
+   必须过陈旧守卫（`onCleanup` 置位后丢弃），否则快速切换 locale 时先发起的那次会「后发先至」覆盖新结果，
+   界面语言与 `locale` 对不上且不会自愈。EditorShell **禁止**另起 watch 再加载一份语言包——
+   两份状态会各自竞态到不同结果；需要 `messages` 时直接用 `provideEditorLocale` 返回的 `ctx.messages`。
+   实例 `t()` 不做跨语言兜底（未命中返回 key），因此**禁止**为「兜底」额外预载 en-US 包：没有读取方，
+   且内置两包的 key 集合由 `localeParity.test.ts` 保证一致，兜底包不可能补上缺失的 key。
+   带 `{占位符}` 的文案统一由 `interpolate`（`locales/resolveMessage.ts`）替换，全局 `t()` 与实例 `t()`
+   共用同一份实现，**禁止**在调用点手写 `.replace("{x}", …)`；漏传 params 由 `localeParams.test.ts` 静态拦截。
 8. **零顶层 DOM 副作用** — `runtime/` 与 `capabilities/registry.ts` 模块顶层禁止访问 `window` / `document`；扩展内部 DOM 操作限于 ProseMirror Plugin view 阶段。
 9. **Phase 入口单一** — Shell 与扩展**禁止**直接调 `editor.setEditable`；一律通过 `useEditorSession.requestPhaseTransition(nextPhase)`；Session 层负责 buffer（editor 未 ready 时）与首次 `reason: 'ready'` 同步 emit。
 10. **Inline gates 单一来源** — Inline gates 仅由 `resolveInlineGates(toolbar, capabilities)` 推导；除此之外不得存在 toolbar→gate 的第二条路径。Full gates 仅由 `profile.features` 推导。
@@ -1268,10 +1385,176 @@ src/appearance/
 13. **浮层与 z-index** — 全局浮层（bubble menu、BlockPicker、mention、AI popover、Ant Design Dropdown/Select/Popover/Modal/Tooltip、自建 Toast/Notice 等）必须挂载在 `EditorShell` 内的 `.yaniv-editor__overlay-portal`，**禁止** teleport / appendTo / `getPopupContainer` / `getContainer` 回退到 `document.body`（HTML5 drag preview 与隐藏 file input 除外）；**禁止** Ant Design 静态 `message` / `notification`（全局单例 + body）。`--ye-z-*` token 仅定义在 `.yaniv-editor`，`zIndexBase` prop 写入 `--ye-z-base`；JS 通过 `getYeZIndex(token, root)` 读取 portal token，**禁止** `:root` fallback。统一入口：`useOverlayMountTarget` / `useOverlayBubbleMenu`（`src/composables/useOverlayMount.ts`）、`useOverlayFeedback` / `showOverlayToast` / `showOverlayNotice`（`src/core/overlayFeedback.ts`）。
 14. **能力按 gate 代码分割** — `capabilities/registry.ts` 中**默认 preset（`basic`）关闭的能力一律 `await import()`**，只有 `basic` 已开启的（core / image）才允许静态 import。gate 必须同时决定「运行时是否注册」与「是否进入 bundle」；否则 `preset` / `features` 只是运行时开关，接入方仍要下载全部能力。同理，`ToolbarNav` / `EditorEditChrome` 中由 gate 控制显隐的组件必须用 `defineAsyncComponent`。CI 有产物断言守着（主 chunk 不得出现 `dragHandle` / `slashCommand` / `searchReplace` / AI 适配器的特征串）。
 15. **禁止模块级可变状态** — 库需支持同页多实例，`let x = ...` 形式的模块级配置会让实例互相覆盖。所有实例相关状态走 provide/inject 或 **owner 键控注册表**（每实例一个 `Symbol`）。历史事故：outline `scrollParent`、AI `hostConfig`（未传 `ai-config` 的实例会静默复用另一实例的密钥）、`aiSuggestionManager` 的构建期 `bindLocale`。无 owner 的查询在存在多个登记方时必须**显式返回 null 并告警**，不得任选其一——任选其一正是缺陷本身。
+    确有跨 session 存活的单例（`aiSuggestionManager`）时，**清理必须由它自己订阅 `editor.on("destroy")` 触发，并持有显式反订阅句柄**（换实例时先摘旧监听）：Session 层只 destroy editor，不会通知功能层；而反过来让 Session 层去调功能层的 `destroy()` 会把门控能力拉回主 chunk，违反不变量 14。同理，凡触碰 editor 的方法都要经存活判断取用（`liveEditor()`），异步回调必须在**回调发生时**重取——销毁后 `editor.state` 仍可读，但凡走到 `editor.view` 的一律抛错。
 16. **HTML 入口惰性解析** — 传入的 HTML 字符串必须经 `DOMParser.parseFromString(..., "text/html")` 解析（惰性文档，无 browsing context）。**禁止** `element.innerHTML = html`：那样节点建在活动文档中，`<img onerror>` / `<svg onload>` 会立即执行、外链资源会真实请求。Inline 的 `v-model:content` 直接接收宿主 HTML，是 UGC 场景的存储型 XSS 面。
 17. **URL 白名单单一入口** — 链接走 `normalizeSafeUrl`、图片/视频走 `normalizeSafeMediaUrl`、iframe 走 `normalizeSafeFrameUrl`（比链接更严格：仅 http/https，且不做 `https://` 自动补全）。节点属性（如 `embed.provider`）**不构成安全边界**——它可由粘贴的 JSON 直接指定，域名判断只是选择渲染形态，真正的边界永远是白名单函数。iframe 必须带 `sandbox`，`allow` 按需最小化。
     **白名单必须落在「属性进入文档」处，而不只是 DOM 边界**：节点的 `parseHTML` / `renderHTML` 只覆盖「从 HTML 解析进来 / 渲染成 DOM 出去」，JSON 内容与 `setImage()` / `setVideo()` / `insertContent()` 这两条路径根本不经过 DOM——`renderHTML` 会把输出洗干净，于是危险值虽然进了 `attrs`，`getHTML()` 却看不出来，而 `getJSON()`（公开 API）会把它原样交给宿主。因此媒体 src 的强制点有三处，缺一不可：① 节点 `parseHTML` / `renderHTML`；② `adaptJsonToSchema`（所有 JSON 内容的唯一漏斗）逐节点调 `sanitizeMediaSrcAttrs`；③ `createMediaSrcGuardPlugin` 的 `appendTransaction` 事务级兜底。见 `src/utils/mediaSrcPolicy.ts` 与 `src/utils/mediaSrcPolicy.test.ts`（四条入口逐一断言）。
+    **链接 href 同理**：`createLinkExtension()` 的 `isAllowedUri` 只覆盖 HTML 解析 / 粘贴 / 自动链接 / `setLink()`，JSON 内容这条不经过它。危险 href 落进 mark attrs 后，TipTap 在 renderHTML 侧会把输出洗成 `href=""`，`getHTML()` 看不出异常，而 `getJSON()` 会把 `javascript:alert(1)` 原样交给宿主；编辑器自身的链接气泡「打开链接」读的也是 `attrs.href`（`window.open("javascript:…")` 会执行）。强制点同样三处：① `isAllowedUri`；② `adaptJsonToSchema` 调 `sanitizeLinkHrefMarks`；③ `createLinkHrefGuardPlugin` 的 `appendTransaction`。处置与 HTML 路径一致——**丢掉整个 link mark、保留文字**，且合法 href 不做归一化改写。见 `src/utils/linkHrefPolicy.ts`。
+    凡是「从 attrs 取 URL 再交给浏览器」的调用点（`window.open` / `location.href` / `<a href>` 手工赋值）都必须再过一次白名单：attrs 可能来自宿主注入的 JSON。
 18. **无障碍基线** — 交互元素一律用原生语义标签（`div` + `@click` 会被 `eslint-plugin-vuejs-accessibility` 拦下，例外须写明理由）；图标按钮必须有 `aria-label`（`a-tooltip` 的 `title` 只进浮层，不构成可访问名称）；切换按钮用 `aria-pressed`，下拉用 `aria-haspopup` / `aria-expanded`。`role="toolbar"` 按 WAI-ARIA APG 收敛为**单一 tab stop**，内部方向键移动（`useRovingTabindex`）。焦点留在正文的弹层（斜杠命令、提及）用 `listbox` / `option` + 正文上的 `aria-activedescendant`（`useVirtualFocusPopup`），关闭时必须清除引用。容器上监听子元素聚焦须用会冒泡的 `focusin` / `focusout`，`focus` / `blur` 不冒泡。
+19. **流式响应必须跨 chunk 缓冲** — `ReadableStream` 的分片边界与数据的语义边界（字符、行）无关，
+    网络分片位置不可预测。解码一律 `decoder.decode(value, { stream: true })`，让解码器把跨 chunk
+    劈开的多字节字符续上；按 `\n` 切分时最后一段可能是**半行**，必须留在缓冲区等下一个 chunk 拼接，
+    流结束后再冲刷无换行的残行。历史事故：三个 AI adapter 各写一份 SSE 解析、同一个 bug 复制三遍，
+    实测表现不是「多字节字符变 �」而是**整段增量凭空消失**。统一实现见
+    `features/ai/adapters/readStreamLines.ts`，**禁止**在 adapter 里另写一份切分逻辑；
+    回归用例必须按**字节**切分构造 chunk，按整行切分覆盖不到这条路径。
+20. **节点位置一律从选区推导** — **禁止**拿节点**对象**去 `doc.descendants` 里反查位置。两个原因：
+    「复制块」走 `node.copy(node.content)`，副本与原块**共享同一批子节点实例**，文档里两处节点
+    真的 `===`；而 `descendants` 回调返回 `false` 只表示「不再向下递归」、**并不终止遍历**，
+    用它做「找到就停」会拿到最后一个匹配。位置要从选区推出：`NodeSelection` 直接取 `$anchor.pos`，
+    否则 `nodeAfter` 起于 `$anchor.pos`、`nodeBefore` 止于 `$anchor.pos`。参照实现见
+    `components/tools/video-toolbar/VideoToolbar.vue` 与 `components/tools/image-toolbar/imageToolbarActions.ts`。
+    同一节点内的位置算术用 `$pos.end(depth)` 表示内容末尾，**禁止** `$pos.start(depth) + parent.nodeSize`
+    ——`nodeSize` 含首尾两个标记、比 `content.size` 大 2，选区会越过本块伸进下一个。
+21. **序列化标签必须与 schema 的 inline/block 一致** — 声明为 `inline: true` 的节点只会出现在段落等
+    inline 容器里，其 `renderHTML` **必须**输出 phrasing content（`span` / `a` / `code` 等），
+    **禁止**按属性切成 `div` / `p` 这类块级标签。否则 `getHTML()` 产出 `<p><div …></div></p>`
+    这种非法 HTML，回读时解析器会在该处劈开父段落——本库 HTML 是一等内容通路
+    （`setHtml` / `v-model:content` 都收 HTML 串），于是每存读一轮就多出两个空段落并逐轮累积，
+    公式插在句中还会把整句拦腰截断。历史事故：`MathExtension` 的块级公式。
+    「块级展示」由 NodeView 的 class + CSS `display` 表达，与序列化标签无关；
+    `parseHTML` 可以保留旧的块级标签变体，以便读回已落库的历史内容。
+22. **节点视图必须渲染「当前」节点** — `update(updatedNode)` 返回 `true` 等于告诉 ProseMirror
+    「已自行处理」，PM 就不再重建视图；此时渲染若仍读创建时捕获的 `node`，新属性**永远**画不出来，
+    且不会自愈。ProseMirror 只在本节点属性变化时才调 `update()`（无关按键与选区变化都不会），
+    因此在 `update()` 里无条件重渲是安全的，**不需要**为了省事沿用旧闭包。写法：视图内持有
+    `let currentNode = node`，`update()` 里先推进它再渲染。参照实现见 `extensions/video.ts`、
+    `extensions/resizableImage.ts`、`extensions/toggle`、`extensions/callout`。
+    历史事故：`EmbedExtension` 的两个渲染函数都读旧 `node`，改 `url` / 切 `provider` 后
+    页面纹丝不动。包裹元素上的属性镜像同理，且属性被清空时必须 `removeAttribute`。
+23. **读「本次更新刚渲染出的 DOM」的 watcher 必须 `flush: "post"`** — Vue 默认的 `pre` 时机跑在
+    组件重渲**之前**，此刻 DOM 还是上一版：本次新增的元素尚未创建，`ref` 也可能还是 `null`。
+    这类 watcher 通常还带「值没变就提前返回」的去重守卫（`id === prevId`），于是**下一轮补不回来**，
+    副作用被永久跳过。历史事故：`OutlinePanel` 的高亮项自动滚动——新敲出的标题按钮在 watcher
+    执行时还不存在，`scrollIntoView` 一次都没调用，直到用户把光标移到别的标题上。
+24. **组件订阅编辑器事件时，换实例必须退订「上一个」实例** — `watch(editor, cb)` 的回调触发时
+    `editor.value` **已经是新实例**，在回调里读它去 `off()` 只会打在刚换上的实例上（那上面还没有监听），
+    旧实例的监听一个也摘不掉。一律用 watch 的第二个参数：
+    `watch(editor, (next, prev) => { detach(prev); attach(next); }, { immediate: true })`。
+    另一种正确写法是 `watch(editor, (e, _prev, onCleanup) => { e.on(...); onCleanup(() => e.off(...)) })`
+    ——`onCleanup` 的闭包捕获的是**当次**实例。参照实现见 `OutlinePanel` / `ZoomBar`（prev 参数）
+    与 `HeadingControl` / `useControlledContent`（onCleanup）。这与不变量 15 的单例清理是同一条
+    原则在组件层的投影：**谁订阅谁按被订阅对象的身份退订**。
+    该形状一次性存在过 4 处，静态护栏见 `composables/editorListenerScope.test.ts`。
+    同理，**订阅不要放进 `nextTick`**：退订跑在它之前会摘空，随后又把监听挂到已被弃用的实例上。
+    还要覆盖**组件卸载**这一半：只处理 `prev` 参数的写法在组件卸载时不会跑（watcher 只是停止），
+    监听就永久留在那个仍然活着的编辑器上。因此**首选 `onCleanup`**——它换实例和卸载都会触发；
+    用 `prev` 参数的必须另配 `onBeforeUnmount` 退订。`ZoomBar` 踩过：底栏在 `mode` 切到 preview
+    时卸载（`resolveChromePolicy` 的 `showFooter`），而 `computeSessionKey` **不含 mode**、
+    编辑器不重建，实测 edit↔preview 每来回一次监听数 4 → 6 → 8 单调增长。
+25. **节点属性不得裸用 HTML 全局属性名** — Tiptap 的默认属性渲染把属性原样写成同名 HTML 属性。
+    名字撞上 `id` / `class` / `style` 时，文档内容会溢出到宿主页面的语义层：`id` 重复或与宿主
+    元素撞车会劫持 `getElementById` / `:target`，`class` 覆盖节点视图自己的类名，`style` 等于
+    让内容注入任意 CSS。这类属性**必须**自带 `renderHTML` 显式选定输出名（本仓库约定 `data-*`），
+    `parseHTML` 相应地读同一个名字。历史事故：`MentionExtension` 的 `id` / `label` 走默认渲染，
+    同一页面被提及两次即产生重复 DOM id。静态护栏见 `extensions/nodeAttributeNames.test.ts`。
+26. **token 表必须完整，不能靠继承或特异性巧合补齐** — 三种失效形状，都不会报错、只会悄悄画出错误的颜色：
+    ① **派生 token 在声明处求值**。自定义属性的 `var()` 在**声明它的元素**上替换，不是在使用处。
+    `:root` 上写 `--ye-table-border: var(--ye-border)`，`var()` 就在 `:root` 上算成浅色字面量再继承下来；
+    编辑器根节点的 `[data-color-mode="dark"]` 再改 `--ye-border` 已经晚了。因此 `:root` 里凡是值形如
+    `var(--ye-X)`、而 `--ye-X` 在深色段被改写的 token，**必须在深色段原样再声明一遍**。
+    ② **外观浅色段盖住全局深色段**。`.yaniv-editor.appearance-X`（0,2,0）比 `[data-color-mode="dark"]`
+    （0,1,0）特异性高，外观浅色段声明过的 token，全局深色那份永远轮不上；需要深色下保持浅色值
+    （Notion 的透明引用块、Word 蓝）也**必须显式写进外观自己的深色段**，把意图落到纸面上。
+    ③ **派生 token 只在 `:root` 上求值，跟不上实例作用域的覆盖**（形状 ① 的浅色 / 外观版本）。
+    改基础 token 的三条路径全都落在**编辑器根节点**这一个元素上——外观类
+    （`.yaniv-editor.appearance-word`）、深色属性（`[data-color-mode="dark"]`）、以及
+    `appearance="custom"` 的内联变量（`applyCustomAppearanceToElement` 用
+    `target.style.setProperty` 直接写在该元素上）。而别名声明在 `:root`（= `<html>`，祖先元素），
+    `var()` 在那里就替换掉了。深色路径当时没暴露，正是因为形状 ① 已在深色段补过一遍。
+    因此 `:root` 上的纯别名**必须在 `.yaniv-editor` 实例作用域再声明一次**——与 z-index 用
+    `.yaniv-editor` 承载 `--ye-z-base` 派生是同一个道理。
+
+    浏览器实测：形状 ① 补齐前，深色下 `--ye-table-border` 解析为 `rgb(233, 234, 236)`，三套外观的
+    表格网格线在深色底上全是接近纯白；`appearance-word` 的行内代码是 `#333` 压在 `#2d2d2d` 上
+    （对比度约 1.06:1）。形状 ③ 补齐前，`appearance-word` **浅色**下 `--ye-border` 已是 word 的
+    `#d4d4d4`，而 `--ye-table-border` 仍解析为全局 `#e9eaec`（单元格边框实测 `rgb(233, 234, 236)`），
+    `--ye-caret` 是全局 `#3370ff` 而非 word 的 `#0078d4`，`--ye-link-hover` 是 `#1456f0` 而非
+    `#106ebe`；word 与 notion 合计 19 个 token 断在这里，`appearance="custom"` 则是**全断**。
+    补齐后实测：word 浅色单元格边框 `rgb(212, 212, 212)`，custom 内联 `--ye-border: #ff0000`
+    时 8 个派生 token 全部跟着变红；深色三套与 default 浅色一处未变。
+    静态护栏见 `styles/darkTokenAliases.test.ts`。
+
+27. **`appearance: none` 必须配套重置 `background`** — 它只关掉原生控件绘制，**不会**清掉 UA 样式表的
+    `button { background-color: ButtonFace }`。浏览器实测：只写 `appearance: none` 的 `<button>`
+    计算出的 `background-color` 仍是 `rgb(239, 239, 239)`，补 `background: none` 才变透明。
+    `TemplateButton` 的 `.template-card` 漏过这条——注释写着「需重置浏览器默认按钮样式」，
+    却只重置了 `font` / `color` / `text-align` / `appearance`，于是深色下卡片标题 `#e0e0e0`
+    压在 UA 灰底 `#efefef` 上，对比度约 1.15:1。静态护栏见 `styles/uaResetScope.test.ts`。
+28. **浮层容器的基础皮肤属于结构层，不能整个推给 appearance** — 拖拽块菜单、斜杠命令菜单、
+    浮动工具栏这些浮在正文之上的不透明面板，必须在自己的结构层样式表里就用 `--ye-*` token
+    给出一套所有外观都能用的皮肤；appearance 只在需要**偏离 token** 时覆盖。
+    `drag-handle.css` / `block-picker.css` 的文件头一度写着「视觉皮肤见 appearance/styles/」，
+    而 `appearance-word` 一条 chrome 样式都没写——浏览器实测 word 外观下这两个菜单的
+    `background-color` 都是 `rgba(0, 0, 0, 0)`，即透明面板压在正文上，`.drag-handle__dot`
+    也没有背景色、六个拖拽点整个看不见。同时 `appearance-default` 那两份副本与 token 基础层
+    **逐字相同**，等于把同一份皮肤抄了三遍还漏了一遍。静态护栏见 `styles/overlayBaseSkin.test.ts`。
+
+    附带一条注意：浮层元素自身带 `data-color-mode`（`DragHandleExtension` 命令式复制，
+    Vue 浮层用 `:data-color-mode` 绑定），因此全局 `[data-color-mode="dark"]` 的 token 表会
+    直接落在**浮层元素本身**上，盖过从编辑器根节点继承来的 appearance 深色 token。
+    实测 word 深色下菜单文字取到全局的 `#e5e5e5` 而非 word 的 `#d4d4d4`——差异极小，
+    但意味着浮层用的是全局深色调色板；appearance 若要浮层完全跟随自己的主题，
+    必须写 `.x.appearance-y[data-color-mode="dark"]` 复合规则（notion 就是这么做的）。
+
+29. **`@media` 块必须写在它想覆盖的基础规则之后** — 媒体查询只是条件包裹，**不提升特异性**。
+    同选择器、同特异性时只看源码顺序，媒体块写在前面就会被后面的基础规则整块盖掉，
+    而 stylelint 只管属性顺序、devtools 也只在真正切到该断点时才看得出来。
+    `toolbar-dropdown.css` 曾把窄屏压缩块放在文件开头：浏览器实测 375px 视口下
+    `matchMedia("(max-width: 768px)")` 命中，但下拉按钮算出的仍是 `height: 32px` /
+    图标 `18px` / 文字 `14px`（媒体块想要的是 28 / 14 / 12），三条声明整块失效。
+    「同值」的媒体声明同样按死代码处理——留着只会让人误以为窄屏做了特化。
+    静态护栏见 `styles/mediaQueryOrder.test.ts`。
+30. **SFC 编译期伪类只能写在 `<style scoped>` 里** — `:deep()` / `:slotted()` / `::v-deep`
+    不是 CSS 规范里的东西，是 `@vue/compiler-sfc` 在编译 **scoped** 样式时消费掉的标记。
+    写进普通 `.css`（经 `index.css` `@import`）或没带 `scoped` 的 `<style>` 就没人转换它，
+    会原样打进 `dist/style.css`，浏览器当成未知伪类**丢弃整条规则**，连 CSSOM 都进不去。
+    `table.css` 曾有 12 条带 `:deep()`：浏览器实测 `document.styleSheets` 的 829 条 style rule 里
+    **一条都找不到**，`table.table-border-outer` 想要的 `border: 2px solid #333` 算出来是 `0px none`。
+    其中 `table-border-*` 三组全仓零引用直接删，两条图标字号压缩改回普通后代选择器。
+    `/deep/` 与 `>>>` 是 Vue 2 遗留写法，Vue 3 已移除，一并禁用。
+    静态护栏见 `styles/scopedPseudoScope.test.ts`。
+31. **深色规则里 `.yaniv-editor` 不能写成 `[data-color-mode]` 的后代** — 该属性由
+    `applyAppearanceToElement` 写在**编辑器根节点自身**上，因此只有两种正确形态：
+    `[data-color-mode="dark"] .某个编辑器内部后代`，或 `.yaniv-editor[data-color-mode="dark"] …`。
+    写成 `[data-color-mode="dark"] .yaniv-editor …` 等于要求另有一个外层祖先持有该属性——
+    宿主页面不在契约里，实际永远匹配不到。`image-toolbar.css` 曾有一条：深色 resize handle
+    想要 `#1f1f1f`，浏览器实测算出的一直是 `rgb(26, 26, 26)`（即 `--ye-bg`，本就已是正确深色，
+    该规则删除即可）。这类错误不变量 26 的同值检查抓不到——它压根匹配不上浅色规则。
+    静态护栏见 `styles/darkOverrides.test.ts`。
+32. **`String.replace` 的替换串不得是运行时变量** — 字符串形式的替换参数里 `$&`、`` $` ``、
+    `$'`、`$1` 是**替换模式**而非字面量，会被展开。替换串来自选项或宿主输入时，攻击面就是
+    「把刚摘掉的原文再塞回去」：`replaceImageWithPlaceholder` 把公开选项 `imagePlaceholderHtml`
+    直接当替换串，宿主传 `<span>$&</span>` 时实测 `<img src="secret.png">` 变成
+    `<span><img src="secret.png"></span>`——占位彻底失效。写成函数形式（`() => placeholder`）
+    没有任何展开语义，是根因修法。静态护栏见 `utils/htmlRegexSafety.test.ts`。
+33. **用正则从 HTML 摘标签时属性区必须引号感知** — 朴素的 `[^>]*` 在**引号内**的第一个 `>`
+    处收尾：`<img alt="a>b" src="x.png">` 只匹配到 `<img alt="a`，剩下的 `b" src="x.png">`
+    作为**可见文本**留在文档里（实测），既是脏内容，也会把 Word 图片的本地路径
+    （`file:///C:/Users/…`）泄漏成正文。统一用 `src/utils/htmlTagPattern.ts` 的 `TAG_INNARDS`
+    拼属性区。静态护栏见 `utils/htmlRegexSafety.test.ts`。
+34. **外部输入驱动的结构生成必须钳制取值范围** — 剪贴板与宿主传入的数值直接驱动建树循环时，
+    畸形值等于拒绝服务。`transformLists` 用 `mso-list` 里的 `level{N}` 直接跑
+    `while (level > stack.length)` 建嵌套列表，`level5000` 实测创建 5000 层嵌套 `<ul>`，
+    序列化时 parse5 递归**爆栈抛 `RangeError`**（耗时 2.4s）；而 `transformPastedHTML`
+    抛异常会让整次粘贴失败。按业务上限钳制（Word 列表最深 9 级），越界收敛而不是照单全收。
+35. **设计 token 只能由 CSS 分层写，JS 不得内联覆盖** — `--ye-*` 由 `variables.css` 给基础值、
+    `appearance/styles/*.css` 三套外观各自覆盖；元素上的内联 style 优先级高于**任何**选择器，
+    JS 写一次就把整套外观按死。`useEditorPagination.initPageCssVariables()` 曾把 A4 常量
+    （794 / 96 / 96 / 931）写到 `.document-container` 上，浏览器实测三套外观的文档尺寸
+    **全部失效**：default 的 900px 页宽被压成 794px、48px 内边距被压成 96px，
+    notion 的 708px 同样被压成 794px，连 word 自己的 939px 最小高度也被改成 931px。
+    该函数已删除；正当的写入路径只有两条——custom 外观的变量注入，
+    以及 `--ye-z-base`（公开 prop `zIndexBase` 的实现）。
+    静态护栏见 `styles/designTokenWriteScope.test.ts`。
+36. **ProseMirror 的 meta 键不能用 `Symbol()`** — 存取实现是
+    `this.meta[typeof key == "string" ? key : key.key]`：symbol 走后一支，而 symbol
+    没有 `.key` 属性，于是**所有** symbol 键共用 `meta["undefined"]` 这一个槽。
+    实测任意 symbol、任意没有 `.key` 的裸对象、乃至字符串 `"undefined"` 都能读写它——
+    `BYPASS_GUARD_META` 原本是 `Symbol()`，意味着只读事务守卫可被**任何**第三方 meta
+    意外解除，而它还是公开导出的 API。改成带命名空间前缀的字符串（`"yaniv:bypassGuard"`）后
+    类型也变诚实了：调用点不再需要 `as unknown as string`。
 
 ---
 
@@ -1279,14 +1562,16 @@ src/appearance/
 
 样式分为 token、结构、功能 chrome、appearance 四层（详见 `docs/contributing/project-structure.md`）：
 
-| 层          | 位置                                                   | 职责                                                            |
-| ----------- | ------------------------------------------------------ | --------------------------------------------------------------- |
-| Token       | `src/styles/variables.css`                             | `--ye-*` 设计 token；颜色在 `:root`，z-index 在 `.yaniv-editor` |
-| 结构        | `content.css` / `table.css` / `code-block.css`         | ProseMirror 边框、背景、交互语义                                |
-| 功能 chrome | `src/styles/*.css`、工具组件 CSS、`overlay-portal.css` | 工具栏、菜单、拖拽手柄、浮层挂载容器等                          |
-| Appearance  | `src/appearance/styles/*.css`                          | 仅 token 与排版（margin / font-size / padding）                 |
+| 层          | 位置                                                   | 职责                                                                                                  |
+| ----------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Token       | `src/styles/variables.css`                             | `--ye-*` 设计 token；颜色字面量在 `:root`，**派生别名与 z-index 在 `.yaniv-editor`**（见不变量 26 ③） |
+| 结构        | `content.css` / `table.css` / `code-block.css`         | ProseMirror 边框、背景、交互语义                                                                      |
+| 功能 chrome | `src/styles/*.css`、工具组件 CSS、`overlay-portal.css` | 工具栏、菜单、拖拽手柄、浮层挂载容器等                                                                |
+| Appearance  | `src/appearance/styles/*.css`                          | 仅 token 与排版（margin / font-size / padding）                                                       |
 
-- `src/styles/index.css` 与 `src/styles/inline.css` 均在 appearance 之前 import `content.css` 与 `overlay-portal.css`。
+- 两个入口都以 `variables.css` 开头（token 必须最先）；`inline.css` 只引 Inline 用得到的子集，
+  不含 document-layout / 表格 / 拖拽手柄 / 大纲，也**不含任何 appearance 文件**。
+- 唯一的排序硬约束：`content.css` 必须排在 `appearance/styles/*.css` 之前（只有 `index.css` 引后者）。
 - appearance 禁止对结构层已声明的选择器使用 `border` / `background` shorthand 重声明。
 - `block-hover.css` 打入 Full 包，选择器限定 `.appearance-notion`（Notion 块 hover 高亮）。
 - 浮层 z-index 基准 `--ye-z-base` 默认 `1000`，由 `zIndexBase` prop 写入根节点；详见 `docs/guide/z-index.md`。
@@ -1299,7 +1584,9 @@ src/appearance/
 
 ### 最小测试集
 
-实现文件：
+本节列出的是**架构层的必备用例**，不是全部测试：下面这四个文件覆盖它们，此外仓库里还有
+三十多个测试文件覆盖扩展、组件、无障碍、公开 API 表面与安全边界。以
+`pnpm run test` / `pnpm run test:coverage` 的实际结果为准（覆盖率阈值见 `vitest.config.ts`）。
 
 | 组                                   | 文件                                            |
 | ------------------------------------ | ----------------------------------------------- |
@@ -1307,6 +1594,9 @@ src/appearance/
 | 6–7 ContentAdapter + 守卫            | `src/core/session/contentAdapter.test.ts`       |
 | 8 applyPhaseTransition 顺序          | `src/core/session/applyPhaseTransition.test.ts` |
 | 9–10 Session buffer / 竞态 / dispose | `src/core/session/useEditorSession.test.ts`     |
+
+> 下面的代码块是**用例意图的示意**（部分为伪代码，如 `useEditorSessionForTest()`），
+> 真实断言以上表四个文件为准。
 
 ```ts
 // 1. resolveEditorProfile：三个 preset × override 合并表
@@ -1486,8 +1776,10 @@ test("onBeforeUnmount 后 buildExtensions resolve 被 discard", async () => {
 
 ---
 
-## 不在本次范围
+## 不在范围
 
 - SSR / Shadow DOM 全面适配
 - 协同编辑 / Yjs
-- Playwright E2E 全量覆盖（已有 `e2e/notion-features.spec.ts` 起步；其余以 vitest + demo 手验为主）
+- Playwright E2E 全量覆盖 —— 目前有 `e2e/smoke.spec.ts`、`notion-features.spec.ts`、
+  `drag-handle.spec.ts`、`overlay-z-index.spec.ts` 四个 spec（CI 有独立 job 跑 chromium），
+  覆盖的是"只有真实浏览器能验的"那部分（布局定位、拖拽、浮层层级）；其余仍以 vitest + demo 手验为主

@@ -1,6 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test, vi } from "vitest";
 
-import { resolveAiExtensionOptions } from "@/features/ai/shared/extensionOptions";
+import {
+  createConfiguredAiClient,
+  resolveAiExtensionOptions,
+} from "@/features/ai/shared/extensionOptions";
 import type { AiExtensionConfigureOptions } from "@/features/ai/shared/extensionOptions";
 
 /**
@@ -117,5 +120,22 @@ describe("registry 的 AI capability getter", () => {
       model: "deepseek-chat",
       storageMode: "memory",
     });
+  });
+});
+
+describe("createConfiguredAiClient", () => {
+  it("把实例 locale 解析器透传给 client —— 否则 client 自己的提示会是英文兜底", async () => {
+    vi.stubEnv("VITE_AI_DEMO_MODE", "false");
+    const errors: Error[] = [];
+
+    createConfiguredAiClient({
+      // 不给 provider：走「未配置」分支，正好检验文案来源
+      getLocaleText: (key) => (key === "messages.aiNotConfigured" ? "缺少 API Key" : key),
+    }).polish("t", "ctx", { onError: (e) => errors.push(e) });
+
+    await vi.waitFor(() => expect(errors.length).toBe(1));
+    expect(errors[0].message).toBe("缺少 API Key");
+
+    vi.unstubAllEnvs();
   });
 });

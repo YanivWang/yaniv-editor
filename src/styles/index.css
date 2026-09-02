@@ -57,7 +57,9 @@
 @import "../features/ai/shared/ai-highlight.css";
 
 /*
- * Visual appearances（npm 全量打入 style.css；loadAppearance 仅切换 class）
+ * Visual appearances（三套内置主题全量打入 style.css，无按需加载：
+ * 根节点的 .appearance-{name} 由 EditorShell 的 :class 绑定，
+ * loadAppearance() 只是把外观记进一个 Set 标记就绪，不做动态 import）
  *
  * 内置主题：appearance/styles/ 下各 *.css，根节点 class 为 .appearance-{name}
  *

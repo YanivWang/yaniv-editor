@@ -107,8 +107,18 @@ function updatePosition() {
   visible.value = true;
 }
 
+let pendingFrame: number | null = null;
+
+/**
+ * 句柄必须留着：卸载时若不取消，排队中的回调仍会跑 `updatePosition`，
+ * 而那时编辑器可能已 destroy——销毁后访问 `editor.view` 是直接抛错的（不变量 15）。
+ */
 function scheduleUpdate() {
-  requestAnimationFrame(updatePosition);
+  if (pendingFrame !== null) cancelAnimationFrame(pendingFrame);
+  pendingFrame = requestAnimationFrame(() => {
+    pendingFrame = null;
+    updatePosition();
+  });
 }
 
 function onLanguageChange(value: SelectValue) {
@@ -119,15 +129,13 @@ function onLanguageChange(value: SelectValue) {
   scheduleUpdate();
 }
 
-function bindEditorEvents() {
-  const e = editor.value;
+function bindEditorEvents(e: Editor | null) {
   if (!e) return;
   e.on("selectionUpdate", scheduleUpdate);
   e.on("transaction", scheduleUpdate);
 }
 
-function unbindEditorEvents() {
-  const e = editor.value;
+function unbindEditorEvents(e: Editor | null) {
   if (!e) return;
   e.off("selectionUpdate", scheduleUpdate);
   e.off("transaction", scheduleUpdate);
@@ -139,12 +147,17 @@ function onScroll() {
   scheduleUpdate();
 }
 
+/**
+ * 退订要拿 watch 的 `prev` 去调，不能在退订函数里就地读 `editor.value`——
+ * 回调触发时它已经是 `next`，`if (prev)` 只是个存在性判断，摘的仍是新实例。
+ * 见 ARCHITECTURE 不变量 24。
+ */
 watch(
   () => editor.value,
   (next, prev) => {
-    if (prev) unbindEditorEvents();
+    unbindEditorEvents(prev ?? null);
     if (next) {
-      bindEditorEvents();
+      bindEditorEvents(next);
       scheduleUpdate();
     }
   },
@@ -173,7 +186,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  unbindEditorEvents();
+  if (pendingFrame !== null) cancelAnimationFrame(pendingFrame);
+  unbindEditorEvents(editor.value ?? null);
   if (scrollEl) {
     scrollEl.removeEventListener("scroll", onScroll, true);
   }

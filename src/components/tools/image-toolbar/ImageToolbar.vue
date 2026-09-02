@@ -75,7 +75,6 @@ import {
   EyeOutlined,
   DeleteOutlined,
 } from "@ant-design/icons-vue";
-import { NodeSelection } from "@tiptap/pm/state";
 import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed, ref } from "vue";
 
@@ -86,6 +85,8 @@ import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner, type EditorChain } from "@/utils/editorCommands";
+
+import { applyImageAlign, findSelectedImage } from "./imageToolbarActions";
 
 // ===== Props =====
 const props = withDefaults(
@@ -122,57 +123,10 @@ const alignOptions = [
 // ===== 工具函数 =====
 
 /**
- * 获取当前选中的图片节点和位置
- */
-function getCurrentImageInfo() {
-  const e = editor.value;
-  if (!e) return { node: null, pos: null };
-
-  const { state } = e;
-  const { selection } = state;
-  let node = null;
-  let pos: number | null = null;
-
-  // 检查是否是节点选择（NodeSelection）
-  if (
-    selection instanceof NodeSelection &&
-    selection.node &&
-    selection.node.type.name === "image"
-  ) {
-    node = selection.node;
-    pos = selection.from;
-    return { node, pos };
-  }
-
-  // 检查光标前后的节点
-  const $anchor = selection.$anchor;
-  const nodeAfter = $anchor.nodeAfter;
-  const nodeBefore = $anchor.nodeBefore;
-
-  if (nodeAfter?.type.name === "image") {
-    node = nodeAfter;
-  } else if (nodeBefore?.type.name === "image") {
-    node = nodeBefore;
-  }
-
-  // 如果找到节点但没找到位置，查找位置
-  if (node && pos === null) {
-    state.doc.descendants((n, p) => {
-      if (n === node) {
-        pos = p;
-        return false;
-      }
-    });
-  }
-
-  return { node, pos };
-}
-
-/**
  * 获取图片的对齐方式
  */
 function getImageAlign() {
-  const { node, pos } = getCurrentImageInfo();
+  const { node, pos } = findSelectedImage(editor.value);
   if (!node || pos === null) return null;
 
   // 优先检查图片节点本身的对齐属性
@@ -202,7 +156,7 @@ function getImageAlign() {
 const shouldShow = (bubbleProps: { editor: any; state: any; from: number; to: number }) => {
   if (!shouldShowImageBubbleMenu(bubbleProps, props.disabled)) return false;
 
-  const { node } = getCurrentImageInfo();
+  const { node } = findSelectedImage(editor.value);
   if (node?.type.name === "image") {
     currentImageSrc.value = node.attrs.src || "";
     currentAlign.value = getImageAlign();
@@ -224,24 +178,10 @@ function setAlign(align: "left" | "center" | "right") {
   const e = editor.value;
   if (!e) return;
 
-  const { node, pos } = getCurrentImageInfo();
+  const { node, pos } = findSelectedImage(editor.value);
   if (!node || pos === null) return;
 
-  const $pos = e.state.doc.resolve(pos);
-  const parent = $pos.parent;
-
-  // 优先设置父节点对齐（段落或标题）
-  if (parent && (parent.type.name === "paragraph" || parent.type.name === "heading")) {
-    const parentStart = $pos.start($pos.depth);
-    e.chain()
-      .setTextSelection({ from: parentStart, to: parentStart + parent.nodeSize })
-      .setTextAlign(align)
-      .run();
-  }
-
-  // 同时设置图片节点的对齐属性
-  e.chain().focus().setNodeSelection(pos).updateAttributes("image", { align }).run();
-
+  applyImageAlign(e, pos, align);
   currentAlign.value = align;
 }
 
@@ -249,7 +189,7 @@ function setAlign(align: "left" | "center" | "right") {
  * 预览图片
  */
 function previewImage() {
-  const { node } = getCurrentImageInfo();
+  const { node } = findSelectedImage(editor.value);
   if (node?.type.name === "image") {
     currentImageSrc.value = node.attrs.src || "";
     previewVisible.value = true;
@@ -277,7 +217,6 @@ function deleteImage() {
 
   [data-color-mode="dark"] & {
     background: #1f1f1f;
-    border-color: var(--ye-border);
   }
 }
 
@@ -287,10 +226,6 @@ function deleteImage() {
   align-items: center;
   padding: 0 4px;
   border-right: var(--ye-border-width) solid var(--ye-border);
-
-  [data-color-mode="dark"] & {
-    border-right-color: var(--ye-border);
-  }
 }
 
 .image-menu-group:last-child {
@@ -348,11 +283,9 @@ function deleteImage() {
 }
 
 .image-menu-btn--danger:hover {
-  color: #ff4d4f;
   background: #fff1f0;
 
   [data-color-mode="dark"] & {
-    color: #ff7875;
     background: #3a1a1a;
   }
 }

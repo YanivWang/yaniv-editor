@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
 
+import { AI_PROVIDERS } from "@/features/ai/config/types";
+
 import { enUS } from "./en-US";
 import { zhCN } from "./zh-CN";
 
@@ -45,6 +47,45 @@ describe("locale parity", () => {
         return typeof value === "string" && value.trim() === "";
       });
       expect(empty, `${name} 存在空文案`).toEqual([]);
+    }
+  });
+
+  /**
+   * `AiProviderInfo` 只保留技术参数，展示名与说明移进语言包（按 provider id 索引）。
+   * 新增 provider 时若漏加文案，AI 设置弹窗的下拉会直接显示原始 key。
+   */
+  test("每个 AI provider 都有展示名与说明", () => {
+    for (const provider of AI_PROVIDERS) {
+      expect(zhKeys, `zh-CN 缺 ${provider.id} 展示名`).toContain(
+        `aiSettings.providerName.${provider.id}`,
+      );
+      expect(zhKeys, `zh-CN 缺 ${provider.id} 说明`).toContain(
+        `aiSettings.providerDesc.${provider.id}`,
+      );
+      expect(enKeys, `en-US 缺 ${provider.id} 展示名`).toContain(
+        `aiSettings.providerName.${provider.id}`,
+      );
+      expect(enKeys, `en-US 缺 ${provider.id} 说明`).toContain(
+        `aiSettings.providerDesc.${provider.id}`,
+      );
+    }
+  });
+
+  test("AI 子包的运行时文案两包都有", () => {
+    for (const key of [
+      "messages.aiNotConfigured",
+      "messages.aiRequestFailed",
+      "aiSettings.storageMode",
+      "aiSettings.storageModeHint",
+      "aiSettings.testTimeout",
+      "aiDemo.continue",
+      "aiDemo.polish",
+      "aiDemo.summarize",
+      "aiDemo.translate",
+      "aiDemo.custom",
+    ]) {
+      expect(zhKeys, `zh-CN 缺 ${key}`).toContain(key);
+      expect(enKeys, `en-US 缺 ${key}`).toContain(key);
     }
   });
 

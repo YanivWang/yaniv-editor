@@ -33,11 +33,29 @@ const runCommand = createCommandRunner(editor);
 const currentFont = ref<string>(DEFAULT_VALUES.fontFamily);
 
 watch(
-  () => editor.value?.getAttributes("textStyle")?.fontFamily,
-  (fontFamily) => {
-    currentFont.value = fontFamily || DEFAULT_VALUES.fontFamily;
+  editor,
+  (e, _prev, onCleanup) => {
+    if (!e) return;
+
+    // 必须显式订阅事务：`editor.state` 不是 Vue 响应式的，
+    // `watch(() => editor.value?.getAttributes(...))` 只在 editor **实例**换掉时才重新求值，
+    // 光标在不同 字体 的文字之间移动一概读不到（实测 watch 只收到 immediate 那一次）。
+    // 本仓库其余 8 个需要跟随选区的组件用的都是这个写法。
+    const sync = () => {
+      const fontFamily = e.getAttributes("textStyle")?.fontFamily;
+      currentFont.value = fontFamily || DEFAULT_VALUES.fontFamily;
+    };
+
+    sync();
+    e.on("selectionUpdate", sync);
+    e.on("transaction", sync);
+
+    onCleanup(() => {
+      e.off("selectionUpdate", sync);
+      e.off("transaction", sync);
+    });
   },
-  { deep: true, immediate: true },
+  { immediate: true },
 );
 
 function applyFont(val: string) {

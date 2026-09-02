@@ -13,10 +13,12 @@ Controlled by `features.outline`, built on UniqueID + TableOfContents.
 
 The panel depends only on whether `features.outline` is enabled — it is independent of the header.
 
-| preset | Entry                               | Behavior                                                                 |
-| ------ | ----------------------------------- | ------------------------------------------------------------------------ |
-| full   | Header outline toggle + rail handle | Right/top outline panel; click to jump to headings; collapsed by default |
-| notion | Rail handle (no header)             | Same as above                                                            |
+| preset | Entry                               | Behavior                                                                           |
+| ------ | ----------------------------------- | ---------------------------------------------------------------------------------- |
+| full   | Header outline toggle + rail handle | Panel floats out at the top-right; click to jump to headings; collapsed by default |
+| notion | Rail handle (no header)             | Same as above                                                                      |
+
+All three presets set `layout.outlineAnchor` to `top-right` (`sharedLayout` in `configs/editorPreset.ts`), so the panel and its handle sit at the document's top-right corner; `OutlinePanel` also supports `top-left`, but no preset uses it today.
 
 When the panel is collapsed, an expand handle (`.outline-rail__handle`) renders at the rail's anchor position. The header's `OutlineToggleButton` is just an extra convenience entry for the full preset — presets that hide the header can still expand from the handle.
 

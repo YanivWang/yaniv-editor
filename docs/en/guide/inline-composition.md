@@ -42,6 +42,8 @@ const extensions = await buildExtensions("inline", {
   blockMenuHost,
   upload: { image: () => undefined, video: () => undefined },
   galleryImages: () => [],
+  // Not consumed on the inline path (mention belongs to notionBlocks), but required by the type
+  mentionItems: () => undefined,
   officePaste: { onPasteFromOfficeWithImages: () => undefined },
   outline: { scrollParent: () => null, bindScrollParent: () => {} },
   aiConfig: () => undefined,

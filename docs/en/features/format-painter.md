@@ -13,10 +13,16 @@ The `notion` preset **disables** format painter by default (aligned with Notion 
 ## Usage
 
 1. Select formatted text as the source
-2. Click the format painter in the header
-3. Apply to the target selection
+2. **Click** the format painter in the header (single-use) or **double-click** it (continuous)
+3. Select the target text in the document — releasing the mouse applies the format
 
-Supports single-use and continuous modes (extension internal commands). Can copy font, color, line height, and other mark attributes.
+Step 3 needs no second button press: on `mouseup` the extension applies the format itself if it is still
+active and the selection is non-empty. Single-use mode exits after one application; continuous mode stays
+on until you press **Esc** or click the button again.
+
+What gets sampled: bold / italic / underline / strike / superscript / subscript, the color, font family and
+font size on `textStyle`, the `highlight` background color, plus the alignment and line height of the
+paragraph or heading.
 
 ## Preview Transition
 

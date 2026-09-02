@@ -21,7 +21,7 @@ test.describe("Notion preset + appearance", () => {
     // preset / appearance 切换会重建 session；等可见下拉收起且编辑器就绪
     await expect(page.locator(".ant-select-dropdown:visible")).toHaveCount(0);
     await expect(page.locator(".yaniv-editor")).toHaveClass(/appearance-notion/);
-    await expect(page.locator(".editor-header, .toolbar-nav")).toHaveCount(0);
+    await expect(page.locator(".document-toolbar")).toHaveCount(0);
     await expectEditorReady(page);
   });
 

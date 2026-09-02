@@ -197,3 +197,70 @@ describe("NodeView 挂载", () => {
     expect(e.view.dom.querySelector("img")).not.toBeNull();
   });
 });
+
+/**
+ * 回归护栏：拖拽写回路径的尺寸合法性。
+ *
+ * 解析侧早就守住了非法尺寸（见「非法尺寸 %s 归一为 null」），但拖拽结束时的写回
+ * 一直是裸 `parseInt(img.style.width)`。图片没加载完、或只是在手柄上点一下没拖动时，
+ * `img.style.width` 是 "" / "auto"，`parseInt` 得到 NaN 并被 `setNodeMarkup` 写进 attrs：
+ * `getJSON()` 会把它序列化成 null，宿主看到的值与文档实际值就此不一致。
+ */
+describe("拖拽写回尺寸", () => {
+  function resizeHandleOf(e: Editor): HTMLElement {
+    const handle = e.view.dom.querySelector(".resize-handle");
+    if (!(handle instanceof HTMLElement)) throw new Error("resize handle 未渲染");
+    return handle;
+  }
+
+  function press(target: HTMLElement, type: string, x = 0, y = 0): void {
+    target.dispatchEvent(
+      new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y }),
+    );
+  }
+
+  it("只按下再松开（未拖动、图片未加载）不把 NaN 写进 attrs", () => {
+    const e = mount('<p><img src="https://cdn.example.com/a.png"></p>');
+    const handle = resizeHandleOf(e);
+
+    press(handle, "mousedown");
+    document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+    const attrs = imageNode(e);
+    expect(attrs).not.toBeNull();
+    expect(Number.isNaN(attrs!.width as number), "width 不应为 NaN").toBe(false);
+    expect(Number.isNaN(attrs!.height as number), "height 不应为 NaN").toBe(false);
+    // 未拖动 => 尺寸维持原样（null），而不是被写成 NaN
+    expect(attrs!.width).toBeNull();
+    expect(attrs!.height).toBeNull();
+  });
+
+  it("NaN 不会经 getJSON 泄漏成 null（文档与序列化保持一致）", () => {
+    const e = mount('<p><img src="https://cdn.example.com/a.png"></p>');
+    const handle = resizeHandleOf(e);
+
+    press(handle, "mousedown");
+    document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+    const json = JSON.stringify(e.getJSON());
+    const attrs = imageNode(e);
+    // 文档里是 null，序列化出来也必须是 null —— 若写进 NaN，两者会对不上
+    expect(attrs!.width).toBeNull();
+    expect(json).not.toContain("NaN");
+  });
+
+  it("真实拖动仍然写回尺寸", () => {
+    const e = mount('<p><img src="https://cdn.example.com/a.png" width="100" height="100"></p>');
+    const handle = resizeHandleOf(e);
+
+    press(handle, "mousedown", 0, 0);
+    document.dispatchEvent(
+      new MouseEvent("mousemove", { bubbles: true, clientX: 60, clientY: 60 }),
+    );
+    document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+    const attrs = imageNode(e);
+    expect(typeof attrs!.width).toBe("number");
+    expect(attrs!.width as number).toBeGreaterThan(100);
+  });
+});

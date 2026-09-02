@@ -148,19 +148,23 @@ function detachEditorListeners(ed: Editor) {
   ed.off("selectionUpdate", updateCounts);
 }
 
-// 监听编辑器实例变化
+/*
+ * 退订走 `onCleanup` 而不是手接 `oldEditor`：`onCleanup` 既在换实例时跑，
+ * 也在 watcher 随组件卸载而停止时跑。只处理 `oldEditor` 的写法漏掉了后者——
+ * 而底栏是会在编辑器还活着的时候卸载的（`mode` 切到 preview 时
+ * `resolveChromePolicy` 把 `showFooter` 置 false，而 `computeSessionKey` 不含 mode，
+ * 编辑器不重建），于是 edit↔preview 每来回一次就在活着的编辑器上多留两个监听。
+ */
 watch(
   editor,
-  (ed, oldEditor) => {
-    if (oldEditor) {
-      detachEditorListeners(oldEditor);
+  (ed, _oldEditor, onCleanup) => {
+    if (!ed) {
+      updateCounts();
+      return;
     }
 
-    if (ed) {
-      attachEditorListeners(ed);
-    } else {
-      updateCounts();
-    }
+    attachEditorListeners(ed);
+    onCleanup(() => detachEditorListeners(ed));
   },
   { immediate: true },
 );

@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { EditorContent } from "@tiptap/vue-3";
-import { computed, onBeforeUnmount, ref, shallowRef, watch, type Ref } from "vue";
+import { computed, onBeforeUnmount, ref, watch, type Ref } from "vue";
 
 import { getAppearanceClassName, useEditorAppearance } from "@/appearance";
 import { provideFindReplacePanel } from "@/components/editor/find-replace";
@@ -65,7 +65,7 @@ import { provideOutlinePanel } from "@/components/editor/outline";
 import type { YanivInlineEditorProps } from "@/configs/inlineTypes";
 import { provideEditorRoot, provideOverlayPortal, provideYanivEditor } from "@/core/editorContext";
 import type { YanivEditorProps, YanivEditorExpose } from "@/core/editorTypes";
-import { provideEditorLocale, resolveLocaleMessages } from "@/core/infra/useEditorLocale";
+import { provideEditorLocale } from "@/core/infra/useEditorLocale";
 import { OVERLAY_PORTAL_CLASS, resolveOverlayPortal } from "@/core/overlayPortal";
 import type { EditorShellHost, FullChromePolicy, InlineChromePolicy } from "@/core/runtime/types";
 import { useEditorRuntime } from "@/core/runtime/useEditorRuntime";
@@ -73,7 +73,6 @@ import { useControlledContent } from "@/core/session/useControlledContent";
 import { useEditorSession } from "@/core/session/useEditorSession";
 import { useEditorPagination } from "@/core/useEditorPagination";
 import { useYanivAiConfig } from "@/core/useYanivAiConfig";
-import type { TiptapLocale } from "@/locales/types";
 import { Modal } from "@/shared/antd";
 import { YE_Z_BASE_VAR, YE_Z_INDEX_DEFAULT_BASE } from "@/utils/zIndex";
 
@@ -103,7 +102,6 @@ const inlineProps = computed(() => props.inlineProps);
 const rootRef = ref<HTMLElement | null>(null);
 const overlayPortalRef = ref<HTMLElement | null>(null);
 const workspaceRef = ref<EditorWorkspaceExpose | null>(null);
-const localeMessages = shallowRef<TiptapLocale | null>(null);
 
 provideEditorRoot(rootRef);
 provideOverlayPortal(overlayPortalRef);
@@ -128,15 +126,9 @@ const localeSource = computed(() =>
   isFull.value ? fullProps.value?.locale : inlineProps.value?.locale,
 );
 
+// 语言包只有 `provideEditorLocale` 这一个加载方：此前这里另起一个 watch 再加载一次，
+// 两份状态既重复请求、又会各自竞态到不同的结果（locale 与 messages 对不上）。
 const localeContext = provideEditorLocale(localeSource);
-
-watch(
-  () => localeContext.locale.value,
-  async (code) => {
-    localeMessages.value = await resolveLocaleMessages(code);
-  },
-  { immediate: true },
-);
 
 useEditorAppearance({
   rootRef,
@@ -194,8 +186,7 @@ const workspaceContainerRef = computed(
   () => workspaceRef.value?.containerRef ?? null,
 ) as Ref<HTMLElement | null>;
 
-const { totalPages, zoomLevel, calculatePages, initPageCssVariables } =
-  useEditorPagination(workspaceContainerRef);
+const { totalPages, zoomLevel, calculatePages } = useEditorPagination(workspaceContainerRef);
 
 let outlineScrollEl: HTMLElement | null = null;
 
@@ -209,7 +200,7 @@ const {
   host: props.host,
   profile,
   sessionKey,
-  locale: computed(() => localeMessages.value!),
+  locale: localeContext.messages,
   blockMenuHost,
   editorProps: inlineProps.value?.editorProps,
   buildCtx: () => ({
@@ -218,6 +209,7 @@ const {
       video: () => fullProps.value?.uploadVideo,
     },
     galleryImages: () => fullProps.value?.galleryImages ?? [],
+    mentionItems: () => fullProps.value?.mentionItems,
     officePaste: {
       onPasteFromOfficeWithImages: () => () =>
         Modal.info({
@@ -243,7 +235,6 @@ const {
   }),
   onReady: (e) => {
     if (!isFull.value) return;
-    initPageCssVariables();
     calculatePages();
     e.on("update", () => calculatePages());
   },

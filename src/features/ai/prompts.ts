@@ -76,9 +76,15 @@ Output the summary directly.`,
 - 处理好文化差异
 直接输出翻译结果，不要添加解释。`,
     /**
-     * 目标语言展示名。仅覆盖 `LANGUAGE_CODES`（14 种）中的 8 种；
-     * 未收录的 code（th / pt / vi / ru / hi / id）由 `client.ts` 中
-     * `translateTargetLabel` 的 `|| targetLang` 兜底，直接把语言代码写进 prompt。
+     * 语言**代码 → 展示名**的可选映射，只在 `translate` 命令拿到的是语言代码时才命中。
+     *
+     * 注意内置 UI 走不到这里：`AiMenuButton` 传给 `editor.commands.translate()` 的是
+     * 已本地化的语言名（`t("editor.lang.xx")`，如「英语」/「English」），
+     * `client.ts` 的 `translateTargetLabel` 查不到就 `|| targetLang` 原样使用——
+     * 结果正确，只是没经过本表。因此本表实际服务的是宿主直接调
+     * `editor.commands.translate("ja")` 这类传代码的用法，
+     * 且只覆盖 `LANGUAGE_CODES`（14 种）中的 8 种，其余（th / pt / vi / ru / hi / id）
+     * 同样按原样写进 prompt。
      */
     targetLanguages: {
       "zh-CN": "简体中文",
@@ -99,5 +105,3 @@ Output the summary directly.`,
 Output the result directly without additional explanations.`,
   },
 } as const;
-
-export type AiFeature = keyof typeof AI_PROMPTS;

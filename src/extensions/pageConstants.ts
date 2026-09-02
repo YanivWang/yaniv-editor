@@ -1,32 +1,16 @@
 /**
  * Page Constants - 页面常量配置
- * @description A4 页面相关的尺寸常量
+ * @description A4 页面高度，供页码统计使用。
+ *
+ * 页宽与内边距**不在这里**：它们是 `--ye-doc-*` 设计 token，
+ * 由 `variables.css` 给基础值、`appearance/styles/*.css` 各自覆盖。
+ * 此前这里还有 `A4_WIDTH_PX` / `PAGE_PADDING_*` / `PAGE_CONTENT_HEIGHT_PX`，
+ * 唯一的用处是被 `initPageCssVariables()` 内联写回 DOM ——
+ * 那反而盖掉了三套外观的尺寸设置（实测 default 的 900px 页宽被压成 794px）。
  */
-
-/**
- * A4 纸张宽度（像素）
- * A4 标准尺寸：210mm × 297mm
- * 在 96 DPI 下：794px × 1123px
- */
-export const A4_WIDTH_PX = 794;
 
 /**
  * A4 纸张高度（像素）
+ * A4 标准尺寸 210mm × 297mm，在 96 DPI 下为 794px × 1123px。
  */
 export const A4_HEIGHT_PX = 1123;
-
-/**
- * 页面顶部内边距（像素）
- */
-export const PAGE_PADDING_TOP_PX = 96;
-
-/**
- * 页面底部内边距（像素）
- */
-export const PAGE_PADDING_BOTTOM_PX = 96;
-
-/**
- * 页面内容区域高度（像素）
- * 总高度减去上下内边距
- */
-export const PAGE_CONTENT_HEIGHT_PX = A4_HEIGHT_PX - PAGE_PADDING_TOP_PX - PAGE_PADDING_BOTTOM_PX;

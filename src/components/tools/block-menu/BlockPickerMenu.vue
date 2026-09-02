@@ -156,8 +156,8 @@ const filteredGroups = computed<BlockMenuGroupDef[]>(() => {
 const flatItems = computed(() => filteredGroups.value.flatMap((group) => group.items));
 
 /**
- * 虚拟焦点：焦点始终留在正文（弹层 `@mousedown.prevent` 不夺焦，上下键由扩展处理），
- * 因此用 `aria-activedescendant` 告知辅助技术当前高亮项。
+ * 虚拟焦点：焦点始终留在正文（弹层 `@mousedown.prevent` 不夺焦，上下键由本组件的
+ * 捕获阶段全局 `keydown` 消费），因此用 `aria-activedescendant` 告知辅助技术当前高亮项。
  */
 const popupId = `yaniv-block-picker-${useId()}`;
 const optionId = (index: number) => `${popupId}-option-${index}`;

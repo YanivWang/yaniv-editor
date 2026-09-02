@@ -15,7 +15,7 @@ When `table` is disabled, table extensions and all table editing entry points ar
 ## Insert
 
 - **full**: header table button → grid picker for rows/columns (optional header row)
-- **notion**: empty line `/` → table block
+- **notion**: type `/` at the start of a block → table block
 
 ## Edit
 

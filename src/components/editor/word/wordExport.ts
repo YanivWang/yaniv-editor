@@ -14,6 +14,8 @@ import {
   WidthType,
   Packer,
   ExternalHyperlink,
+  BorderStyle,
+  type IParagraphOptions,
   type ITableCellOptions,
 } from "docx";
 import { saveAs } from "file-saver";
@@ -35,6 +37,9 @@ const ALIGN_MAP: Record<string, (typeof AlignmentType)[keyof typeof AlignmentTyp
   right: AlignmentType.RIGHT,
   justify: AlignmentType.JUSTIFIED,
 };
+
+/** 段落级装饰（缩进 / 边框），随解析层级下发 */
+type ParagraphDecoration = Pick<IParagraphOptions, "indent" | "border">;
 
 /** 内联文本样式上下文 */
 interface InlineStyle {
@@ -141,20 +146,36 @@ function parseInlineNodes(node: Node, style: InlineStyle): (TextRun | ExternalHy
 }
 
 /**
- * 将 <li> 元素转为段落
+ * 列表项自身的行内内容 —— 必须跳过嵌套的 `<ul>` / `<ol>`。
+ *
+ * `parseInlineNodes` 会一路递归到底，直接对 `<li>` 调用会把子列表的文字并进父项，
+ * 而下面的嵌套递归又会把同一批文字按层级输出一遍，导致 docx 里重复两次。
+ */
+function parseListItemInline(li: Element): (TextRun | ExternalHyperlink)[] {
+  const runs: (TextRun | ExternalHyperlink)[] = [];
+
+  for (const child of Array.from(li.childNodes)) {
+    const tag =
+      child.nodeType === Node.ELEMENT_NODE ? (child as Element).tagName.toUpperCase() : "";
+    if (tag === "UL" || tag === "OL") continue;
+
+    runs.push(...parseInlineNodes(child, { ...defaultInlineStyle }));
+  }
+
+  return runs;
+}
+
+/**
+ * 将 <li> 元素转为段落（含其下嵌套列表，按层级递归）
  */
 function parseListItem(li: Element, ordered: boolean, level: number): Paragraph[] {
   const paragraphs: Paragraph[] = [];
-  const runs = parseInlineNodes(li, { ...defaultInlineStyle });
-  // 过滤出 TextRun（排除嵌套列表生成的段落）
-  const textRuns = runs.filter(
-    (r): r is TextRun => r instanceof TextRun || r instanceof ExternalHyperlink,
-  );
+  const runs = parseListItemInline(li);
 
-  if (textRuns.length > 0) {
+  if (runs.length > 0) {
     paragraphs.push(
       new Paragraph({
-        children: textRuns,
+        children: runs,
         numbering: ordered
           ? { reference: "ordered-list", level }
           : { reference: "bullet-list", level },
@@ -243,17 +264,30 @@ function parseCodeBlock(pre: Element): Paragraph[] {
   );
 }
 
+/** 引用块样式：docx 没有 blockquote 概念，用「左缩进 + 左边框」模拟 */
+const BLOCKQUOTE_STYLE: ParagraphDecoration = {
+  indent: { left: 720 },
+  border: { left: { style: BorderStyle.SINGLE, size: 6, color: "999999" } },
+};
+
 /**
  * 解析块级 HTML 节点为 docx 元素
+ *
+ * @param decoration 附加到本层直接构造的段落上（引用块用）。必须在构造时传入：
+ * `Paragraph` 构造完只剩 XML 树，没有可读回的 options，事后无法再包一层。
+ * 不下发给列表 —— 列表的缩进由 numbering 配置的 hanging indent 决定，覆盖会错位。
  */
-function parseBlockNodes(container: Element): (Paragraph | Table)[] {
+function parseBlockNodes(
+  container: Element,
+  decoration?: ParagraphDecoration,
+): (Paragraph | Table)[] {
   const elements: (Paragraph | Table)[] = [];
 
   for (const node of Array.from(container.childNodes)) {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent?.trim();
       if (text) {
-        elements.push(new Paragraph({ children: [new TextRun({ text })] }));
+        elements.push(new Paragraph({ ...decoration, children: [new TextRun({ text })] }));
       }
       continue;
     }
@@ -268,6 +302,7 @@ function parseBlockNodes(container: Element): (Paragraph | Table)[] {
       const runs = parseInlineNodes(el, { ...defaultInlineStyle });
       elements.push(
         new Paragraph({
+          ...decoration,
           heading: HEADING_MAP[tag],
           children: runs,
           alignment: getAlignment(el),
@@ -282,12 +317,13 @@ function parseBlockNodes(container: Element): (Paragraph | Table)[] {
       if (runs.length > 0) {
         elements.push(
           new Paragraph({
+            ...decoration,
             children: runs,
             alignment: getAlignment(el),
           }),
         );
       } else {
-        elements.push(new Paragraph({}));
+        elements.push(new Paragraph({ ...decoration }));
       }
       continue;
     }
@@ -316,22 +352,7 @@ function parseBlockNodes(container: Element): (Paragraph | Table)[] {
 
     // 引用块
     if (tag === "BLOCKQUOTE") {
-      const innerElements = parseBlockNodes(el);
-      for (const inner of innerElements) {
-        if (inner instanceof Paragraph) {
-          elements.push(
-            new Paragraph({
-              ...((inner as any).options || {}),
-              indent: { left: 720 },
-              border: {
-                left: { style: "single", size: 6, color: "999999" },
-              },
-            }),
-          );
-        } else {
-          elements.push(inner);
-        }
-      }
+      elements.push(...parseBlockNodes(el, BLOCKQUOTE_STYLE));
       continue;
     }
 
@@ -339,6 +360,7 @@ function parseBlockNodes(container: Element): (Paragraph | Table)[] {
     if (tag === "HR") {
       elements.push(
         new Paragraph({
+          ...decoration,
           children: [new TextRun({ text: "─".repeat(50) })],
           alignment: AlignmentType.CENTER,
         }),
@@ -348,11 +370,11 @@ function parseBlockNodes(container: Element): (Paragraph | Table)[] {
 
     // DIV 或其他容器 → 递归
     if (el.children.length > 0) {
-      elements.push(...parseBlockNodes(el));
+      elements.push(...parseBlockNodes(el, decoration));
     } else {
       const text = el.textContent?.trim();
       if (text) {
-        elements.push(new Paragraph({ children: [new TextRun({ text })] }));
+        elements.push(new Paragraph({ ...decoration, children: [new TextRun({ text })] }));
       }
     }
   }

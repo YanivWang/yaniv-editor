@@ -25,10 +25,8 @@ declare module "@tiptap/core" {
       startContinuousFormatPainting: () => ReturnType;
       /** 将采样到的样式应用到当前选区 */
       applyFormat: () => ReturnType;
-      /** 取消格式刷状态并清除缓存 */
+      /** 取消格式刷：复位激活态、清空采样格式、移除光标样式 */
       cancelFormatPainting: () => ReturnType;
-      /** 切换连续应用模式 */
-      toggleContinuousMode: () => ReturnType;
     };
   }
 }
@@ -55,8 +53,8 @@ export interface FormatPainterStorage {
   };
 }
 
-/** 本地存储的键名 */
-export type FormatPainterFormats = FormatPainterStorage["formats"];
+/** 采样得到的格式集合（`FormatPainterStorage["formats"]` 的别名） */
+type FormatPainterFormats = FormatPainterStorage["formats"];
 
 /**
  * 采样当前选区的格式样式
@@ -64,7 +62,7 @@ export type FormatPainterFormats = FormatPainterStorage["formats"];
  * @returns 格式对象，如果采样失败则返回 null
  * @description 从编辑器中提取当前选区的所有格式信息，包括文本样式、颜色、对齐等
  */
-export function sampleFormats(editor: Editor): FormatPainterFormats | null {
+function sampleFormats(editor: Editor): FormatPainterFormats | null {
   try {
     const formats: FormatPainterFormats = {};
 
@@ -81,12 +79,16 @@ export function sampleFormats(editor: Editor): FormatPainterFormats | null {
       color?: string;
       fontFamily?: string;
       fontSize?: string;
-      lineHeight?: string;
     };
     formats.color = textStyleAttrs?.color ?? null;
     formats.fontFamily = textStyleAttrs?.fontFamily ?? null;
     formats.fontSize = textStyleAttrs?.fontSize ?? null;
-    formats.lineHeight = textStyleAttrs?.lineHeight ?? null;
+    // 行高是**段落级节点属性**（见 extensions/lineHeight.ts），不在 textStyle mark 上。
+    // 此前从 textStyleAttrs 读，恒为 undefined —— 整段复制行高的逻辑从未生效过。
+    formats.lineHeight =
+      (editor.getAttributes("paragraph").lineHeight as string | undefined) ??
+      (editor.getAttributes("heading").lineHeight as string | undefined) ??
+      null;
 
     // 从 highlight mark 中获取背景高亮颜色
     const highlightAttrs = editor.getAttributes("highlight") as { color?: string };
@@ -175,36 +177,13 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
 
       /**
        * 采样当前选区的格式（连续应用模式）
-       * @description 获取选中文本的所有格式信息并保存，可以连续应用多次
+       * @description `startFormatPainting(2)` 的语义化别名——此前是整段复制，
+       * 两份实现分头演进的风险大于省下的一次转发。
        */
       startContinuousFormatPainting:
         () =>
-        ({ editor }) => {
-          // 检查是否有选中内容
-          try {
-            const sel = editor.state.selection;
-            if (!sel || sel.empty) {
-              return false;
-            }
-          } catch (error) {
-            return false;
-          }
-
-          // 采样格式信息
-          const formats = sampleFormats(editor);
-          if (!formats) {
-            return false;
-          }
-
-          this.storage.formats = formats;
-          this.storage.isActive = true;
-          this.storage.isContinuous = true;
-
-          // 更新光标样式
-          updateCursorStyle(editor, true);
-
-          return true;
-        },
+        ({ commands }) =>
+          commands.startFormatPainting(2),
 
       /**
        * 将保存的格式应用到当前选区
@@ -296,8 +275,9 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
         },
 
       /**
-       * 取消格式刷状态并清除缓存
-       * @description 清除格式刷的激活状态、保存的格式信息以及浏览器缓存
+       * 取消格式刷
+       * @description 复位激活标志与连续模式、清空采样到的格式，并移除编辑区上的格式刷光标样式。
+       * 采样结果只存在扩展 storage 里，不落任何持久化存储。
        */
       cancelFormatPainting:
         () =>
@@ -308,15 +288,6 @@ export const FormatPainter = Extension.create<Record<string, never>, FormatPaint
           updateCursorStyle(editor, false);
           return true;
         },
-
-      /**
-       * 切换连续应用模式
-       * @description 切换格式刷的连续应用模式开关
-       */
-      toggleContinuousMode: () => () => {
-        this.storage.isContinuous = !this.storage.isContinuous;
-        return true;
-      },
     };
   },
 

@@ -3,6 +3,14 @@
  *
  * 架构约定：outline 使用 --ye-primary / --ye-media-outline-* token；
  * appearance 仅覆盖 token，勿用 outline shorthand 重声明（避免与 hover 态冲突）。
+ *
+ * 深色同理走 token：resize handle 的 `background: var(--ye-bg)` 在深色下自动解析成
+ * `#1a1a1a`，不需要额外的深色覆盖。这里曾有一条
+ * `[data-color-mode="dark"] .yaniv-editor …{ background: #1f1f1f }`——
+ * `data-color-mode` 是 `applyAppearanceToElement` 写在**编辑器根节点自身**上的
+ * （见 appearance/applyAppearance.ts），把 `.yaniv-editor` 写成它的后代就要求
+ * 另有一个外层祖先持有该属性，实际永远匹配不到（浏览器实测深色下算出的仍是
+ * `rgb(26, 26, 26)`，即 `--ye-bg`，而非 `#1f1f1f`）。已删除。
  */
 
 .yaniv-editor .ProseMirror img {
@@ -160,8 +168,4 @@
 
 .yaniv-editor .ProseMirror .resizable-image-wrapper.resizing img {
   pointer-events: none;
-}
-
-[data-color-mode="dark"] .yaniv-editor .ProseMirror .resizable-image-wrapper .resize-handle {
-  background: #1f1f1f;
 }

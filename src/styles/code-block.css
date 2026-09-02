@@ -3,11 +3,12 @@
  *
  * 架构约定：本文件是 ProseMirror 代码块（pre）的唯一结构样式来源；
  * appearance/*.css 仅通过 --ye-codeblock-* token 做主题化。
+ *
+ * 语言角标（.code-block-language-badge）是 `.document-container` 的直接子元素，
+ * 由 CodeBlockLanguageBadge 按容器 rect 算出 top/left；它依赖的
+ * `.document-container { position: relative }` 归 document-layout.css 声明，
+ * 本文件不再重复（原先那条 `.yaniv-editor .document-container` 与之逐字同值）。
  */
-
-.yaniv-editor .document-container {
-  position: relative;
-}
 
 /* 代码块容器：布局与语法 token；颜色由 --ye-codeblock-* 控制（appearance 可覆盖 token） */
 .yaniv-editor .ProseMirror pre {

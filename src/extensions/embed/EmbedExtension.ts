@@ -131,32 +131,40 @@ export const Embed = Node.create({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos, editor }) => {
+    return ({ node, getPos, editor }) => {
       const dom = document.createElement("div");
       dom.className = "embed-block embed-wrapper";
       dom.dataset.type = "embed";
       dom.contentEditable = "false";
 
+      /**
+       * 节点视图必须渲染**当前**节点，而不是创建时捕获的那个。
+       *
+       * ProseMirror 只在本节点属性变化时才调用 `update()`（无关按键与选区变化都不会），
+       * 而 `update()` 返回 `true` 表示「已自行处理」，PM 就不再重建视图。因此一旦渲染
+       * 读的是旧 `node`，新属性就永远画不出来：文档 JSON 与页面显示会长期不一致。
+       */
+      let currentNode = node;
+
       const renderBookmark = () => {
+        const attrs = currentNode.attrs;
         dom.replaceChildren();
         const card = document.createElement("a");
         card.className = "embed-block__bookmark";
         // 未通过白名单的地址退化为不可点击的卡片，避免 javascript: 点击执行
-        const safeHref = normalizeSafeUrl(String(node.attrs.url ?? ""));
+        const safeHref = normalizeSafeUrl(String(attrs.url ?? ""));
         if (safeHref) {
           card.href = safeHref;
           card.target = "_blank";
           card.rel = "noopener noreferrer";
         }
 
-        const safeImage = node.attrs.image
-          ? normalizeSafeMediaUrl(String(node.attrs.image), "image")
-          : null;
+        const safeImage = attrs.image ? normalizeSafeMediaUrl(String(attrs.image), "image") : null;
         if (safeImage) {
           const image = document.createElement("img");
           image.className = "embed-block__image";
           image.src = safeImage;
-          image.alt = node.attrs.title || "";
+          image.alt = attrs.title || "";
           card.appendChild(image);
         }
 
@@ -165,20 +173,21 @@ export const Embed = Node.create({
 
         const title = document.createElement("div");
         title.className = "embed-block__title";
-        title.textContent = node.attrs.title || node.attrs.url || "";
+        title.textContent = attrs.title || attrs.url || "";
 
         const description = document.createElement("div");
         description.className = "embed-block__description";
-        description.textContent = node.attrs.description || node.attrs.url || "";
+        description.textContent = attrs.description || attrs.url || "";
 
         body.appendChild(title);
-        if (node.attrs.description) body.appendChild(description);
+        if (attrs.description) body.appendChild(description);
         card.appendChild(body);
         dom.appendChild(card);
       };
 
       const renderIframe = () => {
-        const target = resolveIframeSrc(String(node.attrs.url ?? ""));
+        const attrs = currentNode.attrs;
+        const target = resolveIframeSrc(String(attrs.url ?? ""));
         // 地址不可安全嵌入时退化为 bookmark 卡片，而不是渲染一个空/危险的 iframe
         if (!target) {
           renderBookmark();
@@ -198,15 +207,32 @@ export const Embed = Node.create({
         // 仅保留播放所需能力；移除 accelerometer / gyroscope / clipboard-write 等传感器与剪贴板权限
         iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
         iframe.allowFullscreen = true;
-        iframe.title = node.attrs.title || "Embedded content";
+        iframe.title = attrs.title || "Embedded content";
         dom.appendChild(iframe);
       };
 
-      if (node.attrs.provider === "iframe") {
-        renderIframe();
-      } else {
-        renderBookmark();
-      }
+      const renderContent = () => {
+        if (currentNode.attrs.provider === "iframe") {
+          renderIframe();
+        } else {
+          renderBookmark();
+        }
+      };
+
+      /**
+       * 把节点属性镜像到包裹元素上。键取自 schema 而非硬编码列表，避免与
+       * `addAttributes` 漂移；属性被清空时必须 `removeAttribute`，否则旧值残留。
+       */
+      const syncWrapperAttributes = () => {
+        for (const key of Object.keys(currentNode.type.spec.attrs ?? {})) {
+          const value = currentNode.attrs[key];
+          if (value == null) dom.removeAttribute(key);
+          else dom.setAttribute(key, String(value));
+        }
+      };
+
+      renderContent();
+      syncWrapperAttributes();
 
       dom.addEventListener("click", () => {
         const pos = typeof getPos === "function" ? getPos() : null;
@@ -214,19 +240,13 @@ export const Embed = Node.create({
         editor.commands.setNodeSelection(pos);
       });
 
-      Object.entries(HTMLAttributes).forEach(([key, value]) => {
-        if (value != null) dom.setAttribute(key, String(value));
-      });
-
       return {
         dom,
         update(updatedNode) {
           if (updatedNode.type.name !== "embed") return false;
-          if (updatedNode.attrs.provider === "iframe") {
-            renderIframe();
-          } else {
-            renderBookmark();
-          }
+          currentNode = updatedNode;
+          renderContent();
+          syncWrapperAttributes();
           return true;
         },
       };

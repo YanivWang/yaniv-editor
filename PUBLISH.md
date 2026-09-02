@@ -1,6 +1,11 @@
 # NPM 发布流程
 
-本文档记录 `@yanivjs/yaniv-editor` 发布到 npm 的标准流程。
+本文档记录 `@yanivjs/yaniv-editor` **手动**发布到 npm 的流程。
+
+> **常规发布走 CI。** 推送 `v*` tag 会触发 `.github/workflows/release.yml`：
+> 它跑完 `verify` + `build` + 入口加载自检 + tag/版本一致性 + registry 断言后，
+> 带 npm provenance 发布。`workflow_dispatch` 可选「只构建不发布」做预演。
+> 下面这套手动流程用于 CI 不可用、或需要在本机验证 tarball 的场合。
 
 ## 1. 发布前确认
 
@@ -79,7 +84,7 @@ pnpm publish --dry-run --registry https://registry.npmjs.org
 
 ```json
 {
-  "files": ["dist"],
+  "files": ["dist", "LICENSE", "NOTICE", "README.md", "README.zh-CN.md"],
   "publishConfig": {
     "access": "public"
   },
@@ -89,7 +94,8 @@ pnpm publish --dry-run --registry https://registry.npmjs.org
 }
 ```
 
-因此发布时会自动执行 `pnpm build`，并只把 `dist` 作为主要产物打进 npm 包。
+因此发布时会自动执行 `pnpm build`；tarball 里除 `dist` 外还必须带上 `LICENSE` 与 `NOTICE`
+（上游为 MIT，许可证与版权声明必须随包分发，CI 的 "Assert LICENSE ships in the tarball" 会校验这一点）。
 
 ## 5. 正式发布
 

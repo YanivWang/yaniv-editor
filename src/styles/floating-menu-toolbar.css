@@ -41,12 +41,3 @@
     display: none !important;
   }
 }
-
-[data-color-mode="dark"] .floating-menu {
-  background: var(--ye-bubble-bg);
-  box-shadow: var(--ye-bubble-shadow);
-}
-
-[data-color-mode="dark"] .menu-group {
-  border-right-color: var(--ye-border);
-}

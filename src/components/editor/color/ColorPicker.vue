@@ -4,7 +4,7 @@
   @features
     - 支持文字颜色和背景颜色两种模式
     - 使用 Popover 弹出层展示颜色选择面板
-    - 提供常用颜色网格（默认20个颜色，每行5个）
+    - office 色板 50 色（10 列 × 5 行），notion 色板文字/背景各 10 色
     - 支持清空颜色功能
     - 预览区域根据类型显示文字颜色或背景颜色效果
 -->
@@ -190,14 +190,12 @@ const t = useEditorT();
  * 组件 Props 接口定义
  */
 interface Props {
-  /** 颜色网格列数，默认 5 列 */
+  /** 颜色网格列数，默认 10 列；notion 色板固定 10 列，此项不生效 */
   columns?: number;
   /** 每个颜色块的大小（px），默认 20px */
   itemSize?: number;
   /** 当前选中的颜色值（v-model） */
   modelValue?: string;
-  /** 颜色块之间的间距（px），默认 8px */
-  gap?: number;
   /** 按钮图标组件（可选） */
   icon?: Component;
   /** 颜色类型：'text' 文字颜色 | 'background' 背景颜色 */
@@ -212,7 +210,6 @@ const props = withDefaults(defineProps<Props>(), {
   columns: 10, // 10 列，适应更多颜色（50个颜色 = 5行 × 10列）
   itemSize: 20,
   modelValue: undefined,
-  gap: 8,
   icon: undefined,
   type: "text",
   title: undefined,
@@ -304,10 +301,12 @@ const DEFAULT_COLORS = [
   "#cc0033",
 ] as const;
 
-const activeColors = computed(() => {
-  if (props.palette !== "notion") {
-    return props.type === "text" ? DEFAULT_COLORS : DEFAULT_COLORS;
-  }
+/**
+ * Office 调色板（`DEFAULT_COLORS`）文字色与背景色共用同一份 50 色；
+ * Notion 皮肤则分成文字 10 色 / 背景 10 色两套。
+ */
+const activeColors = computed<ReadonlyArray<string>>(() => {
+  if (props.palette !== "notion") return DEFAULT_COLORS;
   return props.type === "text" ? NOTION_TEXT_COLORS : NOTION_BACKGROUND_COLORS;
 });
 
@@ -416,8 +415,10 @@ const indicatorBarStyle = computed(() => {
 
 /**
  * 颜色网格样式（计算属性）
- * @description 根据 columns、itemSize 动态生成 CSS Grid 布局样式
- * @note gap 间距由 CSS 统一控制，不在此处设置
+ * @description 按 activeColumns（notion 固定 10 列，否则取 columns prop）与 itemSize
+ * 生成 CSS Grid 布局。
+ * @note 块间距由 CSS 固定为 6px —— `.ye-color-picker-content` 的 min-width 是按
+ * 「10 × itemSize + 9 × 6px + padding」算出来的，间距可配会让弹层宽度算错，故不开放。
  * @example
  * columns=10, itemSize=20
  * 生成: { gridTemplateColumns: 'repeat(10, 20px)' }
@@ -475,9 +476,9 @@ const handleSelectColor = (color: string) => {
 
 /**
  * 清空颜色
- * @description 根据类型返回默认值：
- *   - text: 恢复为黑色 '#000000'
- *   - background: 恢复为透明 'transparent'
+ * @description 按 type 与色板取默认值：
+ *   - text：office → '#000000'，notion → NOTION_DEFAULT_TEXT
+ *   - background：office → 'transparent'，notion → NOTION_DEFAULT_HIGHLIGHT
  */
 const clearColor = () => {
   if (props.type === "text") {
@@ -805,10 +806,6 @@ $dark-selector: '[data-color-mode="dark"] &';
   border-radius: 50%; /* 圆形 */
   transition: transform 0.2s;
 
-  #{$dark-selector} {
-    border-color: var(--ye-border);
-  }
-
   /* 选中状态：蓝色边框和阴影，轻微放大 */
   &.is-selected {
     border-color: rgba(22, 119, 255, 0.8);
@@ -867,10 +864,6 @@ $dark-selector: '[data-color-mode="dark"] &';
   padding-top: 12px;
   margin-top: 12px;
   border-top: var(--ye-border-width) solid var(--ye-border);
-
-  #{$dark-selector} {
-    border-top-color: var(--ye-border);
-  }
 }
 
 .ye-color-picker-advanced-header {
@@ -897,6 +890,9 @@ $dark-selector: '[data-color-mode="dark"] &';
   width: 20px;
   height: 20px;
   padding: 0;
+
+  /* <button>，需重置浏览器默认按钮样式：按钮不继承 font-family，`×` 会退回 Arial */
+  font: inherit;
   font-size: 18px;
   line-height: 1;
   color: #8c8c8c;
@@ -937,7 +933,6 @@ $dark-selector: '[data-color-mode="dark"] &';
 
   #{$dark-selector} {
     background: #1f1f1f;
-    border-color: var(--ye-border);
   }
 
   &:hover {
@@ -974,7 +969,6 @@ $dark-selector: '[data-color-mode="dark"] &';
   #{$dark-selector} {
     color: #f0f0f0;
     background: #1f1f1f;
-    border-color: var(--ye-border);
   }
 
   &:hover {

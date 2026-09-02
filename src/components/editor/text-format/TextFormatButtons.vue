@@ -5,7 +5,7 @@
       :key="format.name"
       :icon="format.icon"
       :title="format.title"
-      :active="format.activeCheck ? format.activeCheck() : isActive(format.name)"
+      :active="isActive(format.name)"
       @click="format.action"
     />
   </ToolbarGroup>
@@ -50,7 +50,6 @@ interface TextFormat {
   name: string;
   icon: typeof BoldOutlined;
   title: string;
-  activeCheck?: () => boolean;
   action: () => void;
 }
 

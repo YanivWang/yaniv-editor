@@ -66,6 +66,7 @@ function createTestBuildCtx(): Omit<
       video: () => undefined,
     },
     galleryImages: () => [],
+    mentionItems: () => undefined,
     officePaste: {
       onPasteFromOfficeWithImages: () => undefined,
     },

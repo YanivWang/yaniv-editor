@@ -11,7 +11,10 @@ Beyond preset / features, these props are for host integration and **typically d
 />
 ```
 
-Falls back to DataURL when not provided.
+When not provided, a local upload falls back to a **`blob:` object URL** produced by `URL.createObjectURL(file)`, plus an "upload handler not configured" notice.
+That URL is only valid for the current page session (it dies on reload), so it **must not be persisted** — production integrations have to pass the handlers.
+
+Pasting an image straight from the clipboard is a different path (the `PasteImage` extension) and inserts a `data:` URL; it does not go through the upload handlers.
 
 ## Gallery
 
@@ -26,6 +29,25 @@ See [Templates and Gallery](../features/templates-gallery.md).
 ```vue
 <YanivEditor :custom-templates="templates" />
 ```
+
+## `@` Mention Suggestions
+
+With the `slashCommand` capability on (the notion preset enables it), typing `@` in the document opens a
+suggestion menu. Without `mentionItems` it shows built-in placeholder data, so production integrations
+should pass real data:
+
+```vue
+<YanivEditor
+  preset="notion"
+  :mention-items="[
+    { id: 'u-1', label: 'Ada', href: '/people/ada', type: 'user' },
+    { id: 'p-1', label: 'Release plan', href: '/pages/release', type: 'page' },
+  ]"
+/>
+```
+
+The same prop feeds the block menu's "page link" item. Like uploads and the gallery, changing it does
+**not** trigger a session rebuild.
 
 ## AI Host Config
 

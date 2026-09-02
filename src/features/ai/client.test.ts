@@ -271,3 +271,157 @@ describe("配置解析优先级", () => {
     vi.unstubAllGlobals();
   });
 });
+
+/**
+ * 回归护栏：`VITE_AI_TEMPERATURE` / `VITE_AI_MAX_TOKENS` 必须真的进请求体。
+ *
+ * 这两个变量此前是死配置：`loadAiConfig()` 读了，但 `getAiConfig()` 的返回类型不带它们，
+ * `resolveAdapter()` 也只传 provider / apiKey / baseUrl / model，最终永远用
+ * `createAiConfig()` 的默认值 0.7 / 2048。下面两条把「读到」和「送达」都钉死。
+ */
+describe("模型调参（temperature / maxTokens）", () => {
+  function stubStream() {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: { getReader: () => ({ read: () => Promise.resolve({ done: true }) }) },
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    return fetchMock;
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("构建期变量进入请求体", async () => {
+    vi.stubEnv("VITE_AI_TEMPERATURE", "0.15");
+    vi.stubEnv("VITE_AI_MAX_TOKENS", "321");
+    const fetchMock = stubStream();
+
+    createAiClient({
+      resolveConfig: () => ({ provider: "openai", apiKey: "sk-x" }),
+    }).polish("t", "ctx", collect().cb);
+
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const body = JSON.parse((fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.temperature).toBe(0.15);
+    expect(body.max_tokens).toBe(321);
+  });
+
+  it("凭据来自更高优先级时，调参仍取构建期变量", async () => {
+    // 这正是此前的失效形态：用户在 AI 设置里配过 key，凭据走第 2 级，
+    // 若调参也跟着分级就会永远拿不到 .env 里的值。
+    vi.stubEnv("VITE_AI_TEMPERATURE", "0.9");
+    getAiConfigStore().saveConfig({
+      provider: "openai",
+      apiKey: "sk-from-dialog",
+      storageMode: "memory",
+      endpoint: "https://api.example.com/v1",
+      model: "gpt-4o-mini",
+      timeout: 60000,
+      enabled: true,
+      updatedAt: Date.now(),
+    });
+    const fetchMock = stubStream();
+
+    createAiClient().polish("t", "ctx", collect().cb);
+
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const body = JSON.parse((fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.temperature).toBe(0.9);
+    expect(body.max_tokens).toBe(2048); // 未设环境变量时用内置默认值
+  });
+
+  it("环境变量不是数字时退回默认值，而不是把 NaN 发出去", async () => {
+    vi.stubEnv("VITE_AI_TEMPERATURE", "hot");
+    const fetchMock = stubStream();
+
+    createAiClient({
+      resolveConfig: () => ({ provider: "openai", apiKey: "sk-x" }),
+    }).polish("t", "ctx", collect().cb);
+
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const body = JSON.parse((fetchMock.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.temperature).toBe(0.7);
+  });
+});
+
+/**
+ * 回归护栏：client 自己产出的文案必须跟随实例 locale。
+ *
+ * 这些串此前写死在 `client.ts` 里（「请先在工具栏 AI 设置中配置 API Key…」「AI 请求失败」
+ * 以及 5 段 demo 流式文案），en-US 的编辑器也照样弹中文。
+ */
+describe("client 文案跟随实例 locale", () => {
+  const zh = (key: string) =>
+    ({
+      "messages.aiNotConfigured": "请先配置 API Key",
+      "messages.aiRequestFailed": "AI 请求失败",
+      "aiDemo.polish": "润色演示",
+    })[key] ?? key;
+
+  beforeEach(() => {
+    // 本地 .env 里可能开着演示模式；显式关掉，让「未配置」走报错分支
+    vi.stubEnv("VITE_AI_DEMO_MODE", "false");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("未配置时用注入的 locale 文案报错", async () => {
+    const { errors, cb } = collect();
+    createAiClient({ getLocaleText: zh }).polish("t", "ctx", cb);
+    await vi.waitFor(() => expect(errors.length).toBe(1));
+    expect(errors[0].message).toBe("请先配置 API Key");
+  });
+
+  it("未注入 locale 时退回英文兜底，而不是暴露原始 key", async () => {
+    const { errors, cb } = collect();
+    createAiClient().polish("t", "ctx", cb);
+    await vi.waitFor(() => expect(errors.length).toBe(1));
+    expect(errors[0].message).toContain("API Key");
+    expect(errors[0].message).not.toContain("messages.");
+  });
+
+  it("demo 模式流式输出走 locale", async () => {
+    vi.stubEnv("VITE_AI_DEMO_MODE", "true");
+    const { done, cb } = collect();
+
+    createAiClient({ getLocaleText: zh }).polish("t", "ctx", cb);
+
+    await vi.waitFor(() => expect(done.length).toBe(1), { timeout: 3000 });
+    expect(done[0]).toBe("润色演示");
+  });
+
+  it("adapter 抛出非 Error 时用 locale 的兜底文案", async () => {
+    const adapter = {
+      provider: "openai",
+      chat: () => Promise.resolve({ content: "" }),
+      // 故意 reject 非 Error：本用例检验的就是 normalizeAiError 对这类值的处理
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+      chatStream: () => Promise.reject("boom-not-an-error"),
+    } as unknown as AiAdapter;
+    const { errors, cb } = collect();
+
+    createAiClient({ adapter, getLocaleText: zh }).polish("t", "ctx", cb);
+
+    await vi.waitFor(() => expect(errors.length).toBe(1));
+    // 字符串被原样包成 Error；换成非字符串才会用到兜底
+    expect(errors[0].message).toBe("boom-not-an-error");
+
+    const adapter2 = {
+      provider: "openai",
+      chat: () => Promise.resolve({ content: "" }),
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+      chatStream: () => Promise.reject({ code: 500 }),
+    } as unknown as AiAdapter;
+    const second = collect();
+    createAiClient({ adapter: adapter2, getLocaleText: zh }).polish("t", "ctx", second.cb);
+
+    await vi.waitFor(() => expect(second.errors.length).toBe(1));
+    expect(second.errors[0].message).toBe("AI 请求失败");
+  });
+});

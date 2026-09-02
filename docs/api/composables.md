@@ -109,15 +109,17 @@ import {
 ## 无障碍
 
 ```ts
-import { useRovingTabindex, useVirtualFocusPopup } from "@yanivjs/yaniv-editor";
+import { useRovingTabindex } from "@yanivjs/yaniv-editor";
 ```
 
-| Composable             | 用途                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------- |
-| `useRovingTabindex`    | 把一个容器收敛为 WAI-ARIA APG 的单一 tab stop，内部用方向键 / Home / End 移动                     |
-| `useVirtualFocusPopup` | 焦点留在正文的弹层：把 `aria-expanded` / `aria-controls` / `aria-activedescendant` 挂到编辑器正文 |
+| Composable             | 用途                                                                                              | 是否导出             |
+| ---------------------- | ------------------------------------------------------------------------------------------------- | -------------------- |
+| `useRovingTabindex`    | 把一个容器收敛为 WAI-ARIA APG 的单一 tab stop，内部用方向键 / Home / End 移动                     | ✅                   |
+| `useVirtualFocusPopup` | 焦点留在正文的弹层：把 `aria-expanded` / `aria-controls` / `aria-activedescendant` 挂到编辑器正文 | ❌ 仅库内（需 fork） |
 
 `useRovingTabindex(containerRef)` 会用 `MutationObserver` 重扫容器——按需加载的工具按钮在首帧尚未挂载。输入型控件（`input` / `textarea` / `contenteditable` / `role="combobox"`）内的方向键不劫持，带修饰键的方向键也不拦截。
+
+`useVirtualFocusPopup` 目前只服务库内的 `BlockPickerMenu` / `MentionSuggestionMenu`，**没有**从包里导出（只存在于 `src/composables/useVirtualFocusPopup.ts`）。
 
 自建工具栏时可直接复用：
 

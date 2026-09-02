@@ -4,8 +4,13 @@
  */
 
 .yaniv-editor.appearance-default {
-  --ye-primary: #3370ff;
-  --ye-primary-hover: #1456f0;
+  /*
+   * 这里**不要**重复声明 `--ye-primary` / `--ye-primary-hover`：它们与 `variables.css`
+   * 的 `:root` 逐字相同，唯一的效果是用 (0,2,0) 的特异性盖住 (0,1,0) 的
+   * `[data-color-mode="dark"]`，让深色主色永远退回浅色 `#3370ff`。
+   * 只保留本外观真正不同的 `--ye-primary-light`（8% 而非全局的 10%），
+   * 并在下方 dark 段给出它的深色对应值。
+   */
   --ye-primary-light: rgb(51 112 255 / 8%);
   --ye-outline-title-color: #3370ff;
   --ye-doc-page-width: 900px;
@@ -125,16 +130,10 @@
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] {
   --ye-outline-title-color: var(--ye-primary);
+
+  /* 与浅色同一比例：全局深色是 15%，本外观取其 0.8 → 12% */
+  --ye-primary-light: rgb(76 136 255 / 12%);
   --ye-mark-bg: rgb(255 243 202 / 22%);
-}
-
-.yaniv-editor.appearance-default.document-layout[data-color-mode="dark"] {
-  background: var(--ye-bg-secondary);
-}
-
-.yaniv-editor.appearance-default[data-color-mode="dark"] .continuous-pages {
-  border: none;
-  box-shadow: none;
 }
 
 .yaniv-editor.appearance-default[data-color-mode="dark"] .document-content .ProseMirror,
@@ -177,104 +176,9 @@
   background-color: var(--ye-primary);
 }
 
-.drag-handle-menu.appearance-default {
-  font-family: var(--ye-font-family);
-  color: var(--ye-text);
-  background: var(--ye-bubble-bg);
-  border: var(--ye-border-width) solid var(--ye-border);
-  border-radius: var(--ye-radius-md);
-  box-shadow: var(--ye-bubble-shadow);
-}
-
-.drag-handle-menu.appearance-default .drag-handle-menu__item {
-  color: var(--ye-text);
-}
-
-.drag-handle-menu.appearance-default .drag-handle-menu__item:hover {
-  background: var(--ye-bg-hover);
-}
-
-.drag-handle-menu.appearance-default .drag-handle-menu__description,
-.drag-handle-menu.appearance-default .drag-handle-menu__arrow {
-  color: var(--ye-text-muted);
-}
-
-.drag-handle-menu.appearance-default .drag-handle-menu__submenu {
-  background: var(--ye-bubble-bg);
-  border: var(--ye-border-width) solid var(--ye-border);
-  border-radius: var(--ye-radius-md);
-  box-shadow: var(--ye-bubble-shadow);
-}
-
-.drag-handle-menu.appearance-default .drag-handle-menu__divider {
-  background: var(--ye-border);
-}
-
-/* ===== 块选择菜单 ===== */
-.block-picker-menu.appearance-default {
-  color: var(--ye-text);
-  scrollbar-color: var(--ye-border) transparent;
-  background: var(--ye-bubble-bg);
-  border-radius: var(--ye-radius-md);
-  box-shadow: var(--ye-bubble-shadow);
-}
-
-.block-picker-menu.appearance-default::-webkit-scrollbar-thumb {
-  background: var(--ye-border);
-}
-
-.block-picker-menu.appearance-default::-webkit-scrollbar-thumb:hover {
-  background: var(--ye-border-hover);
-}
-
-.block-picker-menu.appearance-default .block-picker-group-title {
-  color: var(--ye-text-muted);
-}
-
-.block-picker-menu.appearance-default .block-picker-item {
-  color: var(--ye-text);
-}
-
-.block-picker-menu.appearance-default .block-picker-item:hover,
-.block-picker-menu.appearance-default .block-picker-item.active {
-  background: var(--ye-bg-hover);
-}
-
-.block-picker-menu.appearance-default .block-picker-item-icon {
-  color: var(--ye-text-secondary);
-  background: var(--ye-bg-secondary);
-}
-
-.block-picker-menu.appearance-default .block-picker-item.active .block-picker-item-icon,
-.block-picker-menu.appearance-default .block-picker-item:hover .block-picker-item-icon {
-  color: var(--ye-primary);
-  background: var(--ye-primary-light);
-}
-
-.block-picker-menu.appearance-default .block-picker-item-title {
-  color: var(--ye-text);
-}
-
-.block-picker-menu.appearance-default .block-picker-item-desc,
-.block-picker-menu.appearance-default .block-picker-empty {
-  color: var(--ye-text-muted);
-}
-
-.drag-handle-menu.appearance-default[data-color-mode="dark"] {
-  color: var(--ye-text);
-  background: var(--ye-bubble-bg);
-  border-color: var(--ye-border);
-  box-shadow: var(--ye-bubble-shadow);
-}
-
-.drag-handle-menu.appearance-default[data-color-mode="dark"] .drag-handle-menu__item {
-  color: var(--ye-text);
-}
-
-.drag-handle-menu.appearance-default[data-color-mode="dark"] .drag-handle-menu__item:hover {
-  background: var(--ye-bg-hover);
-}
-
-.block-picker-menu.appearance-default[data-color-mode="dark"] {
-  box-shadow: var(--ye-bubble-shadow);
-}
+/*
+ * 拖拽菜单与块选择菜单的皮肤已收拢到 `src/styles/drag-handle.css` /
+ * `src/styles/block-picker.css` 的 token 基础层——本外观此前那两份副本
+ * 与基础层逐字相同（全是 `var(--ye-*)`），只是把同一份皮肤又抄了一遍，
+ * 而真正没有皮肤的 `appearance-word` 依旧是透明菜单。
+ */

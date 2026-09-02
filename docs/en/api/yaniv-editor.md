@@ -19,10 +19,11 @@ import "@yanivjs/yaniv-editor/style.css";
 | `initialContent`         | `string \| JSONContent`                       | `"<p>开始编辑你的文档...</p>"` | Initial document                                                 |
 | `customAppearanceVars`   | `Record<string, string>`                      | none                           | CSS variables for custom appearance (visual tokens, not z-index) |
 | `zIndexBase`             | `number`                                      | `1000`                         | Overlay z-index base; sets `--ye-z-base`; no session rebuild     |
-| `uploadImage`            | `(file: File) => Promise<string>`             | DataURL fallback               | Image upload handler                                             |
-| `uploadVideo`            | `(file: File) => Promise<string>`             | DataURL fallback               | Video upload handler                                             |
+| `uploadImage`            | `(file: File) => Promise<string>`             | `blob:` object URL fallback    | Image upload handler                                             |
+| `uploadVideo`            | `(file: File) => Promise<string>`             | `blob:` object URL fallback    | Video upload handler                                             |
 | `galleryImages`          | `GalleryImage[]`                              | current document images        | External gallery source                                          |
 | `customTemplates`        | `TemplateItem[]`                              | built-in templates             | Extra templates                                                  |
+| `mentionItems`           | `MentionItem[]`                               | built-in placeholder data      | `@` mention suggestions; requires the `slashCommand` capability  |
 | `locale`                 | `string`                                      | `"zh-CN"`                      | Locale code                                                      |
 | `defaultOutlineExpanded` | `boolean`                                     | `false`                        | Initial outline panel when outline gate is on                    |
 | `aiConfig`               | `YanivEditorAiConfig`                         | none                           | Host-owned AI config                                             |

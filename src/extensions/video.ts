@@ -6,7 +6,8 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { Plugin, NodeSelection, TextSelection } from "@tiptap/pm/state";
 
-import { createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
+import { parseSize } from "@/utils/mediaSize";
+import { applyMediaSrc, createMediaSrcGuardPlugin } from "@/utils/mediaSrcPolicy";
 import { normalizeSafeMediaUrl } from "@/utils/safeUrl";
 
 export interface VideoOptions {
@@ -66,20 +67,14 @@ export const Video = Node.create<VideoOptions>({
       },
       width: {
         default: null,
-        parseHTML: (element) => {
-          const value = element.getAttribute("width");
-          return value ? parseInt(value, 10) : null;
-        },
+        parseHTML: (element) => parseSize(element.getAttribute("width")),
         renderHTML: (attributes) => {
           return attributes.width ? { width: attributes.width } : {};
         },
       },
       height: {
         default: null,
-        parseHTML: (element) => {
-          const value = element.getAttribute("height");
-          return value ? parseInt(value, 10) : null;
-        },
+        parseHTML: (element) => parseSize(element.getAttribute("height")),
         renderHTML: (attributes) => {
           return attributes.height ? { height: attributes.height } : {};
         },
@@ -134,7 +129,7 @@ export const Video = Node.create<VideoOptions>({
       dom.setAttribute("contenteditable", "false");
 
       const video = document.createElement("video");
-      video.src = node.attrs.src;
+      applyMediaSrc(video, node.attrs.src);
       video.controls = true;
       video.style.maxWidth = "100%";
 
@@ -202,7 +197,9 @@ export const Video = Node.create<VideoOptions>({
 
           if (updatedNode.attrs.src !== node.attrs.src) {
             video.pause();
-            video.src = updatedNode.attrs.src;
+            applyMediaSrc(video, updatedNode.attrs.src);
+            // src 被移除后仍需 load() 才会真正中断已在进行的缓冲
+            if (!updatedNode.attrs.src) video.load();
           }
 
           if (

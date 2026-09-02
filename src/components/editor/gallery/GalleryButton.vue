@@ -45,9 +45,10 @@
     <div v-if="galleryImages.length > 0" class="gallery-footer">
       <span class="gallery-footer__count">
         {{
-          t("editor.galleryCount")
-            .replace("{total}", String(galleryImages.length))
-            .replace("{selected}", String(selectedImages.size))
+          t("editor.galleryCount", {
+            total: galleryImages.length,
+            selected: selectedImages.size,
+          })
         }}
       </span>
       <a-button type="primary" :disabled="selectedImages.size === 0" @click="insertSelected">
@@ -60,7 +61,8 @@
 <script setup lang="ts">
 /**
  * GalleryButton - 图库按钮
- * @description 扫描当前文档中已有的图片，展示为图库，支持选中后重新插入
+ * @description 传了 `images` prop 就展示外部图库，否则扫描当前文档里已有的图片（按 src 去重）；
+ * 均支持多选后一次性插回文档。
  */
 import { AppstoreOutlined, FileImageOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { ref } from "vue";
@@ -291,10 +293,6 @@ function insertSelected() {
   padding-top: 12px;
   margin-top: 16px;
   border-top: var(--ye-border-width) solid var(--ye-border);
-}
-
-[data-color-mode="dark"] .gallery-footer {
-  border-top-color: var(--ye-border);
 }
 
 .gallery-footer__count {
