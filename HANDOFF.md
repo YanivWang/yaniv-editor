@@ -126,8 +126,8 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
      一处是用例恰好绕过了差异（补用例后转红），另一处确认**不可达**（钳制生效后 early-return
      永远走不到），后者如实标注成「不变量守卫」而**没有**写进 CHANGELOG 当修复。
 
-7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 42 条**）+
-   `CONTRIBUTING.md` 的约定列表（**现有 34 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
+7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 43 条**）+
+   `CONTRIBUTING.md` 的约定列表（**现有 35 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
    - ⚠️ **新增编号前必须 `grep -nE "^[0-9]+\. "` 核对现有最大编号。** 第 9 棒在注释里写了
      「见约定 18」，而约定 18 早被 `@media` 顺序占用，只能回头改成 22。
    - ⚠️ 往 `CHANGELOG.md` 插新分节时注意：`[Unreleased]` 的 `### Fixed` 段很长（现已 600+ 行），
@@ -298,15 +298,15 @@ pnpm run build:check   # build + 逐条件真实加载每个入口（约 5 分�
 pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个就够）
 ```
 
-**当前基线（第 10 棒全部完成时实测，提交 `cf79661`）：**
+**当前基线（第 11 棒完成时实测，提交 `6c3d545`）：**
 
-- `pnpm run verify` 退出 0，**908 个用例全过（98 个测试文件）**，eslint 零 warning
-  —— 第 9 棒结束时是 834 / 89，第 8 棒是 727 / 73
-- 覆盖率 Statements 66.42% / Branches 55.88% / Functions 62.73% / Lines 68.11%
-- `pnpm run build` 产物预算实测：主 chunk gzip **45544 / 46000**（余量 **456B**）、
+- `pnpm run verify` 退出 0，**911 个用例全过（98 个测试文件）**，eslint 零 warning
+  —— 第 10 棒结束时是 908 / 98，第 9 棒是 834 / 89，第 8 棒是 727 / 73
+- 覆盖率 Statements 66.44% / Branches 55.91% / Functions 62.76% / Lines 68.12%
+- `pnpm run build` 产物预算实测：主 chunk gzip **45471 / 46000**（余量 **529B**）、
   `style.css` **17111 / 19000**、`inline.css` **8910 / 10500**；代码分割断言全过
 - `pnpm run test:e2e` **22 passed**
-- ⚠️ **主 chunk 余量只有 456B，且注释也算进去**（不变量 41）。往主 chunk 加东西前
+- ⚠️ **主 chunk 余量只有 529B，且注释也算进去**（不变量 41）。往主 chunk 加东西前
   先读那条不变量，加完必须 `pnpm run build` 复量。
 - **动了 CSS / 序列化 / 主 chunk 就必须跑 e2e。**
 
@@ -332,6 +332,7 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 - `c59f6e0` / `f5f88d9` —— 第 9 棒的全量逐行复核（37 处修复）
 - `e17928b` —— 第 10 棒尾巴清单 16 条 + 6 个新发现的缺陷 + 4 条护栏
 - `cf79661` —— 第 10 棒删除 16 个零消费 token + 尾巴 #16 / #17
+- `6c3d545` —— 第 11 棒修复撤销按钮在 `mode` 往返后变灰（口子 #4 结清）
 
 用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
@@ -596,11 +597,63 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
    而不是包住正文的容器——那样 unwrap 会把行号数字留进正文（实测 `12正文`）。
    判定该整体删除还是 unwrap 需要**真实的 Word 剪贴板样本**，拿到之前不要改，
    改错的代价是丢正文。
-4. **`UndoRedoButton` 的 `hasRealEdit` 语义可疑。** 它想挡「初始化时的误判」，
-   但实测：初始化时 `can().undo()` 本来就是 false（守卫多余），而 `setContent`
-   （宿主受控推内容）会进 history **且**会 emit `update` 把 `hasRealEdit` 置 true
-   ——它想挡的那个场景恰恰挡不住。根因可能在「受控内容推送该不该进用户的撤销历史」，
-   要动得先想清楚这个产品语义。第 10 棒只记录，未改。
+4. ~~**`UndoRedoButton` 的 `hasRealEdit` 语义可疑。**~~ **第 11 棒已结清（`6c3d545`）。**
+   ⚠️ 第 10 棒记的「`setContent` 会进 history」是**错的转述**：受控推送走的是
+   `ContentAdapter.setContent`，它一直带 `addToHistory: false`，实测**不进** history
+   （会进的是 tiptap 内置的 `setContent` 命令，只有 `wordImport` 在用）。
+   所以「受控推送该不该进撤销历史」这个产品问题根本不存在，代码里早就答了。
+   真正的缺陷在另一头：`hasRealEdit` 挡住了 `mode` 在 edit/preview 间往返后的合法撤销
+   （详见不变量 43）。**教训：转述前一棒的观察前，先自己实证一遍。**
+
+## 第 11 棒做了什么（已完成，提交 `6c3d545`）
+
+结清「仍然开着的口子」#4。**推翻了第 10 棒对该条根因的判断**（见上）。
+
+### 修复
+
+1. **`mode` 从 `preview` 切回 `edit` 后撤销按钮变灰。** `showEditChrome = mode === "edit"`
+   而 `computeSessionKey` **不含 `mode`**——切换 mode 会把整个编辑 chrome 卸载重挂，
+   编辑器实例与历史栈却原样活着。`UndoRedoButton` 把「发生过编辑」记在组件本地 ref 上，
+   重挂即归零，用户撤销不了自己刚写的内容。真实入口实测：往返后同一实例、
+   `can().undo()` 仍为 true、绕过按钮直接 `undo()` 能回退，按钮却是 disabled。
+   → 不变量 43 + 约定 35
+2. **顺带删掉多订的一份 `update`**（`transaction` 的严格子集，不变量 37）。
+
+### 负结果 / 已实证的边界（别重复走）
+
+- **初始化时 `can().undo()` 恒为 false** —— 空文档、带 `content`、带多段内容三种建法
+  实测都是 false。`hasRealEdit` 想挡的场景不存在。
+- **`ContentAdapter.setContent`（受控推送）不进 history** —— 一直带 `addToHistory: false`。
+  只 emit 一次 `update`。
+- **`setEditable` 不影响撤销可用性** —— 它确实只 emit `update`、零 `transaction`
+  （证实不变量 37 那个例外），但 `can().undo()` / `can().redo()` 在它前后完全不变，
+  所以退掉 `update` 订阅不造成回归。**这一步是方法论 11「还有别的路径吗」救回来的**：
+  不变量 37 自己写着这个例外，不查就会漏。
+- **全仓搜同型只此一处** —— 扫「在 `watch(editor)` / `attach*` 里被重置的组件本地 ref」
+  共 3 处，另两处（`LinkBubbleMenu` 的 `linkModalOpen`、`useControlledContent` 的
+  `lastEmittedSignature`）重置的是瞬态 UI 与新实例的新基线，都是正当的。
+
+### 新的观察（未改，属产品语义）
+
+- **受控推送后撤销按钮会亮着，但点一下什么也不发生。** 实测：用户编辑 → 宿主推新内容
+  （`v-model` 受控）→ `can().undo()` 仍是 `true`（history 里留着被 rebase 成空的那一步）
+  → 点撤销文档不变 → 再看按钮才灰。这是 prosemirror-history 的固有行为，
+  **修复前也存在**（当时 `hasRealEdit` 同样是 true），不是本次改动引入的。
+  要修得决定「受控推送后是否清空用户的撤销历史」——属产品取舍。
+
+### 第 11 棒踩的坑（方法论补充）
+
+19. **测试里别随手加 `.focus()`。** tiptap 的 focus 命令把 `view.focus()` 丢进
+    `requestAnimationFrame`，里面只守 `editor.isDestroyed`。回调跑在测试收尾清空
+    `document.body` 之后，view.dom 已脱离文档就抛——而这个错**不冒泡**，
+    单跑该文件完全看不见（7 用例全绿），跑全量才变成 vitest 的 "Unhandled Errors"
+    并让 verify 退出 1。**方法论 13 的又一次现身：用例全过 ≠ 退出码 0。**
+20. **替换脚本会替换到自己刚写的那一行。** 把 `editor.chain().insertContent(…)` 统一
+    抽成 `makeEdit()` 时，替换串把 `makeEdit` 函数体里的那一行也换掉了，变成自递归，
+    `Maximum call stack size exceeded`。抽公共函数时，**先写函数体、再做全局替换，
+    且替换后 `grep` 看函数体本身有没有被殃及**。
+
+---
 
 ## 附录：文件清单口径
 
