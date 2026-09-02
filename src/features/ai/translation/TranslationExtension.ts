@@ -12,6 +12,13 @@ import { runAiSuggestionStream } from "@/features/ai/shared/runAiSuggestionStrea
 import { currentTranslateLang } from "./translateStore";
 
 export interface TranslationOptions extends AiExtensionConfigureOptions {
+  /**
+   * 用户没选过目标语言时的默认值。默认 `"en"`。
+   *
+   * 语言代码（`LANGUAGE_CODES` 的 `code`）会经 `AI_PROMPTS.translate.targetLanguages`
+   * 映射成展示名写进 prompt；映射里没有的值原样写入，所以直接传
+   * 「日本語」这类展示名也可用。
+   */
   defaultTargetLang?: string;
 }
 
@@ -28,7 +35,7 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
 
   addOptions() {
     return {
-      defaultTargetLang: "英文",
+      defaultTargetLang: "en",
     };
   },
 
@@ -52,7 +59,7 @@ export const TranslationExtension = Extension.create<TranslationOptions>({
           }
 
           const lang =
-            targetLang || currentTranslateLang.value || this.options.defaultTargetLang || "英文";
+            targetLang || currentTranslateLang.value || this.options.defaultTargetLang || "en";
 
           preventCommandAutoDispatch(tr);
           const client = createConfiguredAiClient(this.options);

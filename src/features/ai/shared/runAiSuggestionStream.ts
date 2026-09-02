@@ -43,9 +43,6 @@ function runStream(
     documentContextLimit?: number;
     getLocaleText?: (key: string) => string;
   } = {},
-  handlers: {
-    onError?: (error: Error) => void;
-  } = {},
 ): void {
   const context = buildDocumentContext(editor, options.documentContextLimit);
   noticeDocumentContextTruncation(editor, context, options.getLocaleText);
@@ -67,13 +64,14 @@ function runStream(
     onComplete: () => {
       aiSuggestionManager.stopStreaming();
       aiSuggestionManager.updateSuggestion(accumulatedContent);
-      aiSuggestionManager.setAbortController(null);
+      aiSuggestionManager.clearAbortController(abortController);
     },
     onError: (error: Error) => {
-      aiSuggestionManager.setAbortController(null);
+      // 按身份清：换流时旧流的 AbortError 晚于新流启动，无条件清空会把新流的
+      // 取消能力一起扔掉（见 aiSuggestionManager.clearAbortController）
+      aiSuggestionManager.clearAbortController(abortController);
       if (error.name === "AbortError") return;
       console.error(`[${errorTitle}]`, error);
-      handlers.onError?.(error);
       aiSuggestionManager.hide();
       showEditorNotice(editor, {
         message: errorTitle,

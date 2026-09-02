@@ -2,6 +2,7 @@ import { Fragment, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/
 import { TextSelection } from "@tiptap/pm/state";
 
 import type { MediaUploadHandler } from "@/core/editorTypes";
+import { showOverlayNotice } from "@/core/overlayFeedback";
 import { resolveEmbedProvider } from "@/extensions/embed";
 import { resolveMentionItems, type MentionItem } from "@/extensions/mention";
 import { resolveMediaUrl, type MediaKind } from "@/utils/mediaUpload";
@@ -181,7 +182,17 @@ export function pickMediaUrl(
         }
         void resolveMediaUrl({ file, kind, upload, translate, overlayPortal })
           .then(resolve)
-          .catch(() => resolve(null));
+          .catch((error: unknown) => {
+            // `null` 同时表示「用户取消」和「上传失败」，调用方分不出来，
+            // 于是失败会被当成取消静默掉。提示放在最靠近失败点的地方发出。
+            console.error(`[BlockMenu] ${kind} upload failed:`, error);
+            showOverlayNotice(overlayPortal, {
+              message: translate(`messages.${kind}UploadFailed`),
+              kind: "error",
+              duration: 5,
+            });
+            resolve(null);
+          });
       },
       { once: true },
     );

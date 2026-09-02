@@ -59,6 +59,39 @@
 
 ### Fixed
 
+- **换一次 AI 操作之后，「取消」按钮就再也停不下正在跑的流。** `aiSuggestionManager`
+  只存一个 `AbortController`；换流的时序是「新流设句柄 → 旧流被 abort → 旧流的 fetch
+  以 `AbortError` 走 `onError` 并在那里清句柄」，而清的时候句柄已经是**新流**的了。
+  `runStream` 用的是无条件的 `setAbortController(null)`，于是新流的取消能力被一起
+  扔掉：实测点「取消」后新流 `signal.aborted` 仍是 `false`，它继续消耗 API 配额、
+  继续往同一个单例写建议文本。改用按身份清（`clearAbortController(自己那个)`）——
+  这个方法 `aiSuggestionManager` **内部本来就有并且用对了**（`executeCustomPrompt`），
+  只是 `runStream` 那半没跟上。新增护栏禁止 `setAbortController(null)` 出现在源码里。
+  → 不变量 53
+- **切换编辑器语言后，翻译目标语言的文案会串成另一种语言。** 目标语言持久化的是
+  **界面标签**（如「英语」）而不是语言代码：中文界面选了英语再切到英文界面，按钮显示
+  `Translate to 英语`；反过来是「翻译为 English」，菜单里的选中标记两个方向都丢。
+  这份配置存在 localStorage 里，错乱会一直跟着用户走。改为存 `LANGUAGE_CODES` 的
+  代码，显示时按当前 locale 翻译；旧的标签值在界面首次拿到 locale 时自动迁移，
+  反查不到（用户换过界面语言）就回到「未选择」，不会显示成另一种语言。
+  语言代码还能命中 `AI_PROMPTS.translate.targetLanguages` 的展示名映射，
+  那张表本来就是为代码准备的。→ 不变量 54
+- **本地上传图片/视频失败时完全没有提示。** 两个上传弹窗都设了
+  `:show-upload-list="false"`，antd 把文件标成 error 用户根本看不见，而 `catch` 里
+  只有 `onError?.(e)`——宿主的 `uploadImage` 抛错、或返回了不合媒体白名单的地址时，
+  **弹窗照常关闭、图片没插入、界面上什么也不出现**，用户会以为上传成功了。
+  文案 `messages.imageUploadFailed` 早就在两份语言包里写好了，只是从来没有消费方
+  （同仓库的 `WordButton` 是接上的）。→ 不变量 55
+- **从块菜单插入媒体失败时同样无声，且视频那条文案根本不存在。**
+  `pickMediaUrl` 用 `null` 同时表示「用户取消选择」和「上传失败」，调用方只能
+  `if (!src) return`，两者分不开。提示改到最靠近失败点的地方发出（那里还知道原因，
+  也已经拿着 `translate` 与 overlay portal）。补上缺失的 `messages.videoUploadFailed`
+  ——`imageUploadFailed` 有而 video 没有，模板拼接的 key 字面量扫描器认不出来。
+  → 不变量 55、约定 41
+- **`resolveMediaUrl` 的非空断言在类型上说谎。** `normalizeSafeMediaUrl(...)!` 让函数
+  声称返回 `string` 却可能交出 `null`，调用方会把 `src: null` 写进文档（`<img src="null">`
+  会向 `<origin>/null` 发一次请求）。改成显式守卫并抛错，与 upload 路径同口径。
+
 - **拖拽手柄的「转换为」把行内格式整个吃掉。** 转换项按 `node.textContent` 把块重建成
   纯文本，于是加粗 / 斜体、链接的 `href`、换行、mention 全部消失——`<p>普通<strong>加粗
 </strong><a href="https://…">链接</a></p>` 转成标题 1 得到 `<h1>普通加粗链接</h1>`，
@@ -1053,6 +1086,26 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   四条入口逐一断言见 `mediaSrcPolicy.test.ts`。
 
 ### Tests
+
+- `src/features/ai/shared/runAiSuggestionStream.test.ts`（新增，6 条）—— 走真实入口
+  验证换流后的句柄交接：旧流的 `AbortError` / `onComplete` 都不得带走新流的取消能力。
+  ⚠️ 其中两条第一版锁不住东西：`onComplete` 那条没构造出「旧流收尾晚于新流启动」的
+  时序（两种实现结果相同），空 token 那条断言的是文本（空串本来就不改变文本，
+  改成数 `updateSuggestion` 的调用次数）。
+- `src/features/ai/shared/abortControllerHandoff.test.ts`（新增护栏）——
+  源码里不得出现 `setAbortController(null)`，清理必须按身份。
+- `src/features/ai/translation/translateStore.test.ts`（新增，7 条）—— 持久化格式是
+  语言代码；旧标签能迁移；反查不到时回到「未选择」；迁移只做一次。
+- `src/features/ai/AiMenuButton.test.ts`（新增，8 条）—— 切 locale 后翻译目标的显示名
+  跟着变、选中标记不丢。捕获 props 的桩写在 `render` 里，写在 `setup` 里测不出「不更新」。
+- `src/utils/mediaUpload.test.ts`（新增，7 条）—— 此前零覆盖。两条路径的安全口径、
+  按种类取文案、宿主未传 `translate` 时不渲染 `undefined`。
+- `src/components/tools/block-menu/mediaPickFeedback.test.ts`（新增，6 条）——
+  失败要提示、取消不提示、两者都不把 `<input>` 留在文档里。
+- `src/components/editor/uploadFailureFeedback.test.ts`（新增，4 条）——
+  两个上传组件的失败提示，以及「失败时不插入任何内容」。
+- `src/locales/extensionLabelKeys.test.ts` 增加一节：按 `MediaKind` 展开
+  `messages.${kind}Xxx` 逐条验证（约定 41）。
 
 - `src/extensions/dragHandle/DragHandleExtension.test.ts`（新增，30 条）—— 此前这个文件
   1075 行**零单测**，是全仓最大的覆盖缺口（缺 387 条语句，占总缺口 1/6）。

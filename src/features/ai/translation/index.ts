@@ -9,4 +9,9 @@ export type { TranslationOptions } from "./TranslationExtension";
 export { LANGUAGE_CODES } from "./languageCodes";
 export type { LanguageCode } from "./languageCodes";
 
-export { currentTranslateLang, setTranslateLang, clearTranslateLang } from "./translateStore";
+export {
+  currentTranslateLang,
+  setTranslateLang,
+  clearTranslateLang,
+  migrateLegacyTranslateLang,
+} from "./translateStore";

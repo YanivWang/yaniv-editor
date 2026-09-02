@@ -40,6 +40,7 @@ import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
 import { useBatchUploadGate } from "@/composables/useBatchUploadGate";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -51,6 +52,7 @@ import type { Editor } from "@tiptap/vue-3";
 
 const t = useEditorT();
 const getOverlayContainer = useOverlayMountTarget();
+const feedback = useOverlayFeedback();
 
 interface Props {
   editor?: Editor | null;
@@ -91,6 +93,9 @@ async function handleVideoUpload(options: any) {
     uploadGate.markSuccess();
     onSuccess?.({ url });
   } catch (e) {
+    // 同 ImageUpload：`show-upload-list` 关着，不提示就是完全无声
+    console.error("[VideoUpload] Local upload failed:", e);
+    feedback.toast(t("messages.videoUploadFailed"), "error");
     onError?.(e);
   } finally {
     uploadGate.end();

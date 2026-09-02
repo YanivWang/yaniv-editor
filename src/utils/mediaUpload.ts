@@ -45,5 +45,9 @@ export async function resolveMediaUrl({
     duration: 5,
   });
 
-  return normalizeSafeMediaUrl(URL.createObjectURL(file), kind)!;
+  // 不写 `!`：`normalizeSafeMediaUrl` 的返回类型带 null，断掉它等于让函数
+  // 声称返回 string 却可能交出 null，调用方会把 `src: null` 写进文档
+  const objectUrl = normalizeSafeMediaUrl(URL.createObjectURL(file), kind);
+  if (!objectUrl) throw new Error(`Unsafe ${kind} object URL`);
+  return objectUrl;
 }

@@ -54,6 +54,58 @@ function collectLabelKeys(source: string): string[] {
   return [...keys];
 }
 
+/**
+ * 媒体链路用 `messages.${kind}Xxx` 按种类拼 key，`kind` 的取值域是
+ * `MediaKind = "image" | "video"`。上面那个扫描器只认字面量，扫不到这种拼接——
+ * `videoUploadFailed` 就是这么漏的：`imageUploadFailed` 早就写好了，
+ * video 那份从来没加过，界面上直接显示 `messages.videoUploadFailed`。
+ */
+const MEDIA_KINDS = ["image", "video"] as const;
+
+function collectMediaKindKeys(source: string): string[] {
+  const code = stripComments(source);
+  const keys = new Set<string>();
+
+  for (const match of code.matchAll(/messages\.\$\{kind\}(\w+)/g)) {
+    for (const kind of MEDIA_KINDS) keys.add(`messages.${kind}${match[1]}`);
+  }
+
+  return [...keys];
+}
+
+describe("按媒体种类拼出来的 locale key", () => {
+  const found = listSourceFiles(SOURCE_ROOT).flatMap((file) =>
+    collectMediaKindKeys(readFileSync(file, "utf8")).map((key) => ({ file, key })),
+  );
+
+  test("扫描器确实扫到了拼接形态的 key", () => {
+    const keys = new Set(found.map((entry) => entry.key));
+    expect(keys).toContain("messages.imageUploadNotConfigured");
+    expect(keys).toContain("messages.videoUploadNotConfigured");
+    expect(keys).toContain("messages.videoUploadFailed");
+  });
+
+  test("每个种类展开后都要在两份语言包里有文案", () => {
+    const missing = found.flatMap(({ file, key }) => {
+      const relative = file.slice(SOURCE_ROOT.length + 1);
+      return [
+        ...(resolveMessage(zhCN, key) ? [] : [`zh-CN 缺 ${key}（${relative}）`]),
+        ...(resolveMessage(enUS, key) ? [] : [`en-US 缺 ${key}（${relative}）`]),
+      ];
+    });
+
+    expect(missing).toEqual([]);
+  });
+
+  test("自检：展开的是全部种类，注释里的写法不算", () => {
+    expect(collectMediaKindKeys("translate(`messages.${kind}Foo`)")).toEqual([
+      "messages.imageFoo",
+      "messages.videoFoo",
+    ]);
+    expect(collectMediaKindKeys("// translate(`messages.${kind}Foo`)")).toEqual([]);
+  });
+});
+
 describe("扩展层写死的 locale key", () => {
   const found = listSourceFiles(SOURCE_ROOT).flatMap((file) =>
     collectLabelKeys(readFileSync(file, "utf8")).map((key) => ({ file, key })),

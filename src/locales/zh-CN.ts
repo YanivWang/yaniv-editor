@@ -48,6 +48,7 @@ export const zhCN: TiptapLocale = {
 
   messages: {
     imageUploadFailed: "图片上传失败",
+    videoUploadFailed: "视频上传失败",
     imageUploadSuccess: "图片上传成功",
     invalidImageFormat: "不支持的图片格式",
     imageTooLarge: "图片大小超过限制",

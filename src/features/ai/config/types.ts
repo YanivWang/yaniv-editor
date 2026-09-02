@@ -47,7 +47,13 @@ export interface AiUserConfig {
   enabled: boolean;
   /** 最后更新时间 */
   updatedAt: number;
-  /** 翻译目标语言（界面标签，如「英文」） */
+  /**
+   * 翻译目标语言，取 `LANGUAGE_CODES` 里的**语言代码**（如 `"en"` / `"zh-TW"`）。
+   *
+   * v0.2.0 及之前存的是界面标签（如「英语」），那会在切换编辑器语言后错乱
+   * （标签随 locale 变而代码不变）。旧值会在界面首次拿到 locale 时自动迁移，
+   * 反查不到就回到「未选择」。
+   */
   translateTargetLang?: string;
 }
 

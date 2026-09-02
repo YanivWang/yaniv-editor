@@ -24,7 +24,7 @@ import {
   TranslationOutlined,
   SettingOutlined,
 } from "@ant-design/icons-vue";
-import { computed, nextTick, onBeforeUnmount, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 
 import { ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
@@ -33,7 +33,12 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import AiSettingsModal from "./components/AiSettingsModal.vue";
-import { LANGUAGE_CODES, currentTranslateLang, setTranslateLang } from "./translation";
+import {
+  LANGUAGE_CODES,
+  currentTranslateLang,
+  migrateLegacyTranslateLang,
+  setTranslateLang,
+} from "./translation";
 
 import type { Editor } from "@tiptap/core";
 import type { Component } from "vue";
@@ -57,11 +62,28 @@ const props = withDefaults(defineProps<Props>(), {
   placement: "bottom",
 });
 
-const selectedLangKey = computed(() => {
-  if (!currentTranslateLang.value) return "";
-  const lang = LANGUAGE_CODES.find((l) => t(`editor.lang.${l.key}`) === currentTranslateLang.value);
-  return lang ? `translate-${lang.code}` : "";
+/** 当前目标语言在当前 locale 下的显示名；未选择或代码失效时为空 */
+const translateTargetLabel = computed(() => {
+  const lang = LANGUAGE_CODES.find((l) => l.code === currentTranslateLang.value);
+  return lang ? t(`editor.lang.${lang.key}`) : "";
 });
+
+const selectedLangKey = computed(() =>
+  translateTargetLabel.value ? `translate-${currentTranslateLang.value}` : "",
+);
+
+/**
+ * 旧版本把界面标签存进了配置。语言包是按需加载的，模块初始化时反查不了，
+ * 所以等 `t()` 能解析出文案（locale 就绪）之后再迁移一次。
+ */
+watch(
+  () => t("editor.lang.en"),
+  (resolved) => {
+    if (resolved === "editor.lang.en") return;
+    migrateLegacyTranslateLang((key) => t(`editor.lang.${key}`));
+  },
+  { immediate: true },
+);
 
 function onDropdownOpenChange(open: boolean) {
   if (!open || !props.editor) return;
@@ -162,9 +184,9 @@ function runTranslate(key: string) {
   runAiCommandAfterMenuClose((editor, selection) => {
     const lang = LANGUAGE_CODES.find((l) => `translate-${l.code}` === key);
     if (lang) {
-      setTranslateLang(t(`editor.lang.${lang.key}`));
+      setTranslateLang(lang.code);
     }
-    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "英文");
+    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "en");
   });
 }
 
@@ -198,7 +220,7 @@ function onSplitPrimary(itemKey: string) {
   if (itemKey !== "translate" || !currentTranslateLang.value) return;
 
   runAiCommandAfterMenuClose((editor, selection) => {
-    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "英文");
+    runEditorAiChain(editor, selection, "translate", currentTranslateLang.value || "en");
   });
 }
 
@@ -226,8 +248,8 @@ const menuItems = computed((): MenuItemConfig[] => {
     },
     {
       key: "translate",
-      label: currentTranslateLang.value
-        ? t("editor.translateTo", { lang: currentTranslateLang.value })
+      label: translateTargetLabel.value
+        ? t("editor.translateTo", { lang: translateTargetLabel.value })
         : t("editor.translate"),
       icon: TranslationOutlined,
       submenuMode: "split-hover",

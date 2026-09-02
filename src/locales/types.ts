@@ -65,6 +65,7 @@ export interface TiptapLocale {
 
   messages: {
     imageUploadFailed: string;
+    videoUploadFailed: string;
     imageUploadSuccess: string;
     invalidImageFormat: string;
     imageTooLarge: string;

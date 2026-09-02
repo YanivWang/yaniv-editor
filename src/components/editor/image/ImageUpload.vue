@@ -150,6 +150,10 @@ async function handleLocalUpload(options: any) {
     localUploadGate.markSuccess();
     onSuccess?.({ url });
   } catch (e) {
+    // `show-upload-list` 是关的，antd 把文件标成 error 用户也看不见——
+    // 不在这里提示，上传失败就完全无声：弹窗照常关闭，图片没插入
+    console.error("[ImageUpload] Local upload failed:", e);
+    feedback.toast(t("messages.imageUploadFailed"), "error");
     onError?.(e);
   } finally {
     localUploadGate.end();

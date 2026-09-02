@@ -300,16 +300,16 @@ pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个�
 
 **当前基线（第 14 棒全部完成时实测）：**
 
-- `pnpm run verify` 退出 0，**966 个用例全过（102 个测试文件）**，eslint 零 warning
-  —— 第 13 棒 933 / 100，第 12 棒 917 / 98，第 11 棒 911 / 98，第 10 棒 908 / 98
-- 覆盖率 Statements **71.08%** / Branches **59.56%** / Functions **66.79%** / Lines **72.97%**
+- `pnpm run verify` 退出 0，**1009 个用例全过（108 个测试文件）**，eslint 零 warning
+  —— 第 14 棒 966 / 102，第 13 棒 933 / 100，第 12 棒 917 / 98，第 11 棒 911 / 98
+- 覆盖率 Statements **72.89%** / Branches **60.76%** / Functions **69.05%** / Lines **74.85%**
   （`vitest.config.ts` 的阈值仍是 statements 56 / lines 56 / branches 44 / functions 52，
   **实测值已远超阈值，第 16 棒要提档**）
-- `pnpm run build` 产物预算实测：主 chunk gzip **42674 / 46000**（余量 **3326B**）、
+- `pnpm run build` 产物预算实测：主 chunk gzip **42734 / 46000**（余量 **3266B**）、
   `style.css` **17193 / 19000**、`inline.css` **8936 / 10500**；代码分割断言全过
 - `pnpm run test:e2e` **28 passed**（第 14 棒从 25 补到 28）
 - `pnpm run build:check` 通过（三个入口 × ESM/CJS 共 6 种加载方式 + 两个 CSS）
-- ARCHITECTURE 不变量 **52 条**，CONTRIBUTING 约定 **40 条**
+- ARCHITECTURE 不变量 **55 条**，CONTRIBUTING 约定 **42 条**
 - ⚠️ 注释基本不吃产物预算（不变量 41 已更正）：`.ts` / `.vue` 语句之间的注释进不了
   产物（30 行 0B），只有写在**对象字面量属性上**的才进（30 行 209B）。
 
@@ -340,7 +340,8 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 - `2e702b9` / `c2f7b47` —— 第 13 棒选中底色 + 光标色，堵上 token 护栏的反引号漏洞
 - `b3617a4` / `e6f7ccd` —— 第 13 棒续：撤销历史清空 + 间距棘轮护栏 + ColorPicker 移出主 chunk
 - `fa87674` —— 第 13 棒收尾：补 3 条会话重建 e2e，并更正一条被误判为真实缺陷的 jsdom 现象
-- 第 14 棒 —— DragHandle：5 个缺陷 + 30 条单测 + 1 条全仓护栏 + e2e 25→28
+- `58062ba` —— 第 14 棒 DragHandle：5 个缺陷 + 30 条单测 + 1 条全仓护栏 + e2e 25→28
+- 第 15 棒 —— AI 与媒体链路：4 个缺陷 + 38 条用例 + 2 条护栏
 
 用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
@@ -958,6 +959,60 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
     ① `expect(...).not.toThrow()` 验「监听已摘」——jsdom 里处理器抛错不冒泡（约定 39）；
     ② 断言的对象在两种实现下**长得一样**——「创建副本」插在原块前后 HTML 完全相同，
     要靠光标位置才区分得开。**写完问一句：如果实现是错的，这条断言会变吗？**
+
+---
+
+## 第 15 棒做了什么（已完成）
+
+按计划补 AI 与媒体链路。**4 个缺陷，其中 3 个是「用户什么也看不到」的静默失败。**
+
+### 修复（5 项，全部登记进 CHANGELOG）
+
+1. **换流后「取消」再也停不下正在跑的 AI 流**（不变量 53）—— 旧流的 `AbortError`
+   回调无条件清句柄，而此刻句柄已是新流的。**根因很典型**：`aiSuggestionManager`
+   内部本来就有按身份清的 `clearAbortController` 并且用对了（`executeCustomPrompt`），
+   只有 `runStream` 那半没跟上——同一仓库两套写法，一对一错。已公开该方法并立护栏。
+2. **翻译目标语言把显示名当标识符持久化**（不变量 54）—— 切界面语言后按钮显示
+   「Translate to 英语」/「翻译为 English」，选中标记双向丢失。改存代码 + 旧值自动迁移。
+   ⚠️ 这条动了公开 API 语义（`AiUserConfig.translateTargetLang` 的取值域），**先问过用户**。
+3. **图片/视频本地上传失败完全无声**（不变量 55）—— `show-upload-list` 关着，
+   `catch` 里只有 `onError?.(e)`。文案 `messages.imageUploadFailed` 早就写好、**零消费**。
+4. **块菜单插入媒体失败同样无声，且 `videoUploadFailed` 文案根本不存在**（约定 41）——
+   `null` 同时表示「用户取消」和「上传失败」，调用方分不开。
+5. **`resolveMediaUrl` 的 `!` 非空断言在类型上说谎** —— 会把 `src: null` 写进文档。
+   顺带删掉 `runStream` 的死参数 `handlers`（两个调用点都没传过）。
+
+### 负结果 / 被探针推翻的假设（别重复走）
+
+- **`pasteImage` 里解构的 `dispatch` 不会丢 `this`** —— ProseMirror 构造时就把它绑在
+  实例上了（`Object.hasOwn(view, "dispatch") === true`）。看着像坑，实测不是。
+- **`data:` URL 不是绕过了媒体白名单** —— `normalizeSafeMediaUrl` 对它有按 kind
+  收敛的显式分支（`data:image/` / `data:video/`），是有意放行。
+- **`schema.nodes.image` 缺失那条分支库内不可达** —— `PasteImage` 与 image 节点在
+  同一个 capability 里注册，关掉 image 两者一起消失。那是防御性守卫，不是缺陷。
+- **`AiMenuButton` 的 `savedSelection` 没有残留风险** —— split 主按钮只在菜单打开时
+  可达，而每次打开都会重设选区。
+- **`pickMediaUrl` 的 `.catch()` 不是 unhandledrejection** —— rejection 有处理，
+  问题在于处理得太安静。
+- **「异步回调里无条件清共享句柄」全仓只此一处** —— 结构化扫描零命中。
+
+### 第 15 棒踩的坑（方法论补充）
+
+37. **打桩要打得够窄。** `vi.stubGlobal("URL", { ...URL, createObjectURL })` 把 `URL`
+    构造函数一起换掉了，而被测代码内部要 `new URL()`——于是每条用例都"失败"，
+    **失败的是桩不是代码**。只替换要替换的那一个方法，用完恢复。
+38. **等待的判据不能恒真，也不能依赖被测组件恰好渲染了什么。** 等语言包加载时我先写了
+    `!portal.ownerDocument`（恒真，等于没等），改成「渲染文本里还有没有 `editor.`」后
+    `ImageUpload` 过了而 `VideoUpload` 没过——它的弹窗里压根没有那种文案，判据一开始
+    就满足。最后改成直接问 locale 上下文自己（`ctx.messages.value !== null`）。
+    **写等待循环时先问：这个条件在「还没就绪」时真的为假吗？**
+39. **「零消费」不等于「不存在」。** 我查 `videoUploadFailed` 时只 grep 了「非 locale
+    消费方 0 处」，就默认它在语言包里存在——其实它根本没有。测试报
+    `expected 'messages.videoUploadFailed' to contain '视频上传失败'` 才发现。
+    **grep 排除了某个目录时，别把"没在别处出现"读成"在那个目录里存在"。**
+40. **切片改文件又踩了一次（教训 30 的重演）。** 用 `s.index()` 夹两个位置删 `.catch`
+    块，残留了半截 `resolve(null); });`，测试报的是 esbuild 语法错误——
+    那是**无效变异**而不是负结果。改用精确字符串替换，并在变异后先看一眼语法。
 
 ---
 

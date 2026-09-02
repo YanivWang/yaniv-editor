@@ -48,6 +48,7 @@ export const enUS: TiptapLocale = {
 
   messages: {
     imageUploadFailed: "Image upload failed",
+    videoUploadFailed: "Video upload failed",
     imageUploadSuccess: "Image uploaded successfully",
     invalidImageFormat: "Invalid image format",
     imageTooLarge: "Image is too large",

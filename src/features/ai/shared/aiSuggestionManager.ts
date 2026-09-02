@@ -408,7 +408,15 @@ class AiSuggestionManager {
     this.init(editor);
   }
 
-  private clearAbortController(abortController: AbortController): void {
+  /**
+   * 流结束时**按身份**清句柄：只有「当前句柄就是自己那个」才清空。
+   *
+   * 不能用 `setAbortController(null)` 代替。换流的时序是：新流 `setAbortController`
+   * 先 abort 掉旧流 → 旧流的 fetch 随即以 `AbortError` 走 `onError` → 旧流在那里清句柄。
+   * 此刻句柄已经是**新流**的，无条件清空等于把新流的取消能力一起扔掉：
+   * 用户再点「取消」什么也不会发生，新流继续消耗配额、继续往单例写建议文本。
+   */
+  clearAbortController(abortController: AbortController): void {
     if (this.abortController === abortController) {
       this.abortController = null;
     }

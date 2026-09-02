@@ -288,6 +288,18 @@ docs: 补充 z-index 说明
     `localeParity` 只保证两份语言包彼此对齐，也管不到「代码引用的 key 存不存在」。
     `locales/extensionLabelKeys.test.ts` 扫全仓源码逐条解析，新增这类 key 时它会兜住。
 
+41. **模板拼出来的 locale key 要把取值域展开验证。** `messages.${kind}UploadFailed`
+    这类写法字面量扫描器认不出，于是「image 有、video 没有」能一直藏着
+    ——`videoUploadFailed` 就是这么漏的，界面上直接显示原始 key。
+    护栏对 `MediaKind` 的两个取值各展开一遍。新增按枚举拼 key 的写法时，
+    要么把取值域加进护栏，要么改成字面量。
+
+42. **改文案前先查它有没有消费方。** 文案齐全（zh / en / types 三处都有）但零引用，
+    通常不是「多余」而是**「有人要了但没接上」**——`imageUploadFailed` 写好之后
+    从来没被 `catch` 用过，于是上传失败一直是无声的。判断方法同不变量 26：
+    看它周围有没有「曾经有人认真对待过」的痕迹（成对的兄弟 key、types 里的声明、
+    同类场景里已经接上的写法）。
+
 ## 测试
 
 - 单测：`src/**/*.test.ts`（vitest + jsdom）。纯函数与扩展行为优先。
