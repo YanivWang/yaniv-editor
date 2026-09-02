@@ -1,4 +1,4 @@
-# 任务交接：yaniv-editor 全量源码逐行复核
+# 任务交接：yaniv-editor 复核与收尾
 
 **用中文回复。** 用户全程用中文，仓库注释 / CHANGELOG / ARCHITECTURE 也全是中文。
 
@@ -21,8 +21,8 @@
 
 **工作节奏（用户第 9 棒明确要求）**：读交接 → 推进一个阶段 → 写交接 → 下一阶段，**一直推到全部读完为止，不要中途停下来等指令**。
 
-> **第 9 棒已把 294 个文件全部读完。** 后续接手者的工作不再是「继续读」，
-> 而是下面「尾巴清单」里那些**已定位但尚未处理**的条目，以及用户新提出的需求。
+> **第 9 棒把 294 个文件全部读完；第 10 棒把「尾巴清单」20 条全部处理完。**
+> 后续接手者的工作是用户新提出的需求，或本文件末尾「仍然开着的口子」里的条目。
 
 ---
 
@@ -114,9 +114,11 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
    cp "$TMPDIR/y.keep.ts" src/x/y.ts
    ```
 
-   - ⚠️ **绝对不要用 `git show HEAD:<file>` 还原来做变异验证。** 复核成果**全部未提交**，
-     `HEAD` 停在第 7 棒之前，这样会把前几棒的修复一起撤掉，导致无关护栏转红被误判成新发现（第 8 棒踩过）。
-     正确做法：`cp` 备份当前工作区文件，**只把自己这一处**改回缺陷态。
+   - ⚠️ **变异验证要 `cp` 备份当前工作区文件，只把自己这一处改回缺陷态。**
+     第 8 棒用 `git show HEAD:<file>` 还原，把当时未提交的前几棒修复一起撤掉，
+     无关护栏转红被误判成新发现。（第 10 棒起复核成果已全部提交，`HEAD` 是干净的基线，
+     用 `git show HEAD:<file>` 拿**上一次提交**的版本做对照是安全的——但仍要先确认
+     该文件在本轮之前没被改过。）
    - ⚠️ **变异验证期间绝对不要同时在后台跑 `pnpm run verify` 或 `build`**（第 3 棒踩过）。
    - ⚠️ **改完必须 `grep` 确认变异真的写进去了。** 第 9 棒有一次 perl 替换没匹配上，
      「测试仍全过」是无效结果而不是负结果——`grep -c` 返回 0 才发现。
@@ -124,14 +126,17 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
      一处是用例恰好绕过了差异（补用例后转红），另一处确认**不可达**（钳制生效后 early-return
      永远走不到），后者如实标注成「不变量守卫」而**没有**写进 CHANGELOG 当修复。
 
-7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 36 条**）+
-   `CONTRIBUTING.md` 的约定列表（**现有 27 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
+7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 42 条**）+
+   `CONTRIBUTING.md` 的约定列表（**现有 34 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
    - ⚠️ **新增编号前必须 `grep -nE "^[0-9]+\. "` 核对现有最大编号。** 第 9 棒在注释里写了
      「见约定 18」，而约定 18 早被 `@media` 顺序占用，只能回头改成 22。
    - ⚠️ 往 `CHANGELOG.md` 插新分节时注意：`[Unreleased]` 的 `### Fixed` 段很长（现已 600+ 行），
      直接在 `### Fixed\n` 后面插新分节会把原有条目全挤进去。**在 Fixed 段末尾追加条目最安全**。
 8. **能写成静态护栏的就写静态护栏**——对现存与未来文件同时生效，价值最高。
-   **现有 17 个文件 / 28 条规则**（第 9 棒新增 4 个）：
+   现有 **21 个护栏文件**（`grep -rln "readFileSync\|readdirSync" src --include="*.test.ts"`
+   数得到 17 个静态扫描类，另有 `capabilities/toolbarGateMap`、`publicApi`、
+   `locales/localeParity`、`components/editor/template/templates` 四个不读文件系统的）。
+   第 9 棒新增 4 个，第 10 棒新增 4 个 + 1 条规则：
    - `components/editor/table/tableToolLabels.test.ts`（`t()` 不得在 setup 顶层求值后冻结）
    - `locales/localeParams.test.ts`（带 `{占位符}` 的文案不得漏传 params）
    - `styles/darkOverrides.test.ts`（dark 覆盖不得与基础规则同值；三种形态；
@@ -150,6 +155,17 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
    - **`utils/zIndexTokenSync.test.ts`（第 9 棒 B）**——`YE_Z_BASE_OFFSETS` 与 `variables.css` 逐条对齐
    - **`capabilities/toolbarGateMap.test.ts`（第 9 棒 B）**——工具栏 slug 必须映射到真实存在的 gate
    - `publicApi.test.ts`（导出快照）
+   - **`composables/editorListenerScope.test.ts` 的第三条规则（第 10 棒）**——同一个 handler
+     不得同时订阅 `transaction` 与 `update` / `selectionUpdate`（前者是超集，不变量 37）
+   - **`styles/tokenConsumers.test.ts`（第 10 棒）**——定义了的 `--ye-*` 必须有人 `var()` 引用；
+     判据双向（CSS `var()` + JS 字符串读写），扫描范围含 `examples/`（不变量 42）
+   - **`features/ai/translation/languageCodes.test.ts`（第 10 棒）**——`LANGUAGE_CODES` 与
+     `editor.lang.*` 双向对齐，且 `docs/features/ai.md` 的「N 种目标语言」与语言清单
+     必须跟着列表走
+   - **`components/editor/template/templates.test.ts`（第 10 棒）**——锁住「ProseMirror 的
+     `block+` 会自动补 paragraph」这个前提，它是删掉 `normalizeTemplateHtml` 的依据
+   - **`core/useEditorPagination.test.ts` 的分页口径两条（第 10 棒）**——固定用 A4、
+     且三套外观都不得出现画分页线的规则
 
    **写护栏一定要配自检用例。** 第 5 棒的自检抓到正则 bug；第 6 棒抓到扫描器把 `@import` 当选择器；
    第 8 棒抓出两个既有护栏共有的注释漏洞（逐字符找 `{` 在剥注释之前）。
@@ -167,6 +183,37 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
    - ⚠️ **搜同型时会搜到自己刚写的代码。** 第 9 棒搜 `[^>]*` 时发现自己新写的 `O_P_BLOCK` 也犯了同型。
 10. **例外会让护栏失效，宁可把例外那处也修掉。** 第 9 棒本想给 `templates.ts` 的 `[^>]*` 开例外，
     改成抽出共享的 `TAG_INNARDS` 把它一并修掉，规则才能写成绝对的。
+
+### 第 10 棒补充的方法论（都是踩过的）
+
+11. **探针容易只问一半问题。** 验证「这条路径会触发 X」之后，还要问
+    「**还有别的路径也会触发 X 吗**」。第 10 棒给斜杠菜单加 plugin view 的 `destroy()`，
+    探针证明了 `editor.destroy()` 会调它，就下手了——结果 `registerPlugin()` 也会
+    销毁重建全部 plugin view，每注册一个插件就误发一次关闭通知，打穿了 `BlockPickerMenu` 的测试。
+12. **对照实验必须用真实入口，不能手工模拟调用链。** 判 `ListShortcuts` 死活时先自己遍历
+    各扩展的 `addKeyboardShortcuts` 做对照，得出「22 场景全同」；换成
+    `view.dom.dispatchEvent(keydown)` 走 ProseMirror 真正的 `handleKeyDown` 链，
+    才暴露出代码块内 Shift-Enter 的 2 个差异。**同一条尾巴上栽了两次**
+    （前一次是「行为相同 ≠ 没有执行」）。
+13. **未捕获异常看不见。** jsdom 里事件处理器抛出的错不冒泡到 `dispatchEvent` 的调用点，
+    `try/catch` 包着也抓不到，只会变成 vitest 报的 "Unhandled Errors"。
+    要验证「不再抛」得监听 `window` 的 `error` 事件。生产环境同理：控制台被刷屏、
+    宿主的错误监控当成线上故障，而功能看起来完全正常。
+14. **ESM 产物不压缩，主 chunk 里的注释直接吃产物预算**（不变量 41）。
+    一段 10 行的中文论证注释吃掉 471B。**结论留源码，证据搬测试**。
+15. **定位产物涨幅不能单文件二分。** chunk 划分是全局优化的结果：单独还原
+    `listShortcuts.ts` 只差 2B，把整批改动一起还原才看得出那 471B。
+    正确做法是先整批还原确认基线，再逐个加回来。
+16. **`getComputedStyle` 在同一个同步块里读不到刚注入的样式。** 注入 `<style>` 后必须
+    `await` 一次 `setTimeout` 再读，否则拿到的是上一拍的旧值——第 10 棒因此一度得出
+    自相矛盾的 CSS 结论。⚠️ 预览面板隐藏时 `requestAnimationFrame` **不触发**，
+    用它等会直接 45s 超时，只能用 `setTimeout`。
+17. **zsh 默认不做 word splitting。** `for f in $FILES`（空格分隔的字符串）不会拆分，
+    脚本会静默什么也没做，而你以为还原过了。用数组 `files=(a b c)`。
+    这与方法论 6 的「改完必须 grep 确认」是同一类问题的两个面。
+18. **判「死代码」时要想清楚谁是消费方。** `--ye-radius-lg` 在库内零引用，
+    但两个 demo 页面拿它做 `border-radius`——`examples/` 是宿主用法的正式示范，
+    被它用到就有对外价值。护栏的扫描范围因此含 `examples/`。
 
 ---
 
@@ -223,7 +270,8 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
   `new PluginKey("dragHandle")` / `new PluginKey("slashCommand")` / `yanivSearchReplace` / `chat/completions`。
   **绝不能让 `core/` 或 `capabilities/` 静态 import 门控能力模块。**
 - **产物预算（gzip）**：主 chunk ≤ 46000B、`dist/style.css` ≤ 19000B、`dist/inline.css` ≤ 10500B。
-  ⚠️ **主 chunk 余量 758B**（第 9 棒结束时实测 45242；删死代码后从 45596 回落）。`registry.ts` / `templates.ts` /
+  ⚠️ **主 chunk 余量 456B**（第 10 棒结束时实测 45544）。**注释也算进去**——ESM 产物
+  不压缩，源文件里的每行注释都原样进产物（不变量 41）。`registry.ts` / `templates.ts` /
   `core/` / `extensions/` 里 core 能力下的扩展都在主 chunk，往里加代码前先想清楚，
   加完必须 `pnpm run build` 复量。**阶段 D/E 若要新增主 chunk 代码，可能需要先腾空间。**
 - **覆盖率阈值**写在 `vitest.config.ts`（statements 56 / lines 56 / branches 44 / functions 52），只能升不能降。
@@ -250,16 +298,17 @@ pnpm run build:check   # build + 逐条件真实加载每个入口（约 5 分�
 pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个就够）
 ```
 
-**当前基线（第 9 棒全部完成时实测）：**
+**当前基线（第 10 棒全部完成时实测，提交 `cf79661`）：**
 
-- `pnpm run verify` 退出 0，**834 个用例全过（89 个测试文件）**，eslint 零 warning
-  —— 第 8 棒结束时是 727 / 73
-- 覆盖率 Statements 65.10% / Branches 54.65% / Functions 61.30% / Lines 66.76%
-- `pnpm run build` 产物预算实测：主 chunk gzip **45242 / 46000**（余量 758B）、
-  `style.css` **17298 / 19000**、`inline.css` **9064 / 10500**；代码分割断言全过
-- `pnpm run test:e2e` **22 passed**（改过 CSS 与多个组件，已重跑）
-- `pnpm run test:e2e` 第 9 棒**没跑**（阶段 A 只动粘贴转换逻辑，未动 CSS）。
-  第 8 棒结束时是 22 passed。**动了 CSS / 序列化 / 主 chunk 就必须跑。**
+- `pnpm run verify` 退出 0，**908 个用例全过（98 个测试文件）**，eslint 零 warning
+  —— 第 9 棒结束时是 834 / 89，第 8 棒是 727 / 73
+- 覆盖率 Statements 66.42% / Branches 55.88% / Functions 62.73% / Lines 68.11%
+- `pnpm run build` 产物预算实测：主 chunk gzip **45544 / 46000**（余量 **456B**）、
+  `style.css` **17111 / 19000**、`inline.css` **8910 / 10500**；代码分割断言全过
+- `pnpm run test:e2e` **22 passed**
+- ⚠️ **主 chunk 余量只有 456B，且注释也算进去**（不变量 41）。往主 chunk 加东西前
+  先读那条不变量，加完必须 `pnpm run build` 复量。
+- **动了 CSS / 序列化 / 主 chunk 就必须跑 e2e。**
 
 产物预算手动核验：
 
@@ -276,31 +325,15 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 
 ---
 
-## 当前工作区状态（重要）
+## 当前工作区状态
 
-**所有改动都还没提交。** `HEAD` 是 `9d82257`，工作区有大量修改 + 新增未跟踪文件。
+**工作区干净，全部已提交。**
 
-- **2 个删除**：`src/features/ai/config/index.ts`（零导入的 barrel，第 5 棒）、
-  `src/appearance/styles/_shared.css`（第 8 棒，两条规则都已证实是死的）
-- **第 9 棒新增的源文件（3 个）**：`src/utils/htmlTagPattern.ts`、`src/utils/escapeHtml.ts`、
-  `src/components/editor/link/linkActions.ts`
-- **第 9 棒删除的源文件（3 个）**：`src/components/editor/table/TableCell.vue`（空占位）、
-  `src/components/base/BaseTooltip.vue`（零引用 + 两处未被发现的 CSS 缺陷）、
-  `src/components/base/ToolbarDivider.vue`（只被恒假的 `v-if` 引用）
-- **第 9 棒新增的测试（13 个）**：`utils/htmlRegexSafety`、`utils/zIndexTokenSync`、
-  `styles/designTokenWriteScope`、`capabilities/toolbarGateMap`、
-  `extensions/office-paste/officePasteRobustness`、`extensions/lineHeight`、
-  `extensions/column/ColumnExtension`、`extensions/markdownInput/NotionMarkdownInput`、
-  `features/ai/shared/abortControllerHandoff`、`core/overlayFeedback`、
-  `core/useEditorPagination`、`appearance/useEditorAppearance`、
-  `components/editor/link/LinkButton`、`components/editor/font/fontSelectSync`、
-  `components/editor/heading/useHeadingActions`、`components/editor/align/AlignDropdown`、
-  `components/tools/inline-toolbar/InlineToolbar`
+- `c59f6e0` / `f5f88d9` —— 第 9 棒的全量逐行复核（37 处修复）
+- `e17928b` —— 第 10 棒尾巴清单 16 条 + 6 个新发现的缺陷 + 4 条护栏
+- `cf79661` —— 第 10 棒删除 16 个零消费 token + 尾巴 #16 / #17
 
-用户尚未决定如何提交（前几棒问过多次没得到答复）。**在用户明确要求之前不要提交。**
-用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——真要提交时直接提到 `main`。
-
----
+用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
 ## 阶段 A 做了什么（第 9 棒，已完成）
 
@@ -516,68 +549,58 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 
 ---
 
-## 尾巴清单（已定位、尚未处理）
+## 尾巴清单（第 10 棒已全部处理）
 
-1. **格式刷按钮双击会连弹 3 个 toast。** `FormatPainterButton` 同时绑 `@click` 与 `@dblclick`，
-   而 DOM 规范里 `dblclick` 前必然先发两次 `click`，于是双击走完
-   采样→激活（toast A）→取消（toast B）→连续模式（toast C）。**最终状态是对的**，只是噪音。
-   标准修法（把单击延后一个双击窗口）会给每次单击加约 200ms 延迟——产品取舍，
-   `docs/features/format-painter.md` 明确写了「单击单次 / 双击连续」。**建议先问用户。**
-2. **`OutlinePanel` 同时订阅 `transaction` + `update` + `selectionUpdate`，三者冗余。**
-   已从 tiptap 源码确认 `transaction` 是另两者的超集（唯一例外是 `setEditable` 只发 `update`）。
-   每次按键 `syncItems` 跑 3 次，每次对所有标题 `getBoundingClientRect()`（强制回流）。
-   **性能问题不是正确性问题**。同型也在 `FormatPainterButton` / `UndoRedoButton` /
-   `useEditorColorState` / `HeadingControl`。
-3. **`OutlinePanel` 的 debounce pending timer 在 `onBeforeUnmount` 未 `clearTimeout`。** 影响极小。
-4. **`SlashCommandExtension` 的 plugin view 只有 `update` 没有 `destroy`。**
-   编辑器在斜杠菜单开着时被销毁不会触发 `onDeactivate`，菜单可能留在屏上。路径很窄。
-5. **`AiMenuButton.runAiCommandAfterMenuClose` 用 `nextTick + requestAnimationFrame` 且不留帧句柄。**
-   卸载后回调仍会跑到 `editor.view.focus()`。外层有 `try/catch`，只打一条 `console.error`，不崩。
-6. **`docs/` 里是否有描述第 3 棒那 8 个修复所涉行为的段落，仍未回头核对。**
-   重点看 `docs/features/media.md`（相对路径 src）、`docs/api/ai-config.md`
-   （`useAiConfig` 返回值、`isConfigured` 语义）、`docs/features/ai.md`（流式行为）。
-   第 6/7/8 棒大改了深色 token 与 CSS 分层，`docs/` 与 `ARCHITECTURE.md` 的「CSS 分层」表
-   若有描述「appearance 提供浮层皮肤」或 token 作用域的段落，必须一并核对。
-   第 8 棒只更新了 `ARCHITECTURE.md` 的分层表 token 行，`docs/` 下的对应段落**没查**。
-7. **`prompts.ts` 里 4 段 `en` prompt 变体确认全仓零引用**（文件头注释已写明）。
-   第 1 棒选择「文档化而不删除」，第 3–9 棒尊重了这个决定。你若认为该删，注意它不是公开 API。
-8. **`editor.lang.zh` / `editor.lang.ar` 无人渲染**（`LANGUAGE_CODES` 只有 14 项、不含这两个）。
-   它们在公开的 `EditorLocaleMessages` 类型里，删除属于公开 API 变更，
-   且更像「少注册了阿拉伯语」而非「多了死 key」。留给你判断。
-9. ~~`inline.css` 的 `.inline-toolbar` 用 `--ye-border`~~ —— **第 9 棒阶段 E 已修**，
-   浏览器实测三套外观 × 明暗两态零视觉变化。
-10. **`.ye-dropdown-btn.is-active:hover` 与 `.is-active` 同值，疑似死声明。**
-    静态分析显示两种情况下 `.is-active:hover`(0,3,0) 都不改变结果，但**需要真实 ant 运行时样式验证**
-    （起 examples dev server 查 CSSOM）。收益仅 4 行 CSS。
-11. **`templates.ts` 的 `normalizeTemplateHtml` 可能整体多余** —— ProseMirror 解析空 `<td>` 时
-    schema 的 `block+` 会自动补 paragraph。第 9 棒只修了它的正则，**没验证这个函数是否还有必要**。
+20 条全部有了结论。**其中 4 条的结论与原判断相反**——都是实证推翻的，别照原判断行事。
 
-### 第 9 棒新增的观察（已定位，未改；理由都写在各阶段小节里）
+| #   | 条目                          | 结论                                                                 |
+| --- | ----------------------------- | -------------------------------------------------------------------- |
+| 1   | 格式刷双击连弹 3 个 toast     | 修：`MouseEvent.detail` 跳过第二击，单击零延迟，提示降到 2 条        |
+| 2   | 冗余订阅                      | 修：**实际 9 处**（原记 5 处），收敛 + 护栏                          |
+| 3   | OutlinePanel debounce 未清    | 修：`debounce` 交出 `cancel()`                                       |
+| 4   | SlashCommand 缺 destroy       | 修：**改用扩展的 `onDestroy`**，不能写在 plugin view 里（不变量 38） |
+| 5   | AiMenuButton rAF 无句柄       | 修：留句柄 + 卸载取消 + 帧内 `isDestroyed` 守卫                      |
+| 6   | docs 与第 3/6/7/8 棒行为核对  | 修：找到 2 处 token 分层描述与源码不符                               |
+| 7   | `prompts.ts` 的 `en` 变体     | **用户决定保留**（文档化而不删除）                                   |
+| 8   | `editor.lang.zh` / `ar`       | 修：`ar` 补进 `LANGUAGE_CODES`；`zh` 作为显式例外保留                |
+| 9   | `.inline-toolbar` 边框 token  | 第 9 棒已修                                                          |
+| 10  | `.is-active:hover` 疑似死声明 | **推翻**：它是必需的，antd 的规则是 (0,3,0)（不变量 40）             |
+| 11  | `normalizeTemplateHtml` 多余  | 证实并删除；`templates.test.ts` 锁住删除依据                         |
+| 12  | AI prompt 不限长              | 修：`aiConfig.documentContextLimit`（默认 8000 字符）+ 明确提示      |
+| 13  | `readStreamLines` 不释放      | **推翻转述**：四种路径 `locked` 都是 true；真实路径是回调抛错，已修  |
+| 14  | `ListShortcuts` 疑似冗余      | **推翻**：`Shift-Enter` 不能删；顺带挖出未捕获的 `RangeError`        |
+| 15  | 系统明暗监听绑两次            | 修：实测监听器 2 条 / apply 2 次，删掉冗余 watch                     |
+| 16  | `calculatePages` 用 A4 高度   | **推翻**：是有意的——三套外观都不画分页线，min-height 不是页高        |
+| 17  | `ListTools.showTaskList`      | 修：默认改 `true`（公开 prop 默认值变更），删掉三处显式传参          |
+| 18  | Word 导入无确认               | 修：文档非空时先确认；`<img src>` 那半是虚惊，parseHTML 已覆盖       |
+| 19  | VideoUpload modal 提前关      | 修：**同型 2 处**（ImageUpload 也是），抽 `useBatchUploadGate`       |
+| 20  | `lineNumber` 子串匹配         | 不改（差异面无害），但发现**它的测试是空操作**，已补 5 条真用例      |
 
-12. **`buildDocumentContextPrompt` 不限长** —— 全文直接拼进 AI prompt，超长文档会让请求
-    400 失败。截断阈值依赖具体模型（项目支持 openai/aliyun/ollama 且模型可配），
-    静默截断又会无声降低回答质量，属产品决策。
-13. **`readStreamLines` 没有 `try/finally { reader.releaseLock() }`** —— abort 路径由
-    `AbortController` 传给 fetch、body 流会 error 从而释放；但消费方主动 `break`
-    出 for-await 的路径没验证过。
-14. **`ListShortcuts` 的 `Enter` 与 tiptap 内置的 `splitListItem` 重复** —— 已用 spy
-    确认 handler 确实在执行（不是死代码），只是效果与默认重合。三种场景实测行为一致，
-    但嵌套列表 / 代码块内没逐一验证，**没有证据不删**。
-15. **`useEditorAppearance` 里系统明暗监听绑了两次** —— `useResolvedColorMode` 内部一次、
-    第二个 watch 又一次，同一个系统事件触发两次 `syncDom`。`syncDom` 幂等，只是冗余。
-16. **`calculatePages` 用 A4 高度给所有外观算页数** —— notion / default 的页高并非 A4。
-    `totalPages` 只用于状态栏「共 N 页」，属产品语义问题。
-17. **`ListTools` 的 `showTaskList` 默认 `false` 但 4 个调用点全传 `true`** ——
-    默认值从未生效。它是公开 API 的 prop，保留合理。
-18. **`wordImport.importWordFile` 用 `setContent` 替换整个文档**（当前内容全部丢失）
-    且无确认提示；`sanitizeImportedHtml` 只清理了 `<a href>`，`<img src>` 没走
-    `mediaSrcPolicy`——那条策略有事务级守卫插件兜底，但未验证是否覆盖 setContent 路径。
-19. **`VideoUpload` 批量上传时第一个文件成功就关闭 modal**，后续文件仍在后台上传。
-20. **`lineNumber.ts` 的 `[class*="MsoLineNumber"]` 子串匹配范围偏宽** —— 与
-    `htmlClasses` 那处「口径不一致」不同，这里操作是 unwrap 整个元素，改成精确匹配
-    反而可能漏处理，没有证据表明 Word 会输出别的 `MsoLineNumber*` 类。
+### 第 10 棒顺带扫出并处理的
+
+- **16 个零消费方的 `--ye-*` token**（查 #16 时从 `--ye-doc-page-cut-height` 扫同型扫出）。
+  浏览器实测 30 个采样点零视觉差异后删除，新增护栏（不变量 42）。
+- **主 chunk 里的注释直接吃产物预算**（ESM 不压缩），一段注释吃掉 471B（不变量 41）。
 
 ---
+
+## 仍然开着的口子（下一棒可以从这里挑）
+
+1. **文本选中色用的是浏览器默认。** `--ye-selection` 曾配了亮/暗两套值，却从没有
+   `::selection` 规则，这次作为死 token 删掉了。要让选中色跟随品牌，需要：重新加回 token、
+   **为三套外观 × 明暗两态各配值**、写规则、验证选中文字的对比度。属于视觉变更。
+2. **`--ye-spacing-*` 阶梯整套被删后，间距仍然全是硬编码。** 若要建立真正的间距体系，
+   得先决定用在哪些地方，再连规则一起加（不变量 42 会挡住「只加 token 不加规则」）。
+3. **`lineNumber.ts` 的一条未验证观察**：`MsoLineNumber` 在 Word 里是**字符样式**，
+   实际形态可能是 `<span class="MsoLineNumber">12</span>` 这样的行号数字本身，
+   而不是包住正文的容器——那样 unwrap 会把行号数字留进正文（实测 `12正文`）。
+   判定该整体删除还是 unwrap 需要**真实的 Word 剪贴板样本**，拿到之前不要改，
+   改错的代价是丢正文。
+4. **`UndoRedoButton` 的 `hasRealEdit` 语义可疑。** 它想挡「初始化时的误判」，
+   但实测：初始化时 `can().undo()` 本来就是 false（守卫多余），而 `setContent`
+   （宿主受控推内容）会进 history **且**会 emit `update` 把 `hasRealEdit` 置 true
+   ——它想挡的那个场景恰恰挡不住。根因可能在「受控内容推送该不该进用户的撤销历史」，
+   要动得先想清楚这个产品语义。第 10 棒只记录，未改。
 
 ## 附录：文件清单口径
 
@@ -589,3 +612,6 @@ find src -type f \( -name "*.ts" -o -name "*.vue" -o -name "*.css" \) \
 ```
 
 第 9 棒结束时：294 个文件 / 30739 行，全部逐行读完（提交 `c59f6e0`）。
+
+第 10 棒之后是 **295 个**：新增 `composables/useBatchUploadGate.ts`。
+（上表的 294 是第 9 棒逐行复核的口径，保留作历史记录。）
