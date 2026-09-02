@@ -118,6 +118,29 @@ export async function mountEditor(
   );
 }
 
+/**
+ * 等实例 locale 的语言包落地。
+ *
+ * 语言包是 `await import()` 的，一次 `flushPromises()` 等不到；没等够时组件里的
+ * `t()` 返回的还是原始 key（`editor.mathEdit`），断言会莫名其妙地失败。
+ *
+ * ⚠️ 判据只能问 locale 上下文自己。按渲染文本判（「页面上还有没有 `editor.` 开头的字」）
+ * 依赖被测组件恰好渲染了某条文案——组件如果渲染的是公式、图标或空弹窗，
+ * 判据一开始就满足，等于**一次都没等**。这个坑在三个测试文件里各踩了一次。
+ */
+export async function waitForLocaleMessages(
+  ctx: { messages: { value: unknown } },
+  attempts = 80,
+): Promise<void> {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    await flushPromises();
+    await nextTick();
+    if (ctx.messages.value !== null) return;
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  throw new Error("语言包未在预期内就绪");
+}
+
 export function unmountAll(): void {
   while (mounted.length) mounted.pop()?.unmount();
   document.body.innerHTML = "";

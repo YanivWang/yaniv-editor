@@ -15,6 +15,7 @@
         :aria-label="t('editor.mathLatexInput')"
         :placeholder="t('editor.mathPlaceholder')"
         @keydown.enter.ctrl="saveAndClose"
+        @keydown.enter.meta="saveAndClose"
         @keydown.escape="cancelEdit"
         @blur="handleBlur"
       />
@@ -41,6 +42,8 @@
       :aria-label="t('editor.mathEdit')"
       @dblclick="startEdit"
       @click="handleClick"
+      @keydown.enter.prevent="startEdit"
+      @keydown.space.prevent="startEdit"
       v-html="displayHtml"
     />
   </NodeViewWrapper>
@@ -127,7 +130,13 @@ function handleBlur(e: FocusEvent) {
   saveAndClose();
 }
 
-// 处理点击（选中节点）
+/**
+ * 单击选中、双击编辑；键盘 Enter / Space 直接进编辑。
+ *
+ * 这个 `<button>` 的可访问名是「编辑公式」，而键盘激活它原先只会选中节点
+ * ——名不符实，且键盘用户**根本没有进入编辑的路径**（双击没有键盘等价物）。
+ * 鼠标那两条交互保持不变。
+ */
 function handleClick() {
   const pos = props.getPos();
   if (typeof pos === "number") {

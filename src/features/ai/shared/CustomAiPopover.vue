@@ -27,6 +27,7 @@
               :placeholder="t('editor.aiPromptPlaceholder')"
               :auto-size="{ minRows: 3, maxRows: 6 }"
               @keydown.ctrl.enter="handleExecute"
+              @keydown.meta.enter="handleExecute"
             />
           </div>
 

@@ -218,7 +218,7 @@ export const enUS: TiptapLocale = {
     mathInline: "Inline Formula",
     mathBlock: "Block Formula",
     mathPlaceholder: "Enter LaTeX formula...",
-    mathEmpty: "Click to edit formula",
+    mathEmpty: "Double-click to edit formula",
 
     insertTemplate: "Insert Template",
     templateMeetingMinutes: "Meeting Minutes",

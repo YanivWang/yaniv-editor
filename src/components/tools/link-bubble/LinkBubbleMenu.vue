@@ -78,7 +78,9 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { nextTick, ref, watch, computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
+import { applyLinkToEditor } from "@/components/editor/link/linkActions";
 import { shouldShowLinkBubbleMenu } from "@/composables/bubbleMenuShouldShow";
+import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayBubbleMenu, useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -87,6 +89,7 @@ import { createCommandRunner } from "@/utils/editorCommands";
 import { normalizeSafeUrl } from "@/utils/safeUrl";
 
 const t = useEditorT();
+const feedback = useOverlayFeedback();
 
 const appearanceCtx = useInjectEditorAppearance();
 const appearanceClass = computed(() =>
@@ -173,7 +176,12 @@ function editLink() {
 }
 
 /**
- * 应用链接编辑
+ * 应用链接编辑。
+ *
+ * 分流交给 `applyLinkToEditor`——它是 `LinkButton` 用的同一份实现。此前这里自己写了
+ * 一份「按 `selection.empty` 二选一」的逻辑，正是 `linkActions` 抽出来之前的形状：
+ * 同一个决定有两份实现，修好一处不会惠及另一处。
+ * （这里那半实际不可达：bubble menu 只在选区非空时显示。收敛掉是为了不再有第二份。）
  */
 function applyLink() {
   const e = editor.value;
@@ -181,47 +189,29 @@ function applyLink() {
 
   const finalUrl = linkUrl.value.trim();
 
-  if (finalUrl) {
-    const urlToSet = normalizeSafeUrl(finalUrl);
-    if (!urlToSet) return;
-
-    // 更新链接 - 直接使用编辑器实例确保状态同步
-    if (e) {
-      const hasSelection = !e.state.selection.empty;
-      const chain = e.chain().focus();
-
-      if (hasSelection) {
-        // 如果有选中文本，扩展标记范围并设置链接
-        const success = chain
-          .extendMarkRange("link")
-          .setLink({ href: urlToSet, target: "_blank" })
-          .run();
-        if (success) {
-          // 立即更新显示的链接URL
-          currentLinkUrl.value = urlToSet;
-          // 等待状态同步后再次确认
-          nextTick(() => {
-            updateCurrentLinkUrl();
-          });
-        }
-      } else {
-        // 如果没有选中文本，在当前光标位置设置链接
-        const success = chain.setLink({ href: urlToSet, target: "_blank" }).run();
-        if (success) {
-          currentLinkUrl.value = urlToSet;
-          nextTick(() => {
-            updateCurrentLinkUrl();
-          });
-        }
-      }
-    }
-  } else {
-    // 如果URL为空，移除链接
+  if (!finalUrl) {
+    // 清空输入 = 移除链接
     runCommand((chain: any) => chain.unsetLink())();
     currentLinkUrl.value = "";
+    closeLinkModal();
+    return;
   }
 
-  // 关闭模态框并清空输入
+  const safeUrl = normalizeSafeUrl(finalUrl);
+  if (!safeUrl) {
+    // 不提示就是静默失败：弹窗还开着、链接没变，用户不知道自己输错了什么
+    feedback.toast(t("editor.enterValidLink"), "warning");
+    return;
+  }
+
+  applyLinkToEditor(e, safeUrl);
+  currentLinkUrl.value = safeUrl;
+  // 命令走的是 chain，属性要等这一拍事务落地后再读
+  nextTick(updateCurrentLinkUrl);
+  closeLinkModal();
+}
+
+function closeLinkModal() {
   linkModalOpen.value = false;
   linkUrl.value = "";
 }

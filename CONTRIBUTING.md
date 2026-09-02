@@ -300,6 +300,19 @@ docs: 补充 z-index 说明
     看它周围有没有「曾经有人认真对待过」的痕迹（成对的兄弟 key、types 里的声明、
     同类场景里已经接上的写法）。
 
+43. **写「某某不会发生」的断言前，先确认「它会发生」的那一半站得住。**
+    `expect(html).not.toContain("<video")` 在文档里压根没解析出 video 节点时恒真
+    ——测试文档的 HTML 写错标签（`Video` 认的是 `video[src]`）就会这样，
+    而它看起来一切正常。**在否定断言之前加一条肯定的前置断言**
+    （`expectHasVideo`），让「素材根本不对」当场暴露。
+
+44. **jsdom 里有些事实观察不到，说清楚比硬测强。**
+    已知的三处：antd 关闭弹窗依赖 CSS 过渡结束事件（jsdom 不触发，
+    `.ant-modal-wrap` 的 class 与 style 一个字都不变）；tiptap 的 `focus()`
+    走 `requestAnimationFrame` 且 jsdom 没有真实焦点管理；嵌套 dropdown 的
+    overlay 停在测量阶段不渲染内容。碰到这类情况**在测试里写明为什么没测**，
+    并把验收交给 e2e 或组件自己的插槽契约——留一条恒真的断言比没有更糟。
+
 ## 测试
 
 - 单测：`src/**/*.test.ts`（vitest + jsdom）。纯函数与扩展行为优先。

@@ -300,16 +300,16 @@ pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个�
 
 **当前基线（第 14 棒全部完成时实测）：**
 
-- `pnpm run verify` 退出 0，**1009 个用例全过（108 个测试文件）**，eslint 零 warning
-  —— 第 14 棒 966 / 102，第 13 棒 933 / 100，第 12 棒 917 / 98，第 11 棒 911 / 98
-- 覆盖率 Statements **72.89%** / Branches **60.76%** / Functions **69.05%** / Lines **74.85%**
-  （`vitest.config.ts` 的阈值仍是 statements 56 / lines 56 / branches 44 / functions 52，
-  **实测值已远超阈值，第 16 棒要提档**）
-- `pnpm run build` 产物预算实测：主 chunk gzip **42734 / 46000**（余量 **3266B**）、
-  `style.css` **17193 / 19000**、`inline.css` **8936 / 10500**；代码分割断言全过
+- `pnpm run verify` 退出 0，**1109 个用例全过（119 个测试文件）**，eslint 零 warning
+  —— 第 15 棒 1009 / 108，第 14 棒 966 / 102，第 13 棒 933 / 100，第 12 棒 917 / 98
+- 覆盖率 Statements **77.58%** / Branches **65.44%** / Functions **75.51%** / Lines **79.69%**
+  （`vitest.config.ts` 的阈值第 16 棒已提档到 **75 / 77 / 63 / 73**，各留约 2 个点余量；
+  阈值本身做过变异验证——抬到 90 会红，不是摆设）
+- `pnpm run build` 产物预算实测：主 chunk gzip **42695 / 46000**（余量 **3305B**）、
+  `style.css` **17193 / 19000**、`inline.css` **8938 / 10500**；代码分割断言全过
 - `pnpm run test:e2e` **28 passed**（第 14 棒从 25 补到 28）
 - `pnpm run build:check` 通过（三个入口 × ESM/CJS 共 6 种加载方式 + 两个 CSS）
-- ARCHITECTURE 不变量 **55 条**，CONTRIBUTING 约定 **42 条**
+- ARCHITECTURE 不变量 **57 条**，CONTRIBUTING 约定 **44 条**
 - ⚠️ 注释基本不吃产物预算（不变量 41 已更正）：`.ts` / `.vue` 语句之间的注释进不了
   产物（30 行 0B），只有写在**对象字面量属性上**的才进（30 行 209B）。
 
@@ -341,7 +341,8 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 - `b3617a4` / `e6f7ccd` —— 第 13 棒续：撤销历史清空 + 间距棘轮护栏 + ColorPicker 移出主 chunk
 - `fa87674` —— 第 13 棒收尾：补 3 条会话重建 e2e，并更正一条被误判为真实缺陷的 jsdom 现象
 - `58062ba` —— 第 14 棒 DragHandle：5 个缺陷 + 30 条单测 + 1 条全仓护栏 + e2e 25→28
-- 第 15 棒 —— AI 与媒体链路：4 个缺陷 + 38 条用例 + 2 条护栏
+- `54e7a4e` —— 第 15 棒 AI 与媒体链路：4 个缺陷 + 38 条用例 + 2 条护栏
+- 第 16 棒 —— 剩余组件：4 个缺陷 + 100 条用例 + 阈值提档
 
 用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
@@ -1016,51 +1017,130 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
 
 ---
 
-## 下一棒的计划（第 14~16 棒，第 13 棒末尾定的）
+## 第 16 棒做了什么（已完成）
 
-**为什么是这三棒**：常见的缺陷维度已被前 13 棒扫透——第 13 棒收尾时扫了
-「资源释放」「异步竞态」「订阅首次同步」三个维度，**全是负结果**。
-继续按维度扫，边际产出会越来越低。
-但覆盖率是个客观缺口：**200 个文件里 5 个零覆盖、23 个低于 40%，
-33% 的语句从未被执行过**。而本仓库反复印证「没被执行过的代码最容易藏问题」
-（`transformRemoveLineNumberWrapper` 的测试是空操作、`--ye-caret` 定义齐全却零消费，
-都是这么冒出来的）。**目标不是刷数字，是借补测试把没执行过的路径走一遍。**
+剩余组件 + 阈值提档 + 收尾。**4 个缺陷，都是「说了做不到」或「清理只做一半」。**
 
-覆盖率缺口 top（第 13 棒末实测）：
+### 修复（5 项，全部登记进 CHANGELOG）
+
+1. **子菜单收起定时器在组件卸载后仍会触发**（不变量 56）——关菜单时清了，卸载路径漏了。
+2. **公式块的键盘用户没有编辑入口**（不变量 57）——`<button aria-label="编辑公式">`
+   按 Enter 只会选中节点，真正的入口只有 `dblclick`（没有键盘等价物）；
+   空公式占位文案还写着「点击编辑公式」而单击并不进编辑。补键盘路径 + 改文案。
+3. **Mac 上按不了 Cmd+Enter**——Vue 模板的 `.ctrl` 修饰符不匹配 Cmd，两处各补 `.meta`。
+4. **链接气泡菜单输入非法地址时完全无提示**（不变量 55）——弹窗不关、链接不变、
+   什么也不说；同仓库 `ImageUpload` 的同类弹窗一直有这条提示。
+5. **链接气泡菜单收敛到 `applyLinkToEditor`**——它自己写了一份第 9 棒修复前形状的分流。
+
+### 覆盖率与阈值
+
+- Statements **72.89% → 77.58%**，Lines **74.85% → 79.69%**，用例 1009 → **1109**。
+- 阈值 56/56/44/52 → **75/77/63/73**（各留约 2 点余量）。**阈值做过变异验证**：
+  抬到 90 会红，确认它真的在把关。
+- ⚠️ **没有达到「Statements 80% 上下」这个终点判据**（差 2.4 个点）。
+  剩下的大头写在 `vitest.config.ts` 的注释里：`BlockPickerMenu.vue`（99 行）、
+  `aiSuggestionManager` 的浮层挂载与定位（92）、`ColorPicker.vue`（50）、
+  `resizableImage.ts` 的拖拽改尺寸（48）、`AiSettingsModal.vue`（44）。
+  其中拖拽与浮层定位属于「要布局才能测」的部分，另外三个是常规组件逻辑，可以继续补。
+
+### 负结果 / 被推翻的判断（别重复走）
+
+- **`LinkBubbleMenu` 的「裸 setLink」分支不可达** —— 我一度以为第 9 棒那个
+  「编辑已有链接把原链接劈成两半」的缺陷在这里还活着（代码形状一模一样）。
+  实证：`shouldShowLinkBubbleMenu` 要求选区非空才显示，所以永远走 `extendMarkRange`
+  那一支。**收敛仍然做了**，但理由是「不该有第二份实现」，不是「修了一个 bug」。
+- **`wordImport` 的 `<img src>` 确实是虚惊**（复核第 10 棒结论）——
+  `ResizableImage.src` 的 `parseHTML` 过 `normalizeSafeMediaUrl`，schema 层兜住了。
+- **三处「不可达的双保险」**，变异不转红，已如实标注而非硬凑测试：
+  `onMenuClick` 的 `:split-hover` 后缀早退（`findMenuItemByKey` 本来就找不到）、
+  `VideoToolbar` / `ImageToolbar` 的 `!node || pos === null`（两者恒同真同假；
+  且 `updateAttributes("image", …)` 对非 image 节点本就无效）。
+- **`aiSuggestionManager` 不是好的补测目标** —— 已有 399 行测试覆盖了核心，
+  剩下的 92 行几乎都是浮层挂载与定位，jsdom 里测不出价值。
+
+### 一条待复验的观察（不要当成缺陷）
+
+`FindReplaceDialog` 点「替换」之后，jsdom 下选区没有落到剩下的那个命中上
+（直接调 `searchReplaceSelectCurrent()` 能选中 5-6，经组件的 `handleReplace`
+走同一条路却停在 1-1）。差异出在 `focusSearchHit` 里的 `editor.commands.focus()`。
+**按不变量 45，这必须在真实浏览器里复验后才能称为缺陷**，本棒没做，
+所以测试里只锁了「命中集合跟着文档重算」，没有把 jsdom 的现象写成期望行为。
+
+### 第 16 棒踩的坑（方法论补充）
+
+41. **否定断言前要先站住肯定的那一半。** `expect(html).not.toContain("<video")`
+    在文档压根没解析出 video 节点时恒真——测试文档的 HTML 标签写错（`Video` 认的是
+    `video[src]`，我写的是 `div[data-type]`）就是这样，而它看起来一切正常。
+    加一条 `expectHasVideo` 前置断言，当场就暴露了。
+42. **桩要装在被测代码真正拿到的那个对象上。** `vi.spyOn(editor.commands, "x")`
+    对 tiptap 无效：`commands` 是每次访问都新建对象的 getter，spy 装在临时对象上，
+    组件拿到的是另一个，断言永远是「没被调用」。改成断言真实效果
+    （storage / 选区 / 文档），也更贴近用户能看到的东西。
+43. **「总数下降」不是「我那个被清了」。** 验卸载清定时器时用
+    `vi.getTimerCount()` 的总数，而 antd 与 Vue 自己也会清一批，没写清理照样绿。
+    要盯组件排的那一个（按它独有的延时值认出来），看它的 id 有没有被 `clearTimeout`。
+44. **同一个等待判据坑踩了三次才收敛。** 「语言包加载完了没有」写成
+    「渲染文本里还有没有 `editor.`」，会因为组件恰好渲染的是公式 / 图标 / 空弹窗
+    而**一次都不等**。判据只能问 locale 上下文自己，已抽成
+    `waitForLocaleMessages` 放进 `src/testing/mountEditor.ts`。
+45. **按文案找元素要当心子串与自动空格。** 「替换」是「全部替换」的子串（用
+    `includes` 会点到「全部替换」上去）；antd 还会给两个汉字的按钮自动插一个空格
+    （实际文本是「替 换」）。精确比较 + 去空白，并在找不到时把现有文案打出来。
+
+---
+
+## 第 14~16 棒的整体结论
+
+**赌注是「借补测试把没执行过的代码路径走一遍」，赢了**：三棒共翻出 **13 个缺陷**，
+其中 6 个是用户可感知的内容损坏或静默失败，而它们全都躺在覆盖率为零或很低的文件里。
+
+| 棒次 | 范围                                | 缺陷 | 用例 |
+| ---- | ----------------------------------- | ---: | ---: |
+| 14   | `DragHandleExtension`（此前零单测） |    5 |  +33 |
+| 15   | AI 与媒体链路                       |    4 |  +38 |
+| 16   | 剩余组件 + 阈值提档                 |    4 | +100 |
+
+覆盖率 Statements **66.69% → 77.58%**，Lines **68.31% → 79.69%**，
+用例 **933 → 1109**，e2e **25 → 28**，阈值 56/56/44/52 → **75/77/63/73**。
+
+### 终点判据达成情况（如实）
+
+- ✅ 阈值提档（并做了变异验证）
+- ✅ 三棒发现的缺陷全部修完并钉进不变量（新增不变量 50~~57、约定 39~~44）
+- ❌ **Statements 没到 80%**（77.58%，差 2.4 个点）。Lines 79.69% 基本到线。
+
+### 为什么这三棒的产出率高，以及下一棒该怎么挑
+
+**规律很清楚：缺陷密度与「这段代码被执行过没有」强相关。**
+13 个缺陷里，`DragHandleExtension`（0% 覆盖）一个文件贡献 5 个，
+`mediaUpload`（0%）与两个上传组件的失败分支贡献 2 个，
+`MathNodeView`（4.5%）贡献 2 个。**而已有测试的文件几乎没翻出东西**
+（`aiSuggestionManager` 有 399 行测试，这一棒只在它的**未覆盖分支**里找到 1 个）。
+
+所以下一棒仍按「覆盖率最低 + 有用户可感知行为」挑，剩余候选（`vitest.config.ts`
+注释里有同一份清单）：
 
 ```
-缺 387 条 (21.97%)  src/extensions/dragHandle/DragHandleExtension.ts   ← 一个文件占缺口 1/6
-缺  73 条 (21.5%)   src/components/base/ToolbarDropdownButton.vue
-缺  63 条 (25%)     src/components/editor/find-replace/FindReplaceDialog.vue
-缺  63 条 (22.22%)  src/features/ai/AiMenuButton.vue
-缺  53 条 (32.05%)  src/components/tools/link-bubble/LinkBubbleMenu.vue
-缺  47 条 (4.08%)   src/extensions/math/MathNodeView.vue
-缺  42 条 (38.23%)  src/components/tools/video-toolbar/VideoToolbar.vue
-缺  38 条 (39.68%)  src/components/tools/image-toolbar/ImageToolbar.vue
-缺  34 条 (27.65%)  src/components/editor/gallery/GalleryButton.vue
-缺  29 条 (12.12%)  src/features/ai/shared/runAiSuggestionStream.ts
-缺  28 条 (36.36%)  src/components/editor/image/ImageUpload.vue
-缺  28 条 (6.66%)   src/extensions/pasteImage.ts
-零覆盖：wordImport.ts(19) / mediaUpload.ts(9) / menuItem.ts(8)
-       / scrollEditorSelectionIntoView.ts(1) / preventCommandAutoDispatch.ts(1)
+缺  99 行 (42.4%)  components/tools/block-menu/BlockPickerMenu.vue   ← 最大，常规组件逻辑
+缺  50 行 (46.8%)  components/editor/color/ColorPicker.vue
+缺  44 行 (54.6%)  features/ai/components/AiSettingsModal.vue
+缺  48 行 (75.6%)  extensions/resizableImage.ts        ← 拖拽改尺寸，属「要布局」的部分
+缺  92 行 (67.4%)  features/ai/shared/aiSuggestionManager.ts  ← 浮层挂载与定位，同上
 ```
 
-- **第 14 棒**：`DragHandleExtension`。一个文件占缺口 1/6，且是真实浏览器交互逻辑
-  （几何、hover、拖放），`e2e/drag-handle.spec.ts` 已有 5 条可复用扩展。
-  ⚠️ 它是**门控能力**，不在主 chunk，加测试不吃产物预算。
-- **第 15 棒**：AI 与媒体链路——`AiMenuButton` / `runAiSuggestionStream` /
-  `pasteImage` / `mediaUpload` / `ImageUpload` / `VideoToolbar` / `GalleryButton`。
-  ⚠️ AI 要 mock 掉网络；媒体注意 `mediaSrcPolicy` / `safeUrl` 的既有断言。
-- **第 16 棒**：剩余组件（`ToolbarDropdownButton` / `FindReplaceDialog` /
-  `MathNodeView` / `LinkBubbleMenu` / `wordImport`）+ **把 `vitest.config.ts` 的
-  覆盖率阈值提到实测值附近**（只能升不能降）+ 交接文档收尾。
+前三个补完大约能到 Statements 80%。后两个建议走 e2e 而不是硬凑单测
+（判据见 `vitest.config.ts` 里那段：**「这段逻辑要不要布局」，不是「这个文件属不属于交互层」**）。
 
-**终点判据**：覆盖率 Statements 到 80% 上下、阈值提档、三棒里发现的缺陷全部修完
-并钉进不变量。到那时可以宣布「按当前能力已做到位」——这是可验证的终点，不是感觉。
+### 一条待复验的观察
 
-⚠️ **补测试不是刷数字**：每写一条用例都要问「它锁住了什么行为」。
-写完做变异验证——改坏被测代码，用例必须转红。锁不住任何东西的用例是负债，
-本仓库已经踩过（`transformRemoveLineNumberWrapper` 的 `toContain("正文")` 恒真）。
+`FindReplaceDialog` 替换后选区没落到剩下的命中上（jsdom 下）——见第 16 棒小节，
+**必须在真实浏览器里复验后才能称为缺陷**（不变量 45）。
+
+### 仍然挂起的任务
+
+`src/extensions/office-paste/lineNumber.ts` 的 `MsoLineNumber` 形态判定，
+需要一份**真实的 Word 剪贴板 HTML**（不是 `.doc` 文件——`MsoLineNumber` 只存在于
+剪贴板的 `text/html` 里）。拿到之前不要动，改错的代价是丢正文。
 
 ---
 

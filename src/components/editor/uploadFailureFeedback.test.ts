@@ -20,7 +20,11 @@ import { defineComponent, h, nextTick, ref } from "vue";
 import { provideEditorRoot, provideOverlayPortal } from "@/core/editorContext";
 import { provideEditorLocale } from "@/core/infra/useEditorLocale";
 import { EDITOR_ROOT_CLASS, OVERLAY_PORTAL_CLASS } from "@/core/overlayPortal";
-import { installBrowserStubs, installLayoutStubs } from "@/testing/mountEditor";
+import {
+  installBrowserStubs,
+  installLayoutStubs,
+  waitForLocaleMessages,
+} from "@/testing/mountEditor";
 
 import ImageUpload from "./image/ImageUpload.vue";
 import VideoUpload from "./video/VideoUpload.vue";
@@ -56,7 +60,7 @@ const DraggerStub = defineComponent({
 let editor: Editor | null = null;
 let wrapper: VueWrapper | null = null;
 let portal: HTMLElement;
-let localeReady: () => boolean = () => false;
+let localeCtx: { messages: { value: unknown } } | null = null;
 
 async function mountUploader(component: Component, props: Record<string, unknown>): Promise<void> {
   const el = document.createElement("div");
@@ -76,8 +80,7 @@ async function mountUploader(component: Component, props: Record<string, unknown
 
         provideEditorRoot(ref(root));
         provideOverlayPortal(ref(portal));
-        const localeCtx = provideEditorLocale(ref<string | undefined>("zh-CN"));
-        localeReady = () => localeCtx.messages.value !== null;
+        localeCtx = provideEditorLocale(ref<string | undefined>("zh-CN"));
         return () => h(component, { editor: currentEditor, ...props });
       },
     }),
@@ -94,21 +97,7 @@ async function mountUploader(component: Component, props: Record<string, unknown
     },
   );
 
-  /**
-   * 语言包是 `await import()` 的，一次 flush 等不到，没等够就会断言到
-   * `messages.imageUploadFailed` 这样的原始 key。
-   *
-   * 判据直接问 locale 上下文自己：按渲染文本判（「文案里还有没有 `editor.`」）
-   * 依赖被测组件恰好渲染了某条文案——`VideoUpload` 的弹窗里没有，
-   * 于是那个判据一开始就满足，等于没等。
-   */
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    await flushPromises();
-    await nextTick();
-    if (localeReady()) return;
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-  throw new Error("语言包未在预期内就绪");
+  await waitForLocaleMessages(localeCtx!);
 }
 
 async function runUpload(file: File): Promise<unknown> {

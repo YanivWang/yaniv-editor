@@ -59,6 +59,20 @@
 
 ### Fixed
 
+- **下拉菜单的子菜单收起定时器在组件卸载后仍会触发。** 关菜单时清了，卸载路径漏了
+  ——宿主切 preset / locale 会把整个 chrome 卸载重挂，而 `setTimeout` 排的那一帧
+  还在 150ms 后回来改一个已经没人看的状态。补 `onBeforeUnmount`。→ 不变量 56
+- **公式块的键盘用户没有编辑入口。** 显示态是个 `<button aria-label="编辑公式">`，
+  而键盘激活它只会选中节点：真正的编辑入口只有 `dblclick`，双击没有键盘等价物。
+  空公式的占位文案也一直写着「点击编辑公式」，而单击同样不进编辑。
+  补上 Enter / Space 进编辑，并把文案改成与实际交互一致的「双击编辑公式」。→ 不变量 57
+- **公式编辑框与自定义 AI 输入框在 Mac 上按不了 Cmd+Enter。** Vue 模板的 `.ctrl`
+  修饰符不匹配 Cmd（那是 `.meta`），而 tiptap 侧的 `Mod-` 前缀自带这个映射，
+  于是同一个编辑器里两套快捷键行为不一致。两处各补一条 `.meta` 绑定。
+- **链接气泡菜单里输入非法地址时什么也不发生。** 弹窗不关、链接不变、没有任何提示，
+  用户不知道自己输错了什么（同仓库 `ImageUpload` 的网络地址弹窗一直有这条提示）。
+  补上提示，并保留弹窗与用户已输入的内容让他修改。→ 不变量 55
+
 - **换一次 AI 操作之后，「取消」按钮就再也停不下正在跑的流。** `aiSuggestionManager`
   只存一个 `AbortController`；换流的时序是「新流设句柄 → 旧流被 abort → 旧流的 fetch
   以 `AbortError` 走 `onError` 并在那里清句柄」，而清的时候句柄已经是**新流**的了。
@@ -870,6 +884,14 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
 
 ### Changed
 
+- **链接气泡菜单改用与工具栏同一份链接分流实现（`applyLinkToEditor`）。**
+  此前它自己写了一份「按 `selection.empty` 二选一」的逻辑，正是 `linkActions`
+  抽出来之前的形状——同一个决定有两份实现，修好一处不会惠及另一处。
+  （气泡菜单那半实际不可达：菜单只在选区非空时显示；收敛掉是为了不再有第二份，
+  顺带补上了原先漏掉的 `rel="noopener noreferrer"`。）
+- **`ToolbarDropdownButton` 的两处菜单选中逻辑收敛成一个 `selectMenuItem`**
+  （原先 `onMenuClick` 与 `onSplitChildSelect` 有四行逐字重复）。
+
 - **收敛 9 处冗余的编辑器事件订阅。** 实测（tiptap 3）`transaction` 是 `update` /
   `selectionUpdate` 的超集，唯一例外是 `setEditable`——它不产生事务，只 emit `update`。
   `OutlinePanel` / `FormatPainterButton` / `useEditorColorState` 三个事件全订，
@@ -1086,6 +1108,26 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   四条入口逐一断言见 `mediaSrcPolicy.test.ts`。
 
 ### Tests
+
+- **覆盖率阈值提档**：statements 56 → **75**、lines 56 → **77**、
+  branches 44 → **63**、functions 52 → **73**。实测 77.58 / 79.69 / 65.44 / 75.51，
+  各留约 2 个点余量吸收机器与依赖版本差异。阈值本身做了变异验证（抬到 90 会红）。
+- 新增测试文件：`ToolbarDropdownButton`（15）、`MathNodeView`（16）、
+  `wordImport`（9，此前零覆盖）、`pasteImage`（9）、`LinkBubbleMenu`（8）、
+  `FindReplaceDialog`（10）、`VideoToolbar`（7）、`ImageToolbar`（7）、
+  `GalleryButton`（10）、`menuItem`（6，此前零覆盖）、
+  `preventCommandAutoDispatch`（3，此前零覆盖）。
+- `src/testing/mountEditor.ts` 新增 `waitForLocaleMessages`：语言包是按需加载的，
+  等待判据只能问 locale 上下文自己。按渲染文本判会因组件恰好没渲染文案而**一次都不等**
+  ——这个坑在三个测试文件里各踩了一次，收敛成一个工具。
+- ⚠️ 本轮有五条用例第一版**锁不住任何东西**，都已改写或如实标注：
+  卸载清定时器（断言总数下降，而 antd/Vue 自己也会清）、
+  视频删除（测试文档 HTML 写错标签，`not.toContain("video")` 恒真）、
+  预览不弹窗（弹窗开着但地址为空时同样拿不到元素）、
+  非法链接保留弹窗（antd 关闭是过渡动画，同一拍观察不到）、
+  以及三处**不可达的双保险**（`:split-hover` 后缀早退、`!node` 与 `pos === null`
+  重复、`updateAttributes` 对非 image 节点本就无效）——后者按方法论标注为
+  「防御性双保险」而没有硬凑测试去覆盖。
 
 - `src/features/ai/shared/runAiSuggestionStream.test.ts`（新增，6 条）—— 走真实入口
   验证换流后的句柄交接：旧流的 `AbortError` / `onComplete` 都不得带走新流的取消能力。

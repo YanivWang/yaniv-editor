@@ -213,7 +213,7 @@ export const zhCN: TiptapLocale = {
     mathInline: "行内公式",
     mathBlock: "块级公式",
     mathPlaceholder: "输入 LaTeX 公式...",
-    mathEmpty: "点击编辑公式",
+    mathEmpty: "双击编辑公式",
 
     insertTemplate: "插入模板",
     templateMeetingMinutes: "会议纪要",

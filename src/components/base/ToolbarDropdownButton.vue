@@ -155,7 +155,7 @@
 
 <script setup lang="ts">
 import { CheckOutlined, DownOutlined, RightOutlined } from "@ant-design/icons-vue";
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
@@ -260,8 +260,8 @@ function onSplitPrimary(item: MenuItemConfig) {
   emit("splitPrimary", item.key);
 }
 
-function onSplitChildSelect(info: MenuInfo) {
-  const key = String(info.key);
+/** 选中一项：收起整棵菜单、执行它的 action、把 key 交给宿主 */
+function selectMenuItem(key: string) {
   const item = findMenuItemByKey(props.items, key);
   if (!item) return;
 
@@ -270,6 +270,17 @@ function onSplitChildSelect(info: MenuInfo) {
   item.action?.();
   emit("select", key);
 }
+
+function onSplitChildSelect(info: MenuInfo) {
+  selectMenuItem(String(info.key));
+}
+
+/**
+ * 关菜单时会清定时器，**卸载时也必须清**：`scheduleSplitClose` 排的这一帧
+ * 会活过组件——宿主切 preset / locale 会把整个 chrome 卸载重挂，
+ * 而定时器还在 150ms 后回来改一个已经没人看的 ref。清理只做一半就是漏。
+ */
+onBeforeUnmount(cancelSplitClose);
 
 function handleOpenChange(open: boolean) {
   emit("openChange", open);
@@ -283,14 +294,9 @@ const getPopupContainer = useOverlayMountTarget();
 
 function onMenuClick(info: MenuInfo) {
   const key = String(info.key);
+  // 分裂项那一行是自己的容器，点它不算选中（真正的选择由行内两个 button 负责）
   if (key.endsWith(":split-hover")) return;
 
-  const item = findMenuItemByKey(props.items, key);
-  if (!item) return;
-
-  dropdownOpen.value = false;
-  splitOverlayKey.value = null;
-  item.action?.();
-  emit("select", key);
+  selectMenuItem(key);
 }
 </script>
