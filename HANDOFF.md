@@ -298,19 +298,20 @@ pnpm run build:check   # build + 逐条件真实加载每个入口（约 5 分�
 pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个就够）
 ```
 
-**当前基线（第 13 棒完成时实测，提交 `2e702b9`）：**
+**当前基线（第 13 棒全部完成时实测，提交 `fa87674`）：**
 
 - `pnpm run verify` 退出 0，**933 个用例全过（100 个测试文件）**，eslint 零 warning
-  —— 第 13 棒中途 923 / 99，第 12 棒 917 / 98，第 11 棒 911 / 98，第 10 棒 908 / 98
-- 覆盖率 Statements 66.61% / Branches 56.16% / Functions 62.84% / Lines 68.24%
+  —— 第 12 棒 917 / 98，第 11 棒 911 / 98，第 10 棒 908 / 98，第 9 棒 834 / 89
+- 覆盖率 Statements **66.69%** / Branches **56.29%** / Functions **62.94%** / Lines **68.31%**
+  （`vitest.config.ts` 的阈值仍是 statements 56 / lines 56 / branches 44 / functions 52，
+  **实测值已远超阈值，第 16 棒要提档**）
 - `pnpm run build` 产物预算实测：主 chunk gzip **42674 / 46000**（余量 **3326B**）、
   `style.css` **17193 / 19000**、`inline.css` **8936 / 10500**；代码分割断言全过
-  —— 余量一度只剩 217B，把 `ColorPicker` 移出主 chunk 后回到 3326B
-- `pnpm run test:e2e` **22 passed**
-- ⚠️ **主 chunk 余量 3326B。** 但注意：**注释基本不吃预算**——第 12 棒实测更正了
-  不变量 41，`.ts` / `.vue` 里语句之间的注释进不了产物（30 行 0B），
-  只有写在**对象字面量属性上**的才进（30 行 209B）。加代码前仍要 `pnpm run build` 复量。
-- **动了 CSS / 序列化 / 主 chunk 就必须跑 e2e。**
+- `pnpm run test:e2e` **25 passed**（第 13 棒从 22 补到 25）
+- `pnpm run build:check` 通过（三个入口 × ESM/CJS 共 6 种加载方式 + 两个 CSS）
+- ARCHITECTURE 不变量 **49 条**，CONTRIBUTING 约定 **38 条**
+- ⚠️ 注释基本不吃产物预算（不变量 41 已更正）：`.ts` / `.vue` 语句之间的注释进不了
+  产物（30 行 0B），只有写在**对象字面量属性上**的才进（30 行 209B）。
 
 产物预算手动核验：
 
@@ -337,7 +338,8 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 - `6c3d545` / `c238fb7` —— 第 11 棒修复撤销按钮在 `mode` 往返后变灰（口子 #4 结清）
 - `0b571f3` / `c998f11` —— 第 12 棒修复切换语言的内容丢失 / 白屏卡死 / 编辑器泄漏（5 处）
 - `2e702b9` / `c2f7b47` —— 第 13 棒选中底色 + 光标色，堵上 token 护栏的反引号漏洞
-- `b3617a4` —— 第 13 棒续：撤销历史清空 + 间距棘轮护栏 + ColorPicker 移出主 chunk
+- `b3617a4` / `e6f7ccd` —— 第 13 棒续：撤销历史清空 + 间距棘轮护栏 + ColorPicker 移出主 chunk
+- `fa87674` —— 第 13 棒收尾：补 3 条会话重建 e2e，并更正一条被误判为真实缺陷的 jsdom 现象
 
 用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
@@ -840,6 +842,101 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
 31. **长任务要中途汇报。** 连着跑 build / verify / e2e 十几分钟不出声，
     用户会以为卡住了。**每完成一个可验证的小结果就说一句**，
     尤其是在做耗时的产物实验时。
+
+---
+
+## 第 13 棒收尾做了什么（提交 `fa87674`）
+
+补 e2e，并抓出**我自己的一个误判**。
+
+### 补了 3 条会话重建 e2e（22 → 25），逐条变异验证
+
+第 11~13 棒在会话重建这一带修了三个用户可感知的缺陷，却**一条 e2e 都没有**
+——全靠 jsdom 单测发现，而问题的本质恰恰是渲染时序。
+
+| 用例                                   | 变异                    | 结果                       |
+| -------------------------------------- | ----------------------- | -------------------------- |
+| 切语言：内容保留 + 编辑器就绪 + 无错误 | rebuild 不自取内容快照  | 转红                       |
+| 切语言只影响被切的那个实例             | 同上                    | 转红                       |
+| mode 往返后撤销按钮仍可用且真能撤销    | 退回 `hasRealEdit` 守卫 | 转红（toBeEnabled failed） |
+
+### ⚠️⚠️ 重要更正：第 12 棒的「缺陷 4」是 jsdom 特有的
+
+原记录：「session 重建时浮层在已被摘走的容器上抛 `insertBefore of null`」，
+当成真实缺陷写进了 CHANGELOG 和不变量 45。
+
+**补 e2e 时做了对照实验**：把那处修复（`showEditChrome && editor`）回退掉，
+在**真实浏览器**（Chromium）里切 locale 往返 3 轮、切 mode 往返 3 轮，
+`error` / `unhandledrejection` / `console.error` **全为空**，编辑器也从未卡在骨架屏。
+
+修复本身**保留**，但两处修复的理由都要换成独立成立的那个：
+
+- `&& editor` —— 消除的是一个**本就没有意义的渲染帧**（chrome 里 9 个子节点都写着
+  `&& editor`，条件本就该提到父级判一次），不是「修了浏览器里的崩溃」。
+- `await nextTick()` 放进 `try` —— **错误处理的完整性与触发源是什么无关**：
+  rebuild 不该因为任何一个异常就永久停在 `"loading"`。
+
+不变量 44 / 45、CHANGELOG 对应条目、e2e 文件头注释均已更正。
+
+**教训（已钉进不变量 45）：jsdom 里观察到的渲染错误，必须在真实浏览器里复验后
+才能称为「缺陷」。** jsdom 没有真实布局、patch 时序也不同，它报的错可能是它自己的。
+
+### 写 e2e 踩的坑
+
+32. **`locator.click()` 默认点元素中心。** full-editor 的示例文档中部是表格，
+    点中心会落进不可编辑处，`keyboard.type()` 一个字也进不去，而报错信息只说
+    「文本不匹配」，看不出是落点问题。**点最后一个顶层段落（`editor.locator("> p").last()`）
+    再按 `End`。** 现有的 `focusEditorEnd`（`Meta+ArrowDown`）在这个文档上也带不到文末
+    ——它能用在 notion-features 里，是因为那些用例先切了 preset、文档已经不一样了。
+    诊断办法：起 dev server 用浏览器手动把选区放到文末再输入，能进就是落点问题。
+
+---
+
+## 下一棒的计划（第 14~16 棒，第 13 棒末尾定的）
+
+**为什么是这三棒**：常见的缺陷维度已被前 13 棒扫透——第 13 棒收尾时扫了
+「资源释放」「异步竞态」「订阅首次同步」三个维度，**全是负结果**。
+继续按维度扫，边际产出会越来越低。
+但覆盖率是个客观缺口：**200 个文件里 5 个零覆盖、23 个低于 40%，
+33% 的语句从未被执行过**。而本仓库反复印证「没被执行过的代码最容易藏问题」
+（`transformRemoveLineNumberWrapper` 的测试是空操作、`--ye-caret` 定义齐全却零消费，
+都是这么冒出来的）。**目标不是刷数字，是借补测试把没执行过的路径走一遍。**
+
+覆盖率缺口 top（第 13 棒末实测）：
+
+```
+缺 387 条 (21.97%)  src/extensions/dragHandle/DragHandleExtension.ts   ← 一个文件占缺口 1/6
+缺  73 条 (21.5%)   src/components/base/ToolbarDropdownButton.vue
+缺  63 条 (25%)     src/components/editor/find-replace/FindReplaceDialog.vue
+缺  63 条 (22.22%)  src/features/ai/AiMenuButton.vue
+缺  53 条 (32.05%)  src/components/tools/link-bubble/LinkBubbleMenu.vue
+缺  47 条 (4.08%)   src/extensions/math/MathNodeView.vue
+缺  42 条 (38.23%)  src/components/tools/video-toolbar/VideoToolbar.vue
+缺  38 条 (39.68%)  src/components/tools/image-toolbar/ImageToolbar.vue
+缺  34 条 (27.65%)  src/components/editor/gallery/GalleryButton.vue
+缺  29 条 (12.12%)  src/features/ai/shared/runAiSuggestionStream.ts
+缺  28 条 (36.36%)  src/components/editor/image/ImageUpload.vue
+缺  28 条 (6.66%)   src/extensions/pasteImage.ts
+零覆盖：wordImport.ts(19) / mediaUpload.ts(9) / menuItem.ts(8)
+       / scrollEditorSelectionIntoView.ts(1) / preventCommandAutoDispatch.ts(1)
+```
+
+- **第 14 棒**：`DragHandleExtension`。一个文件占缺口 1/6，且是真实浏览器交互逻辑
+  （几何、hover、拖放），`e2e/drag-handle.spec.ts` 已有 5 条可复用扩展。
+  ⚠️ 它是**门控能力**，不在主 chunk，加测试不吃产物预算。
+- **第 15 棒**：AI 与媒体链路——`AiMenuButton` / `runAiSuggestionStream` /
+  `pasteImage` / `mediaUpload` / `ImageUpload` / `VideoToolbar` / `GalleryButton`。
+  ⚠️ AI 要 mock 掉网络；媒体注意 `mediaSrcPolicy` / `safeUrl` 的既有断言。
+- **第 16 棒**：剩余组件（`ToolbarDropdownButton` / `FindReplaceDialog` /
+  `MathNodeView` / `LinkBubbleMenu` / `wordImport`）+ **把 `vitest.config.ts` 的
+  覆盖率阈值提到实测值附近**（只能升不能降）+ 交接文档收尾。
+
+**终点判据**：覆盖率 Statements 到 80% 上下、阈值提档、三棒里发现的缺陷全部修完
+并钉进不变量。到那时可以宣布「按当前能力已做到位」——这是可验证的终点，不是感觉。
+
+⚠️ **补测试不是刷数字**：每写一条用例都要问「它锁住了什么行为」。
+写完做变异验证——改坏被测代码，用例必须转红。锁不住任何东西的用例是负债，
+本仓库已经踩过（`transformRemoveLineNumberWrapper` 的 `toContain("正文")` 恒真）。
 
 ---
 
