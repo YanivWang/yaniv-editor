@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-09-03
+
 ### BREAKING CHANGES
 
 - **`BYPASS_GUARD_META` 的类型从 `symbol` 变为 `string`。** 它原本就没在按 symbol 工作

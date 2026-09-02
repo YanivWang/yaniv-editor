@@ -1,6 +1,6 @@
 {
   "name": "@yanivjs/yaniv-editor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor appearance with AI support",
   "license": "MIT",
   "type": "module",

@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Vue 3 + Tiptap 3 rich-text editor library (**v0.2.0**).
+Vue 3 + Tiptap 3 rich-text editor library (**v0.3.0**).
 
 | Shape               | Import                         | Use case                       |
 | ------------------- | ------------------------------ | ------------------------------ |

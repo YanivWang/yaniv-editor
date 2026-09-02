@@ -1,6 +1,6 @@
 # Yaniv Editor Docs
 
-Vue 3 + Tiptap 3 rich text editor with **Full** and **Inline** component shapes (current **v0.2.0**).
+Vue 3 + Tiptap 3 rich text editor with **Full** and **Inline** component shapes (current **v0.3.0**).
 
 After installing peer dependencies, you do **not** need global Ant Design Vue registration in the host app (see [Getting Started](./guide/getting-started.md)).
 
