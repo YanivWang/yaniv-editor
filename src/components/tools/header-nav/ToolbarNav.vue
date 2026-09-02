@@ -154,7 +154,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useSlots } from "vue";
 
 import { AlignDropdown } from "@/components/editor/align";
 import { CodeBlockDropdown } from "@/components/editor/code-block";
-import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
+import { BackgroundColorIcon, TextColorIcon } from "@/components/editor/color/ColorIcons";
 import { FontFamilySelect, FontSizeSelect } from "@/components/editor/font";
 import { ClearFormatButton } from "@/components/editor/format-clear";
 import { HeadingControl } from "@/components/editor/heading";
@@ -184,6 +184,20 @@ import type { Editor } from "@tiptap/vue-3";
  * 它们连同各自依赖（AI 客户端与适配器、docx/mammoth 封装、KaTeX 封装等）进入主 chunk。
  * 全部为 `v-if` 门控的叶子组件，无父级 ref 访问。
  */
+/**
+ * ColorPicker 是主 chunk 里最大的单个文件（1008 行，含 office / notion 两套色板数据）。
+ * 按钮本身只是个图标，完整的取色面板要等用户点开才用得上。
+ *
+ * ⚠️ 动态 import 必须指向 `ColorPicker.vue` 本身，不能走 `@/components/editor/color`
+ * barrel：同一个 barrel 里的 `ColorIcons` 是静态 import 的（图标画在按钮上，
+ * 首屏就要），Rollup 会因此把整个 barrel 连同 ColorPicker 一起留在主 chunk，
+ * 异步化就白做了。
+ */
+const ColorPicker = defineGatedAsyncComponent(
+  "ColorPicker",
+  () => import("@/components/editor/color/ColorPicker.vue"),
+);
+
 const AiMenuButton = defineGatedAsyncComponent("AiMenuButton", () =>
   import("@/features/ai").then((m) => m.AiMenuButton),
 );

@@ -795,6 +795,15 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `` `--ye-x` ``——注释里提一句，死 token 就永久免检；测试断言里出现一次
   `var(--ye-x)` 同理。`--ye-caret` 正是这么躲过去的。扫描器改为先掩注释、
   并整体跳过 `*.test.ts`；收紧后全仓 99 个 token 只暴露出这一个。→ 不变量 42
+- **受控推送后撤销按钮亮着、点一次却毫无反应。** `setContent` 换掉的是整份文档，
+  prosemirror-history 会把已有历史步骤全部 rebase 成空——撤销时文档一动不动——
+  但事件计数还留着，于是 `can().undo()` 仍是 `true`。按钮在说谎：亮着、点了没用、
+  再看才变灰。`ContentAdapter.setContent` 现在默认连撤销历史一起清空
+  （新增 `resetHistory` 选项，默认 `true`），推送后按钮直接是灰的；
+  推送**之后**用户新写的内容照常可撤销。重置走 prosemirror-history 留给自己
+  undo/redo 命令的入口（`tr.setMeta(historyKey, { historyState })`），干净的
+  `HistoryState` 取自一个只装 history 插件的临时 `EditorState`——全程公开 API，
+  不碰未导出的内部类。宿主关掉撤销能力时认不出 history 插件，静默跳过。→ 不变量 47
 
 ### Changed
 
@@ -855,6 +864,14 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   因此拿到与编辑器不一致的表现。默认改成 `true`，三处显式传参一并删掉，行为不变。
   `TaskList` / `TaskItem` 随 `list` 能力一起注册，这个默认值是站得住的。
   **这是公开 prop 的默认值变更**：需要"默认不显示任务列表"的宿主请显式传 `false`。
+- **`ColorPicker` 移出主 chunk。** 它是主 chunk 里最大的单个文件（1008 行，含 office /
+  notion 两套色板数据），而按钮本身只是个图标，取色面板要等用户点开才用得上。
+  改为 `defineGatedAsyncComponent` 懒加载后主 chunk gzip **45783 → 42674（-3109B）**，
+  余量从 217B 回到 3326B。
+  ⚠️ 两个坑：① 动态 import 必须指向 `ColorPicker.vue` 本身，走
+  `@/components/editor/color` barrel 会因为同 barrel 的 `ColorIcons` 是静态引用而被
+  整体留在主 chunk；② `ToolbarNav` 与 `FloatingMenu` **两处都得改**——只要还剩一个
+  静态引用，Rollup 就把模块留在主 chunk，实测只改一处仅掉 33B，两处都改才掉 3109B。
 
 ### Removed
 

@@ -2,6 +2,7 @@ import { Extension, getSchema } from "@tiptap/core";
 import { Table } from "@tiptap/extension-table";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { TableRow } from "@tiptap/extension-table-row";
+import { undoDepth } from "@tiptap/pm/history";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor } from "@tiptap/vue-3";
 import { afterEach, describe, expect, test } from "vitest";
@@ -222,5 +223,67 @@ describe("ContentAdapter", () => {
 
     const marks = adapted.content?.[0]?.content?.[0]?.marks ?? [];
     expect(marks.map((m) => (typeof m === "string" ? m : m.type))).toEqual(["bold"]);
+  });
+
+  /**
+   * `setContent` 换掉的是整份文档，此前的历史步骤指向的是另一份内容。
+   *
+   * prosemirror-history 的整文档替换会把已有步骤全部 rebase 成空——撤销时文档一动不动
+   * ——但事件计数还留着，于是 `can().undo()` 仍是 `true`：撤销按钮亮着、点一次
+   * 什么也不发生、再看才变灰。这不是"代价可接受的小瑕疵"，是按钮在说谎。
+   * 重置历史用的是 prosemirror-history 给自己 undo/redo 命令留的那个入口
+   * （`tr.setMeta(historyKey, { historyState })`），干净的 HistoryState 从一个
+   * 只装 history 插件的临时 EditorState 里取，全程公开 API。
+   */
+  test("受控推送会连撤销历史一起清空", () => {
+    editor = new Editor({ extensions: [StarterKit], content: "<p>初始</p>" });
+    editor.chain().insertContent("用户写的").run();
+    expect(undoDepth(editor.state)).toBe(1);
+    expect(editor.can().undo()).toBe(true);
+
+    ContentAdapter.setContent(editor, "<p>宿主推送</p>", { source: "external" });
+
+    expect(editor.getHTML()).toContain("宿主推送");
+    expect(undoDepth(editor.state)).toBe(0);
+    // 关键断言：按钮该是灰的，而不是"亮着但点了没反应"
+    expect(editor.can().undo()).toBe(false);
+  });
+
+  test("推送之后用户新写的内容仍然可以撤销", () => {
+    editor = new Editor({ extensions: [StarterKit], content: "<p>初始</p>" });
+    editor.chain().insertContent("旧的").run();
+    ContentAdapter.setContent(editor, "<p>推送内容</p>", { source: "external" });
+    editor.chain().insertContent("新写的").run();
+
+    expect(editor.getHTML()).toContain("新写的");
+    expect(editor.can().undo()).toBe(true);
+
+    editor.chain().undo().run();
+    expect(editor.getHTML()).toContain("推送内容");
+    expect(editor.getHTML()).not.toContain("新写的");
+    // 到底了：推送前的内容不该也不能被撤回来
+    expect(editor.can().undo()).toBe(false);
+    expect(editor.getHTML()).not.toContain("旧的");
+  });
+
+  test("resetHistory: false 保留原有历史", () => {
+    editor = new Editor({ extensions: [StarterKit], content: "<p>初始</p>" });
+    editor.chain().insertContent("用户写的").run();
+    ContentAdapter.setContent(editor, "<p>推送</p>", { source: "external", resetHistory: false });
+
+    expect(undoDepth(editor.state)).toBe(1);
+  });
+
+  /** 宿主可以关掉撤销能力；那时认不出 history 插件，重置必须静默跳过而不是抛错 */
+  test("没有 history 扩展时照常替换内容", () => {
+    editor = new Editor({
+      extensions: [StarterKit.configure({ undoRedo: false })],
+      content: "<p>初始</p>",
+    });
+
+    expect(() =>
+      ContentAdapter.setContent(editor!, "<p>推送</p>", { source: "external" }),
+    ).not.toThrow();
+    expect(editor.getHTML()).toContain("推送");
   });
 });

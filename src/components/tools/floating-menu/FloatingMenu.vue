@@ -67,7 +67,7 @@ import { BubbleMenu } from "@tiptap/vue-3/menus";
 import { computed } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
-import { BackgroundColorIcon, ColorPicker, TextColorIcon } from "@/components/editor/color";
+import { BackgroundColorIcon, TextColorIcon } from "@/components/editor/color/ColorIcons";
 import { HeadingControl } from "@/components/editor/heading";
 import { LinkButton } from "@/components/editor/link";
 import { ListTools } from "@/components/editor/list";
@@ -78,6 +78,18 @@ import { useOverlayBubbleMenu } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
 import { AiMenuButton } from "@/features/ai";
+import { defineGatedAsyncComponent } from "@/shared/gatedAsyncComponent";
+
+/**
+ * 与 ToolbarNav 同款：ColorPicker 是主 chunk 里最大的单个文件（1008 行，两套色板）。
+ * 这里也必须异步——**两个静态引用只要留一个，Rollup 就会把它留在主 chunk**，
+ * 另一处的异步化等于白做（实测：只改 ToolbarNav 时主 chunk 只掉了 33B）。
+ * 动态 import 指向 `ColorPicker.vue` 本身而不是 barrel，理由同 ToolbarNav。
+ */
+const ColorPicker = defineGatedAsyncComponent(
+  "ColorPicker",
+  () => import("@/components/editor/color/ColorPicker.vue"),
+);
 
 const t = useEditorT();
 

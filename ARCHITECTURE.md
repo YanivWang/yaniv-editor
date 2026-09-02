@@ -1688,6 +1688,45 @@ src/shared/
     且规范只保证它认得 color / background-color / text-decoration / text-shadow，
     不能用 `background` shorthand。
 
+47. **`setContent` 换掉整份文档时，撤销历史要跟着清空** — 替换后那些历史步骤指向的是
+    另一份内容，撤销回去没有意义；prosemirror-history 也确实做不到——整文档替换会把
+    已有步骤全部 rebase 成空，撤销时文档一动不动。但它的**事件计数还在**，于是
+    `can().undo()` 仍返回 `true`：撤销按钮亮着、点一次毫无反应、再看才变灰。
+    按钮在说谎，这不是可以接受的小瑕疵。
+    重置走的是 prosemirror-history 留给自己 undo/redo 命令的入口
+    （`tr.setMeta(historyKey, { historyState })`），干净的 `HistoryState` 从一个
+    **只装 history 插件**的临时 `EditorState` 里取——`EditorState.create` 会重新
+    init 插件，拿到的正是初始态；只放这一个插件是为了不触发其他插件 init 的副作用。
+    全程公开 API，不碰未导出的 `HistoryState` / `Branch`。
+    `@tiptap/pm/history` 没有导出 `historyKey`，只能按插件 key 名（`history$`）
+    从 `state.plugins` 里认；认不出来就当宿主关掉了撤销能力，静默跳过。
+    推送**之后**用户新写的内容必须照常可撤销——这是判断实现对不对的关键用例。
+
+48. **间距不做 token 化，改用棘轮护栏挡熵增** — 真正需要随外观变化的间距早就是
+    token 了（`--ye-doc-page-padding` / `--ye-doc-padding-top` 等，三套外观各配各的）；
+    剩下 400 余处硬编码全是组件内部实现细节（工具栏按钮 padding、下拉 gap），
+    既不随外观变，宿主也没有覆盖它们的需求。再包一层 `var()` 只是多一层间接、
+    多吃产物预算，换不来任何可覆盖性——正是不变量 42 要防的那种「冒充设计系统」。
+    间距真实的风险是**熵增**：随手写下的 `5px` / `11px` 会长期留下，
+    久而久之同类元素各不相同而无人察觉。
+    护栏 `styles/spacingScale.test.ts` 锁住**值的集合**（常用阶梯
+    0/1/2/4/6/8/10/12/14/16/24 + 16 条带理由的例外），写出集合外的新值就转红，
+    逼作者回到清单确认「能不能复用已有档位」。
+    ⚠️ 例外清单里的值**不要凭「看着不齐」去改**：逐处核对过，`-1px` 是边框补偿、
+    `36/28/22/18` 是 default 外观标题的递减节奏、`40px` 是给代码块语言标签让位、
+    `11px` 是对齐 antd 组件自身尺寸。改它们需要设计依据。
+
+49. **要把一个模块移出主 chunk，它的静态引用必须一个不剩** — 只要还有任意一处
+    `import X from "…"`，Rollup 就把 X 留在主 chunk，其他地方的 `defineGatedAsyncComponent`
+    等于白写。实测 `ColorPicker`：只把 `ToolbarNav` 改成异步，主 chunk 只掉 **33B**；
+    连 `FloatingMenu` 一起改掉，掉 **3109B** 并生成了独立 chunk。
+    ⚠️ 还要注意 **barrel 的连带**：动态 import 若写成
+    `import("@/components/editor/color").then((m) => m.ColorPicker)`，
+    而同一个 barrel 里的 `ColorIcons` 是静态引用（图标画在按钮上，首屏就要），
+    整个 barrel 连同 ColorPicker 都会留在主 chunk。**动态 import 要指向具体文件。**
+    改完必须 `pnpm run build` 复量，并确认 `dist/` 里真的多出了那个独立 chunk
+    ——「省了几十字节」就是没分割成功的信号。
+
 ---
 
 ## CSS 分层

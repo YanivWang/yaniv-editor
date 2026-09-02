@@ -1,5 +1,6 @@
 import { getSchema, type Extensions, type JSONContent } from "@tiptap/core";
 import { DOMParser, type Node as ProseMirrorNode, type Schema } from "@tiptap/pm/model";
+import { EditorState, type Plugin, type Transaction } from "@tiptap/pm/state";
 
 import { BYPASS_GUARD_META } from "@/capabilities/transactionGuard";
 import { sanitizeLinkHrefMarks } from "@/utils/linkHrefPolicy";
@@ -10,9 +11,52 @@ import type { Editor } from "@tiptap/vue-3";
 export interface SetContentOptions {
   addToHistory?: boolean;
   source?: "external" | "phase" | "session-rebuild";
+  /**
+   * 是否连同撤销历史一起清空，默认 `true`。
+   *
+   * `setContent` 换掉的是**整份文档**，此前那些历史步骤指向的是另一份内容，
+   * 撤销回去没有意义——prosemirror-history 也确实做不到：整文档替换会把已有步骤
+   * 全部 rebase 成空，撤销时文档一动不动。但它的事件计数还在，于是
+   * `can().undo()` 仍返回 `true`，撤销按钮亮着、点一次没有任何反应、再看才变灰。
+   * 清空历史把这个「假的可撤销」变成诚实的不可撤销。
+   */
+  resetHistory?: boolean;
 }
 
 const EMPTY_DOC_HTML = "<p></p>";
+
+/**
+ * prosemirror-history 的插件 key 名（`new PluginKey("history")` → `"history$"`）。
+ * `@tiptap/pm/history` 没有导出 `historyKey`，只能按名字从 `state.plugins` 里认。
+ * 认不出来就当作「宿主关掉了撤销能力」，静默跳过。
+ */
+const HISTORY_PLUGIN_KEY_PREFIX = "history$";
+
+function findHistoryPlugin(state: EditorState): Plugin | null {
+  return (
+    state.plugins.find((plugin) => {
+      const key = (plugin.spec.key as { key?: string } | undefined)?.key;
+      return typeof key === "string" && key.startsWith(HISTORY_PLUGIN_KEY_PREFIX);
+    }) ?? null
+  );
+}
+
+/**
+ * 把一份干净的撤销历史挂到事务上。
+ *
+ * prosemirror-history 的 `apply` 第一件事就是 `tr.getMeta(historyKey)`——带了就直接
+ * 采用其中的 `historyState`，这是它给自己的 undo/redo 命令留的入口，也是唯一不碰
+ * 内部类就能重置历史的办法。干净的 `HistoryState` 从一个**只装了 history 插件**的
+ * 临时 `EditorState` 里取：`EditorState.create` 会重新 init 插件，拿到的正是初始态。
+ * 只放这一个插件是为了不触发其他插件 init 的副作用。
+ */
+function attachHistoryReset(state: EditorState, tr: Transaction): void {
+  const plugin = findHistoryPlugin(state);
+  const key = plugin?.spec.key;
+  if (!plugin || !key) return;
+  const fresh = EditorState.create({ schema: state.schema, plugins: [plugin] });
+  tr.setMeta(key, { historyState: plugin.getState(fresh) });
+}
 
 /**
  * 用惰性文档（inert document）解析 HTML 字符串。
@@ -186,6 +230,8 @@ export const ContentAdapter = {
       .setMeta("addToHistory", options.addToHistory ?? false)
       .setMeta("yaniv:source", options.source ?? "external")
       .replaceWith(0, view.state.doc.content.size, doc.content);
+
+    if (options.resetHistory ?? true) attachHistoryReset(view.state, tr);
 
     view.dispatch(tr);
   },
