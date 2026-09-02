@@ -31,17 +31,14 @@
   --ye-border-width: 1px;
   --ye-border: #e9eaec;
   --ye-border-hover: #dadde2;
-  --ye-border-focus: var(--ye-primary);
 
   /* ===== Selection & Caret ===== */
-  --ye-selection: rgb(51 112 255 / 20%);
   --ye-caret: var(--ye-primary);
 
   /* ===== Toolbar（白底工具栏 + 浅灰画布由 --ye-bg-secondary 区分） ===== */
   --ye-toolbar-bg: #ffffff;
   --ye-toolbar-border: var(--ye-border);
   --ye-toolbar-divider: var(--ye-border);
-  --ye-toolbar-btn-bg: transparent;
   --ye-toolbar-btn-text: #646a73;
   --ye-toolbar-btn-hover: rgb(31 35 41 / 6%);
   --ye-toolbar-btn-active: rgb(31 35 41 / 10%);
@@ -54,7 +51,6 @@
   /* ===== Bubble / Floating Menu ===== */
   --ye-bubble-bg: #ffffff;
   --ye-bubble-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --ye-bubble-border: var(--ye-border);
 
   /* ===== Toolbar Button Size ===== */
   --ye-btn-size: 32px;
@@ -83,7 +79,6 @@
   /* ===== Table ===== */
   --ye-table-border: var(--ye-border);
   --ye-table-header-bg: #f9fafb;
-  --ye-table-selected: rgb(51 112 255 / 10%);
   --ye-table-selected-bg: rgb(51 112 255 / 10%);
 
   /* ===== Blockquote ===== */
@@ -102,31 +97,21 @@
   --ye-line-height: 1.7;
 
   /* ===== Spacing ===== */
-  --ye-spacing-xs: 4px;
-  --ye-spacing-sm: 8px;
-  --ye-spacing-md: 16px;
-  --ye-spacing-lg: 24px;
-  --ye-spacing-xl: 32px;
 
   /* ===== Border Radius ===== */
   --ye-radius-sm: 4px;
   --ye-radius-md: 8px;
   --ye-radius-lg: 12px;
-  --ye-radius-full: 9999px;
 
   /* ===== Shadows ===== */
-  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
   --ye-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
-  --ye-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.04), 0 10px 24px rgba(0, 0, 0, 0.08);
 
   /* ===== Transitions ===== */
   --ye-transition-fast: 0.1s ease;
   --ye-transition-normal: 0.2s ease;
-  --ye-transition-slow: 0.3s ease;
 
   /* ===== Outline Panel（default 基线；appearance 可覆盖） ===== */
   --ye-outline-width: 200px;
-  --ye-outline-offset: 0;
   --ye-outline-title-color: var(--ye-primary);
   --ye-outline-scroll-offset: 80px;
   --ye-outline-h1-size: 13px;
@@ -143,7 +128,6 @@
   --ye-doc-padding-bottom: 80px;
   --ye-doc-padding-inline: 72px;
   --ye-doc-page-padding: 0;
-  --ye-doc-page-cut-height: 16px;
   --ye-doc-container-padding-y: 0;
 }
 
@@ -178,7 +162,6 @@
    *
    * 护栏见 darkTokenAliases.test.ts。
    */
-  --ye-border-focus: var(--ye-primary);
   --ye-caret: var(--ye-primary);
   --ye-toolbar-border: var(--ye-border);
   --ye-toolbar-divider: var(--ye-border);
@@ -186,7 +169,6 @@
   --ye-footer-bg: var(--ye-bg-secondary);
   --ye-footer-text: var(--ye-text-secondary);
   --ye-footer-divider: var(--ye-border);
-  --ye-bubble-border: var(--ye-border);
   --ye-code-text: var(--ye-text);
   --ye-code-inline-border: var(--ye-border);
   --ye-hr-color: var(--ye-border);
@@ -237,7 +219,6 @@
   --ye-placeholder-color: #666;
   --ye-border: #373737;
   --ye-border-hover: #464646;
-  --ye-selection: rgb(76 136 255 / 25%);
   --ye-toolbar-bg: #262626;
   --ye-toolbar-border: var(--ye-border);
   --ye-toolbar-divider: var(--ye-border);
@@ -266,9 +247,7 @@
   --ye-ai-highlight-bg-hover: rgb(255 169 64 / 28%);
   --ye-ai-highlight-border: #ffa940;
   --ye-ai-highlight-border-hover: #ffc069;
-  --ye-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.3);
   --ye-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.35);
-  --ye-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.3), 0 10px 24px rgba(0, 0, 0, 0.45);
 
   /*
    * ===== 派生 token 必须在 dark 段里重新声明一遍 =====
@@ -284,9 +263,7 @@
    * 所以：`:root` 里凡是值形如 `var(--ye-X)`、而 `--ye-X` 在本段被改写的 token，
    * 都必须在这里原样再写一遍。`darkTokenAliases.test.ts` static 护栏会盯住这条。
    */
-  --ye-border-focus: var(--ye-primary);
   --ye-caret: var(--ye-primary);
-  --ye-bubble-border: var(--ye-border);
   --ye-code-inline-border: var(--ye-border);
   --ye-hr-color: var(--ye-border);
   --ye-table-border: var(--ye-border);

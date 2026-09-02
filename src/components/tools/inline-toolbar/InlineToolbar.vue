@@ -8,7 +8,7 @@
     <component :is="UndoRedoButton" v-if="config.undoRedo" :editor="editor" />
     <component :is="HeadingControl" v-if="config.heading" variant="dropdown" :editor="editor" />
     <component :is="TextFormatButtons" v-if="config.textFormat" :editor="editor" />
-    <component :is="ListTools" v-if="config.list" :editor="editor" :show-task-list="true" />
+    <component :is="ListTools" v-if="config.list" :editor="editor" />
     <component :is="AlignDropdown" v-if="config.align" :editor="editor" />
     <component :is="LinkButton" v-if="config.link" :editor="editor" />
     <component :is="ClearFormatButton" v-if="config.clearFormat" :editor="editor" />

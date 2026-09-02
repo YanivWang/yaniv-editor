@@ -21,14 +21,12 @@
   --ye-placeholder-color: rgba(55, 53, 47, 0.4);
   --ye-border: rgba(55, 53, 47, 0.09);
   --ye-border-hover: rgba(55, 53, 47, 0.16);
-  --ye-border-focus: #2383e2;
   --ye-radius-sm: 4px;
   --ye-radius-md: 6px;
   --ye-radius-lg: 8px;
   --ye-primary: #2383e2;
   --ye-primary-hover: #1a6fc9;
   --ye-primary-light: rgb(35 131 226 / 12%);
-  --ye-selection: rgba(35, 131, 226, 0.28);
   --ye-bubble-bg: #ffffff;
   --ye-bubble-shadow:
     rgb(15 15 15 / 5%) 0 0 0 1px, rgb(15 15 15 / 10%) 0 3px 6px, rgb(15 15 15 / 20%) 0 9px 24px;
@@ -416,11 +414,9 @@
   --ye-placeholder-color: rgba(255, 255, 255, 0.4);
   --ye-border: rgba(255, 255, 255, 0.09);
   --ye-border-hover: rgba(255, 255, 255, 0.16);
-  --ye-border-focus: rgb(82, 156, 202);
   --ye-primary: rgb(82, 156, 202);
   --ye-primary-hover: #6aadcf;
   --ye-primary-light: rgb(82 156 202 / 15%);
-  --ye-selection: rgba(82, 156, 202, 0.3);
   --ye-bubble-bg: #252525;
   --ye-bubble-shadow: 0 12px 32px rgb(0 0 0 / 35%), 0 2px 8px rgb(0 0 0 / 25%);
   --ye-code-bg: rgba(135, 131, 120, 0.15);

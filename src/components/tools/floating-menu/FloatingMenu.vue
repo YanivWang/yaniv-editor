@@ -42,7 +42,7 @@
       </div>
 
       <div class="menu-group">
-        <ListTools :show-task-list="true" />
+        <ListTools />
       </div>
 
       <div v-if="showAi" class="menu-group">

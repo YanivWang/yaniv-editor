@@ -1604,6 +1604,18 @@ src/shared/
     ⚠️ 定位涨幅时不能只还原单个文件：chunk 划分是全局优化的结果，
     单独还原 `listShortcuts.ts` 只差 2B，把整批改动一起还原才看得出那 471B。
 
+42. **定义了的 `--ye-*` token 必须有人 `var()` 引用** — 零消费方的 token 不报错、
+    没有任何视觉表现，只会一直躺在 `variables.css` 里冒充「设计系统」，
+    还会诱导后来者去覆盖它——覆盖一个没人读的自定义属性完全没有效果。
+    一次扫出 16 个，三类都不是笔误而是「写了一半」：**同名近似的重复定义**
+    （`--ye-table-selected` / `--ye-outline-offset`，真正在用的是 `*-bg` / `--ye-media-*`）、
+    **成套定义但整套没用**（`--ye-spacing-xs/sm/md/lg/xl` 全部零引用，间距一律硬编码）、
+    **配了值却没写规则**（`--ye-border-focus` 三套外观各配了色而编辑区有意 `outline: none`；
+    `--ye-selection` 配了亮/暗两套却没有任何 `::selection` 规则）。
+    判据双向：CSS 的 `var()` 与 JS 里字符串形式的读写都算消费；
+    扫描范围含 `examples/`——demo 是宿主用法的正式示范，被它用到就有对外价值
+    （`--ye-radius-lg` 正是这种情况）。护栏 `styles/tokenConsumers.test.ts`。
+
 ---
 
 ## CSS 分层

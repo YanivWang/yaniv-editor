@@ -780,6 +780,34 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `prompts.ts` 的注释）。`editor.lang.zh` 作为显式登记的例外保留——翻译目标必须精确到
   简体 / 繁体，`zh-CN` / `zh-TW` 已覆盖。
 
+- **`ListTools` 的 `showTaskList` 默认值从未生效。** 默认 `false`，而编辑器内部三处用法
+  （顶栏 / 浮动菜单 / inline 工具栏）全都显式传 `true`——直接用 `ListTools` 的宿主
+  因此拿到与编辑器不一致的表现。默认改成 `true`，三处显式传参一并删掉，行为不变。
+  `TaskList` / `TaskItem` 随 `list` 能力一起注册，这个默认值是站得住的。
+  **这是公开 prop 的默认值变更**：需要"默认不显示任务列表"的宿主请显式传 `false`。
+
+### Removed
+
+- **删除 16 个零消费方的 `--ye-*` 设计 token。** 它们不报错、没有任何视觉表现，
+  只会一直躺在 `variables.css` 里冒充「设计系统」，还会诱导后来者去覆盖
+  ——覆盖一个没人 `var()` 读的自定义属性完全没有效果。三类，都不是笔误而是「写了一半」：
+  - **同名近似的重复定义**：`--ye-table-selected`、`--ye-outline-offset`
+    （真正在用的是 `--ye-table-selected-bg`、`--ye-media-outline-offset`）
+  - **成套定义但整套没用**：`--ye-spacing-xs/sm/md/lg/xl` 全部零引用（间距一律硬编码）；
+    `--ye-shadow-sm/lg`、`--ye-radius-full`、`--ye-transition-slow` 是阶梯里没轮到的档位
+  - **配了值却没写规则**：`--ye-border-focus`（三套外观各配了色，而编辑区有意
+    `outline: none`）、`--ye-selection`（配了亮/暗两套，全仓却没有任何 `::selection` 规则
+    ——**选中色目前用的是浏览器默认**）、`--ye-toolbar-btn-bg: transparent`（等于没设）、
+    `--ye-bubble-border`（纯别名）、`--ye-doc-page-cut-height`（分页线功能从未实现）
+
+  浏览器实测零视觉影响：三套外观 × 明暗两态 × 5 个关键元素共 **30 个采样点，删除前后逐字相同**
+  （同时确认被删 token 已解析为空，对照有效）。`style.css` 17296 → 17111、
+  `inline.css` 9062 → 8910。→ 不变量 42 / 约定 33
+
+  ⚠️ 若将来要让文本选中色跟随品牌，需要重新加回 `--ye-selection` 并**为三套外观 ×
+  明暗两态各配值**、写 `::selection` 规则、验证选中文字的对比度——那是视觉变更，
+  不在这次死代码清理的范围内。
+
 ### Docs
 
 - **修正两处 token 分层描述与源码不符。** 第 8 棒把派生别名从 `:root` 移到
@@ -789,6 +817,13 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `.yaniv-editor`」——而那一段里实际还有 17 个派生别名（`--ye-toolbar-border`、
   `--ye-table-border` 等）。两处均已改正并补上原因（不变量 26）。
   `z-index.md` 的 token 表与 `variables.css` 逐条核对，17/17 完全一致。
+- **写清「共 N 页」为什么固定按 A4 算。** `--ye-doc-page-min-height` 不是页高
+  ——它是 `min-height`（default 480px 只表示「至少这么高」，notion 是 `calc(100vh - 100px)`
+  跟着视口走），而三套外观都是连续滚动布局，全仓没有任何画分页线的规则：
+  界面上根本不存在「第 2 页」这个视觉对象。`totalPages` 只出现在状态栏，是「按 A4 打印
+  大约多少页」的估算，与 Word 导出同口径；换成外观的 min-height 反而会得出一个
+  既不对应视觉、也不对应打印的数字。曾被记为「用 A4 给所有外观算页数」的产品语义问题，
+  现确认为**有意的选择**，补上依据与两条锁住它的测试。
 - 补上 `documentContextLimit`（`ai-config.md`）、Word 导入的覆盖确认
   （`word-import-export.md`）、格式刷双击的提示条数（`format-painter.md`）。
 

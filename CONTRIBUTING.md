@@ -227,6 +227,14 @@ docs: 补充 z-index 说明
     长论证放那里零成本，源码里留一句结论 + 指向测试即可。
     往 `core/` / `capabilities/` / `core` 能力下的扩展加注释前，先想想这一条。
 
+33. **新增 `--ye-*` token 的同时就要写用到它的规则。** 零消费方的 token 没有任何效果，
+    却会被后来者当成"可覆盖的设计系统接口"（不变量 42）。
+    护栏 `styles/tokenConsumers.test.ts` 会挡；`examples/` 里的使用也算数。
+
+34. **基础组件的事件要透传原生事件对象。** `ToolbarButton` 此前 `emit("click")` 不带 payload，
+    调用方拿不到 `MouseEvent.detail`，就没法识别双击序列里的第二次 click
+    ——只能退回"给每次单击加一个双击窗口延迟"的做法。给 emit 加 payload 是向后兼容的扩展。
+
 ## 测试
 
 - 单测：`src/**/*.test.ts`（vitest + jsdom）。纯函数与扩展行为优先。

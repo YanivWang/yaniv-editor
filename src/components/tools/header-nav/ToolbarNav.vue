@@ -67,7 +67,7 @@
         >
           <div v-if="config.heading || config.list || config.align" class="tool-row">
             <HeadingControl v-if="config.heading" variant="dropdown" />
-            <ListTools v-if="config.list" :show-task-list="true" />
+            <ListTools v-if="config.list" />
             <AlignDropdown v-if="config.align" />
           </div>
         </section>

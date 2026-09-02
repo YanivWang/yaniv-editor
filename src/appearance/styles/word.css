@@ -33,7 +33,6 @@
   --ye-text-muted: #888888;
   --ye-border: #d4d4d4;
   --ye-border-hover: #b3b3b3;
-  --ye-border-focus: #0078d4;
   --ye-radius-sm: 2px;
   --ye-radius-md: 3px;
   --ye-radius-lg: 4px;
@@ -123,7 +122,6 @@
    */
   --ye-primary: #0078d4;
   --ye-primary-hover: #106ebe;
-  --ye-border-focus: #0078d4;
 }
 
 .yaniv-editor.appearance-word[data-color-mode="dark"] .ProseMirror h2,

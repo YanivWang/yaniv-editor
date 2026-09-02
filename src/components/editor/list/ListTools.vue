@@ -37,12 +37,19 @@ const t = useEditorT();
 // ===== Props =====
 interface Props {
   editor?: Editor | null;
-  /** 是否显示任务列表按钮，默认 false */
+  /**
+   * 是否显示任务列表按钮。
+   *
+   * 默认 `true`：`TaskList` / `TaskItem` 随 `list` 能力一起注册，编辑器内部三处用法
+   * （顶栏 / 浮动菜单 / inline 工具栏）本来就全都显示它。此前默认是 `false`，
+   * 而三处调用点又全都显式传 `true`——那个默认值从未生效过，
+   * 只会让直接用 `ListTools` 的宿主拿到与编辑器不一致的表现。
+   */
   showTaskList?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showTaskList: false,
+  showTaskList: true,
 });
 
 const editor = useYanivEditor(() => props.editor);
