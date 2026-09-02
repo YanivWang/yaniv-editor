@@ -1660,6 +1660,9 @@ src/shared/
     它交出的是当次 flush 的 promise，这一轮里任何组件更新抛错都会让它 reject，
     而调用点是 `void rebuild()`——异常无人接管，`status` 永久停在 `"loading"`（白屏骨架）。
     建不出来是允许的，但必须落到 `"error"` 这个确定终态并让用户能重试。
+    ⚠️ 当初击中它的那个渲染错误后经真实浏览器复验，是 **jsdom 特有**的
+    （见不变量 45 的更正）。但**错误处理的完整性与触发源是什么无关**：
+    rebuild 不该因为任何一个异常就永久停在 `"loading"`，本条独立成立。
 
 45. **把 DOM 搬进 overlay portal 的浮层，其「编辑器是否存在」的条件要在父级判一次** —
     `bubble-menu` 系组件（`ImageToolbar` / `VideoToolbar` / `LinkBubbleMenu` /
@@ -1670,7 +1673,15 @@ src/shared/
     抛出 `Cannot read properties of null (reading 'insertBefore')`。
     这一帧本就没有意义——`EditorEditChrome` 里每个子节点都写着 `&& editor`，
     说明整个组件都依赖它，条件应该提到父级判一次，而不是在 9 个子节点各写一遍。
-    与不变量 44 合起来才完整：44 保证这个错误不再让 session 永久卡死，45 让它不再发生。
+
+    ⚠️ **更正（第 13 棒实测）**：上面这个 `insertBefore` 错误**只在 jsdom 里出现，
+    真实浏览器（Chromium）不发生**。第 13 棒补 e2e 时做了对照——把本条修复回退掉，
+    在真实浏览器里切 locale 往返 3 轮、切 mode 往返 3 轮，
+    `error` / `unhandledrejection` / `console.error` 全部为空，编辑器也从未卡在骨架屏。
+    所以本条的价值不是「修了浏览器里的崩溃」，而是**消除一个本就没有意义的渲染帧**
+    ——这个判断独立成立，修复保留。
+    **教训：jsdom 里观察到的渲染错误，必须在真实浏览器里复验后才能称为「缺陷」。**
+    jsdom 没有真实布局、patch 时序也不同，它报的错可能是它自己的。
 
 46. **文本编辑的视觉反馈（选中底色、光标色）必须跟着外观的品牌主色走** —
     `--ye-selection` 与 `--ye-caret` 都在三套外观 × 明暗两态各有一份值，

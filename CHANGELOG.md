@@ -756,7 +756,12 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `try` 之外，而它交出的是当次 flush 的 promise：这一轮里任何组件更新抛错都会让它 reject，
   于是 `rebuild()` 跟着抛，调用点 `void rebuild()` 无人接管，`status` 永久停在 `"loading"`。
   纳入 `try` 后，建不出来会落到 `"error"` 这个确定终态并可重试。→ 不变量 44
-- **session 重建时浮层在已被摘走的容器上抛 `insertBefore of null`。** `bubble-menu` 系
+- **session 重建时 chrome 会带着 `editor === null` 多渲染一帧。**
+  ⚠️ **第 13 棒更正**：本条原先写作「浮层在已被摘走的容器上抛 `insertBefore of null`」，
+  并当成真实缺陷。补 e2e 时做了对照实验——回退本修复后在真实浏览器（Chromium）里
+  切 locale 往返 3 轮、切 mode 往返 3 轮，`error` / `unhandledrejection` /
+  `console.error` 全为空，编辑器也不曾卡在骨架屏。**那个错误是 jsdom 特有的。**
+  修复本身保留：它消除的是一个本就没有意义的渲染帧，这个判断独立成立。原文如下—— `bubble-menu` 系
   的 5 个浮层通过 `appendTo` 把 DOM 搬进 overlay portal，Vue 的 vnode 树仍以为它在原位。
   `EditorEditChrome` 的 `:key` 变化与 `editor` 置 null 同时发生，chrome 带着
   `editor === null` 再渲染一帧时，补插 `v-if` 注释占位符的容器已经没了。
