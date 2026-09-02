@@ -22,6 +22,15 @@ export interface YanivEditorAiConfig {
   storageMode?: AiStorageMode;
   /** 是否显示工具栏「AI 设置」菜单项；有 ai-config 时默认 false */
   showSettings?: boolean;
+  /**
+   * 送进 AI 上下文的文档全文字符上限，超出即截断并提示用户。
+   *
+   * 单位是**字符**不是 token：项目同时支持 openai / aliyun / ollama 且模型可配，
+   * 各家 tokenizer 不同，没有统一换算。默认 8000，按实际用的模型调整；
+   * 传 0 或负数关闭这个保护（超长文档可能让请求 400 失败）。
+   * @default 8000
+   */
+  documentContextLimit?: number;
 }
 
 export interface GalleryImage {

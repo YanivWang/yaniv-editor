@@ -33,6 +33,21 @@
     </div>
   </a-modal>
 
+  <!-- 覆盖确认：导入会替换整个文档，当前内容全部丢失 -->
+  <a-modal
+    v-model:open="replaceConfirmOpen"
+    :title="t('editor.importWordReplaceTitle')"
+    :ok-text="t('editor.importWordReplaceConfirm')"
+    :cancel-text="t('editor.cancel')"
+    :ok-button-props="{ danger: true }"
+    :get-container="getOverlayContainer"
+    wrap-class-name="yaniv-editor-modal"
+    @ok="confirmReplaceImport"
+    @cancel="cancelReplaceImport"
+  >
+    {{ t("editor.importWordReplaceHint") }}
+  </a-modal>
+
   <!-- 导出文件名输入框 -->
   <a-modal
     v-model:open="exportModalOpen"
@@ -96,6 +111,41 @@ const exportFilename = ref("document");
 const importing = ref(false);
 const exporting = ref(false);
 
+// ===== 覆盖确认 =====
+/**
+ * 导入用 `setContent` **替换整个文档**，当前内容全部丢失且无法撤销回上一份文稿。
+ * 文档非空时先确认——空文档没什么可覆盖的，直接导入，不打断用户。
+ */
+const replaceConfirmOpen = ref(false);
+type PendingImport = {
+  file: File;
+  onSuccess?: (body: unknown) => void;
+  onError?: (error: unknown) => void;
+};
+let pendingImport: PendingImport | null = null;
+
+/** `props.editor` 是 @tiptap/vue-3 的 Editor，而 useYanivEditor 交出的是 core 的（同 FormatPainterButton） */
+type BoundEditor = NonNullable<typeof editor.value>;
+
+function documentHasContent(e: BoundEditor): boolean {
+  return e.getText().trim().length > 0 || e.state.doc.content.size > 4;
+}
+
+function confirmReplaceImport() {
+  replaceConfirmOpen.value = false;
+  const pending = pendingImport;
+  pendingImport = null;
+  if (pending) void runImport(pending);
+}
+
+function cancelReplaceImport() {
+  replaceConfirmOpen.value = false;
+  const pending = pendingImport;
+  pendingImport = null;
+  // 让 antd 的上传项落到「失败」而不是永远转圈
+  pending?.onError?.(new Error("import cancelled"));
+}
+
 // ===== 菜单项 =====
 const menuItems = computed<MenuItemConfig[]>(() => [
   {
@@ -117,28 +167,44 @@ const menuItems = computed<MenuItemConfig[]>(() => [
   },
 ]);
 
-/**
- * 处理 Word 文件导入
- */
-async function handleImport(options: any) {
-  const { file, onSuccess, onError } = options || {};
+/** 真正执行导入（已确认或无需确认） */
+async function runImport(pending: PendingImport) {
   const e = editor.value;
   if (!e) return;
 
   importing.value = true;
   try {
     const { importWordFile } = await import("./wordImport");
-    await importWordFile(e, file as File);
+    await importWordFile(e, pending.file);
     importModalOpen.value = false;
     feedback.toast(t("messages.wordImportSuccess"), "success");
-    onSuccess?.({});
+    pending.onSuccess?.({});
   } catch (err) {
     console.error("[WordButton] Import failed:", err);
     feedback.toast(t("messages.wordImportFailed"), "error");
-    onError?.(err);
+    pending.onError?.(err);
   } finally {
     importing.value = false;
   }
+}
+
+/**
+ * 处理 Word 文件导入。
+ *
+ * 文档非空时先弹确认：导入是 `setContent`，会把当前内容整份换掉。
+ */
+async function handleImport(options: any) {
+  const { file, onSuccess, onError } = options || {};
+  const e = editor.value;
+  if (!e) return;
+
+  const pending: PendingImport = { file: file as File, onSuccess, onError };
+  if (documentHasContent(e)) {
+    pendingImport = pending;
+    replaceConfirmOpen.value = true;
+    return;
+  }
+  await runImport(pending);
 }
 
 /**

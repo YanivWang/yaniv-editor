@@ -36,6 +36,9 @@ function streamResponse(chunks: string[], ok = true, status = 200): Response {
           index < chunks.length
             ? Promise.resolve({ done: false, value: encoder.encode(chunks[index++]) })
             : Promise.resolve({ done: true, value: undefined }),
+        // 真实的 ReadableStreamDefaultReader 一定有 cancel；`readStreamLines` 在
+        // finally 里调它取消提前退出时仍在下载的响应流
+        cancel: () => Promise.resolve(),
       }),
     },
   } as unknown as Response;
@@ -60,6 +63,7 @@ function splitStreamResponse(text: string, at: number): Response {
           index < chunks.length
             ? Promise.resolve({ done: false, value: chunks[index++] })
             : Promise.resolve({ done: true, value: undefined }),
+        cancel: () => Promise.resolve(),
       }),
     },
   } as unknown as Response;

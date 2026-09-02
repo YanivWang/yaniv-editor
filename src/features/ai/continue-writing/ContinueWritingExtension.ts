@@ -61,6 +61,7 @@ export const ContinueWritingExtension = Extension.create<ContinueWritingOptions>
             localeText(this.options, "messages.continueWritingFailed"),
             client,
             this.options.getLocaleText,
+            this.options.getDocumentContextLimit?.(),
           );
           return true;
         },

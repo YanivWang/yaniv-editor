@@ -26,6 +26,19 @@
   background: var(--ye-primary-light);
 }
 
+/*
+ * 这条**不是**与 `.is-active` 重复的死声明，删掉激活态按钮 hover 时会变回 antd 的灰色。
+ *
+ * 竞争对手是 antd 运行时注入的
+ * `:where(.css-…).ant-btn-text:not(:disabled):hover`：`:where()` 特异性为 0、
+ * `:not(:disabled)` 计一个伪类，所以它是 **(0,3,0)**——高于 `.ye-dropdown-btn.is-active`
+ * 的 (0,2,0)。只有本条 (0,3,0) 且排在 antd 样式表之后，才压得住它。
+ *
+ * 判据取自真实运行时：起 examples dev server，把 `:hover` 等价替换成一个类
+ * （特异性完全不变）后做删 / 留对照——删掉时解析出 antd 的
+ * `rgba(0,0,0,.06)` / `rgba(0,0,0,.88)`，保留时才是 `--ye-primary-light` / `--ye-primary`。
+ * 只看本仓库的 CSS 会误判成死声明：antd 是 CSS-in-JS，这条规则不在 `dist/style.css` 里。
+ */
 .ye-dropdown-btn.is-active:hover {
   color: var(--ye-primary);
   background: var(--ye-primary-light);

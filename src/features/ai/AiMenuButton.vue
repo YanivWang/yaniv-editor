@@ -24,7 +24,7 @@ import {
   TranslationOutlined,
   SettingOutlined,
 } from "@ant-design/icons-vue";
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref } from "vue";
 
 import { ToolbarDropdownButton } from "@/components/base";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
@@ -88,14 +88,36 @@ function resolveSelection(editor: Editor): { from: number; to: number } {
   return selection;
 }
 
+/**
+ * 排队中的帧句柄。
+ *
+ * 命令要等菜单关闭动画让出一帧再执行，而这一帧可能落在组件卸载之后：
+ * `runEditorAiChain` 第一行就是 `editor.view.focus()`，销毁后访问 `editor.view`
+ * 是直接抛错的（不变量 15）。外层的 try/catch 只是把它压成一条 console.error，
+ * 命令并没有执行——用户点了菜单却什么也没发生。
+ *
+ * 留句柄同时解决第二个问题：连点两项时，前一帧会被取消，不会两条命令抢同一个选区。
+ */
+let pendingFrame: number | null = null;
+
+function cancelPendingAiCommand() {
+  if (pendingFrame === null) return;
+  cancelAnimationFrame(pendingFrame);
+  pendingFrame = null;
+}
+
 function runAiCommandAfterMenuClose(
   run: (editor: Editor, selection: { from: number; to: number }) => void,
 ) {
   const { editor } = props;
   if (!editor) return;
 
+  cancelPendingAiCommand();
   nextTick(() => {
-    requestAnimationFrame(() => {
+    pendingFrame = requestAnimationFrame(() => {
+      pendingFrame = null;
+      // 帧排队期间编辑器可能已销毁（换 session / 组件卸载）
+      if (editor.isDestroyed) return;
       try {
         run(editor, resolveSelection(editor));
       } catch (error) {
@@ -104,6 +126,8 @@ function runAiCommandAfterMenuClose(
     });
   });
 }
+
+onBeforeUnmount(cancelPendingAiCommand);
 
 function runEditorAiChain(
   editor: Editor,

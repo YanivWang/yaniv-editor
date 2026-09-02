@@ -48,6 +48,7 @@ export const CustomAiExtension = Extension.create<CustomAiOptions>({
             selectedText,
             { from, to },
             createConfiguredAiClient(this.options),
+            this.options.getDocumentContextLimit?.(),
           );
           return true;
         },

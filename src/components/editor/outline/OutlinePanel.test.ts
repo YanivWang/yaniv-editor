@@ -5,7 +5,7 @@ import UniqueID from "@tiptap/extension-unique-id";
 import StarterKit from "@tiptap/starter-kit";
 import { Editor } from "@tiptap/vue-3";
 import { mount } from "@vue/test-utils";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { defineComponent, h, nextTick, ref } from "vue";
 
 import { provideEditorLocale } from "@/core/infra/useEditorLocale";
@@ -123,5 +123,67 @@ describe("OutlinePanel 高亮项自动滚入视野", () => {
 
     expect(activeId).toBeTruthy();
     expect(scrolledIds).toContain(activeId);
+  });
+});
+
+/**
+ * 滚动同步是 50ms 防抖的，卸载时可能正压着一个待触发的定时器。
+ *
+ * 大纲面板是可以在编辑器还活着的时候卸载的（用户点关闭、或切到 preview），
+ * 定时器到点后 `syncItems` 会去读已卸载组件的 refs 和 `props.scrollParent()`。
+ * `debounce` 因此必须交出 `cancel()`，由 `onBeforeUnmount` 撤掉待触发的那一次。
+ */
+describe("OutlinePanel 卸载时撤掉待触发的滚动防抖", () => {
+  it("卸载后 pending 的防抖回调不再执行", async () => {
+    vi.useFakeTimers();
+    try {
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+      editor = new Editor({
+        element: host,
+        extensions: [
+          StarterKit,
+          UniqueID.configure({ types: ["heading"] }),
+          TableOfContents.configure({ anchorTypes: ["heading"] }),
+        ],
+        content: "<h1>Alpha</h1><p>body</p>",
+      });
+      const e = editor;
+
+      const scrollHost = document.createElement("div");
+      document.body.appendChild(scrollHost);
+      let scrollParentReads = 0;
+      const scrollParent = () => {
+        scrollParentReads += 1;
+        return scrollHost;
+      };
+
+      wrapper = mount(
+        defineComponent({
+          setup() {
+            provideEditorLocale(ref("zh-CN"));
+            provideOutlinePanel(true);
+            return () => h(OutlinePanel, { editor: e, scrollParent });
+          },
+        }),
+        { attachTo: document.body },
+      );
+      await nextTick();
+
+      // 滚一下，让防抖排上一个 50ms 的定时器
+      scrollHost.dispatchEvent(new Event("scroll"));
+      const readsBeforeUnmount = scrollParentReads;
+
+      wrapper.unmount();
+      wrapper = null;
+
+      // 编辑器仍然活着——卸载的只是面板；定时器若没被撤掉，这里就会再跑一次 syncItems
+      vi.advanceTimersByTime(200);
+
+      expect(scrollParentReads).toBe(readsBeforeUnmount);
+      expect(e.isDestroyed).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

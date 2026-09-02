@@ -31,7 +31,15 @@
 
 ## Token 层级（`variables.css`）
 
-颜色等 token 定义在 `:root`；**z-index token 仅定义在 `.yaniv-editor`**：
+颜色**字面量**定义在 `:root`；**z-index 与派生别名定义在 `.yaniv-editor`**。
+
+派生别名（值形如 `var(--ye-X)` 的 token，如 `--ye-toolbar-border`、`--ye-table-border`）
+不能留在 `:root`：自定义属性在**声明它的元素**上求值，而改基础 token 的三条路径
+——外观类 `.appearance-word`、`[data-color-mode="dark"]`、`custom-appearance-vars` 的内联变量
+——全都落在**编辑器根节点**上。别名声明在祖先 `:root` 就跟不上这些覆盖
+（详见 ARCHITECTURE 不变量 26）。
+
+z-index token：
 
 | Token                     | 计算（默认 base=1000） | 用途                             |
 | ------------------------- | ---------------------- | -------------------------------- |

@@ -28,12 +28,12 @@ Preset 默认能力仅在 `src/core/runtime/resolveEditorProfile.ts` 定义。`e
 
 样式分为结构层、功能 chrome 层和外观层。不要在外观文件中重复结构规则。
 
-| 层级        | 位置                                                    | 职责                                                              |
-| ----------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
-| Token       | `src/styles/variables.css`                              | `--ye-*` 设计 token；颜色等在 `:root`，z-index 在 `.yaniv-editor` |
-| 结构        | `src/styles/content.css`、`table.css`、`code-block.css` | ProseMirror 边框、背景和交互语义                                  |
-| 功能 chrome | `src/styles/*.css`、`src/components/tools/**`           | 工具栏、菜单、拖拽手柄、大纲、`overlay-portal.css` 等             |
-| 外观        | `src/appearance/styles/*.css`                           | 主题 token 和排版（margin、font-size、padding）                   |
+| 层级        | 位置                                                    | 职责                                                                                     |
+| ----------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Token       | `src/styles/variables.css`                              | `--ye-*` 设计 token；颜色**字面量**在 `:root`，**派生别名与 z-index 在 `.yaniv-editor`** |
+| 结构        | `src/styles/content.css`、`table.css`、`code-block.css` | ProseMirror 边框、背景和交互语义                                                         |
+| 功能 chrome | `src/styles/*.css`、`src/components/tools/**`           | 工具栏、菜单、拖拽手柄、大纲、`overlay-portal.css` 等                                    |
+| 外观        | `src/appearance/styles/*.css`                           | 主题 token 和排版（margin、font-size、padding）                                          |
 
 导入顺序在 `src/styles/index.css`（Full）和 `src/styles/inline.css`（Inline）中定义。两者都以 `variables.css` 开头（token 必须最先），随后各自按需引入结构层与功能 chrome 层；`inline.css` 只引 Inline 用得到的那部分（不含 document-layout、表格、拖拽手柄、大纲等）。
 

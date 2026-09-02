@@ -1556,6 +1556,54 @@ src/shared/
     意外解除，而它还是公开导出的 API。改成带命名空间前缀的字符串（`"yaniv:bypassGuard"`）后
     类型也变诚实了：调用点不再需要 `as unknown as string`。
 
+37. **`transaction` 是 `update` / `selectionUpdate` 的超集，同一个 handler 不得重复订阅** —
+    实测（tiptap 3）：插入文本三个事件各发 1 次；只改选区发 `transaction` + `selectionUpdate`；
+    `toggleBold` 发 `transaction` + `update`；纯 meta 事务只发 `transaction`；
+    **唯一的例外是 `setEditable`——它不产生事务，只 emit `update`**。
+    因此「同一 handler 既订 `transaction` 又订 `update` / `selectionUpdate`」在除
+    `setEditable` 外的每一次编辑里都会白跑一到两遍。`OutlinePanel` 曾三个都订，
+    每次按键 `syncItems` 跑 3 次、每次对所有标题 `getBoundingClientRect()`（三倍强制回流）。
+    真要覆盖 `setEditable` 就用**另一个** handler 单独订 `update`。
+    护栏 `composables/editorListenerScope.test.ts`。
+
+38. **编辑器销毁时的清理要写在扩展的 `onDestroy`，不能写在 plugin view 的 `destroy`** —
+    ProseMirror 在**插件集合变化**时会销毁并重建全部 plugin view
+    （`updatePluginViews` → `destroyPluginViews`），而 `editor.registerPlugin()` 就走这条路
+    ——`@tiptap/vue-3` 挂气泡菜单时正好会调它。实测把「通知外部浮层关闭」写进 plugin view 的
+    `destroy` 会在每次注册插件时误发，把 `blockMenuHost` 缓冲的 `pendingOpen` 清掉，
+    斜杠菜单再也弹不出来。`editor.isDestroyed` 不能用来区分：它在 plugin view 的 `destroy` 里
+    三种路径下都还是 `false`。扩展的 `onDestroy` 只在 `editor.destroy()` 时触发一次
+    （`registerPlugin` / `unregisterPlugin` / `setEditable` / `setOptions` 均不触发）。
+    只有**归扩展自己所有、随编辑器一起消失**的状态（storage、装饰）才可以在 view 里清；
+    通知活在编辑器之外的浮层必须走 `onDestroy`。
+
+39. **command 里组合多个候选必须用注入的 `commands`，不能写 `editor.commands.x()`** —
+    后者各自**立即 dispatch** 一个独立事务，而外层 `chain` / `first` 还持有一个基于**旧 state**
+    的 tr，收尾 dispatch 它就抛 `RangeError: Applying a mismatched transaction`。
+    `ListShortcuts` 的 `Shift-Enter` 曾这样写：代码块内每按一次就抛一次，
+    而换行本身是成功的（第一个命令已独立 dispatch 过），异常也不冒泡到按键处理器
+    ——文档完全看不出问题，只会变成一条未捕获错误刷控制台、被宿主的错误监控当成线上故障。
+    正确写法：`editor.commands.first(({ commands }) => [() => commands.a(), () => commands.b()])`。
+
+40. **antd 组件上的状态样式要按 `:where(…):not(:disabled):hover` 的 (0,3,0) 来算** —
+    antd v5 是 CSS-in-JS，规则**不在** `dist/style.css` 里，只看本仓库 CSS 会把
+    `.ye-dropdown-btn.is-active:hover` 误判成与 `.is-active` 重复的死声明。
+    实际 `:where()` 特异性为 0、`:not(:disabled)` 计一个伪类，antd 的
+    `.ant-btn-text:not(:disabled):hover` 是 (0,3,0)，**高于** `.is-active` 的 (0,2,0)；
+    要压住它必须同为 (0,3,0) 且排在 antd 样式表之后。
+    判定办法：起 examples dev server，把 `:hover` 等价替换成一个类（特异性不变）后做删 / 留对照。
+
+41. **ESM 产物不压缩，主 chunk 源文件里的注释直接计入 46000B 预算** —
+    `vite.config.ts` 的 `minify: "terser"` 只对 CJS 生效：Vite 的 `vite:terser` 插件对
+    `build.lib && format === "es"` 直接 `return null`（有意设计，保留 `/*#__PURE__*/`
+    标注让接入方自行压缩）。而 CI 量的正是 `dist/EditorShell*.js` 这个 **ESM** 文件，
+    于是主 chunk 源文件里的每一行注释——包括中文——都原样进产物、直接吃预算。
+    实测给 `listShortcuts.ts`（`core` 能力，静态 import）加一段约 10 行的中文论证注释，
+    主 chunk gzip 涨了 **471B**，一次就吃掉大半余量。
+    **写法：结论留源码（短），证据搬测试**——测试文件不进产物，长论证放那里零成本。
+    ⚠️ 定位涨幅时不能只还原单个文件：chunk 划分是全局优化的结果，
+    单独还原 `listShortcuts.ts` 只差 2B，把整批改动一起还原才看得出那 471B。
+
 ---
 
 ## CSS 分层

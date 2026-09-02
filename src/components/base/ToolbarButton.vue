@@ -48,16 +48,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const getPopupContainer = useOverlayMountTarget();
 
-const emit = defineEmits<{ (e: "click"): void; (e: "dblclick"): void }>();
+/** 透传原生事件：调用方需要 `detail` 才能识别双击序列里的第二次 click（约定 33） */
+const emit = defineEmits<{
+  (e: "click", event: MouseEvent): void;
+  (e: "dblclick", event: MouseEvent): void;
+}>();
 
-function onClick() {
+function onClick(event: MouseEvent) {
   if (props.disabled) return;
-  emit("click");
+  emit("click", event);
 }
 
-function onDblClick() {
+function onDblClick(event: MouseEvent) {
   if (props.disabled) return;
-  emit("dblclick");
+  emit("dblclick", event);
 }
 </script>
 

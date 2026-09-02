@@ -3,8 +3,6 @@
  * @description 提供常用的文档模板，可通过工具栏插入
  */
 
-import { TAG_INNARDS } from "@/utils/htmlTagPattern";
-
 export interface TemplateItem {
   /** 模板唯一标识 */
   key: string;
@@ -12,20 +10,16 @@ export interface TemplateItem {
   nameKey: string;
   /** 模板描述（翻译 key） */
   descKey: string;
-  /** 模板 HTML 内容（表格单元格须含段落，如 `<td><p></p></td>`） */
+  /**
+   * 模板 HTML 内容。
+   *
+   * 空表格单元格**不需要**自己补 `<p></p>`：tableCell 的 schema 是 `block+`，
+   * ProseMirror 解析 `<td></td>` 时会自动补一个 paragraph（实测两条路径产出的
+   * JSON 完全相同）。这里曾有一个 `normalizeTemplateHtml` 专门做这件事，
+   * 对全部 5 个内置模板都是 no-op，对宿主的 `customTemplates` 也是多余的，已删除。
+   * `templates.test.ts` 锁住了这个前提。
+   */
   content: string;
-}
-
-/**
- * 将空表格单元格补全为 `<p></p>`，满足 Tiptap tableCell schema。
- *
- * 属性区用 {@link TAG_INNARDS} 而不是 `[^>]*`：`customTemplates` 是宿主传入的，
- * `<td title="a>b"></td>` 这种带引号 `>` 的单元格用朴素写法会漏掉补全。
- */
-const EMPTY_CELL = new RegExp(`<(td|th)(\\s${TAG_INNARDS})?>\\s*</\\1>`, "gi");
-
-export function normalizeTemplateHtml(html: string): string {
-  return html.replace(EMPTY_CELL, "<$1$2><p></p></$1>");
 }
 
 /**

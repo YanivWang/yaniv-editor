@@ -36,16 +36,13 @@ export function useEditorColorState(editor: MaybeRefOrGetter<Editor | null>) {
   function attachEditorListeners(e: Editor | null) {
     if (!e) return;
     syncColorFromSelection();
-    e.on("selectionUpdate", syncColorFromSelection);
+    // 只订 `transaction`：颜色只依赖选区上的 mark，而 transaction 是另两个事件的超集（不变量 37）
     e.on("transaction", syncColorFromSelection);
-    e.on("update", syncColorFromSelection);
   }
 
   function detachEditorListeners(e: Editor | null) {
     if (!e) return;
-    e.off("selectionUpdate", syncColorFromSelection);
     e.off("transaction", syncColorFromSelection);
-    e.off("update", syncColorFromSelection);
   }
 
   /**

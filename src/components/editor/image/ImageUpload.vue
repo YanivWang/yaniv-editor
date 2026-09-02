@@ -56,6 +56,7 @@ import {
 import { computed, ref } from "vue";
 
 import { ToolbarGroup, ToolbarDropdownButton } from "@/components/base";
+import { useBatchUploadGate } from "@/composables/useBatchUploadGate";
 import { useOverlayFeedback } from "@/composables/useOverlayFeedback";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import type { MenuItemConfig } from "@/configs/toolbarTypes";
@@ -90,6 +91,8 @@ const runCommand = createCommandRunner(editor);
 const imageModalOpen = ref(false);
 const imageUrl = ref("");
 const localUploadOpen = ref(false);
+/** 批量拖入时只有整批结束才关弹窗（见 useBatchUploadGate） */
+const localUploadGate = useBatchUploadGate(localUploadOpen);
 
 // ===== 媒体上传菜单项 =====
 const imageMenuItems = computed<MenuItemConfig[]>(() => [
@@ -133,6 +136,7 @@ function applyImage() {
  */
 async function handleLocalUpload(options: any) {
   const { file, onSuccess, onError } = options || {};
+  localUploadGate.begin();
   try {
     const url = await resolveMediaUrl({
       file: file as File,
@@ -143,10 +147,12 @@ async function handleLocalUpload(options: any) {
     });
     // 插入图片
     runCommand((chain) => chain.insertContent({ type: "image", attrs: { src: url } }))();
-    localUploadOpen.value = false;
+    localUploadGate.markSuccess();
     onSuccess?.({ url });
   } catch (e) {
     onError?.(e);
+  } finally {
+    localUploadGate.end();
   }
 }
 </script>

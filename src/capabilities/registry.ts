@@ -234,6 +234,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         getEndpoint: () => ctx.aiConfig()?.endpoint,
         getTimeout: () => ctx.aiConfig()?.timeout,
         getStorageMode: () => ctx.aiConfig()?.storageMode,
+        getDocumentContextLimit: () => ctx.aiConfig()?.documentContextLimit,
         getLocaleText: (key: string) => resolveMessage(ctx.locale, key) ?? key,
       };
       // locale 由各扩展在发起 AI 会话时绑定（见 aiSuggestionManager.bindLocale 注释）：

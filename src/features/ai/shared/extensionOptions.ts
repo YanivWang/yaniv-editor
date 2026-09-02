@@ -19,6 +19,8 @@ export interface AiExtensionConfigureOptions {
   getStorageMode?: () => AiStorageMode | undefined;
   /** 实例 locale 文案，key 为 dot-path（如 editor.pleaseSelectText） */
   getLocaleText?: (key: string) => string;
+  /** 送进 AI 上下文的文档全文字符上限；省略时用 `DEFAULT_DOCUMENT_CONTEXT_LIMIT` */
+  getDocumentContextLimit?: () => number | undefined;
 }
 
 export interface ResolvedAiExtensionConfig {

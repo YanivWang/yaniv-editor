@@ -16,6 +16,8 @@ interface YanivEditorAiConfig {
   storageMode?: "local" | "memory" | "proxy";
   /** 有 ai-config 时默认 false */
   showSettings?: boolean;
+  /** 送进 AI 上下文的文档全文字符上限，超出即截断并提示用户；@default 8000 */
+  documentContextLimit?: number;
 }
 ```
 
@@ -43,15 +45,26 @@ const aiConfig: YanivEditorAiConfig = {
 
 `ai-config` 只有 `provider` 必填，其余字段的兜底顺序如下（见 `capabilities/registry.ts` 与 `features/ai/shared/extensionOptions.ts`）：
 
-| 字段           | 未传时                                            |
-| -------------- | ------------------------------------------------- |
-| `apiKey`       | `""`                                              |
-| `endpoint`     | `AI_PROVIDERS` 中该 provider 的 `defaultEndpoint` |
-| `model`        | `AI_PROVIDERS` 中该 provider 的 `defaultModel`    |
-| `timeout`      | `60000`（`getAiConfig()` 的 `DEFAULT_TIMEOUT`）   |
-| `enabled`      | `true`（`enabled !== false`）                     |
-| `storageMode`  | `"memory"`                                        |
-| `showSettings` | 有 `ai-config` 时 `false`，否则 `true`            |
+| 字段                   | 未传时                                            |
+| ---------------------- | ------------------------------------------------- |
+| `apiKey`               | `""`                                              |
+| `endpoint`             | `AI_PROVIDERS` 中该 provider 的 `defaultEndpoint` |
+| `model`                | `AI_PROVIDERS` 中该 provider 的 `defaultModel`    |
+| `timeout`              | `60000`（`getAiConfig()` 的 `DEFAULT_TIMEOUT`）   |
+| `enabled`              | `true`（`enabled !== false`）                     |
+| `storageMode`          | `"memory"`                                        |
+| `showSettings`         | 有 `ai-config` 时 `false`，否则 `true`            |
+| `documentContextLimit` | `8000`（`DEFAULT_DOCUMENT_CONTEXT_LIMIT`）        |
+
+::: warning documentContextLimit 的单位是字符，不是 token
+文档全文会原样拼进 system prompt，不限长的话超长文档会把请求撑爆（多数模型返回 400）。
+项目同时支持 openai / aliyun / ollama 且模型可配，各家 tokenizer 不同、没有统一换算，
+所以默认值只能取一个保守估计——**请按你实际用的模型调整**。
+
+截断保留文档**开头**，并在 prompt 末尾加一条标记让模型知道拿到的不是全文；
+同时给用户弹一条提示（`messages.aiDocumentContextTruncated`），不静默降质。
+传 `0` 或负数关闭这个保护。
+:::
 
 ## 配置模式对比
 

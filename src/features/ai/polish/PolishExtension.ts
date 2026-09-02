@@ -50,6 +50,7 @@ export const PolishExtension = Extension.create<PolishOptions>({
             client.polish.bind(client),
             localeText(this.options, "messages.polishFailed"),
             this.options.getLocaleText,
+            this.options.getDocumentContextLimit?.(),
           );
           return true;
         },

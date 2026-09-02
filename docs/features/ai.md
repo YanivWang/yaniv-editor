@@ -25,7 +25,7 @@
 | 续写   | ContinueWritingExtension | 流式续写下文    |
 | 润色   | PolishExtension          | 优化选中文本    |
 | 总结   | SummarizeExtension       | 提取要点        |
-| 翻译   | TranslationExtension     | 14 种目标语言   |
+| 翻译   | TranslationExtension     | 15 种目标语言   |
 | 自定义 | CustomAiExtension        | 用户输入 prompt |
 
 交互 UX：**AiSuggestionPopover** 流式展示建议，可接受/拒绝；**AiHighlightMark** 高亮建议区域。
@@ -79,7 +79,7 @@ import {
 
 ## 翻译语言
 
-简体中文、繁体中文、英语、日语、泰语、法语、西班牙语、葡萄牙语、韩语、越南语、俄语、德语、印地语、印尼语。
+简体中文、繁体中文、英语、日语、泰语、法语、西班牙语、葡萄牙语、韩语、越南语、俄语、德语、印地语、印尼语、阿拉伯语。
 
 ## 相关
 

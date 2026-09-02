@@ -75,16 +75,15 @@ type BoundEditor = NonNullable<typeof editor.value>;
 function attachFormatPainterListeners(e: BoundEditor | null) {
   if (!e) return;
   updateFormatPainterActive();
-  e.on("update", updateFormatPainterActive);
-  e.on("selectionUpdate", updateFormatPainterActive);
+  // 只订 `transaction`（不变量 37）。格式刷的 `startFormatPainting` / `cancelFormatPainting`
+  // 只改 storage 不动 `tr`，但 tiptap 仍会为每次 command dispatch 一个事务，
+  // 因此 ESC 退出、mouseup 自动应用这些路径照样能收到通知（实测）。
   e.on("transaction", updateFormatPainterActive);
 }
 
 /** 退订指定编辑器上的监听 */
 function detachFormatPainterListeners(e: BoundEditor | null) {
   if (!e) return;
-  e.off("update", updateFormatPainterActive);
-  e.off("selectionUpdate", updateFormatPainterActive);
   e.off("transaction", updateFormatPainterActive);
 }
 
@@ -111,12 +110,33 @@ onBeforeUnmount(() => {
 
 // ===== 格式刷命令 =====
 /**
+ * 双击开始前的模式，供 `dblclick` 判定这次双击是「进入连续」还是「退出」。
+ *
+ * DOM 规范里 `dblclick` 之前必然先发两次 `click`，所以 dblclick 跑到时
+ * storage 已经被第一次 click 改过一轮，读它得不到用户按下去之前的状态。
+ */
+type PainterMode = "off" | "once" | "continuous";
+let modeBeforeClick: PainterMode = "off";
+
+function readPainterMode(): PainterMode {
+  const storage = getFormatPainterStorage();
+  if (!storage?.isActive) return "off";
+  return storage.isContinuous ? "continuous" : "once";
+}
+
+/**
  * 单击切换格式刷（单次模式）
  * @description 单击格式刷按钮，采样格式或应用格式
  */
-function toggleFormatPainter() {
+function toggleFormatPainter(event?: MouseEvent) {
+  // 双击序列的第二次 click 直接跳过：否则「采样→取消→连续」三步会连弹 3 个 toast。
+  // `detail` 由规范保证（第一次 1、第二次 2），不需要给单击加双击窗口的延迟。
+  if (event && event.detail >= 2) return;
+
   const e = editor.value;
   if (!e) return;
+
+  modeBeforeClick = readPainterMode();
 
   // 检查是否禁用，如果禁用则提示
   if (isDisabled.value) {
@@ -156,6 +176,11 @@ function toggleFormatPainter() {
 /**
  * 双击切换格式刷连续应用模式
  * @description 双击格式刷按钮，开启连续应用模式
+ *
+ * 判定看的是 `modeBeforeClick`（双击**开始前**的模式），不是当前 storage：
+ * 第一次 click 已经把状态改过一轮了。
+ * - 双击前是连续模式 → 这次双击是「退出」，第一次 click 已经取消完，这里什么也不做
+ * - 其余情况 → 进入连续模式
  */
 function toggleFormatPainterContinuous() {
   const e = editor.value;
@@ -167,32 +192,30 @@ function toggleFormatPainterContinuous() {
     return;
   }
 
-  const active = e.storage.formatPainter?.isActive ?? false;
+  if (modeBeforeClick === "continuous") {
+    modeBeforeClick = "off";
+    updateFormatPainterActive();
+    return;
+  }
+  modeBeforeClick = "off";
 
-  if (!active) {
-    // 格式刷未激活：检查是否有选中内容
-    try {
-      const selection = e.state.selection;
-      if (!selection || selection.empty) {
-        feedback.toast(t("editor.formatPainterDoubleClickSelect"), "warning");
-        return;
-      }
-    } catch (error) {
-      feedback.toast(t("editor.formatPainterSelectTextHint"), "warning");
+  // 检查是否有选中内容
+  try {
+    const selection = e.state.selection;
+    if (!selection || selection.empty) {
+      feedback.toast(t("editor.formatPainterDoubleClickSelect"), "warning");
       return;
     }
+  } catch (error) {
+    feedback.toast(t("editor.formatPainterSelectTextHint"), "warning");
+    return;
+  }
 
-    // 采样格式并激活格式刷（连续模式）
-    const success = e.commands.startContinuousFormatPainting();
-    if (success) {
-      feedback.toast(t("editor.formatPainterAppliedMulti"), "success");
-      updateFormatPainterActive();
-    }
-  } else {
-    // 格式刷已激活：取消格式刷
-    e.commands.cancelFormatPainting();
+  // 采样格式并激活格式刷（连续模式）。第一次 click 若已以单次模式激活，这里直接覆盖为连续。
+  const success = e.commands.startContinuousFormatPainting();
+  if (success) {
+    feedback.toast(t("editor.formatPainterAppliedMulti"), "success");
     updateFormatPainterActive();
-    feedback.toast(t("editor.formatPainterExited"), "info");
   }
 }
 </script>

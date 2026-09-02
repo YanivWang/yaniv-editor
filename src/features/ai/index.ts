@@ -25,7 +25,12 @@ export { aiSuggestionManager } from "./shared";
 export type { AiSuggestionState } from "./shared";
 
 export { runAiSuggestionStream, runAiContinueWritingStream } from "./shared/runAiSuggestionStream";
-export { buildDocumentContextPrompt } from "./shared/documentContext";
+export {
+  buildDocumentContext,
+  buildDocumentContextPrompt,
+  DEFAULT_DOCUMENT_CONTEXT_LIMIT,
+} from "./shared/documentContext";
+export type { DocumentContext } from "./shared/documentContext";
 
 export { default as CustomAiPopover } from "./shared/CustomAiPopover.vue";
 export { default as AiSuggestionPopover } from "./shared/AiSuggestionPopover.vue";

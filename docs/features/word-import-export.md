@@ -15,6 +15,14 @@ Word 工具属于 **full preset 顶栏**，与 `appearance="word"` 视觉皮肤�
 
 顶栏 Word 按钮 → 导入 modal，支持拖拽上传。
 
+::: warning 导入会替换整个文档
+用的是 `setContent`，当前内容会被文件内容整份换掉。**文档非空时会先弹确认**，
+确认后才执行；取消则什么也不做。空文档直接导入，不打断。
+
+图片 `src` 由 `image` 节点的 `parseHTML` 过媒体白名单（`mediaSrcPolicy`），
+不合格的直接不产生节点——这条路径实测已覆盖，不需要在导入侧另做清洗。
+:::
+
 ## 导出
 
 - 输出：`.docx`（docx + file-saver）

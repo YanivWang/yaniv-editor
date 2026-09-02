@@ -85,6 +85,7 @@ export interface TiptapLocale {
     videoUploadNotConfigured: string;
     aiNotConfigured: string;
     aiRequestFailed: string;
+    aiDocumentContextTruncated: string;
   };
 
   editor: {
@@ -158,6 +159,9 @@ export interface TiptapLocale {
     onlySupportVideo: string;
 
     word: string;
+    importWordReplaceTitle: string;
+    importWordReplaceHint: string;
+    importWordReplaceConfirm: string;
     importWord: string;
     exportWord: string;
     clickOrDragUploadWord: string;

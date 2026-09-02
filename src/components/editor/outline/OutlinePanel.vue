@@ -93,12 +93,23 @@ function headingLevelClass(originalLevel: number): string {
   return `outline-panel__item--h${clampHeadingLevel(originalLevel)}`;
 }
 
-function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): T {
+/** 带 `cancel()` 的防抖：pending 的定时器必须能在卸载时撤掉（不变量 15） */
+type Debounced<T extends (...args: never[]) => void> = T & { cancel: () => void };
+
+function debounce<T extends (...args: never[]) => void>(fn: T, wait: number): Debounced<T> {
   let timeout: ReturnType<typeof setTimeout> | null = null;
-  return ((...args: Parameters<T>) => {
+  const wrapped = (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => fn(...args), wait);
-  }) as T;
+    timeout = setTimeout(() => {
+      timeout = null;
+      fn(...args);
+    }, wait);
+  };
+  wrapped.cancel = () => {
+    if (timeout) clearTimeout(timeout);
+    timeout = null;
+  };
+  return wrapped as Debounced<T>;
 }
 
 function resolveHeadingIdAtSelection(e: Editor): string | null {
@@ -203,9 +214,10 @@ function bindScrollParent(element: HTMLElement | null) {
 function attachEditorListeners(e: Editor | null) {
   if (!e || e.isDestroyed) return;
 
+  // 只订 `transaction`：它是 `update` / `selectionUpdate` 的超集（不变量 37）。
+  // 此前三个都订，同一次按键让 `syncItems` 跑 3 次，每次都对所有标题
+  // `getBoundingClientRect()` —— 三倍的强制回流。
   e.on("transaction", syncItems);
-  e.on("update", syncItems);
-  e.on("selectionUpdate", syncItems);
   syncItems();
 }
 
@@ -213,8 +225,6 @@ function detachEditorListeners(e: Editor | null) {
   if (!e || e.isDestroyed) return;
 
   e.off("transaction", syncItems);
-  e.off("update", syncItems);
-  e.off("selectionUpdate", syncItems);
 }
 
 watch(
@@ -264,5 +274,7 @@ watch(
 onBeforeUnmount(() => {
   detachEditorListeners(editor.value);
   bindScrollParent(null);
+  // 滚动防抖可能还压着一个 pending 定时器，它到点会读已卸载组件的 refs 与已销毁的编辑器
+  debouncedSyncItems.cancel();
 });
 </script>

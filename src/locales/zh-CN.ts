@@ -69,6 +69,7 @@ export const zhCN: TiptapLocale = {
     aiNotConfigured:
       "请先在工具栏 AI 设置中配置 API Key，或设置 VITE_AI_DEMO_MODE=true 启用演示模式",
     aiRequestFailed: "AI 请求失败",
+    aiDocumentContextTruncated: "文档过长，仅将前 {kept} 字（共 {total} 字）作为 AI 上下文",
   },
 
   editor: {
@@ -142,6 +143,9 @@ export const zhCN: TiptapLocale = {
     onlySupportVideo: "仅支持视频格式",
 
     word: "Word",
+    importWordReplaceTitle: "导入会替换整个文档",
+    importWordReplaceHint: "导入 Word 会用文件内容替换当前文档，现有内容将全部丢失。确定继续吗？",
+    importWordReplaceConfirm: "替换",
     importWord: "导入 Word",
     exportWord: "导出 Word",
     clickOrDragUploadWord: "点击或拖拽 Word 文件到此区域",

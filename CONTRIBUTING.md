@@ -200,6 +200,33 @@ docs: 补充 z-index 说明
     Vue 报 `Invalid watch source`（`useEditorAppearance` 实测）。包成 getter：
     `() => maybeRef?.value`。
 
+28. **同一个 handler 不要既订 `transaction` 又订 `update` / `selectionUpdate`。**
+    `transaction` 是另两者的超集（不变量 37），重复订阅只会让 handler 白跑。
+    需要覆盖 `setEditable`（唯一不发事务却 emit `update` 的路径）时，
+    用另一个 handler 单独订 `update`。护栏 `composables/editorListenerScope.test.ts` 会挡。
+
+29. **批量上传的弹窗要等整批结束才关。** antd 的 `<a-upload-dragger multiple>`
+    对每个文件各调一次 `customRequest` 且**并发**发起（实测），
+    「成功就关弹窗」会在第一个文件完成时关掉，后面的仍在后台上传并继续往文档插内容。
+    用 `useBatchUploadGate`：整批结束且至少一个成功才关，全批失败时保持打开让用户看到错误。
+
+30. **`chain` / `first` 的候选项要用注入的 `commands`，不要写 `editor.commands.x()`。**
+    后者会各自立即 dispatch，让外层那个基于旧 state 的 tr 抛
+    `RangeError: Applying a mismatched transaction`（不变量 39）。异常不冒泡、文档也看不出，
+    只会变成未捕获错误——所以这类改动要用 `window` 的 `error` 事件来验证，光看结果不够。
+
+31. **判断 antd 组件上的样式是否为死声明，必须起 dev server 看运行时 CSSOM。**
+    antd v5 是 CSS-in-JS，规则不在 `dist/style.css` 里，只读本仓库 CSS 一定算错特异性
+    （不变量 40）。⚠️ 两个探针坑：同一个同步 JS 块里注入 `<style>` 后**立刻**
+    `getComputedStyle` 读到的是上一拍的旧值，必须 `await` 一次 `setTimeout` 再读；
+    而预览面板隐藏时 `requestAnimationFrame` **不触发**，用它等会直接超时。
+
+32. **主 chunk 里的文件，注释要短——结论留源码，证据搬测试。**
+    ESM 产物不压缩，注释原样进 `dist/EditorShell*.js`，而 CI 的 46000B 预算量的就是它
+    （不变量 41）。一段 10 行的中文论证注释实测吃掉 471B。测试文件不进产物，
+    长论证放那里零成本，源码里留一句结论 + 指向测试即可。
+    往 `core/` / `capabilities/` / `core` 能力下的扩展加注释前，先想想这一条。
+
 ## 测试
 
 - 单测：`src/**/*.test.ts`（vitest + jsdom）。纯函数与扩展行为优先。

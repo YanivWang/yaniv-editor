@@ -71,6 +71,8 @@ export const enUS: TiptapLocale = {
     aiNotConfigured:
       "Configure an API Key under AI Settings in the toolbar, or set VITE_AI_DEMO_MODE=true to try the simulated stream.",
     aiRequestFailed: "AI request failed",
+    aiDocumentContextTruncated:
+      "Document is too long; only the first {kept} of {total} characters were sent as AI context.",
   },
 
   editor: {
@@ -144,6 +146,10 @@ export const enUS: TiptapLocale = {
     onlySupportVideo: "Only video formats are supported",
 
     word: "Word",
+    importWordReplaceTitle: "Import replaces the whole document",
+    importWordReplaceHint:
+      "Importing a Word file replaces the current document with the file's content. Everything you have now will be lost. Continue?",
+    importWordReplaceConfirm: "Replace",
     importWord: "Import Word",
     exportWord: "Export Word",
     clickOrDragUploadWord: "Click or drag Word file to this area",

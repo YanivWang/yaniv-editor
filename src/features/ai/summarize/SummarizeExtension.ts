@@ -57,6 +57,7 @@ export const SummarizeExtension = Extension.create<SummarizeOptions>({
             client.summarize.bind(client),
             localeText(this.options, "messages.summarizeFailed"),
             this.options.getLocaleText,
+            this.options.getDocumentContextLimit?.(),
           );
           return true;
         },

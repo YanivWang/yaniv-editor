@@ -202,10 +202,62 @@ describe("HTML transform 链", () => {
     expect(out).not.toContain("MsoNormal");
   });
 
-  it("移除行号包裹层", () => {
+  /**
+   * 这条此前的输入是 `<div style="mso-element:para-border-div">`——里面**根本没有**
+   * `MsoLineNumber` 类，函数对它是空操作，`toContain("正文")` 恒真：
+   * 把实现换成 `html => html` 也照样通过。测试名说「移除行号包裹层」，实际什么也没测到。
+   */
+  it("移除行号包裹层：包裹元素消失，内容保留", () => {
+    const out = transformRemoveLineNumberWrapper('<div class="MsoLineNumber"><p>正文</p></div>');
+    expect(out).toContain("正文");
+    expect(out).not.toContain("MsoLineNumber");
+    expect(out).not.toContain("<div");
+  });
+
+  it("行号包裹层是 span 时同样拆掉", () => {
+    const out = transformRemoveLineNumberWrapper(
+      '<p><span class="MsoLineNumber">12</span>正文</p>',
+    );
+    expect(out).not.toContain("<span");
+    expect(out).toContain("正文");
+  });
+
+  it("多类名元素也命中（class 里还有别的类）", () => {
+    const out = transformRemoveLineNumberWrapper(
+      '<p><span class="MsoNormal MsoLineNumber">7</span>多类名</p>',
+    );
+    expect(out).not.toContain("<span");
+    expect(out).toContain("多类名");
+  });
+
+  /**
+   * 与 `transformMsoHtmlClasses` 的精确口径不同，这里**有意**用子串匹配。
+   *
+   * 那边选择器与操作是两套口径（`[class*=]` 子串选中，`classList.remove` 按 token 精确删），
+   * 对 `MsoNormalTable` 一类是空操作，白跑一趟——所以必须收紧。这里操作是 unwrap
+   * **整个元素**，子串只是把范围放宽。实测差异面只有两项：`MsoLineNumberText`
+   * （若 Word 有此变体，正是想处理的）与 `xMsoLineNumbery`（要误伤得有类名把它嵌在中间，
+   * Word 剪贴板 HTML 不会这样输出）。收紧成 `.MsoLineNumber` 反而可能漏掉变体。
+   *
+   * ⚠️ 一条未验证的观察：`MsoLineNumber` 在 Word 里是**字符样式**，实际形态更可能是
+   * `<span class="MsoLineNumber">12</span>` 这样的行号数字本身，而不是包住正文的容器。
+   * 那样 unwrap 会把行号数字留进正文（实测 `<span class="MsoLineNumber">12</span>正文`
+   * → `12正文`）。判定该整体删除还是 unwrap 需要真实 Word 剪贴板样本，
+   * 拿到之前不改——改错的代价是**丢正文**。
+   */
+  it("子串匹配是有意的：MsoLineNumber* 变体一并拆掉", () => {
+    const out = transformRemoveLineNumberWrapper(
+      '<p><span class="MsoLineNumberText">9</span>变体</p>',
+    );
+    expect(out).not.toContain("<span");
+    expect(out).toContain("变体");
+  });
+
+  it("不含 MsoLineNumber 的内容原样保留", () => {
     const out = transformRemoveLineNumberWrapper(
       '<div style="mso-element:para-border-div"><p>正文</p></div>',
     );
+    expect(out).toContain("<div");
     expect(out).toContain("正文");
   });
 

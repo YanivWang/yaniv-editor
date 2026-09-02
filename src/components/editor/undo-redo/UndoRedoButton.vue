@@ -124,7 +124,7 @@ function attachEditorListeners(e: BoundEditor | null) {
   updateUndoRedoState();
 
   e.on("update", handleUpdate);
-  e.on("selectionUpdate", updateUndoRedoState);
+  // `selectionUpdate` 是 `transaction` 的严格子集，同时订两个只会让状态白算一遍（不变量 37）
   e.on("transaction", updateUndoRedoState);
 }
 
@@ -132,7 +132,6 @@ function attachEditorListeners(e: BoundEditor | null) {
 function detachEditorListeners(e: BoundEditor | null) {
   if (!e) return;
   e.off("update", handleUpdate);
-  e.off("selectionUpdate", updateUndoRedoState);
   e.off("transaction", updateUndoRedoState);
 }
 

@@ -20,6 +20,13 @@ beforeAll(installBrowserStubs);
 /** ZoomBar 订阅的两个事件 */
 const WATCHED_EVENTS = ["update", "selectionUpdate"] as const;
 
+/**
+ * 底栏自己挂的监听数：只订 `update`。字数取自 `characterCount` storage，只随文档内容变，
+ * 移动光标不改变计数——此前多订的 `selectionUpdate` 是纯粹的白算（不变量 37）。
+ * 测试仍观察两个事件，漏订回退时数得出来。
+ */
+const OWN_LISTENERS = 1;
+
 const editors: Editor[] = [];
 
 function createEditor(): Editor {
@@ -68,7 +75,7 @@ describe("ZoomBar 的编辑器监听随组件生命周期释放", () => {
     const baseline = countEditorListenersFor(editor, WATCHED_EVENTS);
 
     const wrapper = mountZoomBar(editor);
-    expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline + 2);
+    expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline + OWN_LISTENERS);
 
     wrapper.unmount();
     expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline);
@@ -110,12 +117,12 @@ describe("ZoomBar 的编辑器监听随组件生命周期释放", () => {
       { attachTo: document.body },
     );
 
-    expect(countEditorListenersFor(first, WATCHED_EVENTS)).toBe(firstBaseline + 2);
+    expect(countEditorListenersFor(first, WATCHED_EVENTS)).toBe(firstBaseline + OWN_LISTENERS);
 
     current.value = second;
     return wrapper.vm.$nextTick().then(() => {
       expect(countEditorListenersFor(first, WATCHED_EVENTS)).toBe(firstBaseline);
-      expect(countEditorListenersFor(second, WATCHED_EVENTS)).toBe(firstBaseline + 2);
+      expect(countEditorListenersFor(second, WATCHED_EVENTS)).toBe(firstBaseline + OWN_LISTENERS);
       wrapper.unmount();
       expect(countEditorListenersFor(second, WATCHED_EVENTS)).toBe(firstBaseline);
     });

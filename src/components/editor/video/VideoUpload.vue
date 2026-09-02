@@ -39,6 +39,7 @@ import { InboxOutlined, VideoCameraOutlined } from "@ant-design/icons-vue";
 import { ref } from "vue";
 
 import { ToolbarButton, ToolbarGroup } from "@/components/base";
+import { useBatchUploadGate } from "@/composables/useBatchUploadGate";
 import { useOverlayMountTarget } from "@/composables/useOverlayMount";
 import { useYanivEditor } from "@/core/editorContext";
 import { useEditorT } from "@/core/infra/useEditorLocale";
@@ -65,6 +66,8 @@ const editor = useYanivEditor(() => props.editor);
 const runCommand = createCommandRunner(editor);
 
 const videoUploadOpen = ref(false);
+/** 批量拖入时只有整批结束才关弹窗（见 useBatchUploadGate） */
+const uploadGate = useBatchUploadGate(videoUploadOpen);
 
 /**
  * 处理本地视频上传（自定义上传逻辑）
@@ -74,6 +77,7 @@ const videoUploadOpen = ref(false);
  */
 async function handleVideoUpload(options: any) {
   const { file, onSuccess, onError } = options || {};
+  uploadGate.begin();
   try {
     const url = await resolveMediaUrl({
       file: file as File,
@@ -84,10 +88,12 @@ async function handleVideoUpload(options: any) {
     });
     // 插入视频
     runCommand((chain) => chain.insertContent({ type: "video", attrs: { src: url } }))();
-    videoUploadOpen.value = false;
+    uploadGate.markSuccess();
     onSuccess?.({ url });
   } catch (e) {
     onError?.(e);
+  } finally {
+    uploadGate.end();
   }
 }
 </script>

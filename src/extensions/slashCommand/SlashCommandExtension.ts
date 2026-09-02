@@ -52,6 +52,17 @@ export const SlashCommandExtension = Extension.create<SlashCommandOptions>({
     };
   },
 
+  /**
+   * 编辑器销毁时收起菜单——菜单挂在 Shell 的 overlay portal 上，不随编辑器消失。
+   *
+   * ⚠️ **不能**写在 plugin view 的 `destroy()` 里：插件集合一变，ProseMirror 就会
+   * 销毁重建全部 plugin view，`registerPlugin()` 正走这条路（不变量 38）。
+   * 依据见 `SlashCommandExtension.test.ts`。
+   */
+  onDestroy() {
+    this.options.onDeactivate?.();
+  },
+
   addProseMirrorPlugins() {
     const extensionOptions = this.options;
 

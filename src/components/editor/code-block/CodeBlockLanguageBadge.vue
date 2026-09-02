@@ -131,13 +131,11 @@ function onLanguageChange(value: SelectValue) {
 
 function bindEditorEvents(e: Editor | null) {
   if (!e) return;
-  e.on("selectionUpdate", scheduleUpdate);
   e.on("transaction", scheduleUpdate);
 }
 
 function unbindEditorEvents(e: Editor | null) {
   if (!e) return;
-  e.off("selectionUpdate", scheduleUpdate);
   e.off("transaction", scheduleUpdate);
 }
 

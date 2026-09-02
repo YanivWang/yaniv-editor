@@ -4,7 +4,7 @@ import { showEditorNotice } from "@/core/overlayFeedback";
 import { resolveOverlayPortal } from "@/core/overlayPortal";
 import { aiClient } from "@/features/ai/client";
 import type { createAiClient } from "@/features/ai/client";
-import { buildDocumentContextPrompt } from "@/features/ai/shared/documentContext";
+import { buildDocumentContext } from "@/features/ai/shared/documentContext";
 import { isValidSelection } from "@/utils/prosemirrorUtils";
 
 import {
@@ -15,6 +15,7 @@ import {
 } from "./AiHighlightMark";
 import AiSuggestionPopover from "./AiSuggestionPopover.vue";
 import CustomAiPopover from "./CustomAiPopover.vue";
+import { noticeDocumentContextTruncation } from "./runAiSuggestionStream";
 
 import type { AiSuggestionData } from "./AiHighlightMark";
 import type { Editor } from "@tiptap/core";
@@ -80,6 +81,8 @@ class AiSuggestionManager {
   private isTemporarilyHidden = false;
   private abortController: AbortController | null = null;
   private customClient: AiClient = aiClient;
+  /** 本次会话的文档上下文字符上限，由 `showCustom` 从扩展 options 带进来 */
+  private documentContextLimit: number | undefined = undefined;
 
   private state: AiSuggestionState = {
     visible: false,
@@ -186,7 +189,9 @@ class AiSuggestionManager {
     selectedText: string,
     selection: { from: number; to: number },
     client: AiClient = aiClient,
+    documentContextLimit?: number,
   ): void {
+    this.documentContextLimit = documentContextLimit;
     this.ensureEditor(editor);
     const live = this.liveEditor();
     if (!live) return;
@@ -218,45 +223,43 @@ class AiSuggestionManager {
 
     let accumulated = "";
 
-    this.customClient.customCommand(
-      this.state.originalText,
-      prompt,
-      buildDocumentContextPrompt(live),
-      {
-        onStart: () => {
-          accumulated = "";
-        },
-        onToken: (token) => {
-          if (!token) return;
-          accumulated += token;
-          this.updateSuggestion(accumulated);
-        },
-        onComplete: () => {
-          this.stopStreaming();
-          this.updateSuggestion(accumulated);
-          this.isExecutingRef.value = false;
-          this.clearAbortController(abortController);
-        },
-        onError: (error) => {
-          this.clearAbortController(abortController);
-          if (error.name === "AbortError") return;
-          console.error("[Custom AI]", error);
-          this.isExecutingRef.value = false;
-          this.hide();
-          // 回调时重取：请求在途期间编辑器可能已被销毁
-          const target = this.liveEditor();
-          if (target) {
-            showEditorNotice(target, {
-              message: this.getLocaleText("messages.customAiFailed"),
-              description: error.message,
-              kind: "error",
-              duration: 3,
-            });
-          }
-        },
-        signal: abortController.signal,
+    const context = buildDocumentContext(live, this.documentContextLimit);
+    noticeDocumentContextTruncation(live, context, this.getLocaleText);
+
+    this.customClient.customCommand(this.state.originalText, prompt, context.prompt, {
+      onStart: () => {
+        accumulated = "";
       },
-    );
+      onToken: (token) => {
+        if (!token) return;
+        accumulated += token;
+        this.updateSuggestion(accumulated);
+      },
+      onComplete: () => {
+        this.stopStreaming();
+        this.updateSuggestion(accumulated);
+        this.isExecutingRef.value = false;
+        this.clearAbortController(abortController);
+      },
+      onError: (error) => {
+        this.clearAbortController(abortController);
+        if (error.name === "AbortError") return;
+        console.error("[Custom AI]", error);
+        this.isExecutingRef.value = false;
+        this.hide();
+        // 回调时重取：请求在途期间编辑器可能已被销毁
+        const target = this.liveEditor();
+        if (target) {
+          showEditorNotice(target, {
+            message: this.getLocaleText("messages.customAiFailed"),
+            description: error.message,
+            kind: "error",
+            duration: 3,
+          });
+        }
+      },
+      signal: abortController.signal,
+    });
   }
 
   /**
@@ -370,6 +373,7 @@ class AiSuggestionManager {
     this.userContextRange = null;
     this.isExecutingRef.value = false;
     this.customClient = aiClient;
+    this.documentContextLimit = undefined;
   }
 
   isVisible(): boolean {

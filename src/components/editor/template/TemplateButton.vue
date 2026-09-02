@@ -51,7 +51,7 @@ import { useEditorT } from "@/core/infra/useEditorLocale";
 import { Modal as AModal } from "@/shared/antd";
 import { createCommandRunner } from "@/utils/editorCommands";
 
-import { builtinTemplates, normalizeTemplateHtml } from "./templates";
+import { builtinTemplates } from "./templates";
 
 import type { TemplateItem } from "./templates";
 import type { Editor } from "@tiptap/vue-3";
@@ -83,8 +83,8 @@ const allTemplates = computed(() => [...builtinTemplates, ...props.customTemplat
  * 插入模板内容到编辑器
  */
 function insertTemplate(tpl: TemplateItem) {
-  const content = normalizeTemplateHtml(tpl.content);
-  runCommand((chain) => chain.insertContent(content))();
+  // 不需要预处理空单元格：tableCell 的 schema 是 `block+`，ProseMirror 会自己补 paragraph
+  runCommand((chain) => chain.insertContent(tpl.content))();
   templateModalOpen.value = false;
 }
 </script>

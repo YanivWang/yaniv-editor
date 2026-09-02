@@ -72,11 +72,9 @@ watch(
     };
 
     sync();
-    e.on("selectionUpdate", sync);
     e.on("transaction", sync);
 
     onCleanup(() => {
-      e.off("selectionUpdate", sync);
       e.off("transaction", sync);
     });
   },

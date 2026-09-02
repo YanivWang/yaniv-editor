@@ -1,4 +1,4 @@
-import { onWatcherCleanup, provide, watch, type ComputedRef, type Ref } from "vue";
+import { provide, watch, type ComputedRef, type Ref } from "vue";
 
 import type { EditorAppearance, EditorColorMode } from "@/configs/editorConfig";
 
@@ -7,7 +7,7 @@ import {
   type EditorAppearanceContext,
   type ResolvedColorMode,
 } from "./appearanceContext";
-import { applyAppearanceToElement, watchSystemColorMode } from "./applyAppearance";
+import { applyAppearanceToElement } from "./applyAppearance";
 import { loadAppearance } from "./loadAppearance";
 import { useResolvedColorMode } from "./useResolvedColorMode";
 
@@ -63,20 +63,14 @@ export function useEditorAppearance(
   // customAppearanceVars 是**可选**参数，不能直接放进 watch 源数组：
   // 省略时数组里就是一个 undefined，Vue 会报 `Invalid watch source`（实测）。
   // 包成 getter 后既是合法的 watch 源，也能正确处理「没有这个 ref」的情况。
+  /**
+   * 系统明暗只由 `resolvedMode` 这一个源带进来，**不要**在这里再绑一次
+   * `watchSystemColorMode`：`useResolvedColorMode` 内部在 `auto` 时已经绑了一个。
+   * 依据见 `useEditorAppearance.test.ts`。
+   */
   watch(
     [rootRef, appearance, colorMode, resolvedMode, () => customAppearanceVars?.value],
     syncDom,
-    { immediate: true },
-  );
-
-  watch(
-    () => colorMode.value,
-    (mode) => {
-      if (mode === "auto") {
-        const cleanup = watchSystemColorMode(() => syncDom());
-        onWatcherCleanup(cleanup);
-      }
-    },
     { immediate: true },
   );
 

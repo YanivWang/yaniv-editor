@@ -139,13 +139,13 @@ const updateCounts = () => {
 
 function attachEditorListeners(ed: Editor) {
   updateCounts();
+  // 字数/字符数只取自 `characterCount` storage，只随文档内容变；
+  // 移动光标不改变计数，此前订的 `selectionUpdate` 纯属白算（不变量 37）
   ed.on("update", updateCounts);
-  ed.on("selectionUpdate", updateCounts);
 }
 
 function detachEditorListeners(ed: Editor) {
   ed.off("update", updateCounts);
-  ed.off("selectionUpdate", updateCounts);
 }
 
 /*

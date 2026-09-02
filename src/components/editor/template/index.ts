@@ -4,5 +4,5 @@
  */
 
 export { default as TemplateButton } from "./TemplateButton.vue";
-export { builtinTemplates, normalizeTemplateHtml } from "./templates";
+export { builtinTemplates } from "./templates";
 export type { TemplateItem } from "./templates";

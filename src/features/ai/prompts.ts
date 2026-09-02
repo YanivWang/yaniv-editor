@@ -83,7 +83,7 @@ Output the summary directly.`,
      * `client.ts` 的 `translateTargetLabel` 查不到就 `|| targetLang` 原样使用——
      * 结果正确，只是没经过本表。因此本表实际服务的是宿主直接调
      * `editor.commands.translate("ja")` 这类传代码的用法，
-     * 且只覆盖 `LANGUAGE_CODES`（14 种）中的 8 种，其余（th / pt / vi / ru / hi / id）
+     * 且只覆盖 `LANGUAGE_CODES`（15 种）中的 8 种，其余（th / pt / vi / ru / hi / id / ar）
      * 同样按原样写进 prompt。
      */
     targetLanguages: {

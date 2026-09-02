@@ -199,3 +199,103 @@ describe("组件订阅编辑器事件必须绑定生命周期", () => {
     expect(findUnboundedSubscription("nodeView.ts", broken)).toEqual([]);
   });
 });
+
+/**
+ * 静态护栏之三：同一个 handler 不得同时订阅 `transaction` 与 `update` / `selectionUpdate`。
+ *
+ * 实测（tiptap 3）三个事件的覆盖关系：
+ *
+ * | 场景          | transaction | update | selectionUpdate |
+ * | ------------- | ----------: | -----: | --------------: |
+ * | 插入文本      |           1 |      1 |               1 |
+ * | 只改选区      |           1 |      0 |               1 |
+ * | toggleBold    |           1 |      1 |               0 |
+ * | 纯 meta 事务  |           1 |      0 |               0 |
+ * | `setEditable` |       **0** |      1 |               0 |
+ *
+ * 也就是说 `transaction` 是另两者的超集，**唯一**的例外是 `setEditable`——它不产生事务，
+ * 只 emit `update`。所以「同一个 handler 既订 transaction 又订 update/selectionUpdate」
+ * 的写法，在除 `setEditable` 外的**每一次**编辑里都会让这个 handler 白跑一到两遍。
+ *
+ * 这不是理论洁癖：`OutlinePanel` 三个都订，于是每次按键 `syncItems` 跑 3 次，
+ * 每次都对所有标题 `getBoundingClientRect()`——三倍的强制回流。同型一次性存在 9 处
+ * （`OutlinePanel` / `FormatPainterButton` / `useEditorColorState` 各 3 个事件，
+ * `UndoRedoButton` / `HeadingControl` / `FontFamilySelect` / `FontSizeSelect` /
+ * `CodeBlockLanguageBadge` / `ZoomBar` 各 2 个）。
+ *
+ * 真需要覆盖 `setEditable` 时，用**另一个** handler 单独订 `update`
+ * （`UndoRedoButton` 的 `handleUpdate` 就是这样），规则因此可以写成绝对的。
+ * 对应 ARCHITECTURE 不变量 37。
+ */
+const SUPERSET_EVENT = "transaction";
+const SUBSET_EVENTS = ["update", "selectionUpdate"] as const;
+
+/** 只认具名 handler：匿名箭头函数无法比较身份，且另有护栏管它们摘不掉的问题 */
+const EVENT_ON_CALL = /\.on\(\s*["'](update|selectionUpdate|transaction)["']\s*,\s*(\w+)\s*\)/g;
+
+export function findRedundantSubscription(text: string): string[] {
+  EVENT_ON_CALL.lastIndex = 0;
+
+  const byHandler = new Map<string, Set<string>>();
+  let match: RegExpExecArray | null;
+  while ((match = EVENT_ON_CALL.exec(text)) !== null) {
+    const [, event, handler] = match;
+    const events = byHandler.get(handler) ?? new Set<string>();
+    events.add(event);
+    byHandler.set(handler, events);
+  }
+
+  const findings: string[] = [];
+  for (const [handler, events] of byHandler) {
+    if (!events.has(SUPERSET_EVENT)) continue;
+    const redundant = SUBSET_EVENTS.filter((event) => events.has(event));
+    if (redundant.length > 0) {
+      findings.push(`${handler} 同时订阅了 transaction 与 ${redundant.join(" / ")}`);
+    }
+  }
+  return findings;
+}
+
+describe("同一 handler 不得重复订阅 transaction 的子集事件", () => {
+  test("全仓无违规", () => {
+    const findings = collectSourceFiles("src").flatMap((file) =>
+      findRedundantSubscription(readFileSync(file, "utf8")).map((hit) => `${file}: ${hit}`),
+    );
+
+    expect(findings).toEqual([]);
+  });
+
+  test("扫描器认得出重复订阅（护栏自检）", () => {
+    // 与 OutlinePanel / FormatPainterButton / useEditorColorState 修复前同形
+    const triple = `
+      e.on("transaction", syncItems);
+      e.on("update", syncItems);
+      e.on("selectionUpdate", syncItems);
+    `;
+    expect(findRedundantSubscription(triple)).toEqual([
+      "syncItems 同时订阅了 transaction 与 update / selectionUpdate",
+    ]);
+
+    // 与 HeadingControl / FontSizeSelect 修复前同形
+    const pair = `
+      e.on("selectionUpdate", sync);
+      e.on("transaction", sync);
+    `;
+    expect(findRedundantSubscription(pair)).toEqual([
+      "sync 同时订阅了 transaction 与 selectionUpdate",
+    ]);
+
+    // 收敛后的写法
+    expect(findRedundantSubscription(`e.on("transaction", sync);`)).toEqual([]);
+
+    // 用**另一个** handler 覆盖 setEditable 是正当写法（UndoRedoButton 就是这样）
+    const withEditable = `
+      e.on("update", handleUpdate);
+      e.on("transaction", updateUndoRedoState);
+    `;
+    expect(findRedundantSubscription(withEditable)).toEqual([]);
+
+    // 只订 update（ZoomBar：字数只随文档变）也不该报
+    expect(findRedundantSubscription(`ed.on("update", updateCounts);`)).toEqual([]);
+  });
+});

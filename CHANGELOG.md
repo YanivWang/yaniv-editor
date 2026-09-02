@@ -42,6 +42,13 @@
 - **`YanivEditor` 新增 `mention-items` prop。** `@` 提及候选项与块菜单「页面链接」插入的内容
   终于可以由宿主注入（此前只有写死的「首页 / 文档 / 路线图 / 我」）。经 `BuildExtensionsCtx.mentionItems`
   getter 下发，与 upload / gallery 一致：**变更不触发 session 重建**。
+- **`aiConfig.documentContextLimit`**：送进 AI 上下文的文档全文字符上限（默认 8000），
+  超出即截断并提示用户。见 Fixed 段与 `docs/api/ai-config.md`。
+- **`@yanivjs/yaniv-editor/ai` 新增导出** `buildDocumentContext`、
+  `DEFAULT_DOCUMENT_CONTEXT_LIMIT` 与类型 `DocumentContext`。
+  `buildDocumentContextPrompt` 保持原签名（新增的 `limit` 是可选参数），
+  `runAiSuggestionStream` / `runAiContinueWritingStream` 也只在末尾追加可选参数
+  ——都是向后兼容的扩展，不属于 BREAKING CHANGES。
 
 ### Fixed
 
@@ -676,8 +683,124 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   （后者是前者的纯别名），所以**视觉零变化**；换成语义正确的 token 后，宿主单独覆盖
   `--ye-toolbar-border` 时 inline 工具栏才会跟随。浏览器实测三套外观 × 明暗两态
   边框色与各自的 `--ye-border` 完全一致，覆盖 `--ye-toolbar-border` 后如期变色。
+- **斜杠菜单在编辑器销毁后留在屏上。** `BlockPickerMenu` 挂在 EditorShell 的 overlay portal 上，
+  不随编辑器消失；`computeSessionKey` 变化（能力开关、locale 切换）会重建编辑器而 Shell 不卸载，
+  菜单正开着时插件的 `update` 再也不会被调用，它就停在旧光标位置上。改为在扩展的 `onDestroy`
+  里通知关闭。**这件事不能写在 plugin view 的 `destroy` 里**：ProseMirror 在插件集合变化时
+  会销毁重建全部 plugin view，而 `editor.registerPlugin()`（`@tiptap/vue-3` 挂气泡菜单时会调）
+  正走这条路——实测那样写会在每次注册插件时误发关闭通知，把 `blockMenuHost` 缓冲的
+  `pendingOpen` 清掉，斜杠菜单**再也弹不出来**。→ 不变量 38
+- **`AiMenuButton` 的 `requestAnimationFrame` 不留帧句柄。** 命令要等菜单关闭动画让出一帧再执行，
+  而这一帧可能落在组件卸载之后：`runEditorAiChain` 第一行就是 `editor.view.focus()`，
+  销毁后访问 `editor.view` 直接抛错（不变量 15），外层 try/catch 只把它压成一条 console.error
+  ——用户点了菜单却什么也没发生。改为留句柄 + `onBeforeUnmount` 取消 + 帧内 `isDestroyed` 守卫；
+  连点两项时前一帧也会被取消，不再有两条命令抢同一个选区。
+- **`OutlinePanel` 卸载时不撤销待触发的滚动防抖。** 面板可以在编辑器还活着时卸载
+  （用户点关闭 / 切到 preview），50ms 后定时器到点，`syncItems` 去读已卸载组件的 refs
+  与 `props.scrollParent()`。`debounce` 改为交出 `cancel()`，由 `onBeforeUnmount` 撤掉。
+- **批量上传时第一个文件成功就关掉弹窗。** antd 的 `<a-upload-dragger multiple>` 对每个文件
+  各调一次 `customRequest` 且**并发**发起（实测三个文件的三次调用全部先进入，随后才逐个完成），
+  而 `VideoUpload` / `ImageUpload` 都写成「成功即 `open = false`」——用户看到弹窗自己关了，
+  内容却还在一个一个冒出来，且再没有取消的入口。抽出 `useBatchUploadGate`：整批结束且至少
+  一个成功才关，全批失败时保持打开让用户看到错误并重试。→ 约定 29
+  （`ImageUpload` 是复核中新发现的同型，此前只记录了 `VideoUpload`。）
+- **`useEditorAppearance` 把系统明暗监听绑了两次。** `useResolvedColorMode` 内部在 `auto` 时
+  已绑一个，第二个 watch 又绑一份，同一个 `prefers-color-scheme` 事件让 `syncDom` 跑两遍
+  ——实测挂载后系统监听器 2 条、一次切换 `applyAppearanceToElement` 调用 2 次。
+  `syncDom` 幂等，所以只是白跑，但它每次都 `await loadAppearance()` 并重写一整套 CSS 变量。
+  删掉第二个 watch：`resolvedMode` 本来就是第一个 watch 的源，这条路径不会漏。
+- **代码块内按 `Shift-Enter` 抛未捕获的 `RangeError`。** `ListShortcuts` 的候选项写成了
+  `editor.commands.newlineInCode()`，它会立即 dispatch 一个独立事务，而外层 `first`
+  还持有基于旧 state 的 tr，收尾 dispatch 就抛 `Applying a mismatched transaction`。
+  换行本身是成功的（第一个命令已独立 dispatch 过），异常也不冒泡到按键处理器
+  ——文档完全看不出问题，只会刷控制台、被宿主的错误监控当成线上故障。
+  改用 `first(({ commands }) => …)` 注入的 `commands`，实测零错误、结果一字不差。→ 不变量 39
+- **`readStreamLines` 在消费方提前退出时不取消底层响应流。** 真实路径不是「消费方写了
+  `break`」——三个 adapter 都完整消费到底——而是 `onToken` 抛错（编辑器销毁后往文档写内容
+  会抛）让异常穿过 `for await`。实测此时流的 `cancel` 回调**不被调用**：服务端仍在推、
+  客户端仍在收，一段长回答就是白烧的带宽与 API 配额。补 `finally { await reader.cancel() }`
+  （用 try/catch 包住，`.catch()` 挡不住同步抛，会盖掉调用方正在抛的真实错误）。
+  顺带修正了两个测试桩——它们伪造的 reader 没有 `cancel`，而真实的一定有。
+- **`transformRemoveLineNumberWrapper` 的测试是空操作。** 输入
+  `<div style="mso-element:para-border-div">` 里根本没有 `MsoLineNumber` 类，函数对它什么也不做，
+  `toContain("正文")` 恒真——把实现换成 `html => html` 也照样通过。补齐 5 条真正锁住
+  unwrap 行为的用例（变异成恒等函数后 4 条转红）。
+
+### Changed
+
+- **收敛 9 处冗余的编辑器事件订阅。** 实测（tiptap 3）`transaction` 是 `update` /
+  `selectionUpdate` 的超集，唯一例外是 `setEditable`——它不产生事务，只 emit `update`。
+  `OutlinePanel` / `FormatPainterButton` / `useEditorColorState` 三个事件全订，
+  `UndoRedoButton` / `HeadingControl` / `FontFamilySelect` / `FontSizeSelect` /
+  `CodeBlockLanguageBadge` / `ZoomBar` 各订两个，于是同一次按键 handler 白跑一到两遍。
+  `OutlinePanel` 最重：`syncItems` 跑 3 次，每次对所有标题 `getBoundingClientRect()`
+  ——三倍的强制回流。全部收敛到能覆盖各自状态的最小事件集（`ZoomBar` 的字数只随文档变，
+  收敛到 `update`），并新增静态护栏。→ 不变量 37 / 约定 28
+- **`ListShortcuts` 的注释改成实测结论。** 22 个场景的带 / 不带对照（真实 DOM keydown 派发，
+  覆盖三层嵌套列表、任务项、引用块、表格单元格、标题、代码块）显示：`Enter` 那条全场景与
+  tiptap 内置一致，属于抢先执行了一遍相同逻辑；**`Shift-Enter` 那条不能删**——摘掉后代码块内
+  换不了行，反而在文档末尾凭空多出一个空段落。此前注释说「只覆盖了三种常见场景、没有证据」，
+  现在证据齐了。⚠️ 判定必须走 `view.dom.dispatchEvent(keydown)`：手工模拟 keymap 调用链
+  会把这 2 个差异误判成「无差异」。
+- **`.ye-dropdown-btn.is-active:hover` 确认为必需，补上判定依据。** 曾被记为「与 `.is-active`
+  同值的疑似死声明」。起 examples dev server 查运行时 CSSOM 后推翻：antd v5 是 CSS-in-JS，
+  它的 `:where(…).ant-btn-text:not(:disabled):hover` 是 (0,3,0)（`:where()` 特异性为 0、
+  `:not(:disabled)` 计一个伪类），**高于** `.is-active` 的 (0,2,0)。删掉这 4 行，
+  激活态按钮 hover 时会变回 antd 的灰色。→ 不变量 40 / 约定 31
+- **`lineNumber.ts` 的子串匹配补上「为什么与隔壁口径不同」的说明**，并如实记下一条未验证的
+  观察：`MsoLineNumber` 在 Word 里是字符样式，实际形态可能是行号数字本身而非包住正文的容器，
+  那样 unwrap 会把行号数字留进正文。判定需要真实 Word 剪贴板样本，拿到之前不改
+  ——改错的代价是丢正文。
+- **主 chunk 里的长注释搬进测试文件。** 发现 ESM 产物**不做压缩**（`vite.config.ts` 的
+  `minify: "terser"` 只对 CJS 生效，Vite 对 `build.lib && format === "es"` 直接
+  `return null`），而 CI 的 46000B 预算量的正是 `dist/EditorShell*.js` 这个 ESM 文件
+  ——主 chunk 源文件里的每行注释都原样进产物。给 `listShortcuts.ts` 加的那段约 10 行
+  中文论证实测吃掉 **471B**，把余量从 521B 压到 61B。改为「结论留源码、证据搬测试」，
+  主 chunk 从 45939 回落到 45545。→ 不变量 41 / 约定 32
+- **格式刷双击连弹 3 个 toast。** DOM 规范里 `dblclick` 之前必然先发两次 `click`，
+  于是一次双击走完「采样激活 → 取消 → 连续模式」三步，各弹一条。最终状态本来就是对的，
+  但噪音大。改用 `MouseEvent.detail`（规范保证第一次 click 是 1、第二次是 2）跳过第二击，
+  **单击零延迟**——不采用「把单击延后一个双击窗口」的标准修法，那会让每次普通单击都变钝。
+  `dblclick` 的判定改看双击**开始前**的模式（它跑到时 storage 已被第一次 click 改过一轮），
+  连续模式下双击照常退出、不会又转回连续。双击的提示从 3 条降到 2 条。
+  `ToolbarButton` 随之透传原生事件（`emit("click", event)`，向后兼容的扩展）。
+- **AI 文档上下文不限长，超长文档会让请求 400 失败。** 全文原样拼进 system prompt。
+  新增 `aiConfig.documentContextLimit`（默认 8000 **字符**——项目同时支持
+  openai / aliyun / ollama 且模型可配，各家 tokenizer 不同没有统一换算，宿主应按实际模型调整；
+  传 0 或负数关闭）。超限时截断保留开头、在 prompt 末尾加标记让模型知道拿到的不是全文，
+  **并给用户弹一条带实际字数的提示**——静默截断只会让用户以为「AI 这次答得不太行」。
+  四条 AI 命令与 customAi 路径都已接上。
+- **Word 导入替换整个文档且无确认。** 用的是 `setContent`，当前内容整份丢失且回不去。
+  文档非空时先弹确认，取消则调 `onError` 让上传项落到失败态而不是一直转圈；
+  空文档直接导入，不打断。
+- **阿拉伯语只有文案、翻译菜单里出不来。** `editor.lang.ar` 早就写好了，
+  但 `LANGUAGE_CODES` 没注册它——更像「少注册了一门语言」而非「多了个死 key」，补进列表。
+  新增护栏 `languageCodes.test.ts`：列表与 locale 双向对齐，且 `docs/features/ai.md`
+  里的「N 种目标语言」与语言清单必须跟着列表走（这次 `ar` 就同时要改文档两处与
+  `prompts.ts` 的注释）。`editor.lang.zh` 作为显式登记的例外保留——翻译目标必须精确到
+  简体 / 繁体，`zh-CN` / `zh-TW` 已覆盖。
+
+### Docs
+
+- **修正两处 token 分层描述与源码不符。** 第 8 棒把派生别名从 `:root` 移到
+  `.yaniv-editor` 后只更新了 `ARCHITECTURE.md` 的分层表，`docs/` 下两处没跟上：
+  `docs/contributing/project-structure.md` 的 Token 行只说「颜色等在 `:root`，
+  z-index 在 `.yaniv-editor`」，`docs/guide/z-index.md` 更写成「z-index token **仅**定义在
+  `.yaniv-editor`」——而那一段里实际还有 17 个派生别名（`--ye-toolbar-border`、
+  `--ye-table-border` 等）。两处均已改正并补上原因（不变量 26）。
+  `z-index.md` 的 token 表与 `variables.css` 逐条核对，17/17 完全一致。
+- 补上 `documentContextLimit`（`ai-config.md`）、Word 导入的覆盖确认
+  （`word-import-export.md`）、格式刷双击的提示条数（`format-painter.md`）。
 
 ### Removed
+
+- **删除 `normalizeTemplateHtml`（含 `EMPTY_CELL` 正则）。** 它把 `<td></td>` 补成
+  `<td><p></p></td>`，理由是「满足 tableCell schema」——而 ProseMirror 自己就做了这件事：
+  tableCell 的 content 是 `block+`，解析空单元格时会自动补 paragraph，实测补与不补产出的
+  文档 JSON **完全相同**；全部 5 个内置模板本来就写了 `<td><p></p></td>`，函数对它们是纯 no-op。
+  它不在包的 `exports` 映射能触达的任何入口上（只在 `components/editor/template/index.ts`
+  导出，而那个 index 不被 `src/index.ts` 引用），因此不是公开 API 变更。
+  `templates.test.ts` 锁住了删除依据：将来 tiptap 若改掉这个行为，第一条就会转红。
 
 - **删除自建的 `BaseTooltip.vue`（126 行）与 `--ye-z-chrome-tooltip` token。**
   组件没有被 `components/base/index.ts` 导出，全仓零引用——项目所有提示都用

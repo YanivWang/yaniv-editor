@@ -23,6 +23,15 @@ beforeAll(installBrowserStubs);
 
 const WATCHED_EVENTS = ["update", "selectionUpdate", "transaction"] as const;
 
+/**
+ * 组件自己挂的监听数：`update`（置 `hasRealEdit`）+ `transaction`（同步可用性）= 2。
+ *
+ * 不能写成 `WATCHED_EVENTS.length`——那会把「组件订了哪些事件」和「测试观察哪些事件」
+ * 绑成同一个数。`selectionUpdate` 是 `transaction` 的严格子集（不变量 37），
+ * 组件不再订它，但测试仍要把它算进来，否则漏订回退时数不出来。
+ */
+const OWN_LISTENERS = 2;
+
 const editors: Editor[] = [];
 let wrapper: VueWrapper | null = null;
 
@@ -78,7 +87,7 @@ describe("UndoRedoButton 的编辑器事件订阅", () => {
 
     // 曾经因为 `if (editor.value) setup()` 与 `{ immediate: true }` 各调一次、
     // 而清理又跑在 nextTick 订阅之前，导致每个事件挂了两份 handler
-    expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline + WATCHED_EVENTS.length);
+    expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline + OWN_LISTENERS);
   });
 
   it("切换编辑器实例后，旧实例上的监听被摘干净", async () => {
@@ -95,9 +104,7 @@ describe("UndoRedoButton 的编辑器事件订阅", () => {
     await settle();
 
     expect(countEditorListenersFor(first, WATCHED_EVENTS)).toBe(firstBaseline);
-    expect(countEditorListenersFor(second, WATCHED_EVENTS)).toBe(
-      secondBaseline + WATCHED_EVENTS.length,
-    );
+    expect(countEditorListenersFor(second, WATCHED_EVENTS)).toBe(secondBaseline + OWN_LISTENERS);
   });
 
   /**
