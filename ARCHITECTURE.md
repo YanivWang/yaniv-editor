@@ -1593,16 +1593,27 @@ src/shared/
     要压住它必须同为 (0,3,0) 且排在 antd 样式表之后。
     判定办法：起 examples dev server，把 `:hover` 等价替换成一个类（特异性不变）后做删 / 留对照。
 
-41. **ESM 产物不压缩，主 chunk 源文件里的注释直接计入 46000B 预算** —
+41. **ESM 产物不压缩，但只有「附着在被输出节点上」的注释才进产物** —
     `vite.config.ts` 的 `minify: "terser"` 只对 CJS 生效：Vite 的 `vite:terser` 插件对
     `build.lib && format === "es"` 直接 `return null`（有意设计，保留 `/*#__PURE__*/`
-    标注让接入方自行压缩）。而 CI 量的正是 `dist/EditorShell*.js` 这个 **ESM** 文件，
-    于是主 chunk 源文件里的每一行注释——包括中文——都原样进产物、直接吃预算。
-    实测给 `listShortcuts.ts`（`core` 能力，静态 import）加一段约 10 行的中文论证注释，
-    主 chunk gzip 涨了 **471B**，一次就吃掉大半余量。
-    **写法：结论留源码（短），证据搬测试**——测试文件不进产物，长论证放那里零成本。
-    ⚠️ 定位涨幅时不能只还原单个文件：chunk 划分是全局优化的结果，
-    单独还原 `listShortcuts.ts` 只差 2B，把整批改动一起还原才看得出那 471B。
+    标注让接入方自行压缩）。CI 量的正是 `dist/EditorShell*.js` 这个 **ESM** 文件。
+    但「不压缩」**不等于**「每行注释都进产物」：Rollup 重新生成代码时只保留挂在输出
+    AST 节点上的 leading comment，语句与语句之间的游离注释会被丢掉。第 11 棒实测
+    （同一次 build 内做过有效性对照——把一个运行时字符串加长 40 字符，hash 变、
+    gzip +5B，证明构建确实响应源码改动）：
+
+    | 注释位置                         | 30 行中文注释的代价 | 文本进产物 |
+    | -------------------------------- | ------------------: | ---------- |
+    | `.ts` 语句之间                   |             **0 B** | 否         |
+    | `.vue` `<script setup>` 语句之间 |             **0 B** | 否         |
+    | 对象字面量的属性上               |           **209 B** | 是         |
+
+    所以吃预算的是 `addAttributes()` / `addKeyboardShortcuts()` 这类**返回对象字面量**
+    里逐属性写的注释（`lineHeight.ts` 就是这种），普通的函数体内、语句间注释是免费的。
+    ⚠️ 本条原先记作「每行注释都原样进产物，10 行吃掉 471B」，是**错误归因**：
+    同一条里就写着「单独还原 `listShortcuts.ts` 只差 2B」——那 471B 来自整批的**代码**
+    改动，被算到注释头上了。定位涨幅不能只还原单个文件（chunk 划分是全局优化结果），
+    但也不能因此把整批的差额归给其中任意一项，**必须逐项单独验证**。
 
 42. **定义了的 `--ye-*` token 必须有人 `var()` 引用** — 零消费方的 token 不报错、
     没有任何视觉表现，只会一直躺在 `variables.css` 里冒充「设计系统」，
@@ -1629,6 +1640,30 @@ src/shared/
     组件本地 ref 只配缓存那次询问的结果，不能参与判定。
     反例辨析：`LinkBubbleMenu` 换实例时关掉 modal、`useControlledContent`
     换实例时清空内容签名，重置的都是**瞬态 UI / 新实例的新基线**，不是编辑器的持久事实。
+
+44. **`rebuild()` 一旦把旧编辑器从 `editor.value` 摘下来，就要对它负责到底** —
+    摘走之后除了这一次 rebuild 再没有人持有它：更新的那次 rebuild 读到的
+    `editor.value` 已是 `null`，`onScopeDispose` 同理。因此**取内容快照**与
+    **销毁旧实例**都必须由 rebuild 自己完成，且不能写在取消检查（`myGen !== generation`）
+    之后——切换语言时两次 rebuild 必然重叠（语言**代码**同步变、语言**包**异步落地），
+    被取代的那次直接 `return`，曾因此留下 `isDestroyed === false` 的完整编辑器，
+    带着 ProseMirror 插件、DOM 监听与扩展定时器常驻，每切一次语言泄漏一个。
+    快照同理：它曾是「调用方先设好、rebuild 再读」的隐含契约，三个调用点只有一个遵守，
+    于是切语言时用户内容整份丢失。**`await nextTick()` 也必须在 `try` 内**：
+    它交出的是当次 flush 的 promise，这一轮里任何组件更新抛错都会让它 reject，
+    而调用点是 `void rebuild()`——异常无人接管，`status` 永久停在 `"loading"`（白屏骨架）。
+    建不出来是允许的，但必须落到 `"error"` 这个确定终态并让用户能重试。
+
+45. **把 DOM 搬进 overlay portal 的浮层，其「编辑器是否存在」的条件要在父级判一次** —
+    `bubble-menu` 系组件（`ImageToolbar` / `VideoToolbar` / `LinkBubbleMenu` /
+    `TableToolbar` / `FloatingMenu`）通过 `appendTo` 把自己的 DOM 移到 portal，
+    Vue 的 vnode 树却仍以为它在原位。session 重建时 `EditorEditChrome` 的
+    `:key` 变化与 `editor` 置 null 同时发生，若让 chrome 带着 `editor === null`
+    再渲染一帧，这些浮层要在**已被摘走的容器**上补插 `v-if` 的注释占位符，
+    抛出 `Cannot read properties of null (reading 'insertBefore')`。
+    这一帧本就没有意义——`EditorEditChrome` 里每个子节点都写着 `&& editor`，
+    说明整个组件都依赖它，条件应该提到父级判一次，而不是在 9 个子节点各写一遍。
+    与不变量 44 合起来才完整：44 保证这个错误不再让 session 永久卡死，45 让它不再发生。
 
 ---
 

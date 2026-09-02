@@ -4,7 +4,9 @@
     <div ref="overlayPortalRef" :class="OVERLAY_PORTAL_CLASS" />
 
     <div v-show="sessionStatus !== 'loading'" class="yaniv-editor__chrome">
-      <template v-if="isFull && fullChrome?.showEditChrome">
+      <!-- `editor` 必须参与判定：让 chrome 带着 editor===null 再渲染一帧，
+           搬进 portal 的浮层会在已被摘走的容器上抛 insertBefore（不变量 45） -->
+      <template v-if="isFull && fullChrome?.showEditChrome && editor">
         <EditorEditChrome
           :key="sessionKey"
           :chrome="fullChrome!"

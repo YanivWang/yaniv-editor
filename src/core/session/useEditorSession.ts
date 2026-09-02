@@ -88,13 +88,38 @@ export function useEditorSession(options: UseEditorSessionOptions) {
     status.value = "loading";
     sessionError.value = null;
 
+    /**
+     * 快照由 `rebuild()` 自己取，不能指望调用方先设好（不变量 44）。
+     * `if (previousEditor)` 而非无条件赋值：并发 rebuild 时后一次读到的已是 `null`，
+     * 此时要保留前一次存下的快照而不是覆盖成空。
+     */
     const previousEditor = editor.value;
+    if (previousEditor) {
+      // full 保留 JSON（属性更完整）；inline 用 HTML。
+      // 灌入新 schema 前由 ContentAdapter.prepareEditorContent 清洗未知节点。
+      contentSnapshot = host === "inline" ? previousEditor.getHTML() : previousEditor.getJSON();
+    }
+
     editor.value = null;
-    await nextTick();
-    if (disposed || myGen !== generation) return;
-    previousEditor?.destroy();
+
+    /**
+     * 摘下来了就要销毁到底（不变量 44）：旧实例一旦离开 `editor.value`，
+     * 除本次 rebuild 再无人持有它——被取代时直接 `return` 会永久泄漏一个完整编辑器。
+     */
+    let previousDestroyed = false;
+    const destroyPrevious = (): void => {
+      if (previousDestroyed) return;
+      previousDestroyed = true;
+      previousEditor?.destroy();
+    };
 
     try {
+      // `nextTick()` 交出的是当次 flush 的 promise，这一轮里任何组件更新抛错都会让它
+      // reject；它曾在 try 之外，异常经 `void rebuild()` 逃逸，status 永久卡在
+      // "loading"（白屏骨架）。建不出来必须落到 "error" 这个确定终态（不变量 44）。
+      await nextTick();
+      destroyPrevious();
+      if (disposed || myGen !== generation) return;
       const ctx: BuildExtensionsCtx = {
         locale: locale.value,
         gates: profile.value.gates,
@@ -156,6 +181,9 @@ export function useEditorSession(options: UseEditorSessionOptions) {
           : (locale.value?.editor.sessionInitFailed ?? "Editor initialization failed");
       status.value = "error";
       editor.value = null;
+    } finally {
+      // 兜住 `await nextTick()` 抛错这条路径——那时还没走到上面那次 destroy。
+      destroyPrevious();
     }
   }
 
@@ -163,19 +191,8 @@ export function useEditorSession(options: UseEditorSessionOptions) {
     void rebuild();
   }
 
-  watch(sessionKey, async (newKey, oldKey) => {
+  watch(sessionKey, (newKey, oldKey) => {
     if (!oldKey || !newKey || newKey === oldKey) return;
-    if (editor.value) {
-      // full 保留 JSON（属性更完整）；inline 用 HTML。
-      // 灌入新 schema 前由 ContentAdapter.prepareEditorContent 清洗未知节点。
-      contentSnapshot = host === "inline" ? editor.value.getHTML() : editor.value.getJSON();
-    }
-    const oldEditor = editor.value;
-    editor.value = null;
-    status.value = "loading";
-    await nextTick();
-    if (disposed) return;
-    oldEditor?.destroy();
     void rebuild();
   });
 

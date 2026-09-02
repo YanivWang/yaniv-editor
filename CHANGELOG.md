@@ -733,6 +733,45 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   绕过按钮直接调 `undo()` 能正常回退，用户却只能看着灰按钮，直到再随便改一个字。
   这个守卫想挡的「初始化时的误判」根本不存在——空文档、带 `content`、带多段内容
   三种建法下 `can().undo()` 初始都是 `false`。整体删除，可用性只由 `can()` 决定。→ 不变量 43
+- **宿主切换语言会丢掉用户正在编辑的全部内容。** `rebuild()` 的内容快照是「调用方先设好、
+  它再读」的隐含契约，三个调用点里只有 `watch(sessionKey)` 遵守。而切语言必然连开两次
+  rebuild——语言**代码**是同步的（`sessionKey` 立刻变），语言**包**是异步加载的
+  （落地后 `locale` 才变）：前一次存了快照、建完就把它清空，后一次落地时快照已是 `null`，
+  直接回落到空文档。改为由 `rebuild()` 自己取快照，调用方只负责触发；
+  `watch(sessionKey)` 里那段与 `rebuild()` 开头逐行重复的「取旧实例→置空→等 tick→销毁」
+  一并删除。→ 不变量 44
+- **每切换一次语言泄漏一个完整的编辑器实例。** 销毁旧实例写在取消检查之后，
+  被更新的那次 rebuild 取代时直接 `return` 走掉；而旧实例已从 `editor.value` 摘走，
+  更新的那次读到的是 `null`，`onScopeDispose` 同理——再没有人持有它。
+  实测遗留实例 `isDestroyed === false`，带着 ProseMirror 插件、DOM 监听与扩展定时器常驻。
+  销毁提到取消检查之前，并用幂等的 `destroyPrevious()` + `finally` 兜住抛错路径。→ 不变量 44
+- **切换语言后编辑器永久停在加载骨架屏，再也建不出来。** `await nextTick()` 写在
+  `try` 之外，而它交出的是当次 flush 的 promise：这一轮里任何组件更新抛错都会让它 reject，
+  于是 `rebuild()` 跟着抛，调用点 `void rebuild()` 无人接管，`status` 永久停在 `"loading"`。
+  纳入 `try` 后，建不出来会落到 `"error"` 这个确定终态并可重试。→ 不变量 44
+- **session 重建时浮层在已被摘走的容器上抛 `insertBefore of null`。** `bubble-menu` 系
+  的 5 个浮层通过 `appendTo` 把 DOM 搬进 overlay portal，Vue 的 vnode 树仍以为它在原位。
+  `EditorEditChrome` 的 `:key` 变化与 `editor` 置 null 同时发生，chrome 带着
+  `editor === null` 再渲染一帧时，补插 `v-if` 注释占位符的容器已经没了。
+  这一帧本无意义（chrome 里每个子节点都写着 `&& editor`），把条件提到父级判一次。
+  实测：改 `features` 触发的重建也会抛这个错，只是没恰好击中 `nextTick`。→ 不变量 45
+- **`initialContent` 被当成受控源反复灌入。** `controlledSource = content ?? initialContent`，
+  而 full 编辑器没有 `content`（它 emit `update` 让宿主自己存，不是 v-model），
+  于是 `initialContent` 掉进受控源的位置：每次 `sessionReady` 由 false 翻 true
+  就重灌一遍，把 `rebuild()` 刚恢复出来的用户内容盖掉。
+  改为按「**这份源自己变没变**」判定，而不是「是不是第一次就绪」——后者会打穿另一条
+  正当路径：`sessionReady` 这个 watch 还兜着「重建期间错过的源变更」（重建时它是 false，
+  `watch(controlledSource)` 会早退），而 demo 的 `initialContent` 正是
+  `computed(() => getSampleContent(preset))`，切 preset 时源变了且同时触发重建。
+  inline 的 `content` 是真受控，宿主是权威，重建后照常重新应用。→ 约定 36
+- **更正不变量 41 的错误归因：主 chunk 里绝大多数注释其实不吃预算。** 原文断言
+  「ESM 产物不压缩，源文件里每一行注释都原样进产物」，并据此要求主 chunk 的注释一律写短。
+  实测（带有效性对照：同一次实验里把一个运行时字符串加长 40 字符，hash 变、gzip +5B，
+  证明构建确实响应源码改动）：`.ts` 语句之间加 30 行中文注释 **0B**、
+  `.vue` `<script setup>` 里同样 **0B**，只有写在**对象字面量属性**上的注释真的进产物
+  （30 行 209B）。Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comment。
+  原结论的矛盾就写在同一条里——「单独还原 `listShortcuts.ts` 只差 2B」，
+  那 471B 来自整批的**代码**改动。同步更正约定 32。
 - **`UndoRedoButton` 多订了一份 `update`。** `hasRealEdit` 删除后，原本用于置位它的
   `handleUpdate` 只剩转调状态同步，而 `update` 是 `transaction` 的严格子集（不变量 37），
   每次编辑白算一遍。只保留 `transaction`。唯一的例外 `setEditable`（只 emit `update`、
