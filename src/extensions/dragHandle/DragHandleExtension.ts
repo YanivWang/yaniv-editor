@@ -225,15 +225,28 @@ function isPointerInHandleZone(
   return clientX >= zoneLeft && clientX <= zoneRight;
 }
 
-function isPointerOverHandleControls(
+/** + 号唤起的块选择器由 `BlockPickerMenu` 渲染，同样属于本扩展弹出的浮层 */
+const BLOCK_PICKER_SELECTOR = ".block-picker-menu, .block-picker-backdrop";
+
+/**
+ * 指针是否落在本扩展自己的交互面上：手柄、+ 号、块菜单、块选择器。
+ *
+ * 这四者都可能比触发它们的块高得多（实测段落 26px、块菜单 139px、块选择器 340px），
+ * 所以指针停在它们上面时**不能**按指针 Y 去重新做块命中——那会命中菜单下方的块，
+ * 把用户正要点的菜单直接关掉。
+ */
+function isPointerOverOwnSurfaces(
   handle: HTMLElement,
   plusButton: HTMLElement,
   menu: HTMLElement,
   target: EventTarget | null,
 ): boolean {
   if (!(target instanceof Node)) return false;
+  if (handle.contains(target) || plusButton.contains(target) || menu.contains(target)) {
+    return true;
+  }
 
-  return handle.contains(target) || plusButton.contains(target) || menu.contains(target);
+  return target instanceof Element && target.closest(BLOCK_PICKER_SELECTOR) !== null;
 }
 
 function findMediaTarget(view: EditorView, event: MouseEvent): DragTarget | null {
@@ -427,30 +440,106 @@ function createTransparentDragImage(source: HTMLElement): HTMLElement {
   return dragImage;
 }
 
-function createInlineContent(schema: Schema, text: string): Fragment | null {
-  return text.trim().length > 0 ? Fragment.from(schema.text(text)) : null;
+/**
+ * 取目标块的行内内容，按源块切分。
+ *
+ * 行内内容块（paragraph / heading / codeBlock）交出自身 content；块级容器
+ * （列表 / 引用 / 表格 / toggle / callout）逐个交出其行内子块，保持文档顺序。
+ * atom 块（图片 / 分割线）没有行内子块，交出空数组。
+ *
+ * 直接搬 Fragment 而不是取 `textContent`：后者会丢掉全部 mark（加粗、链接的
+ * href）与行内节点（换行、mention），且把多个块的文字粘成一段。
+ */
+function collectInlineRuns(node: ProseMirrorNode): Fragment[] {
+  if (node.inlineContent) return [node.content];
+
+  const runs: Fragment[] = [];
+  node.descendants((child) => {
+    if (!child.inlineContent) return true;
+    runs.push(child.content);
+    return false;
+  });
+  return runs;
 }
 
-function createParagraph(schema: Schema, text = ""): ProseMirrorNode {
-  return schema.nodes.paragraph.create(null, createInlineContent(schema, text));
+/**
+ * 把文本里的字面换行换成 hardBreak。
+ *
+ * 代码块的 content 是 `text*`，换行以 `\n` 存在文本节点里；直接搬进段落/标题后
+ * `getHTML()` 输出 `<p>a\nb</p>`，再 `setContent` 回来时 HTML 解析把换行当普通空白
+ * 折叠成空格——**换行永久丢失**（实测往返 `a\nb` → `a b`）。hardBreak 往返无损。
+ */
+function normalizeRun(schema: Schema, run: Fragment): Fragment {
+  const hardBreak = schema.nodes.hardBreak;
+  if (!hardBreak) return run;
+
+  const nodes: ProseMirrorNode[] = [];
+  let changed = false;
+
+  run.forEach((child) => {
+    if (!child.isText || !child.text?.includes("\n")) {
+      nodes.push(child);
+      return;
+    }
+
+    changed = true;
+    child.text.split("\n").forEach((part, index) => {
+      if (index > 0) nodes.push(hardBreak.create());
+      if (part.length > 0) nodes.push(schema.text(part, child.marks));
+    });
+  });
+
+  return changed ? Fragment.fromArray(nodes) : run;
 }
 
-function createHeading(schema: Schema, level: 1 | 2 | 3, text = ""): ProseMirrorNode {
-  return schema.nodes.heading.create({ level }, createInlineContent(schema, text));
+/** 源块可能没有任何行内内容（atom 块），此时仍要产出一个空块，转换才有结果 */
+function prepareRuns(schema: Schema, runs: Fragment[]): Fragment[] {
+  const ensured = runs.length > 0 ? runs : [Fragment.empty];
+  return ensured.map((run) => normalizeRun(schema, run));
 }
 
-function createCodeBlock(schema: Schema, text = ""): ProseMirrorNode {
-  return schema.nodes.codeBlock.create(null, createInlineContent(schema, text));
+/** codeBlock 的 content 是 `text*` 且 `marks: ""`，只能收纯文本；换行按 hardBreak 还原 */
+function runsToText(runs: Fragment[]): string {
+  return runs
+    .map((run) =>
+      run.textBetween(0, run.size, "\n", (leaf) => (leaf.type.name === "hardBreak" ? "\n" : "")),
+    )
+    .join("\n");
 }
 
-function createBlockquote(schema: Schema, text = ""): ProseMirrorNode {
-  return schema.nodes.blockquote.create(null, createParagraph(schema, text));
+function createParagraphs(schema: Schema, runs: Fragment[]): ProseMirrorNode[] {
+  return prepareRuns(schema, runs).map((run) => schema.nodes.paragraph.create(null, run));
 }
 
-function createList(schema: Schema, type: "bulletList" | "orderedList", text = "") {
+function createHeadings(schema: Schema, level: 1 | 2 | 3, runs: Fragment[]): ProseMirrorNode[] {
+  return prepareRuns(schema, runs).map((run) => schema.nodes.heading.create({ level }, run));
+}
+
+function createCodeBlock(schema: Schema, runs: Fragment[]): ProseMirrorNode {
+  const text = runsToText(runs);
+  return schema.nodes.codeBlock.create(null, text.length > 0 ? schema.text(text) : null);
+}
+
+/** `block+` 容器（引用 / toggle / callout）：每个行内片段包一个段落 */
+function createBlockContainer(
+  schema: Schema,
+  typeName: string,
+  attrs: Record<string, unknown> | null,
+  runs: Fragment[],
+): ProseMirrorNode {
+  return schema.nodes[typeName].create(attrs, createParagraphs(schema, runs));
+}
+
+function createList(
+  schema: Schema,
+  type: "bulletList" | "orderedList",
+  runs: Fragment[],
+): ProseMirrorNode {
   return schema.nodes[type].create(
     null,
-    schema.nodes.listItem.create(null, createParagraph(schema, text)),
+    prepareRuns(schema, runs).map((run) =>
+      schema.nodes.listItem.create(null, schema.nodes.paragraph.create(null, run)),
+    ),
   );
 }
 
@@ -463,8 +552,12 @@ function insertNodeAfter(view: EditorView, target: DragTarget, node: ProseMirror
   view.focus();
 }
 
-function replaceTargetNode(view: EditorView, target: DragTarget, node: ProseMirrorNode): void {
-  const tr = view.state.tr.replaceWith(target.pos, target.pos + target.node.nodeSize, node);
+function replaceTargetNode(
+  view: EditorView,
+  target: DragTarget,
+  replacement: ProseMirrorNode | readonly ProseMirrorNode[],
+): void {
+  const tr = view.state.tr.replaceWith(target.pos, target.pos + target.node.nodeSize, replacement);
   const selectionPos = Math.min(target.pos + 1, tr.doc.content.size);
   tr.setSelection(TextSelection.near(tr.doc.resolve(selectionPos), 1));
   view.dispatch(tr.scrollIntoView());
@@ -489,48 +582,49 @@ function createTransformItems(
   getMenuLabel: (key: string) => string,
 ): BlockMenuItem[] {
   const { schema } = view.state;
-  const text = target.node.textContent;
+  const runs = collectInlineRuns(target.node);
 
   const transforms: Array<{ id: string; slashKey: string; run: () => void }> = [
     {
       id: "paragraph",
       slashKey: "paragraph",
-      run: () => replaceTargetNode(view, target, createParagraph(schema, text)),
+      run: () => replaceTargetNode(view, target, createParagraphs(schema, runs)),
     },
     {
       id: "heading1",
       slashKey: "heading1",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 1, text)),
+      run: () => replaceTargetNode(view, target, createHeadings(schema, 1, runs)),
     },
     {
       id: "heading2",
       slashKey: "heading2",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 2, text)),
+      run: () => replaceTargetNode(view, target, createHeadings(schema, 2, runs)),
     },
     {
       id: "heading3",
       slashKey: "heading3",
-      run: () => replaceTargetNode(view, target, createHeading(schema, 3, text)),
+      run: () => replaceTargetNode(view, target, createHeadings(schema, 3, runs)),
     },
     {
       id: "blockquote",
       slashKey: "blockquote",
-      run: () => replaceTargetNode(view, target, createBlockquote(schema, text)),
+      run: () =>
+        replaceTargetNode(view, target, createBlockContainer(schema, "blockquote", null, runs)),
     },
     {
       id: "bulletList",
       slashKey: "bulletList",
-      run: () => replaceTargetNode(view, target, createList(schema, "bulletList", text)),
+      run: () => replaceTargetNode(view, target, createList(schema, "bulletList", runs)),
     },
     {
       id: "orderedList",
       slashKey: "orderedList",
-      run: () => replaceTargetNode(view, target, createList(schema, "orderedList", text)),
+      run: () => replaceTargetNode(view, target, createList(schema, "orderedList", runs)),
     },
     {
       id: "codeBlock",
       slashKey: "codeBlock",
-      run: () => replaceTargetNode(view, target, createCodeBlock(schema, text)),
+      run: () => replaceTargetNode(view, target, createCodeBlock(schema, runs)),
     },
     {
       id: "toggleBlock",
@@ -540,8 +634,8 @@ function createTransformItems(
           view,
           target,
           schema.nodes.toggleBlock
-            ? schema.nodes.toggleBlock.create({ open: true }, createParagraph(schema, text))
-            : createParagraph(schema, text),
+            ? createBlockContainer(schema, "toggleBlock", { open: true }, runs)
+            : createParagraphs(schema, runs),
         ),
     },
     {
@@ -552,11 +646,8 @@ function createTransformItems(
           view,
           target,
           schema.nodes.callout
-            ? schema.nodes.callout.create(
-                { icon: "💡", color: "default" },
-                createParagraph(schema, text),
-              )
-            : createBlockquote(schema, text),
+            ? createBlockContainer(schema, "callout", { icon: "💡", color: "default" }, runs)
+            : createBlockContainer(schema, "blockquote", null, runs),
         ),
     },
   ];
@@ -728,6 +819,17 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           let currentTarget: DragTarget | null = null;
           let isDragging = false;
           let activeMenuKind: BlockMenuKind | null = null;
+          /**
+           * 拖拽影像挂在 `document.body`（`setDragImage` 要求元素在文档里），
+           * 不在编辑器根内，所以必须由本实例自己持有并收回：
+           * 用 `document.querySelectorAll` 全局清理会连别的编辑器实例正在拖拽的影像一起删掉。
+           */
+          let dragImage: HTMLElement | null = null;
+
+          const removeDragImage = () => {
+            dragImage?.remove();
+            dragImage = null;
+          };
 
           const setDraggingState = (dragging: boolean) => {
             isDragging = dragging;
@@ -740,9 +842,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             if (isDragging) {
               setDraggingState(false);
               handle.classList.remove("is-dragging");
-              document.querySelectorAll(".drag-handle__drag-image").forEach((element) => {
-                element.remove();
-              });
+              removeDragImage();
             }
             currentTarget = null;
             plusButton.classList.remove("is-visible");
@@ -792,10 +892,6 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
               return true;
             }
 
-            if (isPointerOverHandleControls(handle, plusButton, menu, eventTarget)) {
-              return true;
-            }
-
             if (
               currentTarget &&
               isPointerInHandleZone(handle, plusButton, currentTarget, clientX, clientY)
@@ -813,6 +909,9 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
             }
 
             if (isDragging) return;
+
+            // 指针停在自己的交互面上时保持现状：重新命中会把用户正要点的菜单关掉
+            if (isPointerOverOwnSurfaces(handle, plusButton, menu, event.target)) return;
 
             if (!shouldTrackPointer(event)) {
               hideHandle();
@@ -848,16 +947,9 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
           const handleMouseLeave = (event: MouseEvent) => {
             const relatedTarget = event.relatedTarget;
-            if (
-              relatedTarget instanceof Node &&
-              (relatedTarget === handleRoot ||
-                handleRoot.contains(relatedTarget) ||
-                handle.contains(relatedTarget) ||
-                plusButton.contains(relatedTarget) ||
-                menu.contains(relatedTarget))
-            ) {
-              return;
-            }
+            if (isPointerOverOwnSurfaces(handle, plusButton, menu, relatedTarget)) return;
+            if (relatedTarget instanceof Node && relatedTarget === handleRoot) return;
+            if (relatedTarget instanceof Node && handleRoot.contains(relatedTarget)) return;
 
             if (
               currentTarget &&
@@ -951,7 +1043,8 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
 
             const selection = NodeSelection.create(view.state.doc, currentTarget.pos);
             const targetRect = currentTarget.dom.getBoundingClientRect();
-            const dragImage = createTransparentDragImage(currentTarget.dom);
+            removeDragImage();
+            dragImage = createTransparentDragImage(currentTarget.dom);
 
             setDraggingState(true);
             closeMenu();
@@ -977,26 +1070,12 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
           handle.addEventListener("dragend", () => {
             setDraggingState(false);
             handle.classList.remove("is-dragging");
-            document.querySelectorAll(".drag-handle__drag-image").forEach((element) => {
-              element.remove();
-            });
+            removeDragImage();
             hideHandle();
           });
 
           const handleDocumentPointerDown = (event: MouseEvent) => {
-            const target = event.target;
-            if (target instanceof Node) {
-              if (menu.contains(target) || handle.contains(target) || plusButton.contains(target)) {
-                return;
-              }
-
-              if (
-                target instanceof Element &&
-                target.closest(".block-picker-menu, .block-picker-backdrop")
-              ) {
-                return;
-              }
-            }
+            if (isPointerOverOwnSurfaces(handle, plusButton, menu, event.target)) return;
 
             closeMenu();
             closeInsertMenu();
@@ -1066,6 +1145,9 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
               plusButton.remove();
               handle.remove();
               menu.remove();
+              // 拖拽途中被销毁（宿主切 locale / preset 会重建会话）时，影像不在编辑器根内，
+              // 不跟着一起消失——必须显式收回，否则整块的深拷贝永久留在 body
+              removeDragImage();
             },
           };
         },

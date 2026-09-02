@@ -42,15 +42,20 @@ export default defineConfig({
        * 同一批 421 个测试、同一份源码，只是量得更准——不是覆盖劣化，
        * 也不是为了让门禁通过而下调阈值。
        *
-       * **为什么不是 80%+**：以下模块是纯浏览器几何逻辑
-       * （`getBoundingClientRect` / `posAtCoords` / HTML5 drag-and-drop），
-       * jsdom 无布局引擎，强行做单测只能断言自己写的桩——功能坏了照样绿。
-       * 它们的验收放在 Playwright E2E（真实 Chromium）：
+       * **哪些部分确实只能靠 E2E**：真正依赖布局引擎的是「指针落在哪个元素上」
+       * （`getBoundingClientRect` / `posAtCoords` / `elementFromPoint`）与 HTML5
+       * drag-and-drop，jsdom 里要么恒为 0 要么不存在。它们的验收在 Playwright
+       * （真实 Chromium）：浮层定位 → `e2e/overlay-z-index.spec.ts`，
+       * 拖拽几何与换序 → `e2e/drag-handle.spec.ts`。
        *
-       * - `extensions/dragHandle/DragHandleExtension.ts` → `e2e/drag-handle.spec.ts`
-       * - 浮层定位（AI 悬浮层 / 块菜单 / bubble menu）→ `e2e/overlay-z-index.spec.ts`
+       * ⚠️ 但**别把整个模块都推给 E2E**。这里原先写着
+       * 「`DragHandleExtension.ts` 是纯浏览器几何逻辑，强行做单测只能断言自己写的桩」，
+       * 据此让它长期零单测——实际上该文件里与布局无关的部分（块转换、菜单渲染、
+       * 目标选择、插件生命周期与资源收回）占了绝大多数，把 `posAtCoords` 换成确定
+       * 输入之后全都可测，而且一测就翻出 4 个真实缺陷（见 CHANGELOG）。
+       * **判据是「这段逻辑要不要布局」，不是「这个文件属不属于交互层」。**
        *
-       * 把这两块排除出统计能让数字明显好看，但那是修饰指标而不是提高质量，
+       * 把剩下的几何部分排除出统计能让数字好看，但那是修饰指标而不是提高质量，
        * 因此保留在分母里，如实反映。
        */
       thresholds: {

@@ -273,6 +273,21 @@ docs: 补充 z-index 说明
     反过来，**不要为了让间距「成体系」就去 token 化**——组件内部的 padding / gap
     没有消费方，包一层 `var()` 只会多一层间接并吃掉产物预算。
 
+39. **别用 `expect(...).not.toThrow()` 验「销毁后监听已摘掉」。** jsdom 里事件处理器
+    抛出的异常**不冒泡到 `dispatchEvent` 的调用点**，那样写恒真——测试永远绿，
+    监听漏摘也照样绿。要验就直接记账：临时替换 `addEventListener` /
+    `removeEventListener` 记录注册与注销，销毁后断言账本清零
+    （`DragHandleExtension.test.ts` 的 `trackDocumentListeners`）。
+    同一个坑的另一面是：那种异常最终会变成 vitest 的 "Unhandled Errors"
+    并让 `verify` 退出 1，而单跑那个文件完全看不见。
+
+40. **扩展里写死的 locale key 走护栏，不指望类型系统。** 扩展拿不到 Vue 的 inject，
+    文案经选项回调注入（`getMenuLabel` / `getLocaleText`），registry 的实现是
+    `resolveMessage(locale, key) ?? key`——**未命中静默回退成 key 本身**，
+    界面上直接出现 `slashCommand.heading1`。回调签名收的是 `string`，TS 拦不住；
+    `localeParity` 只保证两份语言包彼此对齐，也管不到「代码引用的 key 存不存在」。
+    `locales/extensionLabelKeys.test.ts` 扫全仓源码逐条解析，新增这类 key 时它会兜住。
+
 ## 测试
 
 - 单测：`src/**/*.test.ts`（vitest + jsdom）。纯函数与扩展行为优先。
