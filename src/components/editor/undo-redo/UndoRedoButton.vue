@@ -55,15 +55,13 @@ const canUndo = ref(false);
 const canRedo = ref(false);
 
 /**
- * 标记是否有真正的编辑操作
- * 用于区分初始化状态和真正的编辑操作
- */
-const hasRealEdit = ref(false);
-
-/**
- * 更新撤销/重做状态
- * @description 检查编辑器是否可以执行撤销/重做操作
- * 使用更严格的条件判断，确保初始化时没有可撤销操作时按钮为禁用状态
+ * 按钮可用性**只能**由编辑器自己的 `can()` 决定，不能再叠组件本地状态。
+ *
+ * 此前叠了一个 `hasRealEdit`（首次 `update` 事件才置 true），本意是挡「初始化时的误判」。
+ * 但那个场景不存在——刚建好的编辑器 `can().undo()` 本来就是 false；
+ * 而它挡住了真正该放行的场景：`mode` 在 edit/preview 间往返会重挂整个编辑 chrome，
+ * 编辑器实例与历史都还在，重挂出来的按钮却因为本地标记归零而变灰。
+ * 编辑器的持久状态不能存在组件本地。证据见同目录测试。
  */
 function updateUndoRedoState() {
   const e = editor.value;
@@ -74,35 +72,13 @@ function updateUndoRedoState() {
   }
 
   try {
-    // 检查是否可以撤销/重做
-    const undoCheck = e.can().undo?.();
-    const redoCheck = e.can().redo?.();
-
-    // 只有在有真正的编辑操作后，才允许撤销
-    // 这样可以防止初始化时的误判
-    canUndo.value = undoCheck && hasRealEdit.value;
-    canRedo.value = Boolean(redoCheck);
+    canUndo.value = Boolean(e.can().undo?.());
+    canRedo.value = Boolean(e.can().redo?.());
   } catch (error) {
     // 如果检查失败，默认禁用按钮
     canUndo.value = false;
     canRedo.value = false;
   }
-}
-
-/**
- * 处理编辑器更新事件
- * @description 监听编辑器的更新事件，判断是否有真正的编辑操作
- */
-function handleUpdate() {
-  const e = editor.value;
-  if (!e) return;
-
-  // update 事件在文档内容变化时触发
-  // 标记为有真正的编辑操作
-  hasRealEdit.value = true;
-
-  // 更新按钮状态
-  updateUndoRedoState();
 }
 
 type BoundEditor = NonNullable<typeof editor.value>;
@@ -119,19 +95,16 @@ type BoundEditor = NonNullable<typeof editor.value>;
 function attachEditorListeners(e: BoundEditor | null) {
   if (!e) return;
 
-  // 新实例意味着新的历史栈：重新开始判定「是否发生过真正的编辑」
-  hasRealEdit.value = false;
   updateUndoRedoState();
 
-  e.on("update", handleUpdate);
-  // `selectionUpdate` 是 `transaction` 的严格子集，同时订两个只会让状态白算一遍（不变量 37）
+  // `update` / `selectionUpdate` 都是 `transaction` 的严格子集，
+  // 同时订多个只会让状态白算一遍（不变量 37）
   e.on("transaction", updateUndoRedoState);
 }
 
 /** 退订指定编辑器上的监听 */
 function detachEditorListeners(e: BoundEditor | null) {
   if (!e) return;
-  e.off("update", handleUpdate);
   e.off("transaction", updateUndoRedoState);
 }
 

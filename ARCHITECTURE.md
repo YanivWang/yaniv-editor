@@ -1616,6 +1616,20 @@ src/shared/
     扫描范围含 `examples/`——demo 是宿主用法的正式示范，被它用到就有对外价值
     （`--ye-radius-lg` 正是这种情况）。护栏 `styles/tokenConsumers.test.ts`。
 
+43. **编辑器的持久状态不得存在组件本地 ref 里** — 工具栏组件会被卸载重挂，而编辑器实例
+    与它的历史栈、选区、内容都活得更久。把「编辑器发生过什么」记在组件本地，重挂一次就归零，
+    UI 于是与编辑器真实状态脱节。`UndoRedoButton` 曾用一个 `hasRealEdit`
+    （首次收到 `update` 才置 true）与 `can().undo()` 相与，本意是挡「初始化时的误判」——
+    而那个场景根本不存在：空文档、带 `content`、带多段内容三种建法下
+    `can().undo()` 初始都是 `false`。它挡住的反而是真场景：`mode` 在 edit / preview
+    之间往返会把整个编辑 chrome 卸载重挂（`showEditChrome = mode === "edit"`，
+    而 `sessionKey` **不含** `mode`，编辑器实例与历史原样活着），
+    重挂出来的撤销按钮却因为标记归零而变灰，用户撤销不了自己刚写的东西。
+    按钮可用性这类派生 UI 状态**只能**从编辑器当场问出来（`can()` / `isActive()`），
+    组件本地 ref 只配缓存那次询问的结果，不能参与判定。
+    反例辨析：`LinkBubbleMenu` 换实例时关掉 modal、`useControlledContent`
+    换实例时清空内容签名，重置的都是**瞬态 UI / 新实例的新基线**，不是编辑器的持久事实。
+
 ---
 
 ## CSS 分层

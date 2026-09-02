@@ -725,6 +725,18 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `<div style="mso-element:para-border-div">` 里根本没有 `MsoLineNumber` 类，函数对它什么也不做，
   `toContain("正文")` 恒真——把实现换成 `html => html` 也照样通过。补齐 5 条真正锁住
   unwrap 行为的用例（变异成恒等函数后 4 条转红）。
+- **`mode` 从 `preview` 切回 `edit` 后撤销按钮变灰，用户撤销不了自己刚写的内容。**
+  `UndoRedoButton` 把「是否发生过真正的编辑」记在组件本地的 `hasRealEdit` 上，
+  与 `can().undo()` 相与后才允许撤销。而 `showEditChrome = mode === "edit"`，
+  `sessionKey` **不含** `mode`——切到预览会把整个编辑 chrome 卸载，切回来重挂时
+  编辑器实例与历史栈原封不动，本地标记却归零。实测：往返后 `can().undo()` 仍是 `true`、
+  绕过按钮直接调 `undo()` 能正常回退，用户却只能看着灰按钮，直到再随便改一个字。
+  这个守卫想挡的「初始化时的误判」根本不存在——空文档、带 `content`、带多段内容
+  三种建法下 `can().undo()` 初始都是 `false`。整体删除，可用性只由 `can()` 决定。→ 不变量 43
+- **`UndoRedoButton` 多订了一份 `update`。** `hasRealEdit` 删除后，原本用于置位它的
+  `handleUpdate` 只剩转调状态同步，而 `update` 是 `transaction` 的严格子集（不变量 37），
+  每次编辑白算一遍。只保留 `transaction`。唯一的例外 `setEditable`（只 emit `update`、
+  不产生事务）经实测不改变 `can().undo()` / `can().redo()`，不受影响。
 
 ### Changed
 

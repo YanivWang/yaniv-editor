@@ -24,13 +24,13 @@ beforeAll(installBrowserStubs);
 const WATCHED_EVENTS = ["update", "selectionUpdate", "transaction"] as const;
 
 /**
- * 组件自己挂的监听数：`update`（置 `hasRealEdit`）+ `transaction`（同步可用性）= 2。
+ * 组件自己挂的监听数：只有 `transaction`（同步可用性）= 1。
  *
  * 不能写成 `WATCHED_EVENTS.length`——那会把「组件订了哪些事件」和「测试观察哪些事件」
- * 绑成同一个数。`selectionUpdate` 是 `transaction` 的严格子集（不变量 37），
- * 组件不再订它，但测试仍要把它算进来，否则漏订回退时数不出来。
+ * 绑成同一个数。`update` 与 `selectionUpdate` 都是 `transaction` 的严格子集
+ * （不变量 37），组件不再订它们，但测试仍要把它们算进来，否则漏订回退时数不出来。
  */
-const OWN_LISTENERS = 2;
+const OWN_LISTENERS = 1;
 
 const editors: Editor[] = [];
 let wrapper: VueWrapper | null = null;
@@ -62,6 +62,25 @@ function mountButton(current: { value: Editor | null }): VueWrapper {
     }),
     { attachTo: document.body },
   );
+}
+
+/**
+ * 制造一步可撤销的编辑。
+ *
+ * 不能带 `.focus()`：tiptap 的 focus 命令把 `view.focus()` 丢进 `requestAnimationFrame`，
+ * 里面只守 `editor.isDestroyed`。测试收尾清空 `document.body` 后回调才跑，
+ * view.dom 已脱离文档，抛出的错不冒泡到任何调用点，只会变成 vitest 的 "Unhandled Errors"
+ * ——单跑这个文件看不见，跑全量才打穿 CI。撤销历史本来也不需要焦点。
+ */
+function makeEdit(editor: Editor): void {
+  editor.chain().insertContent("用户敲的字").run();
+}
+
+/** 撤销按钮是工具栏里的第一个 button（第二个是重做） */
+function undoButton(w: VueWrapper): HTMLButtonElement {
+  const btn = w.element.querySelectorAll("button")[0];
+  if (!btn) throw new Error("没找到撤销按钮");
+  return btn as HTMLButtonElement;
 }
 
 /** 订阅曾被包在 nextTick 里，需要多让出一次事件循环才能观察到旧行为 */
@@ -139,5 +158,58 @@ describe("UndoRedoButton 的编辑器事件订阅", () => {
     wrapper.unmount();
     wrapper = null;
     expect(countEditorListenersFor(editor, WATCHED_EVENTS)).toBe(baseline);
+  });
+});
+
+/**
+ * 撤销可用性必须完全跟随编辑器的历史栈，不能受组件自身的挂载时机影响。
+ *
+ * 曾经组件里有个 `hasRealEdit` 标记：只有收到过 `update` 事件才允许撤销，
+ * 本意是挡「初始化时的误判」。实测那个场景不存在——空文档、带 `content`、
+ * 带多段内容三种建法下 `can().undo()` 初始都是 `false`。
+ * 它挡住的反而是真场景：`mode` 在 edit / preview 之间往返会把整个编辑 chrome
+ * 卸载重挂（`showEditChrome = mode === "edit"`，而 `sessionKey` 不含 `mode`，
+ * 编辑器实例与历史都原样活着），重挂出来的按钮却因为标记归零而变灰，
+ * 用户撤销不了自己刚写的东西，直到再随便改一个字。
+ */
+describe("撤销可用性只跟随编辑器历史", () => {
+  it("挂载在已有撤销历史的编辑器上，按钮就是可点的", async () => {
+    const editor = createEditor();
+    makeEdit(editor);
+    await settle();
+    expect(editor.can().undo()).toBe(true);
+
+    // 组件此刻才挂上来（等价于 chrome 重挂 / 异步组件迟到）
+    wrapper = mountButton(shallowRef<Editor | null>(editor));
+    await settle();
+
+    expect(undoButton(wrapper).disabled).toBe(false);
+  });
+
+  it("卸载重挂后按钮不会变灰", async () => {
+    const editor = createEditor();
+    const current = shallowRef<Editor | null>(editor);
+
+    wrapper = mountButton(current);
+    await settle();
+    makeEdit(editor);
+    await settle();
+    expect(undoButton(wrapper).disabled).toBe(false);
+
+    wrapper.unmount();
+    wrapper = mountButton(current);
+    await settle();
+
+    expect(editor.can().undo()).toBe(true);
+    expect(undoButton(wrapper).disabled).toBe(false);
+  });
+
+  it("刚建好的编辑器上按钮是禁用的", async () => {
+    const editor = createEditor();
+    wrapper = mountButton(shallowRef<Editor | null>(editor));
+    await settle();
+
+    expect(editor.can().undo()).toBe(false);
+    expect(undoButton(wrapper).disabled).toBe(true);
   });
 });
