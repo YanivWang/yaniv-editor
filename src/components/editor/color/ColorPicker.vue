@@ -404,14 +404,15 @@ const previewTextStyle = computed(() => {
   }
 });
 
-/** 工具栏图标下方的当前颜色横条（与文字颜色图标底部色条一致） */
-const indicatorBarStyle = computed(() => {
-  const color = normalizedColor.value;
-  if (!color || color === "transparent") {
-    return { backgroundColor: "transparent" };
-  }
-  return { backgroundColor: color };
-});
+/**
+ * 工具栏图标下方的当前颜色横条（与文字颜色图标底部色条一致）。
+ *
+ * 这里原先还有一段 `if (!color || color === "transparent") return { backgroundColor: "transparent" }`：
+ * 两个条件都改变不了结果——`normalizeColor` 空值回退 `#000000`，`!color` 永远为假；
+ * 而 `"transparent"` 分支交出的对象与下面这行逐字相同。变异验证（去掉整段守卫）
+ * 24 条用例全绿，正是「这段分支不可达且无差别」的证据，故收敛成一行。
+ */
+const indicatorBarStyle = computed(() => ({ backgroundColor: normalizedColor.value }));
 
 /**
  * 颜色网格样式（计算属性）

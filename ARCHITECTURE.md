@@ -1796,6 +1796,19 @@ src/shared/
     ⚠️ 同类问题还有 Vue 模板的 `.ctrl` 修饰符——它不匹配 Mac 的 Cmd，
     要 `.ctrl` 与 `.meta` 各写一条（tiptap 侧的 `Mod-` 前缀自带这个映射，模板侧没有）。
 
+58. **命令实现只能写自己那条 transaction，不许在里面再调 `editor.commands.*`** —
+    tiptap 的 `CommandManager` 在 `editor.commands` 这个 getter 里就按当前 state
+    造好一条 tr，命令回调返回后**无条件派发**（不看它有没有内容）。于是
+    「命令里再调命令」会排成：外层 tr 先造好（带着那一刻的选区）→ 内层现造一条、
+    立刻派发、改掉选区 → 外层随后派发，把旧选区原样盖回去。doc 没变，
+    因此连 `Applying a mismatched transaction` 都不会报，只表现为「点了没反应」。
+    历史事故：`searchReplace` 的 `focusSearchHit` 这么写，导致查找面板的
+    「上一处 / 下一处 / 替换」选区一动不动（真实 Chromium 实测，命中在 263–268，
+    光标停在 1）。正确写法是往 props 给的 `tr` 上写，或用 props 的 `chain` / `commands`
+    （它们共享同一条 tr）；DOM 焦点这类非事务副作用放到 tr 落地之后的下一帧。
+    静态护栏：`src/extensions/commandTransactionScope.test.ts`（跟随同文件的辅助函数，
+    因为事故正是藏在辅助函数里）。
+
 ---
 
 ## CSS 分层

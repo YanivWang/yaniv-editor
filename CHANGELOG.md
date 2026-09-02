@@ -882,6 +882,17 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `HistoryState` 取自一个只装 history 插件的临时 `EditorState`——全程公开 API，
   不碰未导出的内部类。宿主关掉撤销能力时认不出 history 插件，静默跳过。→ 不变量 47
 
+- **查找替换面板的「上一处 / 下一处 / 替换」不会把选区带到命中上。** 真实 Chromium 实测：
+  命中在 263–268，点完之后光标仍停在原处，只有 `resultIndex` 与高亮装饰换了位置
+  ——用户看到的是「按了没反应」，长文档里还不会滚过去。根因不在 `focus()`，而在
+  `focusSearchHit` 于命令实现内部调用 `editor.commands.*`：tiptap 的 `CommandManager`
+  在 `editor.commands` 这个 getter 里就按当前 state 造好一条事务，命令回调返回后
+  **无条件派发**它。于是内层命令先派发、把选区设到命中上，外层那条随后派发、
+  带着回调开始那一刻的旧选区把它原样盖回去（doc 没变，连 mismatched transaction
+  都不会报）。9 个命令统一改为只写运行器给的那条 `tr`（`tr.setSelection` /
+  `tr.insertText` / `tr.setMeta`），焦点交还改为在 tr 落地后的下一帧执行。
+  → 不变量 58 + 静态护栏 `extensions/commandTransactionScope.test.ts`
+
 ### Changed
 
 - **链接气泡菜单改用与工具栏同一份链接分流实现（`applyLinkToEditor`）。**
@@ -957,6 +968,17 @@ mountPopover` 全程无人捕获。这与 `0.2.0` 已修的 `getAiSuggestionData
   `@/components/editor/color` barrel 会因为同 barrel 的 `ColorIcons` 是静态引用而被
   整体留在主 chunk；② `ToolbarNav` 与 `FloatingMenu` **两处都得改**——只要还剩一个
   静态引用，Rollup 就把模块留在主 chunk，实测只改一处仅掉 33B，两处都改才掉 3109B。
+
+- **测试与门禁**：`BlockPickerMenu` / `ColorPicker` / `AiSettingsModal` 补齐单测
+  （三个组件 +58 条，连同新增的命令层护栏共 +64 条；覆盖率 Statements 77.58% → 80.43%、
+  Lines 79.69% → 82.77%），
+  `vitest.config.ts` 阈值提档到 78 / 80 / 67 / 76；`pnpm run lint` 加上
+  `--max-warnings=0`，让「eslint 零 warning」这条既有约定真的能打断 CI
+  （此前 9 条 import/order warning 照样退出 0）。
+- **两处改变不了任何结果的分支已收敛**：`BlockPickerMenu` 的 `watch(query)`
+  （四个写 `query` 的入口都已各自重置高亮，而它在「空串写成空串」时根本不响应，
+  只盖得住其中两个入口）、`ColorPicker` 的 `indicatorBarStyle` 透明分支
+  （与它下面那行返回逐字相同的对象）。
 
 ### Removed
 

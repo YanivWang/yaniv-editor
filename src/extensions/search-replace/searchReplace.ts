@@ -2,7 +2,7 @@
  * Find / Replace — 简化自 Umo search-replace 思路（ProseMirror 装饰高亮）
  */
 import { Extension, type Editor } from "@tiptap/core";
-import { EditorState, Plugin, PluginKey, Transaction } from "@tiptap/pm/state";
+import { EditorState, Plugin, PluginKey, TextSelection, Transaction } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 export const searchReplacePluginKey = new PluginKey("yanivSearchReplace");
@@ -92,15 +92,47 @@ function bumpTransaction(state: EditorState): Transaction {
   return state.tr.setMeta(searchReplacePluginKey, { [META_FORCE]: Date.now() });
 }
 
+/** 命令回调拿到的那部分 props（只用得到这三个） */
+interface SearchCommandProps {
+  editor: Editor;
+  tr: Transaction;
+  dispatch?: (tr: Transaction) => void;
+}
+
+/**
+ * 把选区落到命中上，并把焦点还给正文。
+ *
+ * ⚠️ **必须写在命令自己的 `tr` 上，不能在命令内部调 `editor.commands.*`。**
+ * `editor.commands.X()` 会从当前 state 现造一个 transaction 并**无条件派发**
+ * （见 tiptap `CommandManager` 的 `commands` getter），而外层命令的 tr 是在回调
+ * 开始之前就造好的、回调返回后才派发——它带着**回调开始那一刻的选区**，
+ * 会把内层刚设好的选区原样盖回去（doc 没变，所以也不会报 mismatched transaction）。
+ *
+ * 真实浏览器实证（Playwright / Chromium）：修复前点「下一处」「上一处」「替换」，
+ * `storage.resultIndex` 与高亮都换到了下一处，选区却纹丝不动
+ * ——命中在 263–268，光标始终停在 1。
+ */
 function focusSearchHit(
-  editor: Editor,
+  { editor, tr, dispatch }: SearchCommandProps,
   hit: { from: number; to: number },
   scroll: boolean,
 ): boolean {
-  editor.commands.focus();
-  const ok = editor.commands.setTextSelection({ from: hit.from, to: hit.to });
-  if (!ok) return false;
-  if (scroll) editor.commands.scrollIntoView();
+  // can() 探测模式：tr 是共享的，写进去会污染真正执行的那条命令
+  if (!dispatch) return true;
+  if (hit.to > tr.doc.content.size) return false;
+
+  tr.setSelection(TextSelection.create(tr.doc, hit.from, hit.to));
+  if (scroll) tr.scrollIntoView();
+
+  /**
+   * DOM 焦点不属于事务：本 tr 要等命令回调返回后才由运行器派发，此刻抢焦点
+   * 只会把**旧**选区写进 DOM。放到下一帧，等 tr 落地之后再要回来。
+   * （tiptap 自己的 `focus()` 命令同样走 rAF，理由一样。）
+   */
+  requestAnimationFrame(() => {
+    if (editor.isDestroyed || !editor.view.dom.isConnected) return;
+    editor.view.focus();
+  });
   return true;
 }
 
@@ -172,108 +204,107 @@ export const SearchReplace = Extension.create<SearchReplaceOptions>({
 
   addCommands() {
     const opts = this.options;
-    const metaTr = (state: EditorState) => bumpTransaction(state);
     const shouldScroll = () => opts.scrollIntoViewOnNavigate !== false;
+    const storageOf = (editor: Editor) =>
+      (editor.storage as unknown as { searchReplace: SearchReplaceStorage }).searchReplace;
+
+    /**
+     * 所有命令都只往**运行器自己的那条 `tr`** 上写，不再另派发一条。
+     *
+     * 原来的写法是 `dispatch?.(state.tr.setMeta(...))`：那是第二条事务，而运行器
+     * 随后还会派发它自己那条（`CommandManager` 无条件派发，不看 tr 有没有内容）。
+     * 一条命令派发两次事务本身已是浪费，真正致命的是**后派发的那条带着旧选区**
+     * ——见 {@link focusSearchHit} 的说明。
+     */
+    const bump = (tr: Transaction) =>
+      tr.setMeta(searchReplacePluginKey, { [META_FORCE]: Date.now() });
 
     return {
       setSearchReplaceTerm:
         (searchTerm: string) =>
-        ({ editor, state, dispatch }) => {
-          (
-            editor.storage as unknown as { searchReplace: SearchReplaceStorage }
-          ).searchReplace.searchTerm = searchTerm;
-          dispatch?.(metaTr(state));
+        ({ editor, tr, dispatch }) => {
+          if (!dispatch) return true;
+          storageOf(editor).searchTerm = searchTerm;
+          bump(tr);
           return true;
         },
       setSearchReplaceReplaceTerm:
         (replaceTerm: string) =>
-        ({ editor, state, dispatch }) => {
-          (
-            editor.storage as unknown as { searchReplace: SearchReplaceStorage }
-          ).searchReplace.replaceTerm = replaceTerm;
-          dispatch?.(metaTr(state));
+        ({ editor, tr, dispatch }) => {
+          if (!dispatch) return true;
+          storageOf(editor).replaceTerm = replaceTerm;
+          bump(tr);
           return true;
         },
       setSearchReplaceCaseSensitive:
         (caseSensitive: boolean) =>
-        ({ editor, state, dispatch }) => {
-          (
-            editor.storage as unknown as { searchReplace: SearchReplaceStorage }
-          ).searchReplace.caseSensitive = caseSensitive;
-          dispatch?.(metaTr(state));
+        ({ editor, tr, dispatch }) => {
+          if (!dispatch) return true;
+          storageOf(editor).caseSensitive = caseSensitive;
+          bump(tr);
           return true;
         },
       resetSearchReplaceIndex:
         () =>
-        ({ editor, state, dispatch }) => {
-          (
-            editor.storage as unknown as { searchReplace: SearchReplaceStorage }
-          ).searchReplace.resultIndex = 0;
-          dispatch?.(metaTr(state));
+        ({ editor, tr, dispatch }) => {
+          if (!dispatch) return true;
+          storageOf(editor).resultIndex = 0;
+          bump(tr);
           return true;
         },
-      searchReplaceFindNext:
-        () =>
-        ({ editor, state, dispatch }) => {
-          const s = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
-            .searchReplace;
-          const nextIdx = s.resultIndex + 1;
-          s.resultIndex = s.results[nextIdx] ? nextIdx : 0;
-          dispatch?.(metaTr(state));
-          const hit = s.results[s.resultIndex];
-          if (!hit) return true;
-          return focusSearchHit(editor, hit, shouldScroll());
-        },
-      searchReplaceFindPrevious:
-        () =>
-        ({ editor, state, dispatch }) => {
-          const s = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
-            .searchReplace;
-          const prevIdx = s.resultIndex - 1;
-          s.resultIndex =
-            prevIdx >= 0 && s.results[prevIdx] ? prevIdx : Math.max(s.results.length - 1, 0);
-          dispatch?.(metaTr(state));
-          const hit = s.results[s.resultIndex];
-          if (!hit) return true;
-          return focusSearchHit(editor, hit, shouldScroll());
-        },
+      searchReplaceFindNext: () => (props) => {
+        const { editor, tr, dispatch } = props;
+        if (!dispatch) return true;
+        const s = storageOf(editor);
+        const nextIdx = s.resultIndex + 1;
+        s.resultIndex = s.results[nextIdx] ? nextIdx : 0;
+        bump(tr);
+        const hit = s.results[s.resultIndex];
+        if (!hit) return true;
+        return focusSearchHit(props, hit, shouldScroll());
+      },
+      searchReplaceFindPrevious: () => (props) => {
+        const { editor, tr, dispatch } = props;
+        if (!dispatch) return true;
+        const s = storageOf(editor);
+        const prevIdx = s.resultIndex - 1;
+        s.resultIndex =
+          prevIdx >= 0 && s.results[prevIdx] ? prevIdx : Math.max(s.results.length - 1, 0);
+        bump(tr);
+        const hit = s.results[s.resultIndex];
+        if (!hit) return true;
+        return focusSearchHit(props, hit, shouldScroll());
+      },
       searchReplaceReplaceCurrent:
         () =>
-        ({ editor, state, dispatch }) => {
-          const s = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
-            .searchReplace;
+        ({ editor, tr, dispatch }) => {
+          const s = storageOf(editor);
           const hit = s.results[s.resultIndex];
           if (!hit) return false;
-          dispatch?.(
-            state.tr.insertText(s.replaceTerm, hit.from, hit.to).setMeta(searchReplacePluginKey, {
-              [META_FORCE]: Date.now(),
-            }),
-          );
+          if (!dispatch) return true;
+          bump(tr.insertText(s.replaceTerm, hit.from, hit.to));
           return true;
         },
       searchReplaceReplaceAll:
         () =>
-        ({ editor, state, dispatch }) => {
-          const s = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
-            .searchReplace;
+        ({ editor, tr, dispatch }) => {
+          const s = storageOf(editor);
           if (!s.results.length) return false;
+          if (!dispatch) return true;
+          // 从后往前替换：先改后面的，前面命中的位置才不会被前一次替换顶偏
           const sorted = [...s.results].sort((a, b) => b.from - a.from);
-          let tr = state.tr;
           for (const r of sorted) {
-            tr = tr.insertText(s.replaceTerm, r.from, r.to);
+            tr.insertText(s.replaceTerm, r.from, r.to);
           }
-          dispatch?.(tr.setMeta(searchReplacePluginKey, { [META_FORCE]: Date.now() }));
+          bump(tr);
           return true;
         },
-      searchReplaceSelectCurrent:
-        () =>
-        ({ editor }) => {
-          const s = (editor.storage as unknown as { searchReplace: SearchReplaceStorage })
-            .searchReplace;
-          const hit = s.results[s.resultIndex];
-          if (!hit) return false;
-          return focusSearchHit(editor, hit, shouldScroll());
-        },
+      searchReplaceSelectCurrent: () => (props) => {
+        const s = storageOf(props.editor);
+        const hit = s.results[s.resultIndex];
+        if (!hit) return false;
+        return focusSearchHit(props, hit, shouldScroll());
+      },
     };
   },
 

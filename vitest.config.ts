@@ -30,7 +30,7 @@ export default defineConfig({
         "src/types/**",
       ],
       /**
-       * 阈值取当前实测基线略下方（**第 16 棒实测 77.58 / 79.69 / 65.44 / 75.51**，
+       * 阈值取当前实测基线略下方（**第 17 棒实测 80.43 / 82.77 / 69.05 / 78.69**，
        * 各留约 2 个点余量吸收机器与依赖版本差异），只允许上调不允许下调。
        * 目的是拦住"整片未覆盖的新代码合入"，而不是追求某个漂亮数字。
        * 覆盖率下降时应补测试，而不是改这里。
@@ -59,17 +59,21 @@ export default defineConfig({
        * 把剩下的几何部分排除出统计能让数字好看，但那是修饰指标而不是提高质量，
        * 因此保留在分母里，如实反映。
        *
-       * **当前离满分还差什么**（第 16 棒末实测，按未覆盖行数排）：
-       * `BlockPickerMenu.vue`（99）、`aiSuggestionManager.ts` 的浮层挂载与定位（92）、
-       * `ColorPicker.vue`（50）、`resizableImage.ts` 的拖拽改尺寸（48）、
-       * `AiSettingsModal.vue`（44）。其中拖拽改尺寸与浮层定位属于上面说的几何部分；
-       * 另外三个是可以继续补的常规组件逻辑。
+       * **当前离满分还差什么**（第 17 棒末实测，按未覆盖行数排）：
+       * `aiSuggestionManager.ts` 的浮层挂载与定位（92）、`DragHandleExtension.ts` 的
+       * 拖拽几何（66）、`resizableImage.ts` 的拖拽改尺寸（48）、
+       * `blockMenuActions.ts`（40）、`video.ts`（37）、`MentionSuggestionMenu.vue`（31）。
+       * 前三个是上面说的「要布局才能测」的几何部分，验收在 E2E；后三个是常规逻辑，
+       * 下一棒还想提档就从它们开始。
+       *
+       * 第 16 棒点名的三个常规组件（`BlockPickerMenu` 99 行、`ColorPicker` 50 行、
+       * `AiSettingsModal` 44 行）已在第 17 棒补完，statements 77.58% → 80.50%。
        */
       thresholds: {
-        statements: 75,
-        lines: 77,
-        branches: 63,
-        functions: 73,
+        statements: 78,
+        lines: 80,
+        branches: 67,
+        functions: 76,
       },
     },
   },

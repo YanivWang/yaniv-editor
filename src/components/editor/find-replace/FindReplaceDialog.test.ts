@@ -213,10 +213,18 @@ describe("命令派发", () => {
     actionButton("下一处").click();
     await nextTick();
     expect(storage(target).resultIndex).toBe(1);
+    expect(
+      [target.state.selection.from, target.state.selection.to],
+      "光标要跟着走到第二个命中，只换高亮索引等于用户按了没反应",
+    ).toEqual([storage(target).results[1].from, storage(target).results[1].to]);
 
     actionButton("上一处").click();
     await nextTick();
     expect(storage(target).resultIndex).toBe(0);
+    expect([target.state.selection.from, target.state.selection.to]).toEqual([
+      storage(target).results[0].from,
+      storage(target).results[0].to,
+    ]);
   });
 
   it("替换只换掉当前这一个，并把选区落到命中上", async () => {
@@ -233,14 +241,13 @@ describe("命令派发", () => {
     expect(storage(target).results).toEqual([{ from: 5, to: 6 }]);
 
     /**
-     * ⚠️ 这里**没有**断言「替换后选区落到剩下那个命中上」。
-     * jsdom 下的观察是：直接调 `searchReplaceSelectCurrent()` 能选中（5-6），
-     * 但经组件的 `handleReplace` 走同一条路时选区没动（停在 1-1）。
-     * 差异出在 `focusSearchHit` 里的 `editor.commands.focus()`——tiptap 的 focus
-     * 在 jsdom 下与浏览器行为不同（不变量 45：jsdom 里的渲染/焦点现象要在真实
-     * 浏览器里复验后才能称为缺陷）。这条留作待复验的观察，不在这里写成断言，
-     * 免得把 jsdom 的怪癖固化成"期望行为"。
+     * ⚠️ 这条断言在第 16 棒是**挂起的观察**：当时 jsdom 里选区停在 (1,1)，按不变量 45
+     * 不敢写成期望行为。第 17 棒在真实 Chromium 里复验，**缺陷复现**（而且不止替换，
+     * 「上一处 / 下一处」同样不动），根因是命令内部又调 `editor.commands.*`
+     * ——见 `commandTransactionScope.test.ts` 与不变量 58。修好之后两边一致。
      */
+    const selection = target.state.selection;
+    expect([selection.from, selection.to], "选区要落到剩下的那个命中上").toEqual([5, 6]);
   });
 
   it("全部替换把命中全换掉", async () => {

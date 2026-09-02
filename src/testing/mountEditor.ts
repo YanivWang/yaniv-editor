@@ -42,6 +42,16 @@ export function installLayoutStubs(): void {
     } as unknown as DOMRectList;
   };
 
+  /**
+   * `scrollIntoView` 在 jsdom 里**根本不存在**（不是空实现），调用会抛 TypeError。
+   * 它是纯滚动行为，属于上面说的「让被测代码能执行」的那一类：菜单键盘导航
+   * （`BlockPickerMenu` 的 `scrollToSelected`）把它写在 `nextTick` 回调里，
+   * 抛出后会变成未处理的 Promise 拒绝，让整轮 verify 退出 1 而不是某条用例转红。
+   */
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = () => {};
+  }
+
   for (const proto of [Text.prototype, Element.prototype, Range.prototype]) {
     Object.defineProperty(proto, "getClientRects", {
       configurable: true,

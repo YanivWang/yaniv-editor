@@ -71,7 +71,7 @@
     "build:types": "vue-tsc --noEmit -p tsconfig.build.json",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "lint:style": "stylelint '{src,examples}/**/*.{css,scss,vue}'",
     "lint:style:fix": "stylelint '{src,examples}/**/*.{css,scss,vue}' --fix",

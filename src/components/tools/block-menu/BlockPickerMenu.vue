@@ -72,7 +72,6 @@ import {
   onUnmounted,
   ref,
   useId,
-  watch,
 } from "vue";
 
 import { getAppearanceClassName, useInjectEditorAppearance } from "@/appearance";
@@ -323,6 +322,15 @@ function hide() {
   }
 }
 
+/**
+ * 改写 `query` 的四个入口（本函数、`activate`、`openInsert`、`hide`）**都要**把高亮
+ * 拉回第一项，一个也不能省。
+ *
+ * 这里原先还挂着一个 `watch(query, () => (selectedIndex.value = 0))` 兜底，但它只在
+ * `query` 真的变了时才触发：`openInsert` / `hide` 把空串写成空串，watcher 不响应，
+ * 于是「关掉菜单再打开，高亮还停在上次那一项」这一半它根本护不住。一张只盖住一半
+ * 的网比没有网更容易让人误以为重置已经集中在一处了，故删掉，规则写在这里。
+ */
 function updateQuery(newQuery: string) {
   query.value = newQuery;
   selectedIndex.value = 0;
@@ -398,10 +406,6 @@ onBeforeUnmount(() => {
 
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeyDown, true);
-});
-
-watch(query, () => {
-  selectedIndex.value = 0;
 });
 
 defineExpose({

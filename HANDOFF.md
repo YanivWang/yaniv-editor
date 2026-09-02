@@ -126,8 +126,8 @@ wc -l /tmp/remain.txt && xargs wc -l < /tmp/remain.txt | sort -rn | head -30
      一处是用例恰好绕过了差异（补用例后转红），另一处确认**不可达**（钳制生效后 early-return
      永远走不到），后者如实标注成「不变量守卫」而**没有**写进 CHANGELOG 当修复。
 
-7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 49 条**）+
-   `CONTRIBUTING.md` 的约定列表（**现有 38 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
+7. **修完就把规则钉进不变量**：`ARCHITECTURE.md` 的编号不变量列表（**现有 58 条**）+
+   `CONTRIBUTING.md` 的约定列表（**现有 45 条**），并在 `CHANGELOG.md` 的 `[Unreleased]` 段登记。
    - ⚠️ **新增编号前必须 `grep -nE "^[0-9]+\. "` 核对现有最大编号。** 第 9 棒在注释里写了
      「见约定 18」，而约定 18 早被 `@media` 顺序占用，只能回头改成 22。
    - ⚠️ 往 `CHANGELOG.md` 插新分节时注意：`[Unreleased]` 的 `### Fixed` 段很长（现已 600+ 行），
@@ -298,18 +298,20 @@ pnpm run build:check   # build + 逐条件真实加载每个入口（约 5 分�
 pnpm run build         # 只构建（约 10~15 秒，做 CSS 探针时用这个就够）
 ```
 
-**当前基线（第 14 棒全部完成时实测）：**
+**当前基线（第 17 棒全部完成时实测）：**
 
-- `pnpm run verify` 退出 0，**1109 个用例全过（119 个测试文件）**，eslint 零 warning
-  —— 第 15 棒 1009 / 108，第 14 棒 966 / 102，第 13 棒 933 / 100，第 12 棒 917 / 98
-- 覆盖率 Statements **77.58%** / Branches **65.44%** / Functions **75.51%** / Lines **79.69%**
-  （`vitest.config.ts` 的阈值第 16 棒已提档到 **75 / 77 / 63 / 73**，各留约 2 个点余量；
+- `pnpm run verify` 退出 0，**1173 个用例全过（121 个测试文件）**，eslint 零 warning
+  —— 第 16 棒 1109 / 119，第 15 棒 1009 / 108，第 14 棒 966 / 102，第 13 棒 933 / 100
+- 覆盖率 Statements **80.43%** / Branches **69.05%** / Functions **78.69%** / Lines **82.77%**
+  （`vitest.config.ts` 的阈值第 17 棒已提档到 **78 / 80 / 67 / 76**，各留约 2 个点余量；
   阈值本身做过变异验证——抬到 90 会红，不是摆设）
+- ⚠️ `pnpm run lint` 第 17 棒起带 `--max-warnings=0`。此前「eslint 零 warning」只是文档
+  里的约定：实测 9 条 `import/order` warning 照样让 verify 退出 0，硬约束根本没生效。
 - `pnpm run build` 产物预算实测：主 chunk gzip **42695 / 46000**（余量 **3305B**）、
   `style.css` **17193 / 19000**、`inline.css` **8938 / 10500**；代码分割断言全过
-- `pnpm run test:e2e` **28 passed**（第 14 棒从 25 补到 28）
+- `pnpm run test:e2e` **30 passed**（第 17 棒从 28 补到 30）
 - `pnpm run build:check` 通过（三个入口 × ESM/CJS 共 6 种加载方式 + 两个 CSS）
-- ARCHITECTURE 不变量 **57 条**，CONTRIBUTING 约定 **44 条**
+- ARCHITECTURE 不变量 **58 条**，CONTRIBUTING 约定 **45 条**
 - ⚠️ 注释基本不吃产物预算（不变量 41 已更正）：`.ts` / `.vue` 语句之间的注释进不了
   产物（30 行 0B），只有写在**对象字面量属性上**的才进（30 行 209B）。
 
@@ -342,7 +344,8 @@ echo "inline.css: $(gzip -c dist/inline.css | wc -c) / 10500"
 - `fa87674` —— 第 13 棒收尾：补 3 条会话重建 e2e，并更正一条被误判为真实缺陷的 jsdom 现象
 - `58062ba` —— 第 14 棒 DragHandle：5 个缺陷 + 30 条单测 + 1 条全仓护栏 + e2e 25→28
 - `54e7a4e` —— 第 15 棒 AI 与媒体链路：4 个缺陷 + 38 条用例 + 2 条护栏
-- 第 16 棒 —— 剩余组件：4 个缺陷 + 100 条用例 + 阈值提档
+- `570e654` —— 第 16 棒剩余组件：4 个缺陷 + 100 条用例 + 阈值提档
+- 第 17 棒 —— 覆盖率补到 80%、查找替换选区缺陷（真实浏览器复验后定性）+ 1 条全仓护栏
 
 用户的全局约定是「在哪个分支改就在哪个分支提交，不要为了提交单独开分支」——直接提到 `main`。
 
@@ -1058,13 +1061,15 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
 - **`aiSuggestionManager` 不是好的补测目标** —— 已有 399 行测试覆盖了核心，
   剩下的 92 行几乎都是浮层挂载与定位，jsdom 里测不出价值。
 
-### 一条待复验的观察（不要当成缺陷）
+### 一条待复验的观察（第 17 棒已结案：是真缺陷）
 
-`FindReplaceDialog` 点「替换」之后，jsdom 下选区没有落到剩下的那个命中上
+原文：`FindReplaceDialog` 点「替换」之后，jsdom 下选区没有落到剩下的那个命中上
 （直接调 `searchReplaceSelectCurrent()` 能选中 5-6，经组件的 `handleReplace`
-走同一条路却停在 1-1）。差异出在 `focusSearchHit` 里的 `editor.commands.focus()`。
-**按不变量 45，这必须在真实浏览器里复验后才能称为缺陷**，本棒没做，
-所以测试里只锁了「命中集合跟着文档重算」，没有把 jsdom 的现象写成期望行为。
+走同一条路却停在 1-1）。当时按不变量 45 留作待复验，没写成断言——**这个处理是对的**。
+
+**第 17 棒在真实 Chromium 里复验：复现，而且比原描述更大**（「上一处 / 下一处」同样
+不动）。但**归因错了**：不是 `editor.commands.focus()` 本身，而是「命令里再调命令」
+导致外层事务带着旧选区盖回来。详见下面第 17 棒一节与不变量 58。
 
 ### 第 16 棒踩的坑（方法论补充）
 
@@ -1089,60 +1094,137 @@ Rollup 重新生成代码时只保留挂在输出 AST 节点上的 leading comme
 
 ---
 
-## 第 14~16 棒的整体结论
+## 第 17 棒做了什么（已完成）
 
-**赌注是「借补测试把没执行过的代码路径走一遍」，赢了**：三棒共翻出 **13 个缺陷**，
-其中 6 个是用户可感知的内容损坏或静默失败，而它们全都躺在覆盖率为零或很低的文件里。
+三件事：把 Statements 补到 80%、给「挂起的观察」结案、收尾。
 
-| 棒次 | 范围                                | 缺陷 | 用例 |
-| ---- | ----------------------------------- | ---: | ---: |
-| 14   | `DragHandleExtension`（此前零单测） |    5 |  +33 |
-| 15   | AI 与媒体链路                       |    4 |  +38 |
-| 16   | 剩余组件 + 阈值提档                 |    4 | +100 |
+### 一、覆盖率补到 80.43%（+64 条用例）
 
-覆盖率 Statements **66.69% → 77.58%**，Lines **68.31% → 79.69%**，
-用例 **933 → 1109**，e2e **25 → 28**，阈值 56/56/44/52 → **75/77/63/73**。
+按第 16 棒点名的三个常规组件补，**目的不是刷数字，是把没执行过的路径走一遍**。
+
+| 文件                  | 补的用例 | 变异验证                         |
+| --------------------- | -------: | -------------------------------- |
+| `BlockPickerMenu.vue` |      +20 | 12 处变异，12 转红               |
+| `ColorPicker.vue`     |      +24 | 19 处变异，18 转红（1 处是发现） |
+| `AiSettingsModal.vue` |      +14 | 15 处变异，15 转红（1 条补用例） |
+
+- 阈值 75/77/63/73 → **78/80/67/76**，抬到 90 会红（变异验证过）。
+- 这三个文件此前分别是 42.4% / 46.8% / 54.6%，其中 `ColorPicker` **一条测试都没有**。
+- 挑法沿用第 14~16 棒：`ColorPicker` 直接挂组件本体（antd Popover 在 jsdom 里能真开，
+  弹层首开之后一直留在 portal 里，改 props 不必重开）；`BlockPickerMenu` 也改成直挂，
+  因为完整挂载既慢又拿不到 `uploadImage` / `uploadVideo` 这两个宿主 prop。
+
+**这一轮的产出率印证了「缺陷密度跟覆盖率相关」，但也划出了边界**：三个文件翻出的是
+**两处「改变不了任何结果」的分支**，而不是第 14~16 棒那种内容损坏——因为这三个文件
+本来就有人用、有人看，真正的缺陷早被用户用出来了。真正的收获来自第二件事。
+
+### 二、给挂起的观察结案：是真缺陷，而且比原描述大
+
+第 16 棒留下「`FindReplaceDialog` 点替换后选区没落到剩下的命中上（jsdom）」。
+按不变量 45 去真实浏览器复验，**复现**，并且顺带发现「上一处 / 下一处」同样不动。
+
+**根因不是 `focus()`，是「命令里再调命令」**：tiptap 的 `CommandManager` 在
+`editor.commands` 这个 getter 里就按当前 state 造好一条 tr，命令回调返回后
+**无条件派发**（不看它有没有内容）。于是排成：外层 tr 先造好（带着那一刻的选区）→
+内层 `editor.commands.setTextSelection()` 现造一条、立刻派发、选区落到命中 →
+外层随后派发，把旧选区原样盖回去。doc 没变，所以连 `mismatched transaction` 都不报，
+只表现为「点了没反应」。
+
+修复：9 个命令统一改为只写运行器给的那条 `tr`；焦点交还放到 tr 落地后的下一帧。
+→ 不变量 58 + 约定 45 + 静态护栏 `extensions/commandTransactionScope.test.ts`
+
+- e2e `find-replace.spec.ts`（2 条，变异验证转红）+ jsdom 侧补了 3 条选区断言。
+
+### 三、收尾
+
+- `pnpm run lint` 加 `--max-warnings=0`：此前「eslint 零 warning」只是文档里的话，
+  实测 9 条 `import/order` warning 照样退出 0。加完做了变异验证（造一条 warning → 退出 1）。
+- 删掉两处改变不了结果的分支（见下方负结果）。
 
 ### 终点判据达成情况（如实）
 
-- ✅ 阈值提档（并做了变异验证）
-- ✅ 三棒发现的缺陷全部修完并钉进不变量（新增不变量 50~~57、约定 39~~44）
-- ❌ **Statements 没到 80%**（77.58%，差 2.4 个点）。Lines 79.69% 基本到线。
+- ✅ **Statements 80.43%**（目标 80%），Lines 82.77%、Branches 69.05%、Functions 78.69%
+- ✅ 阈值提档到 78/80/67/76，并做过变异验证
+- ✅ 挂起的观察已结案：真缺陷，按根因修完并用护栏 + e2e 锁住
+- ✅ 变异验证：**55 次运行，48 次直接转红**；没转红的 7 次逐条查清，没有一条含糊过去
+  - 2 次是**代码本身改变不了结果**（`BlockPickerMenu` 的 `watch(query)`、
+    `ColorPicker` 的 `indicatorBarStyle` 透明分支）→ 删掉 / 收敛
+  - 2 次是**两个入口互为兜底**（`hide()` 与 `openInsert()` 各自重置高亮），
+    去掉任一处都还有另一处兜着，两处都去掉才红 → 在用例注释里写明它锁的是结果
+  - 1 次是**用例缺失**（重新打开弹窗要清掉上次的连接测试结果）→ 补用例后转红
+  - 1 次是**用例太弱**（嵌入块那条：`promptEmbedUrl` 交出的是已决议的 Promise，
+    「期间光标被挪走」写在 await 之后根本没赶上）→ 把挪选区放进 prompt 桩后转红
+  - 1 次是**护栏判据太窄**（只扫 `addCommands()` 块内，抓不到辅助函数里的违规）
+    → 改成跟随同文件调用关系后转红
 
-### 为什么这三棒的产出率高，以及下一棒该怎么挑
+### 负结果与发现（别重复走）
 
-**规律很清楚：缺陷密度与「这段代码被执行过没有」强相关。**
-13 个缺陷里，`DragHandleExtension`（0% 覆盖）一个文件贡献 5 个，
-`mediaUpload`（0%）与两个上传组件的失败分支贡献 2 个，
-`MathNodeView`（4.5%）贡献 2 个。**而已有测试的文件几乎没翻出东西**
-（`aiSuggestionManager` 有 399 行测试，这一棒只在它的**未覆盖分支**里找到 1 个）。
+- **`BlockPickerMenu` 的 `watch(query)` 是护不住一半路径的网。** 四个写 `query` 的入口
+  （`activate` / `openInsert` / `hide` / `updateQuery`）都已各自把高亮归零，而 watcher
+  只在 `query` **真的变化**时触发——`openInsert` / `hide` 把空串写成空串，它根本不响应。
+  一张只盖住一半的网比没有更危险（会让人以为重置已经集中在一处），已删除并把规则写在
+  `updateQuery` 的注释里。⚠️ 补的那条用例锁的是**用户可见的不变量**（关掉再打开高亮回到
+  第一项），不指认是哪一行做的：实测 `hide()` 与 `openInsert()` 各去掉一处仍然全绿，
+  两处都去掉才转红。
+- **`ColorPicker` 的 `indicatorBarStyle` 透明分支与它下面那行返回逐字相同的对象**，
+  `normalizeColor` 又保证了 `!color` 恒假——去掉整段守卫 24 条用例全绿，已收敛成一行。
+  ⚠️ 同文件的 `getTextColorForBackground` 开头那个 `transparent` 早退**不要照着删**：
+  它虽然与后面的长度校验结果相同，但那是「transparent 恰好 11 个字符」的巧合，
+  留着早退是写明意图。
+- **`AiSettingsModal` 重新打开时清测试状态**这条没有用例——变异不转红是因为**测试缺了**，
+  不是不可达，已补。（三种情况里的第 ①种，别一律当成「不可达」放过。）
+- **`useAiConfig` 的状态是模块级的**（同页多实例共享同一份用户配置，属有意例外），
+  用例之间必须自己 `clearConfig()`，不能依赖执行顺序。
 
-所以下一棒仍按「覆盖率最低 + 有用户可感知行为」挑，剩余候选（`vitest.config.ts`
-注释里有同一份清单）：
+### 第 17 棒踩的坑（方法论补充）
+
+46. **`vi.spyOn` 对已经被 spy 的属性会复用同一个 mock，调用记录跨用例累积。**
+    上一条用例里调过一次 `window.prompt`，下一条 `toHaveBeenCalledTimes(1)` 就读成 2。
+    有 spy 的测试文件必须在 `afterEach` 里 `vi.restoreAllMocks()`。
+47. **「浏览器里复验」之前要先确认这个浏览器可信。** Claude 的浏览器预览面板里
+    `requestAnimationFrame` **不触发**（面板隐藏时被节流，交接文档坑 16 记的是超时，
+    这里是更隐蔽的一面）——而 tiptap 的 `focus()` 正好走 rAF。用它当"真实浏览器"
+    会得到和 jsdom 一样的假象，等于白复验。**先在页面里跑一次 rAF 探针**，
+    不触发就换 Playwright（`npx playwright test`，真实 Chromium，rAF 正常）。
+48. **护栏第一次跑就漏掉自己人，和第一次跑就误报自己人一样，都是判据不对。**
+    `commandTransactionScope` 的第一版只扫 `addCommands()` 块内，拿修复前的代码做变异
+    **没有转红**——真实事故正藏在被命令调用的辅助函数 `focusSearchHit` 里。
+    改成顺着同文件的调用关系再走一层才抓得到。**护栏写完必须拿"历史事故的那份代码"
+    做变异验证**，只跑自检样本会给出假绿。
+49. **exposed 的 ref 会被 Vue 解包。** `defineExpose({ isVisible })` 之后，
+    `menu.isVisible` 是布尔值不是 ref，`menu.isVisible.value` 恒为 `undefined`
+    ——断言 `toBe(false)` 会因为 `undefined !== false` 而红得莫名其妙。
+50. **`Element.prototype.scrollIntoView` 在 jsdom 里根本不存在**（不是空实现）。
+    写在 `nextTick` 回调里的调用会变成未处理的 Promise 拒绝，让整轮 verify 退出 1
+    而不是某条用例转红。已补进 `installLayoutStubs()`。
+
+### 下一棒可以从哪儿挑
+
+**规律仍然成立：缺陷密度与「这段代码被执行过没有」强相关**，但第 17 棒补充了一条边界
+——**常规组件补到后期，翻出来的多是「不可达 / 无差别」的分支，而不是真缺陷**。
+第 14~16 棒那种内容损坏集中在零覆盖的交互层。
+
+按未覆盖行数排的剩余候选（第 17 棒末实测，`vitest.config.ts` 注释里有同一份）：
 
 ```
-缺  99 行 (42.4%)  components/tools/block-menu/BlockPickerMenu.vue   ← 最大，常规组件逻辑
-缺  50 行 (46.8%)  components/editor/color/ColorPicker.vue
-缺  44 行 (54.6%)  features/ai/components/AiSettingsModal.vue
-缺  48 行 (75.6%)  extensions/resizableImage.ts        ← 拖拽改尺寸，属「要布局」的部分
-缺  92 行 (67.4%)  features/ai/shared/aiSuggestionManager.ts  ← 浮层挂载与定位，同上
+缺  92 行 (67.4%)  features/ai/shared/aiSuggestionManager.ts   ← 浮层挂载与定位，走 e2e
+缺  66 行 (86.5%)  extensions/dragHandle/DragHandleExtension.ts ← 拖拽几何，走 e2e
+缺  48 行 (75.6%)  extensions/resizableImage.ts                 ← 拖拽改尺寸，走 e2e
+缺  40 行 (75.2%)  components/tools/block-menu/blockMenuActions.ts
+缺  37 行 (62.2%)  extensions/video.ts
+缺  31 行 (55.1%)  components/tools/mention-suggestion/MentionSuggestionMenu.vue
 ```
 
-前三个补完大约能到 Statements 80%。后两个建议走 e2e 而不是硬凑单测
-（判据见 `vitest.config.ts` 里那段：**「这段逻辑要不要布局」，不是「这个文件属不属于交互层」**）。
-
-### 一条待复验的观察
-
-`FindReplaceDialog` 替换后选区没落到剩下的命中上（jsdom 下）——见第 16 棒小节，
-**必须在真实浏览器里复验后才能称为缺陷**（不变量 45）。
+**更值得做的是换维度找缺陷**，第 17 棒的经验是：一条「命令层的写法约定」牵出的缺陷
+（查找替换整条链路都不落选区）比三个组件的补测加起来更有价值。可以继续问的问题：
+还有哪些「意图写在代码里、但被框架的执行顺序悄悄抵消」的地方？
+（不变量 58 是命令层的；订阅层、watcher flush 时机、节点视图 update 都出过同类事故。）
 
 ### 仍然挂起的任务
 
 `src/extensions/office-paste/lineNumber.ts` 的 `MsoLineNumber` 形态判定，
 需要一份**真实的 Word 剪贴板 HTML**（不是 `.doc` 文件——`MsoLineNumber` 只存在于
 剪贴板的 `text/html` 里）。拿到之前不要动，改错的代价是丢正文。
-
----
 
 ## 附录：文件清单口径
 
