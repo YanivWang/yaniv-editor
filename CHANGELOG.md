@@ -32,10 +32,11 @@
 
 ### Known issues
 
-- **registry 元数据里没有 `gitHead`。** 写 `gitHead` 是 npm 的行为，`pnpm publish` 不写，
-  所以每一版的溯源都只能靠 tag 与 CHANGELOG 人工对应。本想把 `release` 换成 `npm publish`
-  来闭合，但**这台发布机上 npm 认不上私仓**（`npm whoami` → `ENEEDAUTH`，而 `pnpm` 与
-  直接 curl 用同一个 token 都正常），换过去等于发不出版。**维持 `pnpm publish`，缺口留着。**
+- **`0.3.1` 这一版在 registry 里没有 `gitHead`。** 写 `gitHead` 是 npm 的行为，`pnpm publish`
+  不写。发布当时本机 npm 认不上私仓（代理问题，`npm whoami` → `ENEEDAUTH`，而 pnpm 与 curl
+  用同一个 token 都正常），只能先用 `pnpm publish` 发出去。代理修好后 npm 已恢复，
+  `release` 脚本随即改回 `npm publish`，**`0.3.2` 起元数据会带上发布时的 HEAD**。
+  `0.3.1` 的溯源靠 tag `v0.3.1` → `a65212d`。
 
 ⚠ **对接入方的影响**：配置分级里第 4 级「构建期 `VITE_AI_*`」对**已发布的 npm 包**不再生效
 ——它本来也不生效（冻结的是发布者机器上的值，不是接入方的），只是现在变成**确定的**不生效。
