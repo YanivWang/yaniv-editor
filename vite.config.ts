@@ -147,6 +147,30 @@ function removeCssEntryDeclarationsPlugin(): Plugin {
  * （2026-09-05 实测；也正因如此 0.3.0 的 tarball 有 6 个声明文件永远无法逐字节复现）。
  * 块之间只是 TS 的声明合并，顺序不影响语义，排序是安全的。
  *
+ * ## 根因（2026-09-05 定位到具体一行，**是第三方包的 bug，不是本仓库的**）
+ *
+ * `unplugin-dts`（`vite-plugin-dts` 的依赖）`dist/shared/unplugin-dts.*.mjs`：
+ *
+ * ```js
+ * await runParallel(cpus().length, Array.from(declarationFiles.entries()),
+ *   async ([filePath, content]) => {
+ *     …
+ *     declareModules.push(...result.declareModules);   // ← 并发回调里往共享数组 push
+ *   });
+ * const declared = declareModules.join("\n");          // ← 原样拼进 bundle 后的 d.ts
+ * ```
+ *
+ * push 的顺序 = 各文件**处理完成**的顺序，与输入顺序无关 ⟹ 每次构建都可能不同。
+ * 修法很小：`runParallel` 本身 `return Promise.all(ret)`，**返回值是按输入顺序的**，
+ * 所以让回调 `return result.declareModules`、再从返回值按序 flat 即可。
+ *
+ * ⚠ `vite-plugin-dts@5.1.0`（unplugin-dts 1.1.0，2026-09-05 时的 latest）**仍未修**，
+ * 三次构建实测仍不同 ⟹ 上游大概率还没发现，值得开个 issue/PR。
+ *
+ * ⚠ 为什么不用 `pnpm patch` 直接改依赖：**这不是致命问题**——声明合并与顺序无关，
+ * 不影响任何运行时行为，只影响「两次构建能否逐字节一致」。为它把依赖版本钉死、
+ * 每次升级都要重做补丁，代价大于收益。等上游修了，**把这个插件整个删掉**即可。
+ *
  * ⚠ 必须排在 `emitCjsTypeDeclarationsPlugin()` **之前**——`.d.cts` 是从 `.d.ts` 复制的，
  * 先复制再排序会让两者不一致。
  */
