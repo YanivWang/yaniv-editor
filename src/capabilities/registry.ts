@@ -234,6 +234,7 @@ export const CAPABILITIES: CapabilityDefinition[] = [
         getEndpoint: () => ctx.aiConfig()?.endpoint,
         getTimeout: () => ctx.aiConfig()?.timeout,
         getStorageMode: () => ctx.aiConfig()?.storageMode,
+        getDemoMode: () => ctx.aiConfig()?.demoMode,
         getDocumentContextLimit: () => ctx.aiConfig()?.documentContextLimit,
         getLocaleText: (key: string) => resolveMessage(ctx.locale, key) ?? key,
       };

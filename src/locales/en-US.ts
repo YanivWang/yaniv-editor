@@ -70,7 +70,7 @@ export const enUS: TiptapLocale = {
     videoUploadNotConfigured:
       "Video upload handler is not configured. Currently using local preview. Please implement your own upload logic for production.",
     aiNotConfigured:
-      "Configure an API Key under AI Settings in the toolbar, or set VITE_AI_DEMO_MODE=true to try the simulated stream.",
+      'Configure an API Key under AI Settings in the toolbar, or pass ai-config="{ demoMode: true }" to try the simulated stream.',
     aiRequestFailed: "AI request failed",
     aiDocumentContextTruncated:
       "Document is too long; only the first {kept} of {total} characters were sent as AI context.",

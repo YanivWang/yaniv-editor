@@ -23,6 +23,14 @@ export interface YanivEditorAiConfig {
   /** 是否显示工具栏「AI 设置」菜单项；有 ai-config 时默认 false */
   showSettings?: boolean;
   /**
+   * 未配置 API Key 时是否走**模拟 AI 流**（演示用）。可以单独传，不必同时给 `provider`。
+   *
+   * ⚠ 这是接入方**唯一真正可用**的演示开关。构建期 `VITE_AI_DEMO_MODE` 对**已发布的 npm 包
+   * 无效**——vite 在库构建时就把 `import.meta.env.VITE_*` 静态替换成字面量，冻结的是发布者
+   * 机器上的值（`0.3.0` 因此把 demo 模式恒开发了出去，见 CHANGELOG 0.3.1 / 0.3.2）。
+   */
+  demoMode?: boolean;
+  /**
    * 送进 AI 上下文的文档全文字符上限，超出即截断并提示用户。
    *
    * 单位是**字符**不是 token：项目同时支持 openai / aliyun / ollama 且模型可配，

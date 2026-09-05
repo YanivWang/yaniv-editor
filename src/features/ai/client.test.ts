@@ -134,6 +134,52 @@ describe("传入固定 adapter 时绕开全局配置", () => {
 });
 
 describe("未配置时的两条分支", () => {
+  /**
+   * ai-config.demoMode 是接入方**唯一真正可用**的演示开关：构建期 VITE_AI_DEMO_MODE
+   * 在库构建时就被 vite 静态替换，冻结的是发布者的值，对已发布的 npm 包永远不生效
+   * （0.3.0 因此把 demo 模式恒开发了出去）。这三个用例锁住新的优先级，别改回去。
+   */
+  it("宿主 ai-config.demoMode=true 时走模拟流（构建期变量为 false 也照样生效）", async () => {
+    vi.stubEnv("VITE_AI_DEMO_MODE", "false");
+
+    const { cb, errors, done } = collect();
+    createAiClient({ resolveConfig: () => ({ demoMode: true }) }).polish("t", "ctx", cb);
+
+    await vi.waitFor(() => expect(done.length + errors.length).toBeGreaterThan(0), {
+      timeout: 5000,
+    });
+    expect(errors).toHaveLength(0);
+
+    vi.unstubAllEnvs();
+  });
+
+  it("宿主 ai-config.demoMode=false 时报错（能压过构建期变量的 true）", async () => {
+    vi.stubEnv("VITE_AI_DEMO_MODE", "true");
+
+    const { cb, errors } = collect();
+    createAiClient({ resolveConfig: () => ({ demoMode: false }) }).polish("t", "ctx", cb);
+
+    await vi.waitFor(() => expect(errors).toHaveLength(1));
+    expect(errors[0].message).toMatch(/API Key/);
+
+    vi.unstubAllEnvs();
+  });
+
+  it("宿主没表态时才回落到构建期变量", async () => {
+    vi.stubEnv("VITE_AI_DEMO_MODE", "true");
+
+    const { cb, errors, done } = collect();
+    // demoMode 缺省（undefined）⟹ 不算表态，继续往下一级找
+    createAiClient({ resolveConfig: () => ({}) }).polish("t", "ctx", cb);
+
+    await vi.waitFor(() => expect(done.length + errors.length).toBeGreaterThan(0), {
+      timeout: 5000,
+    });
+    expect(errors).toHaveLength(0);
+
+    vi.unstubAllEnvs();
+  });
+
   it("演示模式关闭时给出可操作的错误提示", async () => {
     vi.stubEnv("VITE_AI_DEMO_MODE", "false");
 

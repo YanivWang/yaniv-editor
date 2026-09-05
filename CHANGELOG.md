@@ -2,6 +2,42 @@
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-09-05
+
+补完 `0.3.1` 那半个修复。`0.3.1` 把「demo 模式恒开」修掉了，但**没给接入方留下能打开它的路**
+——`isAiDemoMode()` 读的还是构建期 `VITE_AI_DEMO_MODE`，而库构建已经不再内联任何 `VITE_*`，
+于是它对已发布的 npm 包恒为 `false`，而错误文案还在推荐这条走不通的路。
+
+### Added
+
+- **`ai-config.demoMode?: boolean`** —— 未配置 API Key 时是否走模拟 AI 流。
+  这是接入方**唯一真正可用**的演示开关，走已有的宿主 `ai-config` 分级（第 1 级，实例作用域）。
+
+  ```vue
+  <YanivEditor :ai-config="{ demoMode: true }" />
+  ```
+
+### Fixed
+
+- **演示模式此前对已发布包「谁也打不开」。** 新的优先级：宿主 `ai-config.demoMode` 显式表态
+  （`true`/`false`）即生效；缺省（`undefined`）才回落到构建期 `VITE_AI_DEMO_MODE`。
+- **错误文案不再推荐走不通的路。** `messages.aiNotConfigured` 从「设置 `VITE_AI_DEMO_MODE=true`」
+  改为「传入 `ai-config="{ demoMode: true }"`」，zh-CN / en-US 同步。
+
+### Docs
+
+- `AiRuntimeConfigOverride.demoMode` 与 `isAiDemoMode()` 的注释里写清了**为什么**构建期变量
+  对 npm 包无效：vite 在**库构建时**就把 `import.meta.env.VITE_*` 静态替换成字面量，
+  冻结的是**发布者机器上的值**，接入方设什么都读不到。`0.3.0` 正是栽在这儿。
+
+### Tests
+
+- 新增 3 个用例锁住优先级：`demoMode: true` 压过构建期 `false`、`demoMode: false` 压过构建期
+  `true`、缺省时才回落。（122 文件 / 1180 用例全过）
+
+⚠ **不影响已在用 `^0.3.1` 的接入方**：`demoMode` 是可选字段，不传行为不变
+（未配置 API Key 时报错，而不是静默走模拟流）。
+
 ## [0.3.1] — 2026-09-05
 
 发布 `0.3.0` 之后做可复现性核验时挖出来的一组构建问题。**只改构建配置，不改任何运行时源码**，

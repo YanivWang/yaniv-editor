@@ -38,6 +38,15 @@ export interface AiRuntimeConfigOverride {
   model?: string;
   timeout?: number;
   storageMode?: AiStorageMode;
+  /**
+   * 未配置 API Key 时是否走**模拟 AI 流**（演示用）。
+   *
+   * ⚠ 这是接入方**唯一真正可用**的演示模式开关。构建期的 `VITE_AI_DEMO_MODE`
+   * 对**已发布的 npm 包无效**——vite 在**库构建时**就把 `import.meta.env` 静态替换掉了，
+   * 冻结的是发布者机器上的值、不是接入方的（`0.3.0` 正因如此把 demo 模式恒开发了出去，
+   * 见 CHANGELOG 0.3.1）。那个变量现在只在「从源码接入、走接入方自己的 vite 构建」时才有意义。
+   */
+  demoMode?: boolean;
 }
 
 type AiDemoType = "continue" | "polish" | "summarize" | "translate" | "custom";
@@ -85,7 +94,24 @@ function resolveModelTuning(): Pick<ResolvedAiConfig, "temperature" | "maxTokens
   };
 }
 
-function isAiDemoMode(): boolean {
+/**
+ * 是否走模拟 AI 流。优先级：
+ *
+ * 1. **宿主 `ai-config.demoMode`** —— 运行时可配，接入方唯一真正能用的开关；
+ * 2. 构建期 `VITE_AI_DEMO_MODE` —— **只在从源码接入时有效**（见下）。
+ *
+ * ⚠⚠ 第 2 级对**已发布的 npm 包永远不生效**，而且这不是配置问题、是机制决定的：
+ * vite 在**库构建时**就把 `import.meta.env.VITE_*` 静态替换成字面量，值冻结在发布那一刻。
+ * 于是它冻结的是**发布者机器上的值**，接入方设什么都不会被读到。
+ *
+ * `0.3.0` 就栽在这儿：发布机上存在 `.env`（`VITE_AI_DEMO_MODE=true`），这一行被常量折叠成
+ * `true`，**所有接入方拿到的都是恒开的模拟流、运行时关不掉**。`0.3.1` 起库构建不再内联任何
+ * `VITE_*`（见 vite.config.ts 的 `envPrefix`），于是第 2 级对 npm 包恒为 false ——
+ * 这也正是必须有第 1 级的原因，否则演示模式就变成了「谁也打不开」。
+ */
+function isAiDemoMode(resolveOverride?: () => AiRuntimeConfigOverride | null): boolean {
+  const demoMode = resolveOverride?.()?.demoMode;
+  if (typeof demoMode === "boolean") return demoMode;
   return typeof import.meta !== "undefined" && import.meta.env?.VITE_AI_DEMO_MODE === "true";
 }
 
@@ -288,14 +314,14 @@ export function createAiClient(options: CreateAiClientOptions = {}) {
     demoType: AiDemoType = "custom",
   ): Promise<void> {
     if (!fixedAdapter && !isAiConfigured(getAiConfig(resolveConfig))) {
-      if (isAiDemoMode()) {
+      if (isAiDemoMode(resolveConfig)) {
         await simulateAiStream(callbacks, demoType, text);
       } else {
         callbacks.onError?.(
           new Error(
             text(
               "messages.aiNotConfigured",
-              "Configure an API Key under AI Settings in the toolbar, or set VITE_AI_DEMO_MODE=true to try the simulated stream.",
+              'Configure an API Key under AI Settings in the toolbar, or pass ai-config="{ demoMode: true }" to try the simulated stream.',
             ),
           ),
         );

@@ -17,6 +17,8 @@ export interface AiExtensionConfigureOptions {
   getTimeout?: () => number | undefined;
   /** proxy 时后端保管密钥，前端无 apiKey 也视为已配置 */
   getStorageMode?: () => AiStorageMode | undefined;
+  /** 未配置 API Key 时是否走模拟流；**不要求同时有 provider**，见 resolveAiExtensionOptions */
+  getDemoMode?: () => boolean | undefined;
   /** 实例 locale 文案，key 为 dot-path（如 editor.pleaseSelectText） */
   getLocaleText?: (key: string) => string;
   /** 送进 AI 上下文的文档全文字符上限；省略时用 `DEFAULT_DOCUMENT_CONTEXT_LIMIT` */
@@ -24,12 +26,14 @@ export interface AiExtensionConfigureOptions {
 }
 
 export interface ResolvedAiExtensionConfig {
-  provider: AiProvider;
+  /** 缺省表示「宿主没托管 provider」——此时本对象只可能携带 demoMode，见下 */
+  provider?: AiProvider;
   apiKey?: string;
   endpoint?: string;
   model?: string;
   timeout?: number;
   storageMode?: AiStorageMode;
+  demoMode?: boolean;
 }
 
 /**
@@ -41,7 +45,17 @@ export function resolveAiExtensionOptions(
   options: AiExtensionConfigureOptions,
 ): ResolvedAiExtensionConfig | null {
   const provider = options.getProvider?.();
-  if (!provider) return null;
+  const demoMode = options.getDemoMode?.();
+
+  /**
+   * ⚠⚠ `demoMode` 必须在**宿主没配 provider** 时也能透出去——那正是演示模式要生效的场景
+   * （未配置 API Key ⟹ 才有「报错还是走模拟流」这个选择）。早先这里无条件 `return null`，
+   * 于是 `ai-config="{ demoMode: true }"` 根本传不到 client，开关形同虚设。
+   *
+   * 返回的对象不带 `provider` 是安全的：`getAiConfig()` 判的是 `if (runtime?.provider)`，
+   * 不命中就照常继续走 localStorage / 构建期回退，不会被误判成「宿主已托管」。
+   */
+  if (!provider) return demoMode === undefined ? null : { demoMode };
 
   return {
     provider,
@@ -50,6 +64,7 @@ export function resolveAiExtensionOptions(
     model: options.getModel?.(),
     timeout: options.getTimeout?.(),
     storageMode: options.getStorageMode?.(),
+    demoMode,
   };
 }
 

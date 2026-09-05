@@ -68,7 +68,7 @@ export const zhCN: TiptapLocale = {
     imageUploadNotConfigured: "未配置图片上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
     videoUploadNotConfigured: "未配置视频上传接口，当前使用本地预览，生产环境请自行实现上传逻辑",
     aiNotConfigured:
-      "请先在工具栏 AI 设置中配置 API Key，或设置 VITE_AI_DEMO_MODE=true 启用演示模式",
+      '请先在工具栏 AI 设置中配置 API Key，或传入 ai-config="{ demoMode: true }" 启用演示模式',
     aiRequestFailed: "AI 请求失败",
     aiDocumentContextTruncated: "文档过长，仅将前 {kept} 字（共 {total} 字）作为 AI 上下文",
   },

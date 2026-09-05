@@ -22,6 +22,33 @@ describe("resolveAiExtensionOptions", () => {
     expect(resolveAiExtensionOptions(localeOnly)).toBeNull();
   });
 
+  /**
+   * ⚠ 这三条锁的是 0.3.2 修过的一个洞：早先这里在「没有 provider」时无条件 return null，
+   * 于是 `ai-config="{ demoMode: true }"` 根本传不到 client——而**没配 provider 正是
+   * 演示模式唯一要生效的场景**。当时 client 层的测试直接 mock 了 resolveConfig，
+   * 绕过了这段管道，所以假过。**测试要打在管道上，不是打在 mock 上。**
+   */
+  test("只给 demoMode、没有 provider 时也要透出去", () => {
+    const options: AiExtensionConfigureOptions = { getDemoMode: () => true };
+    expect(resolveAiExtensionOptions(options)).toEqual({ demoMode: true });
+  });
+
+  test("demoMode=false 同样是明确表态，不能被当成没配", () => {
+    const options: AiExtensionConfigureOptions = { getDemoMode: () => false };
+    expect(resolveAiExtensionOptions(options)).toEqual({ demoMode: false });
+  });
+
+  test("provider 与 demoMode 同时给时都带上", () => {
+    const options: AiExtensionConfigureOptions = {
+      getProvider: () => "openai",
+      getDemoMode: () => true,
+    };
+    expect(resolveAiExtensionOptions(options)).toMatchObject({
+      provider: "openai",
+      demoMode: true,
+    });
+  });
+
   test("getProvider 返回 undefined 时同样返回 null", () => {
     const options: AiExtensionConfigureOptions = {
       getProvider: () => undefined,
