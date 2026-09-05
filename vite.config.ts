@@ -165,7 +165,10 @@ function removeCssEntryDeclarationsPlugin(): Plugin {
  * 所以让回调 `return result.declareModules`、再从返回值按序 flat 即可。
  *
  * ⚠ `vite-plugin-dts@5.1.0`（unplugin-dts 1.1.0，2026-09-05 时的 latest）**仍未修**，
- * 三次构建实测仍不同 ⟹ 上游大概率还没发现，值得开个 issue/PR。
+ * 三次构建实测仍不同 ⟹ 上游大概率还没发现。
+ * **issue 已写好待提交：`docs/upstream-issue-unplugin-dts.md`**（含最小复现、根因定位到
+ * 具体两行、以及可直接采用的 diff）。上游一旦合入并发版，**把本插件整个删掉**，
+ * 别让绕行代码在这里长住。
  *
  * ⚠ 为什么不用 `pnpm patch` 直接改依赖：**这不是致命问题**——声明合并与顺序无关，
  * 不影响任何运行时行为，只影响「两次构建能否逐字节一致」。为它把依赖版本钉死、
