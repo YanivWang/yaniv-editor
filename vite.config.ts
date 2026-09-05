@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, unlinkSync } from "fs";
+import { copyFileSync, existsSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
 import vue from "@vitejs/plugin-vue";
@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 
 import type { OutputAsset, OutputBundle, OutputChunk } from "rollup";
-import type { Plugin } from "vite";
+import type { Plugin, UserConfig } from "vite";
 
 /**
  * 入口分组 → 产出的 CSS 文件名。
@@ -140,6 +140,66 @@ function removeCssEntryDeclarationsPlugin(): Plugin {
 }
 
 /**
+ * 把声明文件里的 `declare module "..."` 增强块**按文本排序**，让输出稳定。
+ *
+ * `vite-plugin-dts` 发射这些块时没有稳定排序：**同一个 commit、同一台机器连跑两次，
+ * `{index,ai,inline}.d.ts` 里 17 个 `declare module "@tiptap/core"` 块的先后就会不同**
+ * （2026-09-05 实测；也正因如此 0.3.0 的 tarball 有 6 个声明文件永远无法逐字节复现）。
+ * 块之间只是 TS 的声明合并，顺序不影响语义，排序是安全的。
+ *
+ * ⚠ 必须排在 `emitCjsTypeDeclarationsPlugin()` **之前**——`.d.cts` 是从 `.d.ts` 复制的，
+ * 先复制再排序会让两者不一致。
+ */
+function sortAmbientModuleBlocksPlugin(): Plugin {
+  return {
+    name: "yaniv-sort-ambient-module-blocks",
+    closeBundle() {
+      for (const entry of ["index", "inline", "ai"]) {
+        const filePath = resolve(__dirname, "dist", `${entry}.d.ts`);
+        if (!existsSync(filePath)) continue;
+
+        const source = readFileSync(filePath, "utf-8");
+        // 顶层块：从行首的 `declare module "..." {` 到行首的 `}`
+        const blockRe = /^declare module "[^"]+" \{\n[\s\S]*?^\}\n/gm;
+        const blocks: string[] = [];
+        const spans: Array<[number, number]> = [];
+        for (let m = blockRe.exec(source); m; m = blockRe.exec(source)) {
+          blocks.push(m[0]);
+          spans.push([m.index, m.index + m[0].length]);
+        }
+        if (blocks.length < 2) continue;
+
+        /**
+         * 块与块之间**只允许是空白**（实测是一个空行）。夹着别的声明就说明这些块不连续，
+         * 重排会改变它们与那些声明的相对位置 —— 这时宁可不排。
+         * 分隔符按位置原样保留，不做归一，避免顺带改动空行风格。
+         */
+        const separators: string[] = [];
+        let contiguous = true;
+        for (let i = 1; i < spans.length; i++) {
+          const gap = source.slice(spans[i - 1][1], spans[i][0]);
+          if (gap.trim() !== "") {
+            contiguous = false;
+            break;
+          }
+          separators.push(gap);
+        }
+        if (!contiguous) continue;
+
+        const start = spans[0][0];
+        const end = spans[spans.length - 1][1];
+        const sorted = [...blocks].sort();
+        let rebuilt = sorted[0];
+        for (let i = 1; i < sorted.length; i++) rebuilt += separators[i - 1] + sorted[i];
+        if (rebuilt === source.slice(start, end)) continue;
+
+        writeFileSync(filePath, source.slice(0, start) + rebuilt + source.slice(end), "utf-8");
+      }
+    },
+  };
+}
+
+/**
  * 为 CJS 产物补一份 `.d.cts` 声明。
  *
  * 本包是 `"type": "module"`，在 `node16` / `nodenext` 解析下，`.d.ts` 一律被当成 **ESM 类型**。
@@ -159,7 +219,7 @@ function emitCjsTypeDeclarationsPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
+const libConfig: UserConfig = {
   plugins: [
     vue(),
     dts({
@@ -182,6 +242,7 @@ export default defineConfig({
     }),
     consolidateLibCssPlugin(),
     removeCssEntryDeclarationsPlugin(),
+    sortAmbientModuleBlocksPlugin(),
     emitCjsTypeDeclarationsPlugin(),
   ],
   resolve: {
@@ -298,4 +359,28 @@ export default defineConfig({
     },
     cssCodeSplit: true,
   },
-});
+};
+
+/**
+ * ⚠⚠ **库构建绝不能把开发机的 `.env` 编译进产物。**
+ *
+ * `src/features/ai/envConfig.ts` 与 `client.ts` 读 `import.meta.env.VITE_AI_*`，
+ * 而 vite 会在**构建期**把它们静态替换掉——值就此冻结在发布那一刻。后果实测过：
+ * 已发布的 `0.3.0` 是在存在 `.env`（`VITE_AI_DEMO_MODE=true`）的机器上打的，
+ * `isAiDemoMode()` 被常量折叠成 `true`，**所有接入方拿到的都是恒开的模拟 AI 流，
+ * 运行时关不掉**；同时那个 tarball 也无法只从 git 复现（少了这个被 gitignore 的文件，
+ * 237 个产物文件里 124 个对不上）。
+ *
+ * 所以 `command === "build"` 时把 `envPrefix` 换成一个永不匹配的前缀：
+ * 任何 `VITE_*` 都不再被内联，`import.meta.env` 只剩 vite 内置的那几项。
+ * **`serve`（`pnpm dev`）不受影响**，本地调试照旧能用 `.env` 打开 demo 模式。
+ *
+ * ⚠ 由此，配置分级里第 4 级「构建期 `VITE_AI_*`」对**已发布的 npm 包不再生效**
+ * ——它本来也不生效（冻结的是发布者的值，不是接入方的），只是现在变成确定的不生效。
+ * 接入方要用构建期变量，只能从源码接入（走他们自己的 vite 构建）。
+ */
+const NEVER_MATCHING_ENV_PREFIX = "YANIV_LIB_NO_ENV_INLINE_";
+
+export default defineConfig(({ command }) =>
+  command === "build" ? { ...libConfig, envPrefix: NEVER_MATCHING_ENV_PREFIX } : libConfig,
+);
