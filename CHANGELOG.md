@@ -2,6 +2,40 @@
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-09-05
+
+发布 `0.3.0` 之后做可复现性核验时挖出来的一组构建问题。**只改构建配置，不改任何运行时源码**，
+但产物会变——其中第一条修掉的是一个**影响所有接入方的行为缺陷**。
+
+### Fixed
+
+- **`0.3.0` 的 AI demo 模式是恒开的，运行时关不掉。** `src/features/ai/client.ts` 的
+  `isAiDemoMode()` 读 `import.meta.env.VITE_AI_DEMO_MODE`，而 vite 在**构建期**静态替换它——
+  `0.3.0` 是在存在 `.env`（`VITE_AI_DEMO_MODE=true`）的机器上打的，那段代码被常量折叠成
+  `typeof import.meta !== "undefined" && true`，于是**所有装了 `0.3.0` 的接入方拿到的都是
+  模拟 AI 流，而不是真实 API 调用**。
+  修法：`command === "build"` 时把 `envPrefix` 换成一个永不匹配的前缀，库构建不再内联任何
+  `VITE_*`。`pnpm dev`（`serve`）不受影响，本地照旧能用 `.env` 打开 demo 模式。
+- **`{index,ai,inline}.d.ts` 的 `declare module` 增强块顺序不稳定。** `vite-plugin-dts`
+  发射这 17 个 `declare module "@tiptap/core"` 块时没有稳定排序，**同一个 commit、同一台机器
+  连跑两次结果都不同**。新增 `sortAmbientModuleBlocksPlugin()` 在 dts 发射后按文本排序
+  （块之间只是 TS 声明合并，顺序不影响语义）。
+
+### Changed
+
+- **`release` 脚本改用 `npm publish`（原 `pnpm publish`）。** 写 `gitHead` 是 npm 的行为，
+  pnpm 不写——`0.3.0` 在 registry 里的 `gitHead` 是 `undefined`，溯源只能靠人工记录提交号。
+  改回 npm 之后每次发布的元数据都会带上发布时的 HEAD。
+- **补打了遗漏的 `v0.3.0` tag**（指向 `e8a7bfa`）。`0.3.0` 发布时漏打了。
+
+### Build / CI
+
+- 库构建现在是**确定性**的，两条都实测过：有无 `.env` 产物整树哈希相同；连跑两次整树哈希相同。
+
+⚠ **对接入方的影响**：配置分级里第 4 级「构建期 `VITE_AI_*`」对**已发布的 npm 包**不再生效
+——它本来也不生效（冻结的是发布者机器上的值，不是接入方的），只是现在变成**确定的**不生效。
+要用构建期变量，只能从源码接入（走接入方自己的 vite 构建）。
+
 ## [0.3.0] — 2026-09-03
 
 ### BREAKING CHANGES

@@ -1,6 +1,6 @@
 {
   "name": "@yanivjs/yaniv-editor",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Yaniv Editor — Beautiful Tiptap 3 + Vue 3 rich-text editor appearance with AI support",
   "license": "MIT",
   "type": "module",
@@ -83,7 +83,7 @@
     "test:watch": "vitest",
     "verify": "pnpm run typecheck && pnpm run test:coverage && pnpm run lint && pnpm run lint:style && pnpm run format:check",
     "prepublishOnly": "pnpm build",
-    "release": "pnpm build && pnpm publish",
+    "release": "pnpm build && npm publish",
     "test:coverage": "vitest run --coverage",
     "check:dist": "node scripts/check-dist-entries.mjs"
   },
