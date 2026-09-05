@@ -38,6 +38,11 @@
 ⚠ **不影响已在用 `^0.3.1` 的接入方**：`demoMode` 是可选字段，不传行为不变
 （未配置 API Key 时报错，而不是静默走模拟流）。
 
+⚠ **随包发出去的 `package.json` 变了一点**：`0.3.2` 起用 `npm publish`（为了拿 `gitHead`），
+而 npm 比 pnpm 少剥一些字段——多出 `packageManager`，以及 `preinstall` / `prepare` /
+`prepublishOnly` 三个生命周期脚本。**对从 registry 安装的接入方无影响**（依赖的这些钩子不会被
+执行）；只有从 git URL 安装才会跑，而那时 `only-allow pnpm` 正是本仓库想要的行为。
+
 ## [0.3.1] — 2026-09-05
 
 发布 `0.3.0` 之后做可复现性核验时挖出来的一组构建问题。**只改构建配置，不改任何运行时源码**，
