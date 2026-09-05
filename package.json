@@ -83,7 +83,7 @@
     "test:watch": "vitest",
     "verify": "pnpm run typecheck && pnpm run test:coverage && pnpm run lint && pnpm run lint:style && pnpm run format:check",
     "prepublishOnly": "pnpm build",
-    "release": "pnpm build && npm publish",
+    "release": "pnpm build && pnpm publish",
     "test:coverage": "vitest run --coverage",
     "check:dist": "node scripts/check-dist-entries.mjs"
   },

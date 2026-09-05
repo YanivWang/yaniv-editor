@@ -23,14 +23,19 @@
 
 ### Changed
 
-- **`release` 脚本改用 `npm publish`（原 `pnpm publish`）。** 写 `gitHead` 是 npm 的行为，
-  pnpm 不写——`0.3.0` 在 registry 里的 `gitHead` 是 `undefined`，溯源只能靠人工记录提交号。
-  改回 npm 之后每次发布的元数据都会带上发布时的 HEAD。
-- **补打了遗漏的 `v0.3.0` tag**（指向 `e8a7bfa`）。`0.3.0` 发布时漏打了。
+- **补打了遗漏的 `v0.3.0` tag**（指向 `e8a7bfa`），并把本地几个从未推送的旧 tag
+  （`v0.1.1` / `v0.1.3` / `v0.1.4`）推到了远程。
 
 ### Build / CI
 
 - 库构建现在是**确定性**的，两条都实测过：有无 `.env` 产物整树哈希相同；连跑两次整树哈希相同。
+
+### Known issues
+
+- **registry 元数据里没有 `gitHead`。** 写 `gitHead` 是 npm 的行为，`pnpm publish` 不写，
+  所以每一版的溯源都只能靠 tag 与 CHANGELOG 人工对应。本想把 `release` 换成 `npm publish`
+  来闭合，但**这台发布机上 npm 认不上私仓**（`npm whoami` → `ENEEDAUTH`，而 `pnpm` 与
+  直接 curl 用同一个 token 都正常），换过去等于发不出版。**维持 `pnpm publish`，缺口留着。**
 
 ⚠ **对接入方的影响**：配置分级里第 4 级「构建期 `VITE_AI_*`」对**已发布的 npm 包**不再生效
 ——它本来也不生效（冻结的是发布者机器上的值，不是接入方的），只是现在变成**确定的**不生效。
