@@ -8,7 +8,7 @@
 ## 你要做什么
 
 仓库：`/Users/wangcheng/Documents/workSpace/frontEnd/pixelBloomSpace/tiptapCases/yaniv-editor`
-（`@yanivjs/yaniv-editor` v0.3.0，Vue 3 + Tiptap 3 富文本编辑器库，分支 `main`）
+（`@yanivjs/yaniv-editor` v0.3.2，Vue 3 + Tiptap 3 富文本编辑器库，分支 `main`）
 
 原始任务（用户原话的实质）：
 
